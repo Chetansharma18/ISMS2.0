@@ -24,6 +24,7 @@ const CONFIG: MasterCrudConfig<SchemeCategoryMasterItem> = {
   itemUnit: 'categories',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[480px]',
   fields: [
     {

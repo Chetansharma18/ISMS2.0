@@ -14,7 +14,7 @@ export interface DepartmentRemark {
 const KIND_LABEL: Partial<Record<ApplicationActivityLog['action'], string>> = {
   REMARK_ADDED: 'Remark',
   FORWARDED: 'Remark',
-  REVERTED: 'Shortfall',
+  REVERTED: 'Appeal',
   APPROVED: 'Approved',
   REJECTED: 'Rejected'
 };

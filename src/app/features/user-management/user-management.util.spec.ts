@@ -59,6 +59,32 @@ describe('user-management.util', () => {
     expect(filterUsers(list, 'all', 'training partner')).toEqual([b]);
   });
 
+  it('filterUsers supports scheme and duration filters for blacklisted users', () => {
+    const b1 = makeUser({
+      id: 'u2',
+      username: 'Apex Skills',
+      ssoId: 'SSO_APEX',
+      schemeStatus: 'Blacklisted',
+      blacklistScheme: 'Mukhyamantri Yuva Sambal Yojana',
+      blacklistDuration: '3 Years'
+    });
+    const b2 = makeUser({
+      id: 'u3',
+      username: 'Horizon Institute',
+      ssoId: 'SSO_HORIZON',
+      schemeStatus: 'Blacklisted',
+      blacklistScheme: 'All Schemes',
+      blacklistDuration: 'Permanent (Indefinite)'
+    });
+    const list = [b1, b2];
+
+    expect(filterUsers(list, 'blacklisted', '', { scheme: 'Sambal' })).toEqual([b1]);
+    expect(filterUsers(list, 'blacklisted', '', { scheme: 'All Schemes' })).toEqual([b2]);
+    expect(filterUsers(list, 'blacklisted', '', { duration: 'Permanent' })).toEqual([b2]);
+    expect(filterUsers(list, 'blacklisted', '', { duration: '3 Years' })).toEqual([b1]);
+    expect(filterUsers(list, 'blacklisted', 'horizon')).toEqual([b2]);
+  });
+
   it('userRowClass styles blacklisted, inactive and active rows', () => {
     expect(userRowClass({ schemeStatus: 'Blacklisted' })).toBe('bg-rose-50/60 transition-colors');
     expect(userRowClass({ schemeStatus: 'Inactive' })).toBe('opacity-50 bg-slate-50 transition-colors');

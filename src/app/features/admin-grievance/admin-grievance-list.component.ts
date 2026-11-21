@@ -159,8 +159,16 @@ export type { AdminGrievance };
     </ng-template>
 
     <ng-template #viewActionTemplate let-item>
-      <button appButton variant="outline" size="sm" (click)="viewTicket(item)">
-        View
+      <button
+        appButton
+        variant="ghost"
+        size="sm"
+        iconOnly
+        (click)="viewTicket(item)"
+        title="View Ticket"
+        aria-label="View Ticket"
+      >
+        <app-icon name="eye" size="sm" />
       </button>
     </ng-template>
 

@@ -50,9 +50,8 @@ function field(label: string, value: unknown, span: Span = 3): ViewField {
                 <app-form-input label="Aadhaar Card Document Proof" [disabled]="true" [value]="aadhaarProof()"></app-form-input>
               </div>
               <div class="lg:col-span-2 sm:col-span-1 sm:pt-5">
-                <button appButton variant="outline" size="sm" type="button" (click)="previewAadhaar.emit()" title="Preview Aadhaar Card">
+                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="previewAadhaar.emit()" title="Preview Aadhaar Card" aria-label="Preview Aadhaar Card">
                   <app-icon name="eye" size="sm" />
-                  <span>Preview</span>
                 </button>
               </div>
             }

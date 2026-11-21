@@ -480,9 +480,9 @@ import {
                 @let currentFile = getValue(field.key);
                 @if (isNonEmptyFile(currentFile)) {
                   <div class="h-[38px] flex items-center justify-between px-2.5 bg-slate-50 border border-slate-300 rounded-lg text-xs gap-2 shadow-2xs">
-                    <!-- File info: Document/Image icon, Name & Size (no PDF icon) -->
+                    <!-- File info: Document/Image icon, Name & Size -->
                     <div class="flex items-center gap-2 min-w-0 flex-1 truncate">
-                      <app-icon name="document" [stroke]="2" class="shrink-0 text-slate-500" />
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none shrink-0" />
                       <span class="font-medium text-slate-800 truncate text-xs" [title]="getFileName(currentFile)">
                         {{ getFileName(currentFile) }}
                       </span>
@@ -493,14 +493,15 @@ import {
                       <!-- View Button -->
                       <button
                         appButton
-                        variant="secondary"
+                        variant="ghost"
                         size="sm"
+                        iconOnly
                         type="button"
                         (click)="viewFile(field, currentFile)"
                         title="View Document"
+                        aria-label="View Document"
                       >
                         <app-icon name="eye" size="sm" />
-                        <span>View</span>
                       </button>
 
                       <!-- Delete Button -->
@@ -645,7 +646,7 @@ import {
                       JPG / PNG / JPEG
                     </span>
                     <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
-                      Max {{ field.maxFileSizeMb || 5 }} MB
+                      Max {{ field.maxFileSizeMb || 25 }} MB
                     </span>
                   </div>
                 </div>

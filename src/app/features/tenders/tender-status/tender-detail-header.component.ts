@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { NgClass } from '@angular/common';
 import { ButtonComponent, IconComponent } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
-import { canEditTender } from './tender-status.util';
+import { canEditTender, remainingEdits } from './tender-status.util';
 
 /** Top of the application detail page: back button, title, actions and the application summary. */
 @Component({
@@ -32,12 +32,10 @@ import { canEditTender } from './tender-status.util';
               <span>Save Changes</span>
             </button>
           } @else {
-            <button appButton variant="outline" size="sm" type="button" (click)="print.emit()" title="Print Application">
-              <app-icon name="print-simple" [stroke]="2" class="text-slate-600" />
-              <span>Print</span>
-            </button>
-
             @if (canEdit(tender())) {
+              <span class="text-xs text-slate-500 font-medium whitespace-nowrap self-center">
+                ({{ remainingEdits(tender()) }} {{ remainingEdits(tender()) === 1 ? 'edit' : 'edits' }} remaining)
+              </span>
               <button appButton size="sm" type="button" (click)="edit.emit()">
                 <span>Edit Application</span>
               </button>
@@ -108,7 +106,7 @@ export class TenderDetailHeaderComponent {
   readonly edit = output<void>();
   readonly save = output<void>();
   readonly cancel = output<void>();
-  readonly print = output<void>();
 
   protected readonly canEdit = canEditTender;
+  protected readonly remainingEdits = remainingEdits;
 }

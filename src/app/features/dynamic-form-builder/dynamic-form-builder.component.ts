@@ -25,10 +25,18 @@ import {
   DynamicFormBuilderItem,
   DynamicFormField,
   DynamicFormFieldType,
+  DynamicFormStatus,
   FormStep
 } from '../../core/models/admin-masters.model';
+import {
+  FIELD_TYPE_REGISTRY,
+  convertDirectToStep,
+  convertStepToDirect,
+  optionsToText,
+  parseOptionsText
+} from './dynamic-form-builder.util';
 
-export type { DynamicFormBuilderItem, DynamicFormField, DynamicFormFieldType, FormStep };
+export type { DynamicFormBuilderItem, DynamicFormField, DynamicFormFieldType, DynamicFormStatus, FormStep };
 
 interface ApplyEoiDocument {
   id: number;
@@ -48,7 +56,7 @@ interface FormBuilderFormData {
   id?: string;
   formType: string;
   isStepForm: boolean;
-  status: 'Active' | 'Inactive';
+  status: DynamicFormStatus;
   steps: FormStep[];
   fields: DynamicFormField[]; // For direct (non-step) form
 }
@@ -75,7 +83,7 @@ interface FormBuilderFormData {
       @if (showBuilderModal()) {
         <!-- Full-Screen Dynamic Form Builder Screen -->
         <div class="space-y-5 animate-in fade-in duration-150">
-          <!-- Top Bar: Back Button and Actions -->
+          <!-- Top Bar: Navigation -->
           <div class="flex items-center justify-between gap-3 flex-wrap">
             <button
               appButton
@@ -88,15 +96,6 @@ interface FormBuilderFormData {
               <app-icon name="back" size="sm" />
               <span>Back</span>
             </button>
-
-            <div class="flex items-center gap-2.5">
-              <button appButton variant="outline" size="sm" type="button" (click)="closeBuilderModal()">
-                Cancel
-              </button>
-              <button appButton variant="primary" size="sm" type="button" (click)="submitForm()">
-                {{ isEditing() ? 'Update Form' : 'Save Form' }}
-              </button>
-            </div>
           </div>
 
           <!-- Page Title & Subtitle Matching Government Theme -->
@@ -377,11 +376,20 @@ interface FormBuilderFormData {
                                 (ngModelChange)="onFieldTypeChange(field)"
                                 class="w-full"
                               >
-                                <option value="text">Text</option>
-                                <option value="number">Number</option>
+                                <option value="text">Single-Line Text</option>
+                                <option value="textarea">Multi-Line Textarea</option>
+                                <option value="number">Number Input</option>
+                                <option value="currency">Currency (INR ₹)</option>
+                                <option value="email">Email Address</option>
+                                <option value="phone">Mobile / Phone No.</option>
                                 <option value="datepicker">Date Picker</option>
                                 <option value="dropdown">Dropdown List</option>
+                                <option value="radio">Radio Options</option>
+                                <option value="checkbox">Checkbox (Yes / No)</option>
                                 <option value="photo">Photo Upload</option>
+                                <option value="file">Document Upload (PDF/DOC)</option>
+                                <option value="heading">Section Heading</option>
+                                <option value="divider">Divider Line</option>
                               </select>
                             </div>
 
@@ -397,10 +405,10 @@ interface FormBuilderFormData {
                             </div>
                           </div>
 
-                          <!-- Sub-options: Dropdown List -->
-                          @if (field.type === 'dropdown') {
+                          <!-- Sub-options: Dropdown / Radio -->
+                          @if (field.type === 'dropdown' || field.type === 'radio') {
                             <div class="mt-3 p-2.5 rounded-md bg-slate-50 border border-slate-200 space-y-1.5">
-                              <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
+                              <label class="block text-xs font-semibold text-slate-700">Options (comma-separated)*</label>
                               <input
                                 appInput
                                 size="sm"
@@ -413,17 +421,17 @@ interface FormBuilderFormData {
                             </div>
                           }
 
-                          <!-- Sub-options: Photo Upload -->
-                          @if (field.type === 'photo') {
+                          <!-- Sub-options: Photo / File Upload -->
+                          @if (field.type === 'photo' || field.type === 'file') {
                             <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
-                              <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
+                              <div class="text-xs font-semibold text-[#7C0E44]">Upload Constraints</div>
                               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
-                                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
+                                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Files*</label>
                                   <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
                                 </div>
                                 <div>
-                                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
+                                  <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Files*</label>
                                   <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
                                 </div>
                                 <div>
@@ -552,11 +560,20 @@ interface FormBuilderFormData {
                               (ngModelChange)="onFieldTypeChange(field)"
                               class="w-full"
                             >
-                              <option value="text">Text</option>
-                              <option value="number">Number</option>
+                              <option value="text">Single-Line Text</option>
+                              <option value="textarea">Multi-Line Textarea</option>
+                              <option value="number">Number Input</option>
+                              <option value="currency">Currency (INR ₹)</option>
+                              <option value="email">Email Address</option>
+                              <option value="phone">Mobile / Phone No.</option>
                               <option value="datepicker">Date Picker</option>
                               <option value="dropdown">Dropdown List</option>
+                              <option value="radio">Radio Options</option>
+                              <option value="checkbox">Checkbox (Yes / No)</option>
                               <option value="photo">Photo Upload</option>
+                              <option value="file">Document Upload (PDF/DOC)</option>
+                              <option value="heading">Section Heading</option>
+                              <option value="divider">Divider Line</option>
                             </select>
                           </div>
 
@@ -572,10 +589,10 @@ interface FormBuilderFormData {
                           </div>
                         </div>
 
-                        <!-- Conditional: Dropdown -->
-                        @if (field.type === 'dropdown') {
+                        <!-- Conditional: Dropdown / Radio -->
+                        @if (field.type === 'dropdown' || field.type === 'radio') {
                           <div class="mt-3 p-2.5 rounded-md bg-white border border-slate-200 space-y-1.5">
-                            <label class="block text-xs font-semibold text-slate-700">Dropdown Options (comma-separated)*</label>
+                            <label class="block text-xs font-semibold text-slate-700">Options (comma-separated)*</label>
                             <input
                               appInput
                               size="sm"
@@ -588,17 +605,17 @@ interface FormBuilderFormData {
                           </div>
                         }
 
-                        <!-- Conditional: Photo -->
-                        @if (field.type === 'photo') {
+                        <!-- Conditional: Photo / File -->
+                        @if (field.type === 'photo' || field.type === 'file') {
                           <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
-                            <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
+                            <div class="text-xs font-semibold text-[#7C0E44]">Upload Constraints</div>
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div>
-                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Files*</label>
                                 <input appInput size="sm" type="number" min="1" [(ngModel)]="field.minPhotos" class="w-full" />
                               </div>
                               <div>
-                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Photos*</label>
+                                <label class="block text-[11px] font-semibold text-slate-700 mb-1">Max Files*</label>
                                 <input appInput size="sm" type="number" min="1" [(ngModel)]="field.maxPhotos" class="w-full" />
                               </div>
                               <div>
@@ -623,13 +640,22 @@ interface FormBuilderFormData {
             }
 
             <!-- Bottom Action Buttons inside the card -->
-            <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-200">
+            <div class="flex items-center justify-between gap-3 pt-5 border-t border-slate-200">
               <button appButton variant="outline" size="md" type="button" (click)="closeBuilderModal()">
                 Cancel
               </button>
-              <button appButton variant="primary" size="md" type="button" (click)="submitForm()">
-                {{ isEditing() ? 'Update Form' : 'Save Form' }}
-              </button>
+              <div class="flex items-center gap-2">
+                <button appButton variant="outline" size="md" type="button" (click)="previewCurrentForm()">
+                  <app-icon name="eye" size="sm" />
+                  <span>Preview</span>
+                </button>
+                <button appButton variant="secondary" size="md" type="button" (click)="saveDraft()">
+                  <span>Save Draft</span>
+                </button>
+                <button appButton variant="primary" size="md" type="button" (click)="submitForm()">
+                  {{ isEditing() ? 'Update Form' : 'Save Form' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -970,8 +996,8 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
-                                  <span>View</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
+                                  <app-icon name="eye" size="sm" />
                                 </button>
                                 <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
@@ -1063,8 +1089,8 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
-                                  <span>View</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
+                                  <app-icon name="eye" size="sm" />
                                 </button>
                                 <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
@@ -1149,8 +1175,8 @@ interface FormBuilderFormData {
                             </div>
                           </div>
                           <div class="flex items-center gap-1.5 shrink-0">
-                            <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(otrBankDoc.fileName)">
-                              <span>View</span>
+                            <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(otrBankDoc.fileName)" title="View Document" aria-label="View Document">
+                              <app-icon name="eye" size="sm" />
                             </button>
                             <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(otrBankDoc)">
                               <span>Change</span>
@@ -1959,6 +1985,102 @@ interface FormBuilderFormData {
                               </div>
                             }
 
+                            <!-- Textarea Input -->
+                            @if (field.type === 'textarea') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <textarea appInput rows="3" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full"></textarea>
+                              </div>
+                            }
+
+                            <!-- Currency Input -->
+                            @if (field.type === 'currency') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" placeholder="₹0" class="w-full" />
+                              </div>
+                            }
+
+                            <!-- Email Input -->
+                            @if (field.type === 'email') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <input appInput size="sm" type="email" [(ngModel)]="previewFormValues[field.id]" placeholder="name@domain.gov.in" class="w-full" />
+                              </div>
+                            }
+
+                            <!-- Phone Input -->
+                            @if (field.type === 'phone') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <input appInput size="sm" type="tel" [(ngModel)]="previewFormValues[field.id]" placeholder="9876543210" class="w-full" />
+                              </div>
+                            }
+
+                            <!-- Radio Group -->
+                            @if (field.type === 'radio') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <div class="flex flex-wrap items-center gap-3 pt-1">
+                                  @for (opt of getOptionsArray(field); track opt) {
+                                    <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-700">
+                                      <input type="radio" [name]="field.id" [value]="opt" [(ngModel)]="previewFormValues[field.id]" class="accent-primary" />
+                                      <span>{{ opt }}</span>
+                                    </label>
+                                  }
+                                </div>
+                              </div>
+                            }
+
+                            <!-- Checkbox -->
+                            @if (field.type === 'checkbox') {
+                              <div class="pt-3">
+                                <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700">
+                                  <input type="checkbox" [(ngModel)]="previewFormValues[field.id]" class="accent-primary w-4 h-4 rounded" />
+                                  <span>{{ field.label }}</span>
+                                </label>
+                              </div>
+                            }
+
+                            <!-- File Upload -->
+                            @if (field.type === 'file') {
+                              <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                  {{ field.label }}
+                                  @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
+                                </label>
+                                <div class="p-3 border-2 border-dashed border-slate-300 rounded-lg bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
+                                  <div class="text-xs font-semibold text-slate-800">Click to upload document (PDF/DOC)</div>
+                                  <div class="text-[11px] text-slate-400 mt-0.5">Max {{ field.maxSizeMb || 10 }}MB</div>
+                                </div>
+                              </div>
+                            }
+
+                            <!-- Heading -->
+                            @if (field.type === 'heading') {
+                              <h3 class="text-sm font-bold text-slate-800 border-b pb-1 col-span-12 mt-2 mb-0">{{ field.label }}</h3>
+                            }
+
+                            <!-- Divider -->
+                            @if (field.type === 'divider') {
+                              <hr class="border-slate-200 col-span-12 my-2" />
+                            }
+
                             <!-- Same Address Checkbox (Rendered right below Registered PIN Code in Step 1) -->
                             @if (field.id === 'crf-18') {
                               <div class="col-span-12 pt-3 pb-1">
@@ -2279,6 +2401,48 @@ interface FormBuilderFormData {
                           }
                         </select>
                       }
+                      @if (field.type === 'textarea') {
+                        <textarea appInput rows="3" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full"></textarea>
+                      }
+                      @if (field.type === 'currency') {
+                        <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" placeholder="₹0" class="w-full" />
+                      }
+                      @if (field.type === 'email') {
+                        <input appInput size="sm" type="email" [(ngModel)]="previewFormValues[field.id]" placeholder="name@domain.gov.in" class="w-full" />
+                      }
+                      @if (field.type === 'phone') {
+                        <input appInput size="sm" type="tel" [(ngModel)]="previewFormValues[field.id]" placeholder="9876543210" class="w-full" />
+                      }
+                      @if (field.type === 'radio') {
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                          @for (opt of getOptionsArray(field); track opt) {
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-700">
+                              <input type="radio" [name]="field.id" [value]="opt" [(ngModel)]="previewFormValues[field.id]" class="accent-primary" />
+                              <span>{{ opt }}</span>
+                            </label>
+                          }
+                        </div>
+                      }
+                      @if (field.type === 'checkbox') {
+                        <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-semibold text-slate-700 pt-1">
+                          <input type="checkbox" [(ngModel)]="previewFormValues[field.id]" class="accent-primary w-4 h-4 rounded" />
+                          <span>{{ field.label }}</span>
+                        </label>
+                      }
+                      @if (field.type === 'file') {
+                        <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
+                          <div class="text-xs font-semibold text-slate-800">Click to upload document (PDF/DOC)</div>
+                          <div class="text-[11px] text-slate-400 mt-1">
+                            Max {{ field.maxSizeMb || 10 }}MB
+                          </div>
+                        </div>
+                      }
+                      @if (field.type === 'heading') {
+                        <h3 class="text-sm font-bold text-slate-800 border-b pb-1 col-span-12 mt-2 mb-0">{{ field.label }}</h3>
+                      }
+                      @if (field.type === 'divider') {
+                        <hr class="border-slate-200 col-span-12 my-2" />
+                      }
                       @if (field.type === 'photo') {
                         <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
                           <div class="text-xs font-semibold text-slate-800">Click to upload document / photo</div>
@@ -2515,26 +2679,40 @@ export class DynamicFormBuilderComponent {
 
   // --- Step Management ---
 
+  readonly fieldTypes = FIELD_TYPE_REGISTRY;
+
   toggleStepFormMode(): void {
     this.formData.isStepForm = !this.formData.isStepForm;
     this.onStepFormToggle();
   }
 
   onStepFormToggle(): void {
-    if (this.formData.isStepForm && this.formData.steps.length === 0) {
-      // Migrate existing direct fields into Step 1 or create Step 1
-      this.formData.steps = [
-        {
-          id: 'stp-' + Date.now() + '-1',
-          stepNumber: 1,
-          title: 'Step 1: General Details',
-          fields: this.formData.fields.length > 0 ? [...this.formData.fields] : [
-            { id: 'fld-' + Date.now() + '-1', label: '', type: 'text', mandatory: true }
-          ]
-        }
-      ];
-      this.activeStepIndex.set(0);
+    if (this.formData.isStepForm) {
+      this.formData.steps = convertDirectToStep(this.formData.fields, this.formData.steps);
+      if (this.activeStepIndex() >= this.formData.steps.length) {
+        this.activeStepIndex.set(0);
+      }
+    } else {
+      this.formData.fields = convertStepToDirect(this.formData.steps);
     }
+  }
+
+  previewCurrentForm(): void {
+    const previewItem: DynamicFormBuilderItem = {
+      id: this.formData.id || 'preview-temp',
+      formType: this.formData.formType || 'Untitled Form Preview',
+      isStepForm: this.formData.isStepForm,
+      status: this.formData.status,
+      steps: this.formData.isStepForm ? this.formData.steps : undefined,
+      fields: this.formData.isStepForm ? this.formData.steps.flatMap(s => s.fields) : this.formData.fields
+    };
+    this.openPreviewModal(previewItem);
+  }
+
+  saveDraft(): void {
+    this.formData.status = 'Draft' as any;
+    this.submitForm();
+    this.notification.info('Form draft saved successfully.');
   }
 
   getActiveStep(): FormStep | null {
@@ -2864,13 +3042,13 @@ export class DynamicFormBuilderComponent {
   }
 
   onFieldTypeChange(field: DynamicFormField): void {
-    if (field.type === 'photo') {
+    if (field.type === 'photo' || field.type === 'file') {
       field.minPhotos = field.minPhotos || 1;
       field.maxPhotos = field.maxPhotos || 5;
       field.maxSizeMb = field.maxSizeMb || 5;
     }
-    if (field.type === 'dropdown') {
-      field.optionsText = field.optionsText || 'Option 1, Option 2, Option 3';
+    if (field.type === 'dropdown' || field.type === 'radio') {
+      field.optionsText = field.optionsText || (field.type === 'radio' ? 'Yes, No' : 'Option 1, Option 2, Option 3');
       this.updateFieldOptions(field);
     }
   }
@@ -2995,10 +3173,17 @@ export class DynamicFormBuilderComponent {
           type: f.type,
           mandatory: !!f.mandatory
         };
-        if (f.type === 'dropdown') {
+        if (f.placeholder) copy.placeholder = f.placeholder;
+        if (f.fieldKey) copy.fieldKey = f.fieldKey;
+        if (f.helpText) copy.helpText = f.helpText;
+        if (f.defaultValue !== undefined) copy.defaultValue = f.defaultValue;
+        if (f.validation) copy.validation = { ...f.validation };
+        if (f.conditions) copy.conditions = [...f.conditions];
+
+        if (f.type === 'dropdown' || f.type === 'radio') {
           copy.options = this.getOptionsArray(f);
           copy.optionsText = copy.options.join(', ');
-        } else if (f.type === 'photo') {
+        } else if (f.type === 'photo' || f.type === 'file') {
           copy.minPhotos = Number(f.minPhotos) || 1;
           copy.maxPhotos = Number(f.maxPhotos) || 5;
           copy.maxSizeMb = Number(f.maxSizeMb) || 5;

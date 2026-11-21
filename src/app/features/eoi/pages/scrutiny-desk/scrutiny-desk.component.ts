@@ -321,12 +321,12 @@ export class ScrutinyDeskComponent {
         id: 'ACT-3',
         timestamp: app.scrutinyDetails.decisionTimestamp || '10/09/2026 11:30 AM',
         action: 'REVERTED',
-        title: isAppeal ? 'Appeal Accepted' : 'Shortfall Notice Issued (Reverted to Applicant)',
+        title: isAppeal ? 'Appeal Accepted' : 'Appeal Clarification Requested (Reverted to Applicant)',
         actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
         actorRole: 'Department Scrutiny Officer',
         description: isAppeal
           ? `Appeal accepted. Response time: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`
-          : `Shortfall notice issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
+          : `Clarification request issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
         badgeClass: isAppeal ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
         meta: {
           documents: app.scrutinyDetails.shortfall.documents,
@@ -509,10 +509,10 @@ export class ScrutinyDeskComponent {
     const due = new Date(now);
     due.setDate(due.getDate() + dueDays);
 
-    const title = isAppealFlow ? 'Appeal Accepted' : 'Shortfall Raised';
+    const title = isAppealFlow ? 'Appeal Accepted' : 'Appeal Clarification Requested';
     const actionDesc = isAppealFlow
       ? `Appeal accepted. Response time: ${dueDays} days.`
-      : `Shortfall raised for ${submission.documents.length} document(s). Response time: ${dueDays} days.`;
+      : `Clarification requested for ${submission.documents.length} document(s). Response time: ${dueDays} days.`;
 
     const newActivity: ApplicationActivityLog = {
       id: `ACT-${Date.now()}`,
@@ -566,9 +566,9 @@ export class ScrutinyDeskComponent {
 
     this.closeModals();
     const successMsg = isAppealFlow
-      ? 'Appeal accepted and shortfall notice sent to applicant.'
-      : 'Shortfall sent to the applicant.';
-    this.notifications.success(successMsg, isAppealFlow ? 'Appeal Accepted' : 'Shortfall Raised');
+      ? 'Appeal accepted and clarification request sent to applicant.'
+      : 'Clarification request sent to the applicant.';
+    this.notifications.success(successMsg, isAppealFlow ? 'Appeal Accepted' : 'Clarification Requested');
     this.loadApplicant(app.id);
   }
 

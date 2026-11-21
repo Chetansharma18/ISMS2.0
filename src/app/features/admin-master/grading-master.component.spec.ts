@@ -8,6 +8,7 @@ describe('GradingMasterComponent', () => {
     expect(comp.config.title).toBe('Grading Master');
     expect(comp.config.entityLabel).toBe('Grade');
     expect(comp.config.dataKey).toBe('GRADING_MASTERS');
+    expect(comp.config.hideViewAction).toBe(true);
 
     const columnKeys = comp.config.columns.map((c) => c.key);
     expect(columnKeys).toContain('sNo');

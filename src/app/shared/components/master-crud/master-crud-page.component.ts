@@ -26,6 +26,7 @@ import { DropdownComponent } from '../dropdown/dropdown.component';
 import { InputDirective } from '../form-controls/input/input.directive';
 import { SwitchComponent } from '../switch/switch.component';
 import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
+import { MasterFilterBarComponent, StatusFilterOption } from '../master-filter-bar/master-filter-bar.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
@@ -56,7 +57,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
     DropdownComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -64,10 +66,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Page Header -->
       <app-page-header
         [title]="config.title"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: config.title }]"
-        [searchable]="true"
-        [searchPlaceholder]="config.searchPlaceholder || 'Search...'"
-        [(searchQuery)]="searchQuery"
+        [subtitle]="config.subtitle"
+        [breadcrumbs]="config.breadcrumbs || [{ label: 'Home', url: '/' }, { label: config.title }]"
       >
         <!-- Add Button -->
         <button
@@ -81,6 +81,21 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           <span>Add {{ config.entityLabel }}</span>
         </button>
       </app-page-header>
+
+      <!-- Unified Master Filter & Search Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        [searchPlaceholder]="config.searchPlaceholder || 'Search ' + config.entityLabel.toLowerCase() + '...'"
+        [(status)]="statusFilter"
+        [showStatusFilter]="!!(config.hasStatus && !config.hideStatusFilter)"
+        [statusOptions]="statusFilterOptions()"
+        [filters]="config.filters || []"
+        [(filterValues)]="filterValues"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        [itemUnit]="config.itemUnit"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Master Table -->
       <app-table
@@ -109,33 +124,36 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Status badge cell template -->
       <ng-template #statusTemplate let-item>
         <span
-          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-normal border select-none"
+          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
           [ngClass]="item.status === 'Inactive'
-            ? 'bg-slate-50 text-slate-600 border-slate-200'
-            : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
+            ? 'bg-slate-100 text-slate-600 border-slate-300'
+            : 'bg-emerald-50 text-emerald-700 border-emerald-300'"
         >
-          {{ item.status }}
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="item.status === 'Inactive' ? 'bg-slate-400' : 'bg-emerald-500'"></span>
+          {{ item.status || 'Active' }}
         </span>
       </ng-template>
 
       <!-- Action cell template: View + Edit + Active/Inactive toggle -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            title="View Details"
-            aria-label="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-          </button>
+          @if (!config.hideViewAction) {
+            <!-- View Button -->
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); openViewModal(item)"
+              title="View Details"
+              aria-label="View Details"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
 
-          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+          }
 
           <!-- Edit Button -->
           <button
@@ -401,13 +419,78 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   formData: Record<string, any> = {};
   pendingPermission = '';
 
+  readonly statusFilter = signal<'ALL' | 'Active' | 'Inactive'>('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly activeCount = computed(() => {
+    return this.items().filter((it: any) => it.status !== 'Inactive').length;
+  });
+
+  readonly inactiveCount = computed(() => {
+    return this.items().filter((it: any) => it.status === 'Inactive').length;
+  });
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All', count: this.items().length },
+    { value: 'Active', label: 'Active', count: this.activeCount() },
+    { value: 'Inactive', label: 'Inactive', count: this.inactiveCount() }
+  ]);
+
+  readonly isFilterActive = computed(() => {
+    if (this.statusFilter() !== 'ALL') return true;
+    const fv = this.filterValues();
+    return Object.values(fv).some(v => !!v);
+  });
+
+  setStatusFilter(status: 'ALL' | 'Active' | 'Inactive'): void {
+    this.statusFilter.set(status);
+  }
+
+  setFilterValue(key: string, value: string): void {
+    this.filterValues.update(prev => ({ ...prev, [key]: value }));
+  }
+
+  resetFilters(): void {
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+    this.searchQuery.set('');
+  }
+
+  resolveFilterOptions(filter: { options: string[] | (() => string[]) }): string[] {
+    if (!filter.options) return [];
+    return typeof filter.options === 'function' ? filter.options() : filter.options;
+  }
+
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.items();
-    if (!q) return all;
-    return all.filter((item: any) =>
-      this.config.searchFields.some(f => String(item[f] ?? '').toLowerCase().includes(q))
-    );
+    const status = this.statusFilter();
+    const fv = this.filterValues();
+    let list = this.items();
+
+    // 1. Status Filter
+    if (status !== 'ALL') {
+      list = list.filter((item: any) => {
+        if (status === 'Inactive') return item.status === 'Inactive';
+        return item.status !== 'Inactive';
+      });
+    }
+
+    // 2. Custom Dropdown Filters
+    const activeFilters = Object.entries(fv).filter(([_, val]) => !!val);
+    if (activeFilters.length > 0) {
+      list = list.filter((item: any) => {
+        return activeFilters.every(([key, val]) => String(item[key] ?? '') === val);
+      });
+    }
+
+    // 3. Search query
+    if (q) {
+      list = list.filter((item: any) =>
+        this.config.searchFields.some(f => String(item[f] ?? '').toLowerCase().includes(q))
+      );
+    }
+
+    return list;
   });
 
   tableColumns = signal<TableColumn<T>[]>([]);
@@ -441,7 +524,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   private buildColumns(): void {
     const cols = [...this.config.columns];
-    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-40 min-w-[140px]' });
+    const actionWidth = this.config.hideViewAction ? 'w-28 min-w-[105px]' : 'w-36 min-w-[130px]';
+    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: actionWidth });
     this.tableColumns.set(cols);
   }
 
@@ -653,7 +737,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   selectedViewItem = signal<any | null>(null);
 
   readonly viewableColumns = computed(() => {
-    return this.config.columns.filter(c => c.key !== 'sNo' && c.key !== 'action' && c.key !== 'status');
+    const cols = this.config.viewColumns || this.config.columns;
+    return cols.filter(c => c.key !== 'sNo' && c.key !== 'action' && c.key !== 'status');
   });
 
   isTagsColumn(key: string): boolean {

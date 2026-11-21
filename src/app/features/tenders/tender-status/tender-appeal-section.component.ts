@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import type { ShortfallRequest, SubmittedTender } from '../../../core/models/tender.model';
 import { ButtonComponent, IconComponent } from '../../../shared';
 import { TenderDocViewRequest } from './tender-doc-card.component';
-import { remainingDaysText } from './tender-appeal.util';
+import { canAppeal, remainingDaysText } from './tender-appeal.util';
 
 /** The appeal the applicant sent against the rejection of this application: the rejection remarks, applicant's remarks, and department's response. */
 @Component({
@@ -12,48 +12,52 @@ import { remainingDaysText } from './tender-appeal.util';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    @if (app().appeal; as appeal) {
+    @if (app().appeal || appealResponseNotice()) {
       <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4" aria-labelledby="appeal-heading">
         <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
           <div class="flex items-center gap-3">
             <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">6</span>
             <h2 id="appeal-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Appeal Request & Department Response</h2>
           </div>
-          <span class="text-[11px] text-slate-500">Appeal Submitted on {{ appeal.submittedOn }}</span>
+          @if (app().appeal; as appeal) {
+            <span class="text-[11px] text-slate-500">Appeal Submitted on {{ appeal.submittedOn }}</span>
+          }
         </div>
 
-        <!-- 1. Original Rejection Remarks -->
-        <div class="space-y-1 text-xs">
-          <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Original Rejection Grounds</span>
-          <p class="m-0 text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-2.5 rounded border border-slate-200/80">{{ app().rejectionReason || 'Technical qualification criteria not met.' }}</p>
-        </div>
-
-        <!-- 2. Applicant's Appeal Remarks -->
-        <div class="space-y-1 text-xs">
-          <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Your Appeal Remarks</span>
-          <p class="m-0 text-slate-900 leading-relaxed whitespace-pre-line bg-sky-50/50 p-2.5 rounded border border-sky-100">{{ appeal.reply }}</p>
-        </div>
-
-        <!-- 3. Files Attached to Appeal -->
-        @if (appeal.files.length > 0) {
-          <div class="space-y-1.5 text-xs">
-            <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Appeal Attachments</span>
-            <div class="flex flex-wrap gap-2">
-              @for (file of appeal.files; track file.fileName) {
-                <button
-                  appButton
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  (click)="viewDoc.emit({ fileName: file.fileName, title: 'Appeal Attachment', fileSize: file.fileSize })"
-                >
-                  <app-icon name="document" size="xs" />
-                  <span>{{ file.fileName }}</span>
-                  <span class="text-slate-400 text-[10.5px]">({{ file.fileSize }})</span>
-                </button>
-              }
-            </div>
+        @if (app().appeal; as appeal) {
+          <!-- 1. Original Rejection Remarks -->
+          <div class="space-y-1 text-xs">
+            <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Original Rejection Grounds</span>
+            <p class="m-0 text-slate-700 leading-relaxed whitespace-pre-line bg-slate-50 p-2.5 rounded border border-slate-200/80">{{ app().rejectionReason || 'Technical qualification criteria not met.' }}</p>
           </div>
+
+          <!-- 2. Applicant's Appeal Remarks -->
+          <div class="space-y-1 text-xs">
+            <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Your Appeal Remarks</span>
+            <p class="m-0 text-slate-900 leading-relaxed whitespace-pre-line bg-sky-50/50 p-2.5 rounded border border-sky-100">{{ appeal.reply }}</p>
+          </div>
+
+          <!-- 3. Files Attached to Appeal -->
+          @if (appeal.files.length > 0) {
+            <div class="space-y-1.5 text-xs">
+              <span class="text-slate-500 block text-[11px] font-semibold uppercase tracking-wider">Appeal Attachments</span>
+              <div class="flex flex-wrap gap-2">
+                @for (file of appeal.files; track file.fileName) {
+                  <button
+                    appButton
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    (click)="viewDoc.emit({ fileName: file.fileName, title: 'Appeal Attachment', fileSize: file.fileSize })"
+                  >
+                    <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                    <span>{{ file.fileName }}</span>
+                    <span class="text-slate-400 text-[10.5px]">({{ file.fileSize }})</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
         }
 
         <!-- 4. Department Response Section -->
@@ -81,7 +85,7 @@ import { remainingDaysText } from './tender-appeal.util';
                 <span>Department Remarks:</span>
               </span>
               <p class="m-0 text-slate-800 text-xs leading-relaxed whitespace-pre-line bg-white/90 p-3 rounded-lg border border-amber-200/90 font-medium">
-                {{ deptNotice.remarks || appeal.deptRemarks || 'Appeal reviewed. Please submit the requested documents within the allotted response window.' }}
+                {{ deptNotice.remarks || app().appeal?.deptRemarks || 'Appeal reviewed. Please submit the requested documents within the allotted response window.' }}
               </p>
             </div>
 
@@ -179,7 +183,7 @@ import { remainingDaysText } from './tender-appeal.util';
                           type="button"
                           (click)="viewDoc.emit({ fileName: up.fileName, title: up.requiredDoc, fileSize: up.fileSize })"
                         >
-                          <app-icon name="document" size="xs" />
+                          <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
                           <span>{{ up.fileName }}</span>
                           <span class="text-slate-400 text-[10.5px]">({{ up.fileSize }})</span>
                         </button>
@@ -190,19 +194,39 @@ import { remainingDaysText } from './tender-appeal.util';
               </div>
             }
           </div>
-        } @else if (appeal.status === 'Pending') {
+        } @else if (app().appeal?.status === 'Pending') {
           <div class="p-3.5 rounded-lg border border-amber-200 bg-amber-50/60 text-xs text-amber-900 flex items-center gap-2.5">
             <app-icon name="clock" size="sm" class="text-amber-600 shrink-0" />
             <span>Your appeal request is under review by the department scrutiny committee. Department response will appear here with remarks, date & time, and 7-day response window.</span>
           </div>
-        } @else if (appeal.status === 'Rejected') {
+        } @else if (app().appeal?.status === 'Rejected') {
           <div class="p-3.5 rounded-lg border border-rose-200 bg-rose-50 text-xs text-rose-900 flex items-start gap-2.5">
             <app-icon name="close" size="sm" class="text-rose-600 shrink-0 mt-0.5" />
             <div>
               <strong class="font-semibold block mb-0.5">Appeal Rejected:</strong>
-              <span>{{ appeal.rejectionReason || 'Appeal rejected after review by the scrutiny committee.' }}</span>
+              <span>{{ app().appeal?.rejectionReason || 'Appeal rejected after review by the scrutiny committee.' }}</span>
             </div>
           </div>
+        }
+      </section>
+    } @else {
+      <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4" aria-labelledby="appeal-heading">
+        <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">6</span>
+            <h2 id="appeal-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Appeal Request & Department Response</h2>
+          </div>
+        </div>
+
+        @if (canAppeal(app())) {
+          <div class="p-4 rounded-lg bg-amber-50 border border-amber-200 text-xs space-y-3">
+            <p class="m-0 text-amber-900 font-medium">This application was rejected. You can submit an appeal request against the rejection.</p>
+            <button appButton size="sm" type="button" (click)="requestAppeal.emit(app())">
+              Appeal Request
+            </button>
+          </div>
+        } @else {
+          <p class="m-0 text-xs text-slate-500">No appeal has been submitted for this application.</p>
         }
       </section>
     }
@@ -211,15 +235,16 @@ import { remainingDaysText } from './tender-appeal.util';
 export class TenderAppealSectionComponent {
   readonly app = input.required<SubmittedTender>();
   readonly respond = output<ShortfallRequest>();
+  readonly requestAppeal = output<SubmittedTender>();
   readonly viewDoc = output<TenderDocViewRequest>();
+
+  protected readonly canAppeal = canAppeal;
 
   readonly appealResponseNotice = computed<ShortfallRequest | null>(() => {
     const list = this.app().shortfalls || [];
-    // If the application has an appeal and shortfalls, find the latest notice
-    if (this.app().appeal && list.length > 0) {
+    if (list.length > 0) {
       return list[list.length - 1];
     }
-    // Or if appeal has deptRemarks/responseDeadline, synthesize request
     const appeal = this.app().appeal;
     if (appeal?.deptRemarks) {
       return {

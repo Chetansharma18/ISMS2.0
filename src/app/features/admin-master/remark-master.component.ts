@@ -25,6 +25,7 @@ const CONFIG: MasterCrudConfig<RemarkMasterItem> = {
   itemUnit: 'remarks',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[480px]',
   fields: [
     {

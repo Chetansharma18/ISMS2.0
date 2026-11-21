@@ -20,7 +20,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       >
         <div class="flex items-center gap-2">
           <h2 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-navy transition-colors">
-            Required Supporting Documents
+            Supporting Documents
           </h2>
         </div>
 

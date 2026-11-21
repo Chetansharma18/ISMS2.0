@@ -74,9 +74,16 @@ export function categoryLabel(value: string | undefined): string {
     </ng-template>
 
     <ng-template #viewSanctionOrderTemplate let-row>
-      <button appButton variant="outline" size="sm" (click)="viewSanctionOrder(row)" title="Open the e-signed sanction order">
+      <button
+        appButton
+        variant="ghost"
+        size="sm"
+        iconOnly
+        (click)="viewSanctionOrder(row)"
+        title="Open the e-signed sanction order"
+        aria-label="View Sanction Order"
+      >
         <app-icon name="eye" size="sm" />
-        <span>{{ viewOnly ? 'View' : 'View Sanction Order' }}</span>
       </button>
     </ng-template>
 

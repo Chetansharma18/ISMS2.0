@@ -174,9 +174,9 @@ export class ScrutinyRevertModalComponent {
   readonly confirmed = output<RevertSubmission>();
   readonly close = output<void>();
 
-  readonly modalTitle = computed(() => (this.isAppeal() ? 'Accept Appeal' : 'Raise Shortfall'));
-  readonly submitLabel = computed(() => (this.isAppeal() ? 'Accept' : 'Raise Shortfall'));
-  readonly docLabel = computed(() => (this.isAppeal() ? 'Appeal Documents' : 'Shortfall Documents'));
+  readonly modalTitle = computed(() => (this.isAppeal() ? 'Accept Appeal' : 'Request Appeal Clarification'));
+  readonly submitLabel = computed(() => (this.isAppeal() ? 'Accept' : 'Send Clarification Request'));
+  readonly docLabel = computed(() => (this.isAppeal() ? 'Appeal Documents' : 'Requested Documents'));
 
   protected readonly other = OTHER;
   protected readonly dayOptions = RESPONSE_DAY_OPTIONS;

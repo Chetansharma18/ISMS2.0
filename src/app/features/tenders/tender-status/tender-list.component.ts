@@ -44,7 +44,7 @@ import { canAppeal } from './tender-appeal.util';
           variant="ghost"
           size="sm"
           type="button"
-          (click)="open.emit({ tender, tab: 'overview' })"
+          (click)="open.emit({ tender, tab: 'organisation' })"
           class="tabular-nums"
           title="Open Application Details Page"
         >
@@ -55,7 +55,7 @@ import { canAppeal } from './tender-appeal.util';
       <!-- Custom Scheme Title Template -->
       <ng-template #schemeTitleTemplate let-tender>
         <span
-          (click)="open.emit({ tender, tab: 'overview' })"
+          (click)="open.emit({ tender, tab: 'organisation' })"
           class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors text-[13px]"
           title="Open {{ tender.schemeTitle }}"
         >
@@ -155,7 +155,7 @@ import { canAppeal } from './tender-appeal.util';
           size="sm"
           iconOnly
           type="button"
-          (click)="open.emit({ tender, tab: 'overview' })"
+          (click)="open.emit({ tender, tab: 'organisation' })"
           title="Open Application Details Page"
           aria-label="View Details"
         >

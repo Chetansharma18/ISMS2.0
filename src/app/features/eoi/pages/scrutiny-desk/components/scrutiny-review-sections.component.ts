@@ -293,7 +293,9 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
             </ng-template>
 
             <ng-template #viewTemplate let-doc>
-              <button appButton variant="outline" size="sm" (click)="viewDoc.emit(doc)">View</button>
+              <button appButton variant="ghost" size="sm" iconOnly (click)="viewDoc.emit(doc)" title="View Document" aria-label="View Document">
+                <app-icon name="eye" size="sm" />
+              </button>
             </ng-template>
           </div>
         }

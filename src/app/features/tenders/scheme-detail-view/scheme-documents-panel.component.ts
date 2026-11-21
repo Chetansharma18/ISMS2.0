@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { SchemeTender } from '../tenders.models';
-import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ButtonComponent, IconComponent } from '../../../shared';
 
 /** 2-column table for Scheme Documents (PDF) with View action button. */
 @Component({
   selector: 'app-scheme-documents-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
+  imports: [ButtonComponent, IconComponent],
   host: { class: 'block h-full' },
   template: `
     <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs h-full">
@@ -27,9 +27,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-3">
               <div class="flex items-center gap-2.5">
-                <div class="w-6 h-6 rounded bg-[#D92D20] flex items-center justify-center text-white text-[9px] font-bold shrink-0 shadow-2xs">
-                  PDF
-                </div>
+                <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
                 <div class="min-w-0">
                   <div class="font-semibold text-slate-900 leading-snug">
                     Request for Proposal (RFP)
@@ -42,13 +40,16 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </td>
             <td class="px-4 py-3 text-right">
               <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
                 (click)="downloadRfp.emit()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-navy bg-sky-50 hover:bg-sky-100 border border-sky-200 transition-colors cursor-pointer select-none"
                 title="View Request for Proposal (RFP)"
+                aria-label="View Request for Proposal (RFP)"
               >
                 <app-icon name="eye" size="sm" />
-                <span>View</span>
               </button>
             </td>
           </tr>
@@ -57,9 +58,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-3">
               <div class="flex items-center gap-2.5">
-                <div class="w-6 h-6 rounded bg-[#D92D20] flex items-center justify-center text-white text-[9px] font-bold shrink-0 shadow-2xs">
-                  PDF
-                </div>
+                <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
                 <div class="min-w-0">
                   <div class="font-semibold text-slate-900 leading-snug">
                     Standard Operating Procedure (SOP)
@@ -72,13 +71,16 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </td>
             <td class="px-4 py-3 text-right">
               <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
                 type="button"
                 (click)="downloadSop.emit()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold text-navy bg-sky-50 hover:bg-sky-100 border border-sky-200 transition-colors cursor-pointer select-none"
                 title="View Standard Operating Procedure (SOP)"
+                aria-label="View Standard Operating Procedure (SOP)"
               >
                 <app-icon name="eye" size="sm" />
-                <span>View</span>
               </button>
             </td>
           </tr>

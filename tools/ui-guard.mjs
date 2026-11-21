@@ -56,6 +56,7 @@ const KIT_PREFIXES = [
   'shared/components/form-controls/',
   'shared/components/loader/',
   'shared/components/status-badge/',
+  'shared/components/master-filter-bar/',
   'shared/components/empty-state/',
   'shared/components/toast-outlet/'
 ];

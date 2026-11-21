@@ -163,8 +163,16 @@ export type { Grievance };
     </ng-template>
 
     <ng-template #viewActionTemplate let-item>
-      <button appButton variant="outline" size="sm" (click)="viewTicket(item)">
-        View
+      <button
+        appButton
+        variant="ghost"
+        size="sm"
+        iconOnly
+        (click)="viewTicket(item)"
+        title="View Ticket"
+        aria-label="View Ticket"
+      >
+        <app-icon name="eye" size="sm" />
       </button>
     </ng-template>
 
@@ -220,7 +228,7 @@ export type { Grievance };
           <div>
             <div class="flex justify-between items-end mb-1.5">
               <label class="block text-[13px] font-semibold text-slate-700">Attachment (PDF, PNG, JPG, TXT)</label>
-              <span class="text-[11px] text-slate-400">Max upload 5MB</span>
+              <span class="text-[11px] text-slate-400">Max upload 25MB</span>
             </div>
             <input type="file" accept=".pdf,.png,.jpg,.jpeg,.txt" (change)="onFileSelected($event)" class="w-full text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[13px] file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100 cursor-pointer" />
             @if (attachmentError()) {
@@ -482,8 +490,8 @@ export class GrievanceListComponent {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        this.attachmentError.set('File size exceeds the 5MB limit.');
+      if (file.size > 25 * 1024 * 1024) {
+        this.attachmentError.set('File size exceeds the 25MB limit.');
         input.value = ''; // Reset input
         this.newTicket.attachment = '';
         this.newTicket.attachmentUrl = null;

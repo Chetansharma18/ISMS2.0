@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, TableColumn, TableComponent } from '../../../../../shared';
+import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../../../../../shared';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { SchemeFormState } from '../scheme-form.state';
 import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
@@ -16,7 +16,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
   selector: 'app-step4-complete-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, TableComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, TableComponent],
   host: { class: 'block' },
   template: `
     <div class="w-full space-y-4 font-sans">
@@ -130,44 +130,56 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
               @if (state.editableStep1.registrationCertDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">Registration Certificate: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">Registration Certificate: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Registration Certificate', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Registration Certificate', doc.fileSize)" title="View Registration Certificate" aria-label="View Registration Certificate"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
               @if (state.editableStep1.panCardDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">PAN Card: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">PAN Card: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'PAN Card', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'PAN Card', doc.fileSize)" title="View PAN Card" aria-label="View PAN Card"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
               @if (state.editableStep1.gstCertDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">GST Certificate: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">GST Certificate: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'GST Certificate', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'GST Certificate', doc.fileSize)" title="View GST Certificate" aria-label="View GST Certificate"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
               @if (state.editableStep1.msmeCertDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">Udyam Certificate: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">Udyam Certificate: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Udyam Certificate', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Udyam Certificate', doc.fileSize)" title="View Udyam Certificate" aria-label="View Udyam Certificate"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
@@ -233,22 +245,28 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
               @if (state.editableStep3.authorizationLetterDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">Authorization Letter: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">Authorization Letter: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Authorization Letter', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Authorization Letter', doc.fileSize)" title="View Authorization Letter" aria-label="View Authorization Letter"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
               @if (state.editableStep3.idProofDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
-                    <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">Identity Proof: </span>
-                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">Identity Proof: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Signatory Identity Proof', doc.fileSize)">View</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Signatory Identity Proof', doc.fileSize)" title="View Signatory Identity Proof" aria-label="View Signatory Identity Proof"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
@@ -294,11 +312,14 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             @if (doc.status === 'uploaded') {
               <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-100">
                 <div class="flex items-center justify-between gap-3">
-                  <div class="min-w-0">
-                    <span class="text-slate-500 text-[11.5px]">Cancelled Cheque / Passbook: </span>
-                    <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                  <div class="flex items-center gap-2 min-w-0">
+                    <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                    <div class="min-w-0">
+                      <span class="text-slate-500 text-[11.5px]">Cancelled Cheque / Passbook: </span>
+                      <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                    </div>
                   </div>
-                  <button appButton variant="ghost" size="sm" class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Cancelled Cheque', doc.fileSize)">View</button>
+                  <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Cancelled Cheque', doc.fileSize)" title="View Cancelled Cheque" aria-label="View Cancelled Cheque"><app-icon name="eye" size="sm" /></button>
                 </div>
               </div>
             }
@@ -342,10 +363,15 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
         </div>
 
         <ng-template #nameTemplate let-doc>
-          <span class="font-medium text-slate-900 text-[12.5px]">{{ doc.name }}</span>
-          @if (doc.isMandatory) {
-            <span class="text-rose-600 font-bold" title="Mandatory"> *</span>
-          }
+          <div class="flex items-center gap-2">
+            <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none shrink-0" />
+            <div class="min-w-0">
+              <span class="font-medium text-slate-900 text-[12.5px]">{{ doc.name }}</span>
+              @if (doc.isMandatory) {
+                <span class="text-rose-600 font-bold" title="Mandatory"> *</span>
+              }
+            </div>
+          </div>
           @if (errors()[doc.id]) {
             <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
           }
@@ -374,8 +400,8 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
         <ng-template #actionTemplate let-doc>
           <div class="flex items-center gap-1.5 justify-center">
             @if (doc.status === 'uploaded') {
-              <button appButton variant="ghost" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">
-                View
+              <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)" title="View Document" aria-label="View Document">
+                <app-icon name="eye" size="sm" />
               </button>
             }
             @if (isEditingDocs()) {

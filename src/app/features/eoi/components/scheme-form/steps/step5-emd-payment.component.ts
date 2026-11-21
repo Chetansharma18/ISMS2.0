@@ -17,7 +17,7 @@ import { SchemeFormState } from '../scheme-form.state';
 
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center gap-2.5">
-          <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <span class="w-5 h-5 rounded-full bg-[#D73389] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
           <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Fee Details</h2>
         </div>
 

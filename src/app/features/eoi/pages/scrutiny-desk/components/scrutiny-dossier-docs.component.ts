@@ -73,7 +73,7 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
 
             @if (doc.comment) {
               <div class="px-2.5 py-1.5 rounded bg-[#FCF8FA] border border-[#EADCE2] text-[11.5px] text-[#25212A] leading-snug">
-                <span class="font-semibold text-[#7C0E44]">Comment:</span>
+                <span class="font-semibold text-[#D73389]">Comment:</span>
                 <span class="ml-1 break-words">{{ doc.comment }}</span>
               </div>
             }

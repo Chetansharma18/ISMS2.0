@@ -28,7 +28,7 @@ interface StatMetric {
           <span class="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
             Real-Time Governance Metrics
           </span>
-          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #7C0E44; margin-top: 10px; letter-spacing: -0.025em;">
+          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #D73389; margin-top: 10px; letter-spacing: -0.025em;">
             Impact Across Rajasthan
           </div>
           <p class="text-[14px] sm:text-[15px] text-slate-500 mt-2 mx-auto max-w-2xl">
@@ -50,7 +50,7 @@ interface StatMetric {
                   </div>
                 </div>
 
-                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #7C0E44; letter-spacing: -0.02em;" class="tabular-nums mt-1">
+                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #D73389; letter-spacing: -0.02em;" class="tabular-nums mt-1">
                   {{ stat.count }}
                 </div>
                 <p class="text-[13px] sm:text-[14px] font-bold text-slate-700 mt-1.5 leading-snug">
@@ -98,9 +98,9 @@ export class StatsSectionComponent {
       count: '₹248.5 Cr',
       label: 'Direct Scheme Benefits Disbursed',
       description: 'Aadhaar-linked DBT payouts to training partners and youth stipends.',
-      badge: 'bg-[#F8EDF1] text-[#7C0E44]',
-      iconBg: 'bg-[#F8EDF1]',
-      iconColor: 'text-[#7C0E44]'
+      badge: 'bg-[#FDF2F7] text-[#D73389]',
+      iconBg: 'bg-[#FDF2F7]',
+      iconColor: 'text-[#D73389]'
     }
   ];
 }

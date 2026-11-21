@@ -212,7 +212,7 @@ import { formatBytes } from './tenders-page.util';
       <section class="space-y-3 pt-4 border-t border-[#E8EEF5]">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">SUPPORTING DOCUMENTS</h3>
+            <h3 class="text-[#D73389] font-bold text-sm tracking-wide m-0">SUPPORTING DOCUMENTS</h3>
             <p class="text-xs text-slate-500 mt-1 mb-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
           </div>
           <button

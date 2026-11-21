@@ -11,7 +11,7 @@ import { SchemeFormState } from '../scheme-form.state';
     <section class="bg-white border border-[#EADCE2] rounded-xl shadow-2xs overflow-hidden">
       <div class="p-4 sm:p-5 space-y-3.5">
         <div class="space-y-1">
-          <h2 class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">
+          <h2 class="text-base sm:text-lg font-bold text-[#D73389] m-0">
             {{ state.schemeTitle() }}
           </h2>
           <p class="text-xs sm:text-sm text-slate-500 leading-relaxed m-0">

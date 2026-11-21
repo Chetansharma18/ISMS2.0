@@ -47,7 +47,7 @@ export interface RegistrationStepItem {
           ></div>
           <div class="relative z-10 flex items-center gap-3">
             <div>
-              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#D73389] m-0">
                 Aspirant Profile Summary
               </h1>
               <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">
@@ -96,7 +96,7 @@ export interface RegistrationStepItem {
           <!-- Left: Title & Subtitle -->
           <div class="relative z-10 flex items-center gap-3">
             <div>
-              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#D73389] m-0">
                 Profile Summary
               </h1>
               <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">

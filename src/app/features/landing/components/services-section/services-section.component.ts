@@ -50,7 +50,7 @@ import { IconComponent } from '../../../../shared';
             
             <!-- Heading & Short Orange Underline -->
             <div class="mb-4 sm:mb-5">
-              <h2 id="mobile-app-heading" class="font-sans text-[28px] sm:text-[32px] lg:text-[36px] font-bold leading-[1.2] text-[#7C0E44] tracking-tight m-0">
+              <h2 id="mobile-app-heading" class="font-sans text-[28px] sm:text-[32px] lg:text-[36px] font-bold leading-[1.2] text-[#D73389] tracking-tight m-0">
                 ISMS <span class="text-[#EA580C]">2.0</span> Mobile Application
               </h2>
 
@@ -63,13 +63,13 @@ import { IconComponent } from '../../../../shared';
               An integrated, multilingual mobile application providing instantaneous access to scheme notifications, biometric attendance, training center verifications, and grievances.
             </p>
 
-            <!-- Three Feature Highlights: Horizontal Compact Items (40-44px icon, #F8EDF1 bg, #7C0E44 text) -->
+            <!-- Three Feature Highlights: Horizontal Compact Items (40-44px icon, #FDF2F7 bg, #D73389 text) -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 mb-6 sm:mb-8 max-w-155">
               
               <!-- Feature 1: For Multiple Stakeholders -->
-              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(124,14,68,0.04)]">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#F8EDF1] flex items-center justify-center text-[#7C0E44] shrink-0">
-                  <app-icon name="stakeholders" size="lg" [stroke]="1.8" class="text-[#7C0E44]" />
+              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(215,51,137,0.04)]">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#FDF2F7] flex items-center justify-center text-[#D73389] shrink-0">
+                  <app-icon name="stakeholders" size="lg" [stroke]="1.8" class="text-[#D73389]" />
                 </div>
                 <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#25212A] leading-snug">
                   For Multiple Stakeholders
@@ -77,8 +77,8 @@ import { IconComponent } from '../../../../shared';
               </div>
 
               <!-- Feature 2: In English & Hindi -->
-              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(124,14,68,0.04)]">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#F8EDF1] flex items-center justify-center text-[#7C0E44] shrink-0 font-bold text-[13px] font-sans">
+              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(215,51,137,0.04)]">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#FDF2F7] flex items-center justify-center text-[#D73389] shrink-0 font-bold text-[13px] font-sans">
                   A / अ
                 </div>
                 <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#25212A] leading-snug">
@@ -87,9 +87,9 @@ import { IconComponent } from '../../../../shared';
               </div>
 
               <!-- Feature 3: Secure & Role Based Access -->
-              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(124,14,68,0.04)]">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#F8EDF1] flex items-center justify-center text-[#7C0E44] shrink-0">
-                  <app-icon name="shield-tick" size="lg" [stroke]="1.8" class="text-[#7C0E44]" />
+              <div class="flex items-center gap-3 bg-white/95 border border-[#EADCE2] rounded-[10px] px-3.5 py-2.5 shadow-[0_2px_8px_rgba(215,51,137,0.04)]">
+                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-[#FDF2F7] flex items-center justify-center text-[#D73389] shrink-0">
+                  <app-icon name="shield-tick" size="lg" [stroke]="1.8" class="text-[#D73389]" />
                 </div>
                 <span class="font-sans text-[14px] sm:text-[14.5px] font-semibold text-[#25212A] leading-snug">
                   Secure &amp; Role Based Access
@@ -99,12 +99,12 @@ import { IconComponent } from '../../../../shared';
             </div>
 
             <!-- Statistics Panel: One Clean White Panel (3 equal columns with dividers) -->
-            <div class="w-full max-w-155 bg-white/96 border border-[#EADCE2] rounded-xl shadow-[0_8px_24px_rgba(124,14,68,0.06)] p-4 sm:p-5 lg:p-6 box-border">
+            <div class="w-full max-w-155 bg-white/96 border border-[#EADCE2] rounded-xl shadow-[0_8px_24px_rgba(215,51,137,0.06)] p-4 sm:p-5 lg:p-6 box-border">
               <div class="grid grid-cols-3 divide-x divide-[#EADCE2] text-center">
                 
                 <!-- Stat 1: 1K+ Downloads -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#7C0E44] leading-none tabular-nums tracking-tight">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#D73389] leading-none tabular-nums tracking-tight">
                     1K+
                   </div>
                   <div class="font-sans text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#5F5268] mt-1.5 sm:mt-2">
@@ -114,7 +114,7 @@ import { IconComponent } from '../../../../shared';
 
                 <!-- Stat 2: 4.8 User Rating (with Orange Star) -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#7C0E44] leading-none tabular-nums tracking-tight flex items-center justify-center gap-0.5 sm:gap-1">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#D73389] leading-none tabular-nums tracking-tight flex items-center justify-center gap-0.5 sm:gap-1">
                     <span>4.8</span>
                     <span class="text-[#EA580C] text-[16px] sm:text-[22px] lg:text-[26px] leading-none -mt-0.5" aria-hidden="true">★</span>
                   </div>
@@ -125,7 +125,7 @@ import { IconComponent } from '../../../../shared';
 
                 <!-- Stat 3: 200+ Active Users -->
                 <div class="px-1.5 sm:px-4 flex flex-col items-center justify-center">
-                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#7C0E44] leading-none tabular-nums tracking-tight">
+                  <div class="font-sans text-[22px] sm:text-[32px] lg:text-[40px] font-bold text-[#D73389] leading-none tabular-nums tracking-tight">
                     200+
                   </div>
                   <div class="font-sans text-[11px] sm:text-[14px] lg:text-[15px] font-normal text-[#5F5268] mt-1.5 sm:mt-2">

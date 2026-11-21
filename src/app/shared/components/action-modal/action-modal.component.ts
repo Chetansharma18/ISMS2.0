@@ -60,7 +60,7 @@ import { IconComponent } from '../icon/icon.component';
 
             <!-- Title -->
             @if (title) {
-              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-[#D73389] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
@@ -87,7 +87,7 @@ import { IconComponent } from '../icon/icon.component';
                     <button
                       type="button"
                       (click)="onSecondaryAction()"
-                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#AA5E7A] text-[#7C0E44] text-sm font-medium hover:bg-[#F8EDF1] transition-colors cursor-pointer"
+                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#E865A6] text-[#D73389] text-sm font-medium hover:bg-[#FDF2F7] transition-colors cursor-pointer"
                     >
                       {{ secondaryLabel }}
                     </button>

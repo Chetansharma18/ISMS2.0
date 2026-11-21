@@ -50,7 +50,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <!-- Main Hero Heading -->
             <h1 class="hero-main-title font-black tracking-tight leading-[1.12] text-[#0B3558] mt-2 sm:mt-3 mb-0">
               Empowering Youth,<br />
-              Building <span class="text-[#7C0E44]">Skilled Rajasthan</span>
+              Building <span class="text-[#D73389]">Skilled Rajasthan</span>
             </h1>
 
             <!-- Supporting Description -->

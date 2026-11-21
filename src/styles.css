@@ -19,18 +19,18 @@
   --font-mono: var(--font-sans);
 
   /* Centralized Design System Palette - Light Burgundy, Dusty Rose, Soft Peach, White */
-  --color-primary: #7C0E44;
-  --color-primary-dark: #5E0832;
-  --color-primary-light: #F8EDF1;
-  --color-secondary: #AA5E7A;
-  --color-muted-rose: #D49A9A;
-  --color-light-peach: #F2DACE;
+  --color-primary: #D73389;
+  --color-primary-dark: #B82470;
+  --color-primary-light: #FDF2F7;
+  --color-secondary: #E865A6;
+  --color-muted-rose: #EAA8C8;
+  --color-light-peach: #FDF0F6;
 
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
   --color-surface-soft: #FCF8FA;
-  --color-surface-blush: #F8EDF1;
-  --color-surface-rose: #F6E7EA;
+  --color-surface-blush: #FDF2F7;
+  --color-surface-rose: #FDE8F1;
 
   --color-border: #EADCE2;
   --color-field-border: #E5D6DE;
@@ -40,24 +40,24 @@
   --color-text-muted: #89818A;
 
   /* Theme-aligned aliases */
-  --color-gov-blue: #7C0E44;
-  --color-gov-blue-dark: #5E0832;
-  --color-header-blue: #7C0E44;
-  --color-table-header: #F6E7EC;
-  --color-sso-blue: #7C0E44;
+  --color-gov-blue: #D73389;
+  --color-gov-blue-dark: #B82470;
+  --color-header-blue: #D73389;
+  --color-table-header: #FDE8F1;
+  --color-sso-blue: #D73389;
 
   /* Aliases kept for existing markup: text-brand / text-brand-dark / border-theme */
-  --color-brand: #7C0E44;
-  --color-brand-dark: #5E0832;
+  --color-brand: #D73389;
+  --color-brand-dark: #B82470;
   --color-theme: #EADCE2;
 
   /* Deep burgundy used for headers, primary CTAs and document chrome */
-  --color-navy: #7C0E44;
-  --color-navy-dark: #5E0832;
+  --color-navy: #D73389;
+  --color-navy-dark: #B82470;
 
   /* Dusty rose accent */
-  --color-ocean: #AA5E7A;
-  --color-ocean-dark: #7C0E44;
+  --color-ocean: #E865A6;
+  --color-ocean-dark: #D73389;
 
   /* Neutral surfaces and form borders */
   --color-surface-muted: #FCF8FA;
@@ -79,19 +79,19 @@
    --------------------------------------------------------- */
 :root {
   /* Brand */
-  --color-primary: #7C0E44;
-  --color-primary-dark: #5E0832;
-  --color-primary-light: #F8EDF1;
-  --color-secondary: #AA5E7A;
-  --color-muted-rose: #D49A9A;
-  --color-light-peach: #F2DACE;
+  --color-primary: #D73389;
+  --color-primary-dark: #B82470;
+  --color-primary-light: #FDF2F7;
+  --color-secondary: #E865A6;
+  --color-muted-rose: #EAA8C8;
+  --color-light-peach: #FDF0F6;
 
   /* Backgrounds */
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;
   --color-surface-soft: #FCF8FA;
-  --color-surface-blush: #F8EDF1;
-  --color-surface-rose: #F6E7EA;
+  --color-surface-blush: #FDF2F7;
+  --color-surface-rose: #FDE8F1;
 
   /* Text */
   --color-text-primary: #25212A;
@@ -303,7 +303,7 @@ textarea::placeholder {
    Sidebar Navigation Overrides
    Guarantees pure white / crisp readable text & icons for
    inactive navigation items on the burgundy gradient background,
-   and light peach (#F2DACE) with burgundy (#7C0E44) for active item.
+   and light peach (#F2DACE) with burgundy (#D73389) for active item.
    --------------------------------------------------------- */
 app-sidebar aside nav a {
   color: rgba(255, 255, 255, 0.95) !important;
@@ -321,16 +321,16 @@ app-sidebar aside nav a span {
 
 app-sidebar aside nav a.active-link,
 app-sidebar aside nav a[class*="bg-[#F2DACE]"],
-app-sidebar aside nav a[class*="text-[#7C0E44]"] {
+app-sidebar aside nav a[class*="text-[#D73389]"] {
   background-color: #F2DACE !important;
-  color: #7C0E44 !important;
+  color: #D73389 !important;
 }
 
 app-sidebar aside nav a.active-link app-icon,
 app-sidebar aside nav a.active-link span,
 app-sidebar aside nav a[class*="bg-[#F2DACE]"] app-icon,
 app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
-  color: #7C0E44 !important;
+  color: #D73389 !important;
 }
 
 /* Language Segmented Toggle in Header */
@@ -358,14 +358,14 @@ app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
 }
 
 .lang-toggle-btn:hover {
-  color: #7C0E44 !important;
+  color: #D73389 !important;
 }
 
 .lang-toggle-btn.active {
   background-color: #FFFFFF !important;
-  color: #7C0E44 !important;
+  color: #D73389 !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.08) !important;
+  box-shadow: 0 1px 2px rgba(215, 51, 137, 0.08) !important;
 }
 
 /* ---------------------------------------------------------
@@ -394,49 +394,49 @@ app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
 /* Primary action: deep burgundy, white text. */
 .btn-primary {
   color: #FFFFFF !important;
-  background-color: #7C0E44;
-  border-color: #7C0E44;
+  background-color: #D73389;
+  border-color: #D73389;
 }
 
 .btn-primary:hover {
-  background-color: #5E0832;
-  border-color: #5E0832;
+  background-color: #B82470;
+  border-color: #B82470;
 }
 
 .btn-secondary {
   color: #FFFFFF !important;
-  background-color: #AA5E7A;
-  border-color: #AA5E7A;
+  background-color: #E865A6;
+  border-color: #E865A6;
 }
 
 .btn-secondary:hover {
-  background-color: #8C4B64;
-  border-color: #8C4B64;
+  background-color: #D73389;
+  border-color: #D73389;
 }
 
 /* Secondary action next to a primary one: white with a dusty rose border (Back, View, Cancel, Close). */
 .btn-outline {
-  color: #7C0E44;
+  color: #D73389;
   background-color: #FFFFFF;
-  border-color: #AA5E7A;
-  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.05);
+  border-color: #E865A6;
+  box-shadow: 0 1px 2px rgba(215, 51, 137, 0.05);
 }
 
 .btn-outline:hover {
-  background-color: #F8EDF1;
-  border-color: #7C0E44;
-  color: #5E0832;
+  background-color: #FDF2F7;
+  border-color: #D73389;
+  color: #B82470;
 }
 
 .btn-reset {
-  color: #7C0E44;
+  color: #D73389;
   background-color: #FFFFFF;
   border-color: #EADCE2;
 }
 
 .btn-reset:hover {
-  background-color: #F8EDF1;
-  border-color: #AA5E7A;
+  background-color: #FDF2F7;
+  border-color: #E865A6;
 }
 
 .btn-sm {
@@ -690,8 +690,8 @@ select:focus {
 
 .card-header {
   padding: var(--space-4);
-  background-color: #F8E9EE;
-  color: #7C0E44;
+  background-color: #FDE8F1;
+  color: #D73389;
   border-bottom: 1px solid var(--color-border, #EADCE2);
   font-weight: 600;
 }
@@ -716,8 +716,8 @@ table.table {
 table.table th {
   height: 48px;
   padding: 0 var(--space-3);
-  background-color: #F6E7EC;
-  color: #7C0E44;
+  background-color: #FDE8F1;
+  color: #D73389;
   border-bottom: 1px solid var(--color-border, #EADCE2);
   font-size: 13.5px;
   font-weight: 600;

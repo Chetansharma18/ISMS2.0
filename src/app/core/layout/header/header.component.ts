@@ -89,7 +89,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <a routerLink="/" class="flex flex-col items-end justify-center text-right no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
                 <!-- Top Row: ISMS 2.0 (No background box) -->
                 <div class="leading-none">
-                  <span class="text-[#9C214A] font-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[31px] tracking-tight">
+                  <span class="text-[#D73389] font-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-[31px] tracking-tight">
                     ISMS 2.0
                   </span>
                 </div>
@@ -101,7 +101,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               </a>
 
               <!-- Divider between ISMS & SSO Login -->
-              <div class="hidden sm:block w-[1.5px] h-6 sm:h-7 lg:h-7.5 bg-[#8C1B3F]/25 shrink-0" aria-hidden="true"></div>
+              <div class="hidden sm:block w-[1.5px] h-6 sm:h-7 lg:h-7.5 bg-[#D73389]/25 shrink-0" aria-hidden="true"></div>
 
               <!-- SSO Login Button (Themed Icon + Text) -->
               <button
@@ -308,7 +308,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       <div class="my-1 border-t border-[#EADCE2]"></div>
 
                       <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-[#7C0E44]" />
+                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-[#D73389]" />
                         <span>Switch Role</span>
                       </div>
 
@@ -393,9 +393,9 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       cursor: pointer !important;
       border-radius: 7px !important;
       background: linear-gradient(135deg, #FFFFFF 0%, #FFF9FA 100%) !important;
-      border: 1.5px solid rgba(136, 28, 67, 0.25) !important;
-      color: #881C43 !important;
-      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.06) !important;
+      border: 1.5px solid rgba(215, 51, 137, 0.3) !important;
+      color: #D73389 !important;
+      box-shadow: 0 1px 3px rgba(215, 51, 137, 0.08) !important;
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
 
@@ -458,22 +458,22 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     }
 
     .header-sso-btn:hover {
-      background: linear-gradient(135deg, #FFF0F4 0%, #FDE4EB 100%) !important;
-      border-color: #881C43 !important;
-      color: #751235 !important;
-      box-shadow: 0 4px 14px rgba(136, 28, 67, 0.16), 0 0 0 1px rgba(136, 28, 67, 0.08) !important;
+      background: linear-gradient(135deg, #FFF0F7 0%, #FDEAF3 100%) !important;
+      border-color: #D73389 !important;
+      color: #B82470 !important;
+      box-shadow: 0 4px 14px rgba(215, 51, 137, 0.18), 0 0 0 1px rgba(215, 51, 137, 0.1) !important;
       transform: translateY(-1.5px);
     }
 
     .header-sso-btn:hover .sso-icon {
-      filter: drop-shadow(0 1px 2px rgba(136, 28, 67, 0.25));
+      filter: drop-shadow(0 1px 2px rgba(215, 51, 137, 0.25));
       transform: scale(1.08);
     }
 
     .header-sso-btn:active {
       transform: translateY(0);
-      background: #FAD3DF !important;
-      box-shadow: 0 1px 3px rgba(136, 28, 67, 0.12) !important;
+      background: #FCE1EE !important;
+      box-shadow: 0 1px 3px rgba(215, 51, 137, 0.12) !important;
     }
   `]
 })

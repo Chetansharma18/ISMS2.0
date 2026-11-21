@@ -35,8 +35,8 @@ const NO_DISTRICTS: string[] = [];
     <section class="border border-[#EADCE2] rounded-xl overflow-hidden bg-white shadow-2xs">
       <div class="bg-white px-5 py-3.5 border-b border-[#EADCE2] flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5 min-w-0">
-          <span class="w-6 h-6 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
-          <h2 class="text-base sm:text-[17px] font-bold text-[#7C0E44] m-0">Company Particulars &amp; Registration Details</h2>
+          <span class="w-6 h-6 rounded-full bg-[#D73389] text-white flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <h2 class="text-base sm:text-[17px] font-bold text-[#D73389] m-0">Company Particulars &amp; Registration Details</h2>
         </div>
         <span class="text-xs text-slate-500 tabular-nums font-semibold truncate">CIN: {{ state.editableStep1.registrationNumber || '-' }}</span>
       </div>
@@ -45,7 +45,7 @@ const NO_DISTRICTS: string[] = [];
         <!-- 1. Basic Organisation Details -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
-            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
+            <h3 class="text-[16px] font-semibold text-[#D73389] tracking-tight m-0">
               Basic Organisation Details
             </h3>
           </div>
@@ -165,7 +165,7 @@ const NO_DISTRICTS: string[] = [];
         <!-- 2. Registration & Documents -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
-            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
+            <h3 class="text-[16px] font-semibold text-[#D73389] tracking-tight m-0">
               Registration &amp; Statutory Documents
             </h3>
           </div>
@@ -257,7 +257,7 @@ const NO_DISTRICTS: string[] = [];
         <!-- 3. Contact Information -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
-            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
+            <h3 class="text-[16px] font-semibold text-[#D73389] tracking-tight m-0">
               Contact Information
             </h3>
           </div>
@@ -322,14 +322,14 @@ const NO_DISTRICTS: string[] = [];
         <!-- 4. Registered & Office Address -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
-            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
+            <h3 class="text-[16px] font-semibold text-[#D73389] tracking-tight m-0">
               Registered &amp; Office Address
             </h3>
           </div>
 
           <!-- Subsection A: Registered Address -->
           <div class="space-y-3.5 pt-1">
-            <h4 class="text-[15px] font-semibold text-[#7C0E44] m-0">
+            <h4 class="text-[15px] font-semibold text-[#D73389] m-0">
               A. Registered Address
             </h4>
 
@@ -395,7 +395,7 @@ const NO_DISTRICTS: string[] = [];
                 [ngModel]="state.editableStep1.sameAsRegistered"
                 (ngModelChange)="state.editableStep1.sameAsRegistered = $event"
                 [disabled]="!state.isEditingStep2()"
-                class="w-4 h-4 text-[#7C0E44] border-[#EADCE2] rounded focus:ring-[#AA5E7A] accent-[#7C0E44]"
+                class="w-4 h-4 text-[#D73389] border-[#EADCE2] rounded focus:ring-[#E865A6] accent-[#D73389]"
               />
               <span>Office address is the same as registered address</span>
             </label>
@@ -409,7 +409,7 @@ const NO_DISTRICTS: string[] = [];
           <!-- Subsection B: Office Address -->
           @if (!state.editableStep1.sameAsRegistered) {
             <div class="space-y-3.5 pt-1">
-              <h4 class="text-[15px] font-semibold text-[#7C0E44] m-0">
+              <h4 class="text-[15px] font-semibold text-[#D73389] m-0">
                 B. Office Address
               </h4>
 
@@ -508,7 +508,7 @@ const NO_DISTRICTS: string[] = [];
     }
 
     :host ::ng-deep app-form-input > div > div.relative:focus-within {
-      border-color: #AA5E7A !important;
+      border-color: #E865A6 !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
@@ -538,7 +538,7 @@ const NO_DISTRICTS: string[] = [];
     }
 
     :host ::ng-deep app-form-select button[type="button"]:focus {
-      border-color: #AA5E7A !important;
+      border-color: #E865A6 !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
@@ -557,7 +557,7 @@ const NO_DISTRICTS: string[] = [];
     }
 
     :host ::ng-deep app-form-textarea textarea:focus {
-      border-color: #AA5E7A !important;
+      border-color: #E865A6 !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 

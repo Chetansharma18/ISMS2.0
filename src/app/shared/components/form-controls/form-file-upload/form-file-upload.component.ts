@@ -44,11 +44,11 @@ import { IconComponent } from '../../icon/icon.component';
             class="w-full flex items-center justify-between p-3 sm:p-3.5 rounded-lg border border-[#EADCE2] bg-white hover:bg-[#FCF8FA] transition-colors cursor-pointer shadow-2xs group"
           >
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-8.5 h-8.5 rounded-md bg-[#FCF8FA] flex items-center justify-center text-[#625663] group-hover:text-[#7C0E44] group-hover:bg-[#F8EDF1] transition-colors shrink-0">
+              <div class="w-8.5 h-8.5 rounded-md bg-[#FCF8FA] flex items-center justify-center text-[#625663] group-hover:text-[#D73389] group-hover:bg-[#FDF2F7] transition-colors shrink-0">
                 <app-icon name="document" size="sm" [stroke]="2" />
               </div>
               <div class="min-w-0 text-left">
-                <span class="block text-xs sm:text-[13px] font-semibold text-[#25212A] group-hover:text-[#7C0E44] truncate">
+                <span class="block text-xs sm:text-[13px] font-semibold text-[#25212A] group-hover:text-[#D73389] truncate">
                   {{ uploadPrompt || ('Upload ' + (label || 'document')) }}
                 </span>
                 <span class="block text-[11px] text-[#625663] font-normal mt-0.5">
@@ -56,7 +56,7 @@ import { IconComponent } from '../../icon/icon.component';
                 </span>
               </div>
             </div>
-            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-400 group-hover:text-[#7C0E44] shrink-0" />
+            <app-icon name="upload" size="sm" [stroke]="2" class="text-slate-400 group-hover:text-[#D73389] shrink-0" />
           </div>
         } @else {
           <div class="flex items-center gap-2.5 flex-wrap">
@@ -101,7 +101,7 @@ import { IconComponent } from '../../icon/icon.component';
             <button
               type="button"
               (click)="openPreview()"
-              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#7C0E44] hover:text-[#5E0832] bg-[#F8EDF1] hover:bg-[#F2DACE] border border-[#EADCE2] rounded transition-colors cursor-pointer"
+              class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-[#D73389] hover:text-[#B82470] bg-[#FDF2F7] hover:bg-[#FDF0F6] border border-[#EADCE2] rounded transition-colors cursor-pointer"
               title="Open {{ fileDoc.fileName }} in new tab"
             >
               <app-icon name="external-link" size="sm" [stroke]="2" />

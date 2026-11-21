@@ -63,7 +63,7 @@ import { isEditDisabled } from './tenders-page.util';
         >
           <app-icon name="users-committee" size="sm" [stroke]="2" />
           @if ((item().committeeMembers && item().committeeMembers!.length > 0) || item().committeeApprover) {
-            <span class="absolute -top-1 -right-1 px-1 min-w-[14px] h-[14px] leading-[14px] text-center rounded-full text-[9px] font-bold bg-[#7C0E44] text-white">
+            <span class="absolute -top-1 -right-1 px-1 min-w-[14px] h-[14px] leading-[14px] text-center rounded-full text-[9px] font-bold bg-[#D73389] text-white">
               {{ (item().committeeMembers?.length || 0) + (item().committeeApprover ? 1 : 0) }}
             </span>
           }

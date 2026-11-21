@@ -101,7 +101,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               </div>
               <div class="flex items-center gap-3 shrink-0">
                 @if (editingSchemeRefNo()) {
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#FDF2F7] text-[#D73389] border border-[#EADCE2]">
                     Ref: {{ editingSchemeRefNo() }}
                   </span>
                 }

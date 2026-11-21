@@ -496,8 +496,8 @@ interface FormBuilderFormData {
 
                           <!-- Sub-options: Photo Upload -->
                           @if (field.type === 'photo') {
-                            <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
-                              <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
+                            <div class="mt-3 p-3 rounded-md bg-[#FDF2F7] border border-[#EADCE2] space-y-2">
+                              <div class="text-xs font-semibold text-[#D73389]">Photo Upload Constraints</div>
                               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div>
                                   <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
@@ -671,8 +671,8 @@ interface FormBuilderFormData {
 
                       <!-- Conditional: Photo -->
                       @if (field.type === 'photo') {
-                        <div class="mt-3 p-3 rounded-md bg-[#F8EDF1] border border-[#EADCE2] space-y-2">
-                          <div class="text-xs font-semibold text-[#7C0E44]">Photo Upload Constraints</div>
+                        <div class="mt-3 p-3 rounded-md bg-[#FDF2F7] border border-[#EADCE2] space-y-2">
+                          <div class="text-xs font-semibold text-[#D73389]">Photo Upload Constraints</div>
                           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                               <label class="block text-[11px] font-semibold text-slate-700 mb-1">Min Photos*</label>
@@ -2806,7 +2806,7 @@ export class DynamicFormBuilderComponent {
       case 'number': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'datepicker': return 'bg-amber-50 text-amber-700 border-amber-200';
       case 'dropdown': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      case 'photo': return 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]';
+      case 'photo': return 'bg-[#FDF2F7] text-[#D73389] border-[#EADCE2]';
       default: return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   }

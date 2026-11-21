@@ -233,7 +233,7 @@ interface TwoStepFormData {
             @if (formData.authTypes.length > 0) {
               <div class="mt-2.5 flex flex-wrap gap-1.5">
                 @for (type of formData.authTypes; track type) {
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shadow-2xs">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#FDF2F7] text-[#D73389] border border-[#EADCE2] shadow-2xs">
                     <span>{{ type }}</span>
                     <button
                       appButton
@@ -282,7 +282,7 @@ interface TwoStepFormData {
               <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Authentication Methods</span>
               <div class="flex flex-wrap gap-2">
                 @for (type of item.authTypes; track type) {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#FDF2F7] text-[#D73389] border border-[#EADCE2]">
                     {{ type }}
                   </span>
                 }

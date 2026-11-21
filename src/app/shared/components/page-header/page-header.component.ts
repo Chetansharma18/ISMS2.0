@@ -42,7 +42,7 @@ export interface BreadcrumbItem {
           <button
             type="button"
             (click)="onBackClick()"
-            class="w-8 h-8 rounded-full border border-[#EADCE2] bg-white/90 hover:bg-white flex items-center justify-center text-[#7C0E44] shadow-2xs transition-all cursor-pointer shrink-0"
+            class="w-8 h-8 rounded-full border border-[#EADCE2] bg-white/90 hover:bg-white flex items-center justify-center text-[#D73389] shadow-2xs transition-all cursor-pointer shrink-0"
             [title]="backTitle"
             [attr.aria-label]="backTitle"
           >
@@ -53,12 +53,12 @@ export interface BreadcrumbItem {
         <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
           <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
             <h1
-              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#7C0E44] tracking-tight leading-tight"
+              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#D73389] tracking-tight leading-tight"
             >
               {{ title }}
             </h1>
             @if (badge) {
-              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#7C0E44] text-white select-none tracking-wide shrink-0">
+              <span class="px-2 py-0.5 text-xs font-bold rounded-md bg-[#D73389] text-white select-none tracking-wide shrink-0">
                 {{ badge }}
               </span>
             }
@@ -87,7 +87,7 @@ export class PageHeaderComponent {
   @Input() showBack = false;
   @Input() backTitle = 'Go Back';
   @Input() badge?: string;
-  @Input() bgColor = 'var(--color-primary, #7C0E44)';
+  @Input() bgColor = 'var(--color-primary, #D73389)';
   @Input() searchable = false;
   @Input() searchPlaceholder = 'Search...';
 

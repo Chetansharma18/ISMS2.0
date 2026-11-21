@@ -37,8 +37,8 @@ interface TenderItem {
         <!-- PANEL HEADER (Matches mockup: Document icon, Tender Notices, Active badge, View All ->) -->
         <div class="tender-panel-header px-5 sm:px-6 border-b border-[#F1E8EC] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
-            <app-icon name="document" size="md" class="text-[#7C0E44]" />
-            <h2 class="text-[16px] sm:text-[17px] font-bold text-[#7C0E44] tracking-tight m-0">Tender Notices</h2>
+            <app-icon name="document" size="md" class="text-[#D73389]" />
+            <h2 class="text-[16px] sm:text-[17px] font-bold text-[#D73389] tracking-tight m-0">Tender Notices</h2>
             <!-- Live Active Indicator Badge -->
             <span class="tender-live-badge">
               <span class="tender-live-dot"></span>
@@ -206,7 +206,7 @@ interface TenderItem {
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tender-item-row:hover {
-      background: linear-gradient(90deg, rgba(136, 28, 67, 0.04) 0%, rgba(255, 255, 255, 0.95) 100%);
+      background: linear-gradient(90deg, rgba(215, 51, 137, 0.04) 0%, rgba(255, 255, 255, 0.95) 100%);
       transform: translateX(4px);
     }
 
@@ -220,8 +220,8 @@ interface TenderItem {
       transition: all 0.22s ease;
     }
     .tender-item-row:hover .tender-accent-bar {
-      background: linear-gradient(180deg, #EA580C 0%, #881C43 100%);
-      box-shadow: 0 0 8px rgba(136, 28, 67, 0.35);
+      background: linear-gradient(180deg, #EA580C 0%, #D73389 100%);
+      box-shadow: 0 0 8px rgba(215, 51, 137, 0.35);
     }
 
     .tender-date-chip {
@@ -237,8 +237,8 @@ interface TenderItem {
       transition: all 0.2s ease;
     }
     .tender-item-row:hover .tender-date-chip {
-      background: rgba(136, 28, 67, 0.08);
-      color: #881C43;
+      background: rgba(215, 51, 137, 0.08);
+      color: #D73389;
     }
 
     .tender-new-badge {
@@ -255,19 +255,19 @@ interface TenderItem {
     .tender-category-badge {
       font-size: 11px;
       font-weight: 700;
-      color: #7C0E44;
-      background: rgba(136, 28, 67, 0.06);
-      border: 1px solid rgba(136, 28, 67, 0.2);
+      color: #D73389;
+      background: rgba(215, 51, 137, 0.06);
+      border: 1px solid rgba(215, 51, 137, 0.2);
       border-radius: 6px;
       padding: 2px 8px;
       flex-shrink: 0;
       transition: all 0.2s ease;
     }
     .tender-item-row:hover .tender-category-badge {
-      background: #881C43;
+      background: #D73389;
       color: #FFFFFF;
-      border-color: #881C43;
-      box-shadow: 0 2px 6px rgba(136, 28, 67, 0.25);
+      border-color: #D73389;
+      box-shadow: 0 2px 6px rgba(215, 51, 137, 0.25);
     }
 
     .tender-title {
@@ -288,7 +288,7 @@ interface TenderItem {
       }
     }
     .tender-item-row:hover .tender-title {
-      color: #7C0E44;
+      color: #D73389;
     }
 
     .tender-ref-id {
@@ -325,7 +325,7 @@ interface TenderItem {
       transition: all 0.22s ease;
     }
     .tender-item-row:hover .tender-row-arrow {
-      color: #7C0E44;
+      color: #D73389;
       opacity: 1;
       transform: translateX(3px);
     }

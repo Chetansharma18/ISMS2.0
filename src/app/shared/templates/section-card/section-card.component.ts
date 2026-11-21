@@ -18,7 +18,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     @if (title()) {
       <div class="px-4 sm:px-5 py-3 border-b border-[#EADCE2] bg-[#F8E9EE] flex items-center justify-between gap-3">
         <div class="min-w-0">
-          <h3 class="text-sm font-semibold text-[#7C0E44] m-0">{{ title() }}</h3>
+          <h3 class="text-sm font-semibold text-[#D73389] m-0">{{ title() }}</h3>
           @if (subtitle()) {
             <p class="text-xs text-[#625663] m-0 mt-0.5">{{ subtitle() }}</p>
           }

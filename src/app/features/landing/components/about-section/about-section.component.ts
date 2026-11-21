@@ -33,8 +33,8 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <!-- Left Column: About Content (~55% width) -->
           <div class="w-full flex flex-col justify-center text-left">
             
-            <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #7C0E44 -->
-            <h2 id="about-isms-heading" class="font-sans text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#7C0E44] m-0 tracking-tight">
+            <!-- Section Heading: Inter 700, 36px Desktop / 32px Tablet / 28px Mobile, #D73389 -->
+            <h2 id="about-isms-heading" class="font-sans text-[28px] sm:text-[32px] xl:text-[36px] font-bold leading-[1.2] text-[#D73389] m-0 tracking-tight">
               About ISMS <span class="text-[#EA580C]">2.0</span>
             </h2>
 
@@ -56,9 +56,9 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <div class="w-full flex items-center justify-center">
             
             <!-- Video Container Card: 16:9, rounded 12px, border 1px solid #EADCE2, subtle shadow -->
-            <div class="w-full rounded-xl overflow-hidden bg-[#5E0832] border border-[#EADCE2] shadow-[0_4px_16px_rgba(124,14,68,0.08)] relative transform-[translateZ(0)] will-change-transform">
+            <div class="w-full rounded-xl overflow-hidden bg-[#B82470] border border-[#EADCE2] shadow-[0_4px_16px_rgba(215,51,137,0.08)] relative transform-[translateZ(0)] will-change-transform">
               
-              <div class="relative w-full aspect-video bg-[#5E0832] overflow-hidden flex items-center justify-center">
+              <div class="relative w-full aspect-video bg-[#B82470] overflow-hidden flex items-center justify-center">
                 
                 <!-- Actual Video Element -->
                 <video 

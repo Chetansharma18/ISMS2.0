@@ -48,7 +48,7 @@ import { IconComponent } from '../icon/icon.component';
         <table class="table w-full text-left border-collapse text-[13px] bg-white">
           <!-- Themed Table Header -->
           <thead>
-            <tr class="bg-[#F6E7EC] text-[#7C0E44] text-[13.5px] font-semibold select-none border-b border-[#EADCE2]">
+            <tr class="bg-[#FDE8F1] text-[#D73389] text-[13.5px] font-semibold select-none border-b border-[#EADCE2]">
               @for (col of columns; track col.key; let last = $last) {
                 <th
                   class="h-12 px-3.5 select-none whitespace-nowrap"
@@ -476,17 +476,17 @@ export class TableComponent {
     switch (act.variant) {
       case 'primary':
       case 'pdf-view':
-        return base + 'bg-[#7C0E44] hover:bg-[#5E0832] text-white';
+        return base + 'bg-[#D73389] hover:bg-[#B82470] text-white';
       case 'secondary':
-        return base + 'bg-[#AA5E7A] hover:bg-[#8C4B64] text-white';
+        return base + 'bg-[#E865A6] hover:bg-[#8C4B64] text-white';
       case 'outline':
-        return base + 'border border-[#AA5E7A] text-[#7C0E44] bg-white hover:bg-[#F8EDF1]';
+        return base + 'border border-[#E865A6] text-[#D73389] bg-white hover:bg-[#FDF2F7]';
       case 'danger':
         return base + 'bg-[#FCE8E8] text-[#C62828] hover:bg-[#F9C5C5] border border-[#F9C5C5]';
       case 'ghost':
-        return 'p-1 text-[#7C0E44] hover:bg-[#F8EDF1] rounded transition-colors';
+        return 'p-1 text-[#D73389] hover:bg-[#FDF2F7] rounded transition-colors';
       default:
-        return base + 'bg-[#7C0E44] hover:bg-[#5E0832] text-white';
+        return base + 'bg-[#D73389] hover:bg-[#B82470] text-white';
     }
   }
 }

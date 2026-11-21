@@ -52,13 +52,13 @@ let nextId = 0;
         [attr.aria-labelledby]="title() ? titleId : null"
         (click)="$event.stopPropagation()"
       >
-        <div class="h-1.5 w-full bg-[#7C0E44] shrink-0 print:hidden"></div>
+        <div class="h-1.5 w-full bg-[#D73389] shrink-0 print:hidden"></div>
 
         @if (title() || showClose()) {
           <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-[#EADCE2] flex items-start justify-between gap-3 shrink-0">
             <div class="min-w-0">
               @if (title()) {
-                <h2 [id]="titleId" class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">{{ title() }}</h2>
+                <h2 [id]="titleId" class="text-base sm:text-lg font-bold text-[#D73389] m-0">{{ title() }}</h2>
               }
               @if (subtitle()) {
                 <p class="text-xs text-[#625663] m-0 mt-0.5">{{ subtitle() }}</p>
@@ -73,7 +73,7 @@ let nextId = 0;
                 aria-label="Close"
                 title="Close"
                 (click)="close.emit()"
-                class="hover:bg-[#F8EDF1] hover:text-[#7C0E44] text-[#625663] rounded-lg transition-colors shrink-0 -mr-1 -mt-1 cursor-pointer"
+                class="hover:bg-[#FDF2F7] hover:text-[#D73389] text-[#625663] rounded-lg transition-colors shrink-0 -mr-1 -mt-1 cursor-pointer"
               >
                 <app-icon name="close" size="lg" />
               </button>

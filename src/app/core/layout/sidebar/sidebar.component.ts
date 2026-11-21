@@ -34,8 +34,8 @@ import {
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
-      style="background: linear-gradient(180deg, #5E0832 0%, #7C0E44 50%, #4A0626 100%);"
+      class="shrink-0 text-white border-r border-[#8F1654] h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
+      style="background: linear-gradient(180deg, #B82470 0%, #D73389 50%, #8F1654 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
@@ -45,7 +45,7 @@ import {
         <!-- Mobile Sidebar Close Header (Visible only < md) -->
         <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10">
           <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
+            <span class="font-bold text-sm text-white">ISMS <span class="text-[#FDF0F6]">2.0</span></span>
             <span class="text-[11px] text-white/70 font-medium">Menu</span>
           </div>
           <button
@@ -73,23 +73,23 @@ import {
             @for (item of adminToolNav; track item.link) {
               <a
                 [routerLink]="item.link"
-                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                routerLinkActive="!bg-[#FDF0F6] !text-[#D73389] font-bold shadow-xs active-link"
                 #adminRla="routerLinkActive"
                 [routerLinkActiveOptions]="defaultMatch"
-                [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                [style.color]="adminRla.isActive ? '#D73389' : '#FFFFFF'"
                 class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
               >
                 <app-icon
                   [name]="item.icon"
-                  [class.!text-[#7C0E44]]="adminRla.isActive"
+                  [class.!text-[#D73389]]="adminRla.isActive"
                   [class.text-white/80]="!adminRla.isActive"
                   [class.group-hover:text-white]="!adminRla.isActive"
-                  [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                  [style.color]="adminRla.isActive ? '#D73389' : '#FFFFFF'"
                 />
                 <span
                   class="tracking-tight"
-                  [class.!text-[#7C0E44]]="adminRla.isActive"
-                  [style.color]="adminRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                  [class.!text-[#D73389]]="adminRla.isActive"
+                  [style.color]="adminRla.isActive ? '#D73389' : '#FFFFFF'"
                 >{{ item.label }}</span>
               </a>
             }
@@ -128,12 +128,12 @@ import {
     <ng-template #navLink let-item let-pending="pending">
       <a
         [routerLink]="item.link"
-        [class.!bg-[#F2DACE]]="isActive(item.key)"
-        [class.!text-[#7C0E44]]="isActive(item.key)"
+        [class.!bg-[#FDF0F6]]="isActive(item.key)"
+        [class.!text-[#D73389]]="isActive(item.key)"
         [class.font-bold]="isActive(item.key)"
         [class.shadow-xs]="isActive(item.key)"
         [class.active-link]="isActive(item.key)"
-        [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+        [style.color]="isActive(item.key) ? '#D73389' : '#FFFFFF'"
         class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
       >
         <div class="flex items-center gap-2.5 min-w-0">
@@ -141,16 +141,16 @@ import {
             [name]="item.icon"
             [stroke]="item.stroke ?? 1.75"
             class="transition-colors"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
+            [class.!text-[#D73389]]="isActive(item.key)"
             [class.text-white/80]="!isActive(item.key)"
             [class.group-hover:text-white]="!isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            [style.color]="isActive(item.key) ? '#D73389' : '#FFFFFF'"
           />
           <span
             class="tracking-tight min-w-0"
             [class.font-medium]="item.bold"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            [class.!text-[#D73389]]="isActive(item.key)"
+            [style.color]="isActive(item.key) ? '#D73389' : '#FFFFFF'"
           >{{ item.label }}</span>
         </div>
         @if (pending) {
@@ -202,14 +202,14 @@ import {
               <a
                 [routerLink]="sub.link"
                 [queryParams]="sub.query"
-                routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                routerLinkActive="!bg-[#FDF0F6] !text-[#D73389] font-bold shadow-xs active-link"
                 #subRla="routerLinkActive"
                 [routerLinkActiveOptions]="sub.query ? exactMatch : defaultMatch"
-                [style.color]="subRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                [style.color]="subRla.isActive ? '#D73389' : '#FFFFFF'"
                 class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
               >
-                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="subRla.isActive ? 'bg-[#7C0E44]' : 'bg-white/50'"></span>
-                <span class="truncate" [class.!text-[#7C0E44]]="subRla.isActive" [style.color]="subRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ sub.label }}</span>
+                <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="subRla.isActive ? 'bg-[#D73389]' : 'bg-white/50'"></span>
+                <span class="truncate" [class.!text-[#D73389]]="subRla.isActive" [style.color]="subRla.isActive ? '#D73389' : '#FFFFFF'">{{ sub.label }}</span>
               </a>
             }
           </div>

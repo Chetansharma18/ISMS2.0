@@ -17,11 +17,11 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
 
       <!-- Profile Verification Banner (Read-only / Non-editable) -->
       <div class="flex items-start sm:items-center gap-3 p-3.5 sm:p-4 bg-[#FCF8FA] border border-[#EADCE2] rounded-xl shadow-xs">
-        <div class="w-8.5 h-8.5 rounded-lg flex items-center justify-center shrink-0 bg-[#F8EDF1] text-[#7C0E44]">
+        <div class="w-8.5 h-8.5 rounded-lg flex items-center justify-center shrink-0 bg-[#FDF2F7] text-[#D73389]">
           <app-icon name="lock" size="sm" [stroke]="2" />
         </div>
         <div class="min-w-0">
-          <div class="text-xs sm:text-sm font-bold text-[#7C0E44] leading-tight">
+          <div class="text-xs sm:text-sm font-bold text-[#D73389] leading-tight">
             Registration Profile Verification
           </div>
           <p class="text-xs text-slate-500 m-0 mt-0.5 truncate sm:whitespace-normal">

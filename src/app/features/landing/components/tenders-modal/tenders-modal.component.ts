@@ -34,9 +34,9 @@ interface Tender {
               <span class="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" aria-hidden="true"></span>
               <span class="text-xs font-bold text-slate-800 tracking-wide uppercase">Active Notices</span>
             </div>
-            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F8EDF1] border border-[#EADCE2]">
-              <span class="text-[11px] font-medium text-[#7C0E44]">Total Tenders:</span>
-              <strong class="text-xs font-bold text-[#7C0E44] tabular-nums">{{ tenders.length }}</strong>
+            <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FDF2F7] border border-[#EADCE2]">
+              <span class="text-[11px] font-medium text-[#D73389]">Total Tenders:</span>
+              <strong class="text-xs font-bold text-[#D73389] tabular-nums">{{ tenders.length }}</strong>
             </div>
           </div>
 
@@ -45,10 +45,10 @@ interface Tender {
             @for (item of tenders; track item.id) {
               <div
                 (click)="openLoginPrompt(item)"
-                class="group relative bg-white border border-[#E2E8F0] hover:border-[#7C0E44]/40 hover:bg-[#FFFDFC] shadow-2xs hover:shadow-md rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 cursor-pointer overflow-hidden"
+                class="group relative bg-white border border-[#E2E8F0] hover:border-[#D73389]/40 hover:bg-[#FFFDFC] shadow-2xs hover:shadow-md rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 cursor-pointer overflow-hidden"
               >
                 <!-- Left Accent Line on Hover -->
-                <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#7C0E44] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></div>
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#D73389] opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true"></div>
 
                 @if (item.isNew) {
                   <img src="/new.png" alt="New Tender" class="absolute -top-1 -left-1 w-6 sm:w-7 h-6 sm:h-7 object-cover z-10 pointer-events-none drop-shadow-2xs rounded-tl-xl" />
@@ -64,11 +64,11 @@ interface Tender {
                     <span class="text-slate-300">•</span>
                     <span class="text-[11px] font-medium text-slate-600 tabular-nums truncate max-w-[200px] sm:max-w-none">{{ item.id }}</span>
                     <span class="text-slate-300">•</span>
-                    <span class="text-[10.5px] font-semibold text-[#7C0E44] bg-[#F8EDF1] px-2 py-0.5 rounded-md border border-[#EADCE2]">{{ item.category }}</span>
+                    <span class="text-[10.5px] font-semibold text-[#D73389] bg-[#FDF2F7] px-2 py-0.5 rounded-md border border-[#EADCE2]">{{ item.category }}</span>
                   </div>
 
                   <!-- Title -->
-                  <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-[#7C0E44] transition-colors line-clamp-2 m-0">
+                  <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-[#D73389] transition-colors line-clamp-2 m-0">
                     {{ item.title }}
                   </h4>
                 </div>

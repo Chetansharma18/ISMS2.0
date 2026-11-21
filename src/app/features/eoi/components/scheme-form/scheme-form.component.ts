@@ -38,7 +38,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
           </div>
 
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#D73389] tracking-tight m-0">
               Apply for EOI
             </h1>
             <span class="text-xs text-slate-500 font-medium select-none">
@@ -73,10 +73,10 @@ export type { EoiDocumentItem } from './scheme-form.model';
 
           <div class="pb-3.5 border-b border-[#EADCE2] space-y-1">
             <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-full bg-[#7C0E44] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              <span class="w-7 h-7 rounded-full bg-[#D73389] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                 {{ state.currentStep() }}
               </span>
-              <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0">
+              <h2 class="text-lg sm:text-[19px] font-bold text-[#D73389] m-0">
                 {{ stepTitle() }}
               </h2>
             </div>

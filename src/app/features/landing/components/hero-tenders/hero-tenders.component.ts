@@ -37,11 +37,21 @@ interface TenderItem {
         <!-- Multi-color Rajasthan Royal Top Accent Stripe -->
         <div class="tender-top-stripe" aria-hidden="true"></div>
 
-        <!-- PANEL HEADER (Executive Royal Blue with Golden Amber Icon & Live Indicator) -->
-        <div class="tender-panel-header px-4.5 sm:px-5.5 flex items-center justify-between shrink-0 z-10">
-          <div class="flex items-center gap-3">
+        <!-- PANEL HEADER (Off-White with Subtle Heritage Background Artwork & Low Gradient) -->
+        <div class="tender-panel-header px-4.5 sm:px-5.5 flex items-center justify-between shrink-0 relative overflow-hidden z-10">
+          
+          <!-- Subtle Heritage Watermark Background Image Layer -->
+          <div class="tender-header-bg-wrap" aria-hidden="true">
+            <img 
+              src="/rajasthan-heritage-palace.png" 
+              alt="" 
+              class="tender-header-bg-art"
+            />
+          </div>
+
+          <div class="flex items-center gap-3 relative z-10">
             <div class="tender-icon-box" aria-hidden="true">
-              <app-icon name="document" size="md" />
+              <app-icon name="document" size="md" class="text-[#D73389]" />
             </div>
             <div>
               <div class="flex items-center gap-2">
@@ -57,16 +67,18 @@ interface TenderItem {
           </div>
           
           <!-- View All Action -->
-          <button 
-            appButton
-            variant="inverse"
-            size="sm"
-            type="button"
-            (click)="openModal()" 
-            aria-label="View all tenders in modal">
-            <span>View All</span>
-            <app-icon name="arrow-right" size="xs" />
-          </button>
+          <div class="relative z-10 shrink-0">
+            <button 
+              appButton
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="openModal()" 
+              aria-label="View all tenders in modal">
+              <span>View All</span>
+              <app-icon name="arrow-right" size="xs" />
+            </button>
+          </div>
         </div>
 
         <!-- TENDER LIST: Clean readable rows, subtle dividers, internally scrollable -->
@@ -193,29 +205,56 @@ interface TenderItem {
     .tender-panel-header {
       height: 68px;
       position: relative;
-      background: linear-gradient(135deg, #162F65 0%, #1E3A8A 55%, #224599 100%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 60%, #F5F2EB 100%);
+      border-bottom: 1px solid #ECE7DF;
+    }
+
+    .tender-header-bg-wrap {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+
+    .tender-header-bg-art {
+      height: 100%;
+      width: auto;
+      max-width: 58%;
+      object-fit: contain;
+      object-position: bottom right;
+      opacity: 0.22;
+      filter: saturate(0.85) contrast(1.05);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+      user-select: none;
+      transition: opacity 0.3s ease;
+    }
+    .tender-panel-card:hover .tender-header-bg-art {
+      opacity: 0.30;
     }
 
     .tender-icon-box {
       width: 38px;
       height: 38px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: #FDF2F7;
+      border: 1px solid rgba(215, 51, 137, 0.22);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #FDE047;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      color: #D73389;
+      box-shadow: 0 1px 3px rgba(215, 51, 137, 0.08);
       flex-shrink: 0;
     }
 
     .tender-header-title {
       font-size: 16.5px;
       font-weight: 700;
-      color: #FFFFFF;
-      letter-spacing: -0.01em;
+      color: #1E293B;
+      letter-spacing: -0.015em;
       margin: 0;
       line-height: 1.2;
     }
@@ -223,50 +262,31 @@ interface TenderItem {
     .tender-header-subtitle {
       font-size: 11px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.75);
+      color: #64748B;
       margin: 2px 0 0 0;
       line-height: 1;
-    }
-
-    .tender-panel-header .btn {
-      background: rgba(255, 255, 255, 0.14) !important;
-      border: 1px solid rgba(255, 255, 255, 0.28) !important;
-      color: #FFFFFF !important;
-      border-radius: 8px !important;
-      font-weight: 600 !important;
-      gap: 5px !important;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
-      transition: all 0.2s ease !important;
-    }
-    .tender-panel-header .btn:hover {
-      background: rgba(255, 255, 255, 0.25) !important;
-      border-color: rgba(255, 255, 255, 0.45) !important;
-      color: #FFFFFF !important;
-      transform: translateY(-1px) !important;
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
-      text-decoration: none !important;
     }
 
     .tender-live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 1.5px 7px;
+      gap: 4.5px;
+      padding: 1.5px 7.5px;
       border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid rgba(52, 211, 153, 0.35);
-      color: #6EE7B7;
+      background: #ECFDF5;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #047857;
       font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       text-transform: uppercase;
     }
     .tender-live-dot {
       width: 5.5px;
       height: 5.5px;
       border-radius: 9999px;
-      background-color: #34D399;
-      box-shadow: 0 0 8px #34D399;
+      background-color: #10B981;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
       animation: tenderPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     @keyframes tenderPulse {

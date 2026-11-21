@@ -85,7 +85,7 @@ export interface AnnouncementItem {
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0 focus:outline-none focus:text-[#F28C28]"
                 >
                   <!-- Date Badge -->
-                  <span class="bg-[#172554] text-[#FDE047] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
+                  <span class="text-[#FDE047] font-semibold text-[11px] sm:text-[12px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text (Hindi / English - explicitly pure white) -->
@@ -108,7 +108,7 @@ export interface AnnouncementItem {
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0"
                 >
                   <!-- Date Badge -->
-                  <span class="bg-[#172554] text-[#FDE047] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
+                  <span class="text-[#FDE047] font-semibold text-[11px] sm:text-[12px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Announcement Text -->

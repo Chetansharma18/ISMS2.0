@@ -32,29 +32,17 @@ interface TenderItem {
   template: `
     <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
     <div class="w-full h-full flex flex-col">
-      <div class="tender-panel-card w-full h-[380px] sm:h-[395px] lg:h-[405px] xl:h-[415px] 2xl:h-[425px] rounded-xl sm:rounded-[14px] flex flex-col overflow-hidden relative">
+      <div class="tender-panel-card w-full h-[420px] sm:h-[430px] lg:h-[445px] xl:h-[460px] rounded-2xl flex flex-col overflow-hidden relative">
         
-        <!-- Full-Cover Authentic Rajasthan Background Image (Centered & Covering Entire Card) -->
-        <div class="tender-card-bg-wrap" aria-hidden="true">
-          <img
-            src="/raj.png"
-            alt=""
-            class="tender-card-bg-img"
-            loading="eager"
-          />
-          <div class="tender-card-bg-overlay"></div>
-        </div>
-
-        <!-- PANEL HEADER -->
-        <div class="tender-panel-header px-5 sm:px-6 border-b border-[#EADCE2] flex items-center justify-between shrink-0 z-10">
+        <!-- PANEL HEADER (Matches mockup: Document icon, Tender Notices, Active badge, View All ->) -->
+        <div class="tender-panel-header px-5 sm:px-6 border-b border-[#F1E8EC] flex items-center justify-between shrink-0 z-10">
           <div class="flex items-center gap-2.5">
-            <!-- Small Orange Accent Bar -->
-            <span class="w-1.5 h-4.5 bg-[#EA580C] rounded-full inline-block" aria-hidden="true"></span>
-            <h2 class="text-[15.5px] sm:text-[16.5px] font-bold text-[#7C0E44] tracking-wide m-0">TENDER NOTICES</h2>
-            <!-- Live Indicator Badge -->
+            <app-icon name="document" size="md" class="text-[#7C0E44]" />
+            <h2 class="text-[16px] sm:text-[17px] font-bold text-[#7C0E44] tracking-tight m-0">Tender Notices</h2>
+            <!-- Live Active Indicator Badge -->
             <span class="tender-live-badge">
               <span class="tender-live-dot"></span>
-              <span class="hidden sm:inline">Active</span>
+              <span>Active</span>
             </span>
           </div>
           
@@ -67,7 +55,7 @@ interface TenderItem {
             (click)="openModal()" 
             aria-label="View all tenders in modal">
             <span>View All</span>
-            <app-icon name="chevron-right" size="sm" />
+            <app-icon name="arrow-right" size="xs" />
           </button>
         </div>
 
@@ -163,50 +151,21 @@ interface TenderItem {
   `,
   styles: [`
     .tender-panel-card {
-      background: linear-gradient(180deg, #FFFFFF 0%, #FDFCFD 60%, #FCF8FA 100%);
-      border: 1px solid #E2E8F0;
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.07), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+      background: #FFFFFF;
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.05);
+      border-radius: 18px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tender-panel-card:hover {
       transform: translateY(-2px);
-      border-color: rgba(136, 28, 67, 0.22);
-      box-shadow: 0 12px 30px -4px rgba(136, 28, 67, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    .tender-card-bg-wrap {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 0;
-    }
-    .tender-card-bg-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-      transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-    .tender-panel-card:hover .tender-card-bg-img {
-      transform: scale(1.04);
-    }
-    .tender-card-bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.78) 45%, rgba(255, 255, 255, 0.88) 100%);
-      backdrop-filter: blur(1.5px);
-      -webkit-backdrop-filter: blur(1.5px);
+      box-shadow: 0 24px 50px -10px rgba(124, 14, 68, 0.14), 0 6px 18px -2px rgba(0, 0, 0, 0.06);
     }
 
     .tender-panel-header {
-      height: 60px;
+      height: 62px;
       position: relative;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: #FFFFFF;
     }
 
     .tender-live-badge {

@@ -33,9 +33,6 @@ interface TenderItem {
     <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
     <div class="w-full h-full flex flex-col">
       <div class="tender-panel-card w-full h-[430px] sm:h-[440px] lg:h-[455px] xl:h-[470px] rounded-2xl flex flex-col overflow-hidden relative">
-        
-        <!-- Multi-color Rajasthan Royal Top Accent Stripe -->
-        <div class="tender-top-stripe" aria-hidden="true"></div>
 
         <!-- PANEL HEADER (Off-White with Subtle Heritage Background Artwork & Low Gradient) -->
         <div class="tender-panel-header px-4.5 sm:px-5.5 flex items-center justify-between shrink-0 relative overflow-hidden z-10">
@@ -193,13 +190,6 @@ interface TenderItem {
     .tender-panel-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 30px 65px -12px rgba(15, 23, 42, 0.32), 0 12px 28px -4px rgba(34, 69, 153, 0.18);
-    }
-
-    .tender-top-stripe {
-      width: 100%;
-      height: 3.5px;
-      background: linear-gradient(90deg, #D73389 0%, #EA580C 35%, #F59E0B 70%, #224599 100%);
-      flex-shrink: 0;
     }
 
     .tender-panel-header {

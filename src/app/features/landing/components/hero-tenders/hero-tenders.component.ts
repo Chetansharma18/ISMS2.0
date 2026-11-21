@@ -32,7 +32,7 @@ interface TenderItem {
   template: `
     <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
     <div class="w-full h-full flex flex-col">
-      <div class="tender-panel-card w-full h-[410px] sm:h-[430px] lg:h-[440px] xl:h-[450px] rounded-xl sm:rounded-[14px] flex flex-col overflow-hidden relative">
+      <div class="tender-panel-card w-full h-[380px] sm:h-[395px] lg:h-[405px] xl:h-[415px] 2xl:h-[425px] rounded-xl sm:rounded-[14px] flex flex-col overflow-hidden relative">
         
         <!-- Full-Cover Authentic Rajasthan Background Image (Centered & Covering Entire Card) -->
         <div class="tender-card-bg-wrap" aria-hidden="true">

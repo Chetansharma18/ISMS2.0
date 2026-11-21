@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HeroTendersComponent } from '../hero-tenders/hero-tenders.component';
+import { HeroStatsComponent } from '../hero-stats/hero-stats.component';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ButtonComponent, IconComponent } from '../../../../shared';
 
@@ -23,12 +24,12 @@ export interface HeroSlide {
   selector: 'app-hero-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HeroTendersComponent, ButtonComponent, IconComponent],
+  imports: [CommonModule, HeroTendersComponent, HeroStatsComponent, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full bg-[#F8F9FA] py-4 sm:py-5 lg:py-6 border-b border-[#E2E8F0]">
+    <section class="relative w-full bg-[#F8F9FA] py-3 sm:py-3.5 lg:py-4 border-b border-[#E2E8F0]">
       
       <!-- Inner Container: Full Width up to 1920px (Left Half: Image, Right Half: Tender) -->
       <div class="w-full max-w-[1920px] mx-auto px-3 sm:px-6 md:px-8 lg:px-10 xl:px-12 relative z-10">
@@ -149,6 +150,9 @@ export interface HeroSlide {
           </div>
 
         </div>
+
+        <!-- 4 Key Governance Stats Strip (Youth Registered, Youth Trained, Youth Placed, Training Partners) -->
+        <app-hero-stats class="block w-full mt-3 sm:mt-3.5 lg:mt-4"></app-hero-stats>
       </div>
 
     </section>
@@ -157,7 +161,7 @@ export interface HeroSlide {
     .hero-slider-card {
       position: relative;
       width: 100%;
-      height: 410px;
+      height: 380px;
       border-radius: 12px;
       overflow: hidden;
       background-color: #0f172a;
@@ -168,18 +172,23 @@ export interface HeroSlide {
     }
     @media (min-width: 640px) {
       .hero-slider-card {
-        height: 430px;
+        height: 395px;
         border-radius: 14px;
       }
     }
     @media (min-width: 1024px) {
       .hero-slider-card {
-        height: 440px;
+        height: 405px;
       }
     }
     @media (min-width: 1280px) {
       .hero-slider-card {
-        height: 450px;
+        height: 415px;
+      }
+    }
+    @media (min-width: 1536px) {
+      .hero-slider-card {
+        height: 425px;
       }
     }
 

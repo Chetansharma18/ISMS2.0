@@ -38,7 +38,7 @@ export type { Grievance };
   ],
   template: `
     <app-list-page
-      title="Grievance"
+      [title]="'Grievance'"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance' }]"
       [(searchQuery)]="searchQuery"
       searchPlaceholder="Search Scheme, Title, Description, Issue Type..."

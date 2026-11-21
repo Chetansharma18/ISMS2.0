@@ -26,6 +26,9 @@ import { PageShellComponent } from '../page-shell/page-shell.component';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageShellComponent, PageHeaderComponent, TableComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   template: `
     <app-page-shell>
       <app-page-header

@@ -506,6 +506,10 @@ app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
   user-select: none;
 }
 
+.btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
 .btn:disabled,
 .btn[aria-disabled='true'] {
   opacity: 0.55;

@@ -39,7 +39,7 @@ export type { AdminGrievance };
   ],
   template: `
     <app-list-page
-      title="Grievance Management"
+      [title]="'Grievance Management'"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Grievance Management' }]"
       [(searchQuery)]="searchQuery"
       searchPlaceholder="Search User, Scheme, Title, Description, Issue Type..."

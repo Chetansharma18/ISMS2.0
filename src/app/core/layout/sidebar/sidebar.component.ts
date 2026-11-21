@@ -16,9 +16,13 @@ import {
   EOI_CONFIGURATION_NAV,
   EXACT_MATCH,
   EXISTING_USER_NAV,
+  HELP_SUPPORT_NAV,
   MASTER_ICON,
   MASTER_NAV,
+  NavItem,
   NEW_USER_NAV,
+  PRIVACY_POLICY_NAV,
+  TERMS_AND_CONDITIONS_NAV,
   USER_MANAGEMENT_ICON,
   USER_MANAGEMENT_NAV
 } from './sidebar-nav.config';
@@ -62,7 +66,9 @@ import {
       <div class="flex-1 min-h-0 overflow-y-auto flex flex-col relative z-0">
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5 py-3 pb-32" aria-label="Main Navigation">
-          @if (isAspirant()) {
+          @if (activeContextItem(); as contextItem) {
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: contextItem }" />
+          } @else if (isAspirant()) {
             @for (item of aspirantNav; track item.key) {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
             }
@@ -108,7 +114,6 @@ import {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isProfilePending() }" />
             }
           }
-
         </nav>
       </div>
 
@@ -128,49 +133,72 @@ import {
 
     <!-- One link: icon, label and (for Profile) the "Pending" badge -->
     <ng-template #navLink let-item let-pending="pending">
-      <a
-        [routerLink]="item.link"
-        [class.!bg-[#F2DACE]]="isActive(item.key)"
-        [class.!text-[#7C0E44]]="isActive(item.key)"
-        [class.font-bold]="isActive(item.key)"
-        [class.shadow-xs]="isActive(item.key)"
-        [class.active-link]="isActive(item.key)"
-        [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-        class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <app-icon
-            [name]="item.icon"
-            [stroke]="item.stroke ?? 1.75"
-            class="transition-colors"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
-            [class.text-white/80]="!isActive(item.key)"
-            [class.group-hover:text-white]="!isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-          />
-          <span
-            class="tracking-tight min-w-0"
-            [class.font-medium]="item.bold"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-          >{{ item.label }}</span>
-        </div>
-        @if (pending) {
-          <span
-            class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none font-semibold shadow-2xs"
-            [class.bg-white/90]="isActive(item.key)"
-            [class.text-[#B85B18]]="isActive(item.key)"
-            [class.border]="isActive(item.key)"
-            [class.border-[#B85B18]/30]="isActive(item.key)"
-            [class.bg-white/20]="!isActive(item.key)"
-            [class.text-white]="!isActive(item.key)"
-            [class.border-white/30]="!isActive(item.key)"
-          >
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
-            Pending
-          </span>
-        }
-      </a>
+      @if (item.external || item.link.startsWith('http')) {
+        <a
+          [href]="item.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+          [attr.aria-label]="item.label + ' (opens in a new tab)'"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <app-icon
+              [name]="item.icon"
+              [stroke]="item.stroke ?? 1.75"
+              class="transition-colors text-white/80 group-hover:text-white"
+            />
+            <span
+              class="tracking-tight min-w-0"
+              [class.font-medium]="item.bold"
+            >{{ item.label }}</span>
+          </div>
+          <app-icon name="external-link" size="xs" class="text-white/60 group-hover:text-white shrink-0 ml-1.5" />
+        </a>
+      } @else {
+        <a
+          [routerLink]="item.link"
+          [class.!bg-[#F2DACE]]="isActive(item.key)"
+          [class.!text-[#7C0E44]]="isActive(item.key)"
+          [class.font-bold]="isActive(item.key)"
+          [class.shadow-xs]="isActive(item.key)"
+          [class.active-link]="isActive(item.key)"
+          [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <app-icon
+              [name]="item.icon"
+              [stroke]="item.stroke ?? 1.75"
+              class="transition-colors"
+              [class.!text-[#7C0E44]]="isActive(item.key)"
+              [class.text-white/80]="!isActive(item.key)"
+              [class.group-hover:text-white]="!isActive(item.key)"
+              [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            />
+            <span
+              class="tracking-tight min-w-0"
+              [class.font-medium]="item.bold"
+              [class.!text-[#7C0E44]]="isActive(item.key)"
+              [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            >{{ item.label }}</span>
+          </div>
+          @if (pending) {
+            <span
+              class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none font-semibold shadow-2xs"
+              [class.bg-white/90]="isActive(item.key)"
+              [class.text-[#B85B18]]="isActive(item.key)"
+              [class.border]="isActive(item.key)"
+              [class.border-[#B85B18]/30]="isActive(item.key)"
+              [class.bg-white/20]="!isActive(item.key)"
+              [class.text-white]="!isActive(item.key)"
+              [class.border-white/30]="!isActive(item.key)"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
+              Pending
+            </span>
+          }
+        </a>
+      }
     </ng-template>
 
     <!-- A collapsible section (Master, User Management) -->
@@ -275,7 +303,13 @@ export class SidebarComponent {
     toggle: () => this.toggleUserManagement()
   };
 
-  readonly currentUrl = signal<string>(this.router.url);
+  readonly currentUrl = signal<string>(
+    this.router.url && this.router.url !== '/'
+      ? this.router.url
+      : (typeof window !== 'undefined' && window.location?.pathname && window.location.pathname !== '/'
+          ? window.location.pathname
+          : (this.router.url || ''))
+  );
 
   constructor() {
     this.router.events
@@ -289,12 +323,38 @@ export class SidebarComponent {
   }
 
   private cleanUrl(): string {
-    const raw = this.currentUrl() || this.router.url || '';
+    const browserPath = typeof window !== 'undefined' ? window.location?.pathname : '';
+    const raw = this.currentUrl() || this.router.url || browserPath || '';
     return raw.split('?')[0].split('#')[0];
   }
 
+  readonly activeContextItem = computed<NavItem | null>(() => {
+    const key = this.activeKey();
+    if (key === 'terms-and-conditions') {
+      return TERMS_AND_CONDITIONS_NAV;
+    }
+    if (key === 'help-support') {
+      return HELP_SUPPORT_NAV;
+    }
+    if (key === 'privacy-policy') {
+      return PRIVACY_POLICY_NAV;
+    }
+    return null;
+  });
+
   readonly activeKey = computed<string>(() => {
     const url = this.cleanUrl();
+
+    // Legal & Support routes
+    if (url === '/terms-and-conditions' || url.startsWith('/terms-and-conditions/')) {
+      return 'terms-and-conditions';
+    }
+    if (url === '/help-support' || url.startsWith('/help-support/')) {
+      return 'help-support';
+    }
+    if (url === '/privacy-policy' || url.startsWith('/privacy-policy/')) {
+      return 'privacy-policy';
+    }
 
     // 0. Aspirant Portal routes
     if (url === '/training-calendar' || url.startsWith('/training-calendar')) {

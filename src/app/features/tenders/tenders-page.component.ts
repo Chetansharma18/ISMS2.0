@@ -186,7 +186,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
           
           <app-schemes-header
-            [searchQuery]="searchQuery()"
+            [(searchQuery)]="searchQuery"
+            [suggestions]="searchSuggestions()"
             [isSuperAdmin]="isSuperAdmin()"
             (searchChange)="onSearchChange($event)"
             (configureEoi)="openConfigureScreen()"
@@ -219,7 +220,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             [pagination]="true"
             [pageSize]="pageSize"
             [rowClass]="getRowClass"
-            (rowClick)="onRowClick($event)"
             itemUnit="schemes"
             emptyMessage="No active schemes available matching your search query."
             [customTemplates]="{
@@ -419,6 +419,36 @@ export class TendersPageComponent {
 
   readonly filteredSchemes = computed(() => filterActiveSchemes(this.schemes(), this.searchQuery()));
 
+  readonly searchSuggestions = computed(() => {
+    const list: string[] = [];
+    const seen = new Set<string>();
+    for (const s of this.schemes()) {
+      if (s.schemeName && !seen.has(s.schemeName)) {
+        seen.add(s.schemeName);
+        list.push(s.schemeName);
+      }
+      if (s.refNo && !seen.has(s.refNo)) {
+        seen.add(s.refNo);
+        list.push(s.refNo);
+      }
+      if (s.schemeCategory && !seen.has(s.schemeCategory)) {
+        seen.add(s.schemeCategory);
+        list.push(s.schemeCategory);
+      }
+      const cat = (s as any).category;
+      if (cat && !seen.has(cat)) {
+        seen.add(cat);
+        list.push(cat);
+      }
+      const code = (s as any).code;
+      if (code && !seen.has(code)) {
+        seen.add(code);
+        list.push(code);
+      }
+    }
+    return list;
+  });
+
   onSearchChange(val: string): void {
     this.searchQuery.set(val);
   }
@@ -564,11 +594,11 @@ export class TendersPageComponent {
   getRowClass = (item: SchemeTender): string => {
     const isInactive = item.isActive === false;
     if (isInactive) {
-      return 'opacity-50 !bg-slate-100/70 cursor-pointer hover:!bg-slate-200/80 transition-colors';
+      return 'opacity-50 !bg-slate-100/70 transition-colors';
     }
     return this.draftFor(item.refNo)
-      ? '!bg-amber-50 cursor-pointer hover:!bg-amber-100/70 transition-colors'
-      : 'bg-white cursor-pointer hover:bg-slate-100/90 transition-colors';
+      ? '!bg-amber-50 hover:!bg-amber-100/70 transition-colors'
+      : 'bg-white hover:bg-slate-50/80 transition-colors';
   };
 
   /** Pending (unfinished) application the signed-in applicant has for the given scheme, if any. */

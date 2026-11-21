@@ -39,6 +39,10 @@ export class OtrValidationService {
     this.submittedSteps.set(next);
   }
 
+  resetSubmittedSteps(): void {
+    this.submittedSteps.set(new Set<number>());
+  }
+
   /* ==========================================================================
      Step 1: Organization Details Validation (Sub-sections 1 to 4)
      ========================================================================== */
@@ -197,6 +201,10 @@ export class OtrValidationService {
   /* ==========================================================================
      Step 2: Officer In-Charge Directory Validation
      ========================================================================== */
+  validateOfficerInCharge(oicList: OfficerInCharge[]): string[] {
+    return this.validateStep2(oicList);
+  }
+
   validateSingleOic(oic: OfficerInCharge, index: number): string[] {
     const prefix = 'Officer In-Charge: ';
     const errors: string[] = [];
@@ -435,5 +443,14 @@ export class OtrValidationService {
       }
     }
     return null;
+  }
+
+  validateAll(formData: OtrFormData): { step1: string[]; step2: string[]; step3: string[]; step4: string[] } {
+    return {
+      step1: this.validateStep1(formData.step1),
+      step2: this.validateStep2(formData.step2),
+      step3: this.validateStep3(formData.step3),
+      step4: this.validateStep4(formData.step4)
+    };
   }
 }

@@ -88,15 +88,17 @@ describe('tenders-page.util', () => {
 
   describe('filterActiveSchemes', () => {
     const list = [
-      scheme({ sNo: 7, refNo: 'A-1', schemeName: 'Alpha', eoiDescription: 'first' }),
+      scheme({ sNo: 7, refNo: 'A-1', schemeName: 'Alpha', eoiDescription: 'first', schemeCategory: 'Rajvik' }),
       scheme({ sNo: 8, refNo: 'B-2', schemeName: 'Beta', eoiDescription: 'second', closingDate: '01/01/2000' }),
-      scheme({ sNo: 9, refNo: 'C-3', schemeName: 'Gamma', eoiDescription: 'third', schemeTitle: 'Gamma Title' })
+      scheme({ sNo: 9, refNo: 'C-3', schemeName: 'Gamma', eoiDescription: 'third', schemeTitle: 'Gamma Title', schemeCategory: 'samarth' }),
+      scheme({ sNo: 10, refNo: 'RSLDC/EOI/PMKVY/2026-27/01', schemeName: 'Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)', eoiDescription: 'Central scheme', schemeCategory: 'PMKVY' }),
+      scheme({ sNo: 11, refNo: 'RSLDC/EOI/SOLAR/2026-27/01', schemeName: 'Rooftop Solar Skill Development Scheme', eoiDescription: 'Solar power training', schemeCategory: 'Solar' })
     ];
 
     it('drops closed schemes and renumbers from 1', () => {
       const result = filterActiveSchemes(list, '', now);
-      expect(result.map(s => s.refNo)).toEqual(['A-1', 'C-3']);
-      expect(result.map(s => s.sNo)).toEqual([1, 2]);
+      expect(result.map(s => s.refNo)).toEqual(['A-1', 'C-3', 'RSLDC/EOI/PMKVY/2026-27/01', 'RSLDC/EOI/SOLAR/2026-27/01']);
+      expect(result.map(s => s.sNo)).toEqual([1, 2, 3, 4]);
     });
 
     it('matches name, ref no, description and title case-insensitively', () => {
@@ -106,13 +108,24 @@ describe('tenders-page.util', () => {
       expect(filterActiveSchemes(list, 'gamma title', now).map(s => s.refNo)).toEqual(['C-3']);
     });
 
+    it('matches scheme category case-insensitively', () => {
+      expect(filterActiveSchemes(list, 'rajvik', now).map(s => s.refNo)).toEqual(['A-1']);
+      expect(filterActiveSchemes(list, 'SAMARTH', now).map(s => s.refNo)).toEqual(['C-3']);
+    });
+
+    it('filters correctly for PMKVY and Solar queries (Bug 5)', () => {
+      expect(filterActiveSchemes(list, 'PMKVY', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/PMKVY/2026-27/01']);
+      expect(filterActiveSchemes(list, 'Solar', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/SOLAR/2026-27/01']);
+      expect(filterActiveSchemes(list, 'solar', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/SOLAR/2026-27/01']);
+    });
+
     it('does not match closed schemes even when the query fits', () => {
       expect(filterActiveSchemes(list, 'beta', now)).toEqual([]);
     });
 
     it('does not mutate the input', () => {
       filterActiveSchemes(list, '', now);
-      expect(list.map(s => s.sNo)).toEqual([7, 8, 9]);
+      expect(list.map(s => s.sNo)).toEqual([7, 8, 9, 10, 11]);
     });
   });
 

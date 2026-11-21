@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
 
 export const routes: Routes = [
   {
@@ -85,6 +86,37 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/payment-history/payment-history.component').then(
         (m) => m.PaymentHistoryComponent
+      )
+  },
+  {
+    path: 'privacy-policy',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'terms-and-conditions',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'help-support',
+    loadComponent: () =>
+      import('./features/help-support/help-support.component').then(
+        (m) => m.HelpSupportComponent
       )
   },
   {

@@ -163,20 +163,31 @@ export function isEditDisabled(scheme: SchemeTender, now: number = Date.now()): 
 
 /**
  * Returns the not-yet-closed schemes that match the search query
- * (name, reference no., description, title), renumbered from 1.
+ * (name, reference no., description, title, category, code), renumbered from 1.
  */
 export function filterActiveSchemes(schemes: SchemeTender[], query: string, now: number = Date.now()): SchemeTender[] {
   const q = query.toLowerCase().trim();
   const active = schemes.filter(s => !isSchemeClosed(s, now));
-  const list = !q
-    ? active
-    : active.filter(
-      s =>
-        s.schemeName.toLowerCase().includes(q) ||
-        s.refNo.toLowerCase().includes(q) ||
-        s.eoiDescription.toLowerCase().includes(q) ||
-        (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q))
+  if (!q) {
+    return active.map((item, idx) => ({ ...item, sNo: idx + 1 }));
+  }
+
+  const list = active.filter(s => {
+    const name = (s.schemeName || '').toLowerCase();
+    const title = (s.schemeTitle || '').toLowerCase();
+    const ref = (s.refNo || '').toLowerCase();
+    const desc = (s.eoiDescription || '').toLowerCase();
+    const cat = (s.schemeCategory || (s as any).category || '').toLowerCase();
+    const code = ((s as any).code || '').toLowerCase();
+    return (
+      name.includes(q) ||
+      title.includes(q) ||
+      ref.includes(q) ||
+      desc.includes(q) ||
+      cat.includes(q) ||
+      code.includes(q)
     );
+  });
 
   return list.map((item, idx) => ({
     ...item,

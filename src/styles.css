@@ -877,6 +877,14 @@ table.table tbody tr:hover {
   outline-offset: 2px;
 }
 
+:focus-visible:is(.is-invalid, [aria-invalid="true"], :invalid),
+.is-invalid :focus-visible,
+[data-invalid="true"] :focus-visible,
+.border-rose-600 :focus-visible,
+.border-rose-600:focus-within {
+  outline-color: #DC2626 !important;
+}
+
 button:disabled,
 input:disabled,
 select:disabled,

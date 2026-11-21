@@ -37,7 +37,7 @@ interface TenderItem {
         <!-- Full-Cover Authentic Rajasthan Background Image (Centered & Covering Entire Card) -->
         <div class="tender-card-bg-wrap" aria-hidden="true">
           <img
-            src="/aboutas.png"
+            src="/raj.png"
             alt=""
             class="tender-card-bg-img"
             loading="eager"
@@ -176,32 +176,29 @@ interface TenderItem {
 
     .tender-card-bg-wrap {
       position: absolute;
-      top: 60px;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
       overflow: hidden;
       z-index: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 12px;
     }
     .tender-card-bg-img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
       object-position: center;
       transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .tender-panel-card:hover .tender-card-bg-img {
-      transform: scale(1.02);
+      transform: scale(1.04);
     }
     .tender-card-bg-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.78) 100%);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(255, 255, 255, 0.78) 45%, rgba(255, 255, 255, 0.88) 100%);
+      backdrop-filter: blur(1.5px);
+      -webkit-backdrop-filter: blur(1.5px);
     }
 
     .tender-panel-header {

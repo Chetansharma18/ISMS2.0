@@ -176,6 +176,48 @@ export const MOCK_MANAGEMENT_USERS: UserManagementItem[] = resolveMock([
     email: 'tp3@isms.gov.in',
     mobileNo: '9828099883',
     schemeStatus: 'Active'
+  },
+  {
+    sNo: 11,
+    id: 'usr-11',
+    userId: 'USR-1011',
+    username: 'Apex Vocational Institute',
+    ssoId: 'SSO_TP_APEX_VOC',
+    userType: 'TP',
+    roleType: 'Training Partner',
+    designation: 'Training Partner / PIA',
+    schemeDepartment: 'Mukhyamantri Yuva Sambal Yojana',
+    schemeName: 'Mukhyamantri Yuva Sambal Yojana',
+    districtName: 'Jaipur',
+    blockName: 'Sanganer',
+    email: 'apex.skills@isms.gov.in',
+    mobileNo: '9828099884',
+    schemeStatus: 'Blacklisted',
+    blacklistScheme: 'Mukhyamantri Yuva Sambal Yojana',
+    blacklistDuration: '3 Years',
+    blacklistRemarks: 'Order Ref RSLDC/DEBAR/2026/04 - Non-compliance of biometric attendance',
+    blacklistedAt: '2026-02-10'
+  },
+  {
+    sNo: 12,
+    id: 'usr-12',
+    userId: 'USR-1012',
+    username: 'Horizon Skill Academy',
+    ssoId: 'SSO_TP_HORIZON',
+    userType: 'TP',
+    roleType: 'Training Partner',
+    designation: 'Training Partner / PIA',
+    schemeDepartment: 'All Schemes',
+    schemeName: 'All Schemes',
+    districtName: 'Jodhpur',
+    blockName: 'Mandore',
+    email: 'horizon.skill@isms.gov.in',
+    mobileNo: '9828099885',
+    schemeStatus: 'Blacklisted',
+    blacklistScheme: 'All Schemes',
+    blacklistDuration: 'Permanent (Indefinite)',
+    blacklistRemarks: 'Order Ref RSLDC/DEBAR/2025/19 - State-wide debarment due to fraudulent batch submission',
+    blacklistedAt: '2025-11-20'
   }
 ]);
 

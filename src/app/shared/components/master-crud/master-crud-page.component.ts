@@ -26,6 +26,7 @@ import { DropdownComponent } from '../dropdown/dropdown.component';
 import { InputDirective } from '../form-controls/input/input.directive';
 import { SwitchComponent } from '../switch/switch.component';
 import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
+import { MasterFilterBarComponent, StatusFilterOption } from '../master-filter-bar/master-filter-bar.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
@@ -56,7 +57,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
     DropdownComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -64,10 +66,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Page Header -->
       <app-page-header
         [title]="config.title"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: config.title }]"
-        [searchable]="true"
-        [searchPlaceholder]="config.searchPlaceholder || 'Search...'"
-        [(searchQuery)]="searchQuery"
+        [subtitle]="config.subtitle"
+        [breadcrumbs]="config.breadcrumbs || [{ label: 'Home', url: '/' }, { label: config.title }]"
       >
         <!-- Add Button -->
         <button
@@ -82,80 +82,20 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         </button>
       </app-page-header>
 
-      <!-- Table Top Filters Bar -->
-      <div class="mb-3.5 bg-white p-2.5 sm:p-3 rounded-lg border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between gap-2.5 text-xs">
-        <div class="flex flex-wrap items-center gap-2">
-          <!-- Status Filter Tabs -->
-          @if (config.hasStatus && !config.hideStatusFilter) {
-            <div class="inline-flex items-center gap-1">
-              <button
-                appButton
-                [variant]="statusFilter() === 'ALL' ? 'secondary' : 'ghost'"
-                size="sm"
-                type="button"
-                (click)="setStatusFilter('ALL')"
-              >
-                All ({{ items().length }})
-              </button>
-              <button
-                appButton
-                [variant]="statusFilter() === 'Active' ? 'secondary' : 'ghost'"
-                size="sm"
-                type="button"
-                (click)="setStatusFilter('Active')"
-              >
-                Active ({{ activeCount() }})
-              </button>
-              <button
-                appButton
-                [variant]="statusFilter() === 'Inactive' ? 'secondary' : 'ghost'"
-                size="sm"
-                type="button"
-                (click)="setStatusFilter('Inactive')"
-              >
-                Inactive ({{ inactiveCount() }})
-              </button>
-            </div>
-          }
-
-          <!-- Dynamic Master Filters (e.g. Sector dropdown) -->
-          @for (filter of config.filters || []; track filter.key) {
-            <div class="inline-flex items-center gap-1.5">
-              <select
-                appInput
-                size="sm"
-                [ngModel]="filterValues()[filter.key] || ''"
-                (ngModelChange)="setFilterValue(filter.key, $event)"
-                class="text-xs font-medium py-1 h-7 max-w-[200px]"
-              >
-                <option value="">{{ filter.placeholder || 'All ' + filter.label }}</option>
-                @for (opt of resolveFilterOptions(filter); track opt) {
-                  <option [value]="opt">{{ opt }}</option>
-                }
-              </select>
-            </div>
-          }
-
-          <!-- Reset Filters Button -->
-          @if (isFilterActive()) {
-            <button
-              appButton
-              variant="outline"
-              size="sm"
-              type="button"
-              (click)="resetFilters()"
-            >
-              <app-icon name="close" size="xs" />
-              <span>Reset</span>
-            </button>
-          }
-        </div>
-
-        <!-- Filter Count Badge -->
-        <div class="text-[12px] font-medium text-slate-500 ml-auto whitespace-nowrap">
-          Showing <strong class="text-slate-700 font-bold">{{ filteredItems().length }}</strong> of {{ items().length }} {{ config.itemUnit }}
-        </div>
-      </div>
+      <!-- Unified Master Filter & Search Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        [searchPlaceholder]="config.searchPlaceholder || 'Search ' + config.entityLabel.toLowerCase() + '...'"
+        [(status)]="statusFilter"
+        [showStatusFilter]="!!(config.hasStatus && !config.hideStatusFilter)"
+        [statusOptions]="statusFilterOptions()"
+        [filters]="config.filters || []"
+        [(filterValues)]="filterValues"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        [itemUnit]="config.itemUnit"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Master Table -->
       <app-table
@@ -489,6 +429,12 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   readonly inactiveCount = computed(() => {
     return this.items().filter((it: any) => it.status === 'Inactive').length;
   });
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All', count: this.items().length },
+    { value: 'Active', label: 'Active', count: this.activeCount() },
+    { value: 'Inactive', label: 'Inactive', count: this.inactiveCount() }
+  ]);
 
   readonly isFilterActive = computed(() => {
     if (this.statusFilter() !== 'ALL') return true;

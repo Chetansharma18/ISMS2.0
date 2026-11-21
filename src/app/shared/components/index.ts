@@ -28,6 +28,7 @@ export * from './action-modal/action-modal.component';
 export * from './form-sdc';
 export * from './master-crud/master-crud-page.component';
 export * from './master-crud/master-crud.types';
+export * from './master-filter-bar/master-filter-bar.component';
 export * from './toast-outlet/toast-outlet.component';
 export * from './stepper/stepper.component';
 export * from './bar-chart/bar-chart.component';

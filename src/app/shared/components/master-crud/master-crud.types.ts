@@ -34,6 +34,10 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   entityLabel: string;
   /** Page title shown in the header, e.g. "Sector Master" */
   title: string;
+  /** Optional subtitle shown in the header */
+  subtitle?: string;
+  /** Optional custom breadcrumbs shown in the header */
+  breadcrumbs?: { label: string; url?: string }[];
   /** Placeholder for the search box */
   searchPlaceholder: string;
   /** Raw item fields to match against when searching */

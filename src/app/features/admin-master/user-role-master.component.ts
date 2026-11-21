@@ -17,11 +17,14 @@ const CONFIG: MasterCrudConfig<UserRoleMasterItem> = {
   dataKey: 'USER_ROLES',
   entityLabel: 'Role Type',
   title: 'Role Management',
+  subtitle: 'Configure user roles, administrative authority, and designation scopes',
+  breadcrumbs: [{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Role Management' }],
   searchPlaceholder: 'Search by role type...',
   searchFields: ['roleTypeName'],
   itemUnit: 'roles',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[480px]',
   fields: [
     { key: 'roleTypeName', label: 'Role Type', type: 'text', required: true, maxLength: 100, placeholder: 'Enter role type (e.g. Scrutiny Officer)', colSpan: 3 }

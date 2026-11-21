@@ -20,6 +20,13 @@ export interface MasterFieldConfig<T = any> {
   colSpan?: 1 | 2 | 3;
 }
 
+export interface MasterFilterConfig {
+  key: string;
+  label: string;
+  options: string[] | (() => string[]);
+  placeholder?: string;
+}
+
 export interface MasterCrudConfig<T extends { id: string; status?: string } = any> {
   /** DataEngineService resource key, e.g. 'SECTORS', 'DESIGNATIONS' */
   dataKey: string;
@@ -57,4 +64,12 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   buildPayload: (formData: any) => Partial<T>;
   /** Optional custom confirmation text for delete */
   deleteConfirmText?: (item: T) => string;
+  /** Whether to hide the View action button in the table action column */
+  hideViewAction?: boolean;
+  /** Explicit column definitions for the View Details modal (defaults to config.columns) */
+  viewColumns?: TableColumn<T>[];
+  /** Dynamic top filter dropdowns (e.g. Sector, Category, Department) */
+  filters?: MasterFilterConfig[];
+  /** Whether to hide the default quick Status filter [All, Active, Inactive] (defaults to false if hasStatus=true) */
+  hideStatusFilter?: boolean;
 }

@@ -23,7 +23,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
       <!-- High-Definition Authentic Rajasthan Panoramic Desert & Fort Background -->
       <div class="absolute inset-0 w-full h-full pointer-events-none select-none z-0" aria-hidden="true">
         <img
-          src="/raj-hd.png"
+          src="/hero-rajasthan-desert-2k.jpg"
           alt=""
           class="hero-bg-img"
           loading="eager"

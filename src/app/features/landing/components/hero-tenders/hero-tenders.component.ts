@@ -32,24 +32,34 @@ interface TenderItem {
   template: `
     <!-- Right Column Panel: 50% width on desktop, matching height with slider, clean official government card -->
     <div class="w-full h-full flex flex-col">
-      <div class="tender-panel-card w-full h-[420px] sm:h-[430px] lg:h-[445px] xl:h-[460px] rounded-2xl flex flex-col overflow-hidden relative">
+      <div class="tender-panel-card w-full h-[430px] sm:h-[440px] lg:h-[455px] xl:h-[470px] rounded-2xl flex flex-col overflow-hidden relative">
         
-        <!-- PANEL HEADER (Matches mockup: Document icon, Tender Notices, Active badge, View All ->) -->
-        <div class="tender-panel-header px-5 sm:px-6 border-b border-[#F1E8EC] flex items-center justify-between shrink-0 z-10">
-          <div class="flex items-center gap-2.5">
-            <app-icon name="document" size="md" class="text-[#D73389]" />
-            <h2 class="text-[16px] sm:text-[17px] font-bold text-[#D73389] tracking-tight m-0">Tender Notices</h2>
-            <!-- Live Active Indicator Badge -->
-            <span class="tender-live-badge">
-              <span class="tender-live-dot"></span>
-              <span>Active</span>
-            </span>
+        <!-- Multi-color Rajasthan Royal Top Accent Stripe -->
+        <div class="tender-top-stripe" aria-hidden="true"></div>
+
+        <!-- PANEL HEADER (Executive Royal Blue with Golden Amber Icon & Live Indicator) -->
+        <div class="tender-panel-header px-4.5 sm:px-5.5 flex items-center justify-between shrink-0 z-10">
+          <div class="flex items-center gap-3">
+            <div class="tender-icon-box" aria-hidden="true">
+              <app-icon name="document" size="md" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="tender-header-title">Tender Notices</h2>
+                <!-- Live Active Indicator Badge -->
+                <span class="tender-live-badge">
+                  <span class="tender-live-dot"></span>
+                  <span>Active</span>
+                </span>
+              </div>
+              <p class="tender-header-subtitle">Official RSLDC e-Procurement</p>
+            </div>
           </div>
           
           <!-- View All Action -->
           <button 
             appButton
-            variant="outline"
+            variant="inverse"
             size="sm"
             type="button"
             (click)="openModal()" 
@@ -87,7 +97,7 @@ interface TenderItem {
                 <div class="flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2">
                     <span class="tender-date-chip">
-                      <app-icon name="calendar" size="xs" class="text-slate-400" />
+                      <app-icon name="calendar" size="xs" class="text-[#224599]" />
                       <span>{{ item.date }}</span>
                     </span>
                     @if (item.isNew) {
@@ -107,7 +117,7 @@ interface TenderItem {
                 </h4>
 
                 <!-- Bottom Row: Reference Number & Login Required Indicator -->
-                <div class="flex items-center justify-between gap-3 pt-1">
+                <div class="flex items-center justify-between gap-3 pt-1.5">
                   <p class="tender-ref-id" [title]="item.id">
                     {{ item.id }}
                   </p>
@@ -120,12 +130,23 @@ interface TenderItem {
 
               <!-- Hover Arrow Action Indicator -->
               <div class="tender-row-arrow" aria-hidden="true">
-                <app-icon name="chevron-right" size="sm" />
+                <app-icon name="arrow-right" size="xs" />
               </div>
 
             </div>
           }
 
+        </div>
+
+        <!-- PANEL FOOTER: Institutional subtle status strip -->
+        <div class="tender-panel-footer px-5 border-t border-slate-100 flex items-center justify-between shrink-0 z-10">
+          <div class="flex items-center gap-2 text-slate-500 font-medium text-[11px]">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span>Live Procurement Stream</span>
+          </div>
+          <span class="text-[11px] font-bold text-[#224599] cursor-pointer hover:underline" (click)="openModal()">
+            10 Active Notices →
+          </span>
         </div>
 
       </div>
@@ -152,41 +173,100 @@ interface TenderItem {
   styles: [`
     .tender-panel-card {
       background: #FFFFFF;
-      border: 1px solid rgba(226, 232, 240, 0.9);
-      box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.05);
-      border-radius: 18px;
+      border: 1px solid rgba(226, 232, 240, 0.95);
+      box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.28), 0 8px 24px -4px rgba(34, 69, 153, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+      border-radius: 20px;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tender-panel-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 24px 50px -10px rgba(124, 14, 68, 0.14), 0 6px 18px -2px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 30px 65px -12px rgba(15, 23, 42, 0.32), 0 12px 28px -4px rgba(34, 69, 153, 0.18);
+    }
+
+    .tender-top-stripe {
+      width: 100%;
+      height: 3.5px;
+      background: linear-gradient(90deg, #D73389 0%, #EA580C 35%, #F59E0B 70%, #224599 100%);
+      flex-shrink: 0;
     }
 
     .tender-panel-header {
-      height: 62px;
+      height: 68px;
       position: relative;
-      background: #FFFFFF;
+      background: linear-gradient(135deg, #162F65 0%, #1E3A8A 55%, #224599 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .tender-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FDE047;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .tender-header-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .tender-header-subtitle {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.75);
+      margin: 2px 0 0 0;
+      line-height: 1;
+    }
+
+    .tender-panel-header .btn {
+      background: rgba(255, 255, 255, 0.14) !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      color: #FFFFFF !important;
+      border-radius: 8px !important;
+      font-weight: 600 !important;
+      gap: 5px !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1) !important;
+      transition: all 0.2s ease !important;
+    }
+    .tender-panel-header .btn:hover {
+      background: rgba(255, 255, 255, 0.25) !important;
+      border-color: rgba(255, 255, 255, 0.45) !important;
+      color: #FFFFFF !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15) !important;
+      text-decoration: none !important;
     }
 
     .tender-live-badge {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      padding: 2px 8px;
+      gap: 4px;
+      padding: 1.5px 7px;
       border-radius: 9999px;
-      background: rgba(234, 88, 12, 0.09);
-      border: 1px solid rgba(234, 88, 12, 0.25);
-      color: #EA580C;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      color: #6EE7B7;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
     .tender-live-dot {
-      width: 6px;
-      height: 6px;
+      width: 5.5px;
+      height: 5.5px;
       border-radius: 9999px;
-      background-color: #EA580C;
-      box-shadow: 0 0 6px #EA580C;
+      background-color: #34D399;
+      box-shadow: 0 0 8px #34D399;
       animation: tenderPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
     @keyframes tenderPulse {
@@ -199,15 +279,15 @@ interface TenderItem {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 13px 18px;
-      background: transparent;
+      padding: 12px 18px;
+      background: #FFFFFF;
       cursor: pointer;
       text-align: left;
       transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .tender-item-row:hover {
-      background: linear-gradient(90deg, rgba(215, 51, 137, 0.04) 0%, rgba(255, 255, 255, 0.95) 100%);
-      transform: translateX(4px);
+      background: linear-gradient(90deg, rgba(215, 51, 137, 0.04) 0%, rgba(34, 69, 153, 0.02) 60%, rgba(255, 255, 255, 0.98) 100%);
+      transform: translateX(3px);
     }
 
     .tender-accent-bar {
@@ -215,65 +295,68 @@ interface TenderItem {
       left: 0;
       top: 0;
       bottom: 0;
-      width: 3.5px;
+      width: 4px;
       background: transparent;
       transition: all 0.22s ease;
     }
     .tender-item-row:hover .tender-accent-bar {
-      background: linear-gradient(180deg, #EA580C 0%, #D73389 100%);
-      box-shadow: 0 0 8px rgba(215, 51, 137, 0.35);
+      background: linear-gradient(180deg, #D73389 0%, #EA580C 50%, #224599 100%);
+      box-shadow: 0 0 10px rgba(215, 51, 137, 0.45);
     }
 
     .tender-date-chip {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 11.5px;
-      color: #556987;
-      font-weight: 500;
-      background: #F1F5F9;
+      font-size: 11px;
+      color: #475569;
+      font-weight: 600;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
       padding: 1.5px 7px;
       border-radius: 5px;
       transition: all 0.2s ease;
     }
     .tender-item-row:hover .tender-date-chip {
-      background: rgba(215, 51, 137, 0.08);
-      color: #D73389;
+      background: #EFF6FF;
+      border-color: #BFDBFE;
+      color: #1E40AF;
     }
 
     .tender-new-badge {
-      font-size: 10px;
+      font-size: 9.5px;
       font-weight: 700;
       color: #047857;
       background: #ECFDF5;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 1px 6px;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      padding: 1px 5px;
       border-radius: 4px;
       letter-spacing: 0.03em;
     }
 
     .tender-category-badge {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       color: #D73389;
-      background: rgba(215, 51, 137, 0.06);
-      border: 1px solid rgba(215, 51, 137, 0.2);
+      background: linear-gradient(135deg, #FDF2F7 0%, #FCE7F3 100%);
+      border: 1px solid rgba(215, 51, 137, 0.25);
       border-radius: 6px;
       padding: 2px 8px;
       flex-shrink: 0;
+      letter-spacing: 0.02em;
       transition: all 0.2s ease;
     }
     .tender-item-row:hover .tender-category-badge {
       background: #D73389;
       color: #FFFFFF;
       border-color: #D73389;
-      box-shadow: 0 2px 6px rgba(215, 51, 137, 0.25);
+      box-shadow: 0 2px 8px rgba(215, 51, 137, 0.28);
     }
 
     .tender-title {
       font-size: 13px;
       font-weight: 600;
-      color: #25212A;
+      color: #0F172A;
       line-height: 1.45;
       margin: 4px 0 0 0;
       display: -webkit-box;
@@ -288,7 +371,7 @@ interface TenderItem {
       }
     }
     .tender-item-row:hover .tender-title {
-      color: #D73389;
+      color: #1E3A8A;
     }
 
     .tender-ref-id {
@@ -299,35 +382,46 @@ interface TenderItem {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 65%;
+      max-width: 62%;
     }
 
     .tender-login-link {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 11.5px;
+      font-size: 11px;
       font-weight: 600;
-      color: #EA580C;
+      color: #B45309;
+      background: #FFFBEB;
+      border: 1px solid #FDE68A;
+      padding: 2px 7px;
+      border-radius: 5px;
       flex-shrink: 0;
       transition: all 0.2s ease;
     }
     .tender-item-row:hover .tender-login-link {
-      color: #C2410C;
+      background: #FEF3C7;
+      color: #92400E;
+      border-color: #FCD34D;
       transform: translateX(-2px);
     }
 
     .tender-row-arrow {
-      color: #CBD5E1;
+      color: #94A3B8;
       flex-shrink: 0;
       transform: translateX(0);
-      opacity: 0.4;
+      opacity: 0.5;
       transition: all 0.22s ease;
     }
     .tender-item-row:hover .tender-row-arrow {
-      color: #D73389;
+      color: #224599;
       opacity: 1;
       transform: translateX(3px);
+    }
+
+    .tender-panel-footer {
+      height: 38px;
+      background: #F8FAFC;
     }
 
     .tender-custom-scroll {
@@ -341,11 +435,11 @@ interface TenderItem {
       background: #F8FAFC;
     }
     .tender-custom-scroll::-webkit-scrollbar-thumb {
-      background: #CBD5E1;
-      border-radius: 3px;
+      background-color: #CBD5E1;
+      border-radius: 10px;
     }
     .tender-custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: #94A3B8;
+      background-color: #94A3B8;
     }
   `]
 })

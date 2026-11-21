@@ -35,19 +35,30 @@ export interface TenderProposalDocReplaceRequest {
       [class.max-w-md]="narrow()"
     >
       <div class="min-w-0 flex items-center gap-2">
-        <app-icon name="pdf-badge-r3" solid class="text-[#E5252A] select-none" />
+        <app-icon name="pdf-badge" solid class="text-[#E5252A] select-none" />
         <div class="min-w-0">
           <span class="font-medium text-slate-800 truncate block text-[11.5px]">{{ doc()?.fileName || fallbackName() }}</span>
           <span class="text-[10px] text-slate-500">{{ doc()?.fileSize || fallbackSize() }}</span>
         </div>
       </div>
       <div class="flex items-center gap-1 shrink-0">
-        <button appButton variant="outline" size="sm" type="button" (click)="onView()">View</button>
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="onView()"
+          title="View Document"
+          aria-label="View Document"
+        >
+          <app-icon name="eye" size="sm" />
+        </button>
         @if (isEditing()) {
-          <label class="px-2 py-1 bg-white hover:bg-slate-100 border border-slate-300 text-brand rounded text-xs font-medium cursor-pointer">
+          <button appButton variant="secondary" size="sm" type="button" (click)="replaceFileInput.click()">
             Replace
-            <input type="file" (change)="replace.emit($event)" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
-          </label>
+          </button>
+          <input #replaceFileInput type="file" (change)="replace.emit($event)" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
         }
       </div>
     </div>

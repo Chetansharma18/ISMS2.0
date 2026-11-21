@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, InputDirective, TableColumn, TableComponent } from '../../../../../shared';
+import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiDocumentItem } from '../scheme-form.model';
 import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
@@ -9,7 +9,7 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, InputDirective, TableComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
@@ -37,8 +37,9 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
             Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
           </div>
           @if (doc.status === 'uploaded' && doc.fileName) {
-            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium block mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
-              {{ doc.fileName }} ({{ doc.fileSize }})
+            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
+              <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+              <span class="truncate">{{ doc.fileName }} ({{ doc.fileSize }})</span>
             </span>
           }
           @if (errors()[doc.id]) {
@@ -68,7 +69,9 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
             <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
             <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
           } @else {
-            <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
+            <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)" title="View Document" aria-label="View Document">
+              <app-icon name="eye" size="sm" />
+            </button>
             <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
             <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
             <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>

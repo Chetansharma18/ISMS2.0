@@ -539,9 +539,9 @@ export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolve
           { id: 'crf-3', label: 'Registration No. (CIN / Reg. No.)', type: 'text', mandatory: true },
           { id: 'crf-4', label: 'Date of Registration', type: 'datepicker', mandatory: true },
           { id: 'crf-5', label: 'State / UT of Registration', type: 'dropdown', mandatory: true, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh', 'Karnataka', 'Haryana', 'Madhya Pradesh', 'Punjab', 'Tamil Nadu'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh, Karnataka, Haryana, Madhya Pradesh, Punjab, Tamil Nadu' },
-          { id: 'crf-6', label: 'Certificate of Registration / Incorporation', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 5 },
+          { id: 'crf-6', label: 'Certificate of Registration / Incorporation', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 25 },
           { id: 'crf-7', label: 'Organisation PAN', type: 'text', mandatory: true },
-          { id: 'crf-8', label: 'Organisation PAN Card', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 },
+          { id: 'crf-8', label: 'Organisation PAN Card', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 25 },
           { id: 'crf-9', label: 'GST Registered', type: 'dropdown', mandatory: true, options: ['Yes', 'No'], optionsText: 'Yes, No' },
           { id: 'crf-10', label: 'MSME / Udyam Registered', type: 'dropdown', mandatory: true, options: ['Yes', 'No'], optionsText: 'Yes, No' },
           { id: 'crf-11', label: 'NSDC Partner', type: 'dropdown', mandatory: false, options: ['Not Applicable', 'Yes', 'No'], optionsText: 'Not Applicable, Yes, No' },
@@ -576,8 +576,8 @@ export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolve
           { id: 'crf-211', label: 'Passport No. (Optional)', type: 'text', mandatory: false },
           { id: 'crf-212', label: 'State', type: 'dropdown', mandatory: false, options: ['Rajasthan', 'Delhi', 'Maharashtra', 'Gujarat', 'Uttar Pradesh'], optionsText: 'Rajasthan, Delhi, Maharashtra, Gujarat, Uttar Pradesh' },
           { id: 'crf-213', label: 'Residential Address', type: 'text', mandatory: false },
-          { id: 'crf-214', label: 'Authorization Letter / Board Resolution', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 5 },
-          { id: 'crf-215', label: 'Authorized Person Identity Proof', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 }
+          { id: 'crf-214', label: 'Authorization Letter / Board Resolution', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 3, maxSizeMb: 25 },
+          { id: 'crf-215', label: 'Authorized Person Identity Proof', type: 'photo', mandatory: false, minPhotos: 1, maxPhotos: 2, maxSizeMb: 25 }
         ]
       },
       {
@@ -594,7 +594,7 @@ export const MOCK_DYNAMIC_FORM_BUILDER_ITEMS: DynamicFormBuilderItem[] = resolve
           { id: 'crf-307', label: 'IFSC Code', type: 'text', mandatory: true },
           { id: 'crf-308', label: 'MICR Code (Optional)', type: 'number', mandatory: false },
           { id: 'crf-309', label: 'Branch Address', type: 'text', mandatory: true },
-          { id: 'crf-310', label: 'Upload Cancelled Cheque / Bank Passbook', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 5 }
+          { id: 'crf-310', label: 'Upload Cancelled Cheque / Bank Passbook', type: 'photo', mandatory: true, minPhotos: 1, maxPhotos: 2, maxSizeMb: 25 }
         ]
       },
       {

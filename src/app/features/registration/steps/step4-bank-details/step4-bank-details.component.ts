@@ -147,7 +147,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               (fileChange)="updateFileDoc('cancelledChequeDoc', $event)"
               [required]="true"
               accept=".pdf,.jpg,.jpeg,.png"
-              [maxSizeMb]="5"
+              [maxSizeMb]="25"
               [error]="getFieldError('cancelledChequeDoc')"
             ></app-form-file-upload>
           </div>

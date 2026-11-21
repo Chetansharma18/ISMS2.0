@@ -20,7 +20,7 @@ import { remainingDaysText } from './tender-appeal.util';
       <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3 flex-wrap">
         <div class="flex items-center gap-3">
           <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">6</span>
-          <h2 id="shortfall-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Shortfall Requests</h2>
+          <h2 id="shortfall-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Appeal Requests</h2>
         </div>
         <span class="text-[11px] text-slate-500">
           {{ notices().length }} request(s) &bull; {{ openCount() }} pending
@@ -28,7 +28,7 @@ import { remainingDaysText } from './tender-appeal.util';
       </div>
 
       @if (notices().length === 0) {
-        <p class="m-0 text-xs text-slate-500">No shortfall request has been raised on this application.</p>
+        <p class="m-0 text-xs text-slate-500">No appeal request has been raised on this application.</p>
       }
 
       <ol class="m-0 p-0 list-none space-y-4">
@@ -64,7 +64,7 @@ import { remainingDaysText } from './tender-appeal.util';
                 <li class="relative">
                   <span class="absolute -left-5 top-1 w-3 h-3 rounded-full bg-amber-500 ring-2 ring-white"></span>
                   <div class="flex flex-wrap items-center justify-between gap-1">
-                    <span class="font-semibold text-slate-900">Shortfall request raised</span>
+                    <span class="font-semibold text-slate-900">Appeal clarification request raised</span>
                     <span class="text-[11px] text-slate-500">{{ notice.raisedOn }} &bull; {{ notice.raisedBy }}</span>
                   </div>
                   <p class="m-0 mt-1 text-slate-700 leading-relaxed whitespace-pre-line">{{ notice.remarks }}</p>

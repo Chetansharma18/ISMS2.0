@@ -620,7 +620,7 @@ export class SchemeDetailPdfService {
       { sNo: 14, name: 'EOI Document with Sign & Seal on each page', note: 'By Company Secretary or Authorized Representative' }
     ];
 
-    doc.text(`4. REQUIRED SUPPORTING DOCUMENTS CHECKLIST (${reqList.length} STATUTORY UPLOADS)`, 15, y2 + 4.4);
+    doc.text(`4. SUPPORTING DOCUMENTS CHECKLIST (${reqList.length} STATUTORY UPLOADS)`, 15, y2 + 4.4);
     y2 += 8;
 
     doc.setFont('helvetica', 'normal');

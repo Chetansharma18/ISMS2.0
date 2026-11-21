@@ -82,7 +82,7 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                 size="sm"
                 (click)="accept.emit()"
                 class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-2xs"
-                title="Accept appeal and raise shortfall notice"
+                title="Accept appeal and request clarification"
               >
                 <app-icon name="check" size="xs" />
                 <span>Accept Appeal</span>
@@ -144,9 +144,7 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                       @for (up of res.uploads; track up.fileName) {
                         <div class="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition-colors shadow-2xs">
                           <div class="flex items-center gap-2.5 min-w-0">
-                            <div class="w-7 h-7 rounded bg-red-50 text-red-600 border border-red-200 flex items-center justify-center shrink-0 font-bold text-[10px]">
-                              PDF
-                            </div>
+                            <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
                             <div class="min-w-0">
                               <span class="text-xs font-semibold text-slate-900 block truncate" [title]="up.requiredDoc">
                                 {{ up.requiredDoc }}
@@ -158,11 +156,14 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
                             appButton
                             variant="ghost"
                             size="sm"
+                            iconOnly
                             type="button"
                             (click)="viewFile.emit({ title: up.requiredDoc, fileName: up.fileName, fileSize: up.fileSize })"
-                            class="text-navy hover:text-sky-700 hover:bg-sky-50 shrink-0"
+                            class="shrink-0"
+                            title="View Document"
+                            aria-label="View Document"
                           >
-                            <span>View</span>
+                            <app-icon name="eye" size="sm" />
                           </button>
                         </div>
                       }

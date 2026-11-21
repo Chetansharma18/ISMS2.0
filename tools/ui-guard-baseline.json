@@ -3,7 +3,7 @@
     "page-frame": 1
   },
   "features/eoi/pages/scrutiny-desk/components/scrutiny-appeal-card.component.ts": {
-    "button-style": 3
+    "button-style": 2
   },
   "features/eoi/pages/scrutiny-desk/components/scrutiny-past-performance.component.ts": {
     "raw-button": 1
@@ -30,7 +30,6 @@
     "raw-table": 1
   },
   "features/tenders/scheme-detail-view/scheme-documents-panel.component.ts": {
-    "raw-button": 2,
     "raw-table": 1
   },
   "features/tenders/tender-status.component.ts": {

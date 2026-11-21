@@ -3,7 +3,7 @@ import { ShortfallRequest, ShortfallResponse, ShortfallSharedDoc } from '../../.
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { FileDoc } from '../../registration/models/otr-form.model';
 import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
-import { ButtonComponent, InputDirective } from '../../../shared';
+import { ButtonComponent, IconComponent, InputDirective } from '../../../shared';
 import { FormFileUploadComponent } from '../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
 import { formatDateMedium } from '../../../shared/utils';
 import { isShortfallOverdue, isShortfallResponseComplete } from './tender-shortfall.util';
@@ -22,7 +22,7 @@ export interface ShortfallSubmission {
   selector: 'app-shortfall-response-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, FormFileUploadComponent, ButtonComponent, InputDirective],
+  imports: [ActionModalComponent, FormFileUploadComponent, ButtonComponent, IconComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -31,7 +31,7 @@ export interface ShortfallSubmission {
       [reverseButtons]="true"
       [showAccentBar]="false"
       accentBarClass="bg-amber-500"
-      [title]="isAppeal() ? 'Appeal Response' : 'Shortfall Request'"
+      title="Department Appeal Response"
       primaryLabel="Submit"
       secondaryLabel=""
       maxWidthClass="max-w-2xl"
@@ -58,12 +58,15 @@ export interface ShortfallSubmission {
               <ul class="m-0 p-0 list-none border border-slate-200 rounded-lg divide-y divide-slate-200 bg-white">
                 @for (doc of req.sharedDocs; track doc.fileName) {
                   <li class="flex items-center justify-between gap-3 px-3 py-2">
-                    <span class="min-w-0">
-                      <span class="block font-medium text-slate-800 truncate">{{ doc.title }}</span>
-                      <span class="block text-[11px] text-slate-500 truncate">{{ doc.fileName }} &bull; {{ doc.fileSize }}</span>
-                    </span>
-                    <button appButton variant="outline" size="sm" type="button" (click)="viewShared(doc)" class="shrink-0">
-                      View
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] select-none shrink-0" />
+                      <span class="min-w-0">
+                        <span class="block font-medium text-slate-800 truncate">{{ doc.title }}</span>
+                        <span class="block text-[11px] text-slate-500 truncate">{{ doc.fileName }} &bull; {{ doc.fileSize }}</span>
+                      </span>
+                    </div>
+                    <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewShared(doc)" class="shrink-0" title="View Document" aria-label="View Document">
+                      <app-icon name="eye" size="sm" />
                     </button>
                   </li>
                 }
@@ -88,10 +91,10 @@ export interface ShortfallSubmission {
 
           <!-- Remarks -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-slate-800" for="shortfall-remarks">Remarks</label>
+            <label class="block text-xs font-semibold text-slate-800" for="appeal-remarks">Remarks</label>
             <textarea
               appInput
-              id="shortfall-remarks"
+              id="appeal-remarks"
               rows="3"
               [value]="remarks()"
               (input)="remarks.set($any($event.target).value)"

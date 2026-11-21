@@ -996,8 +996,8 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
-                                  <span>View</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
+                                  <app-icon name="eye" size="sm" />
                                 </button>
                                 <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
@@ -1089,8 +1089,8 @@ interface FormBuilderFormData {
                                 </div>
                               </div>
                               <div class="flex items-center gap-1.5 shrink-0">
-                                <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(doc.fileName)">
-                                  <span>View</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
+                                  <app-icon name="eye" size="sm" />
                                 </button>
                                 <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
                                   <span>Change</span>
@@ -1175,8 +1175,8 @@ interface FormBuilderFormData {
                             </div>
                           </div>
                           <div class="flex items-center gap-1.5 shrink-0">
-                            <button appButton variant="secondary" size="sm" type="button" (click)="viewApplyDoc(otrBankDoc.fileName)">
-                              <span>View</span>
+                            <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(otrBankDoc.fileName)" title="View Document" aria-label="View Document">
+                              <app-icon name="eye" size="sm" />
                             </button>
                             <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(otrBankDoc)">
                               <span>Change</span>

@@ -14,14 +14,12 @@ export type TenderOtrDocType =
 
 /** Detail view navigation tabs on application details page. */
 export type TenderDetailTab =
-  | 'overview'
   | 'organisation'
   | 'signatory'
   | 'bank'
   | 'documents'
   | 'fees'
-  | 'shortfall'
-  | 'all';
+  | 'shortfall';
 
 /** Event payload emitted when requesting to open a tender application detail view. */
 export interface TenderOpenEvent {

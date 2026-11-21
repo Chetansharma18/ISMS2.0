@@ -17,6 +17,7 @@ export interface AboutStatCard {
   readonly label: string;
   readonly count: string;
   readonly icon: IconName;
+  readonly bgImage: string;
   readonly waveSrc: string;
   readonly cardClass: string;
   readonly iconBoxClass: string;
@@ -34,11 +35,18 @@ export interface AboutStatCard {
     class: 'block w-full bg-white'
   },
   template: `
-    <!-- Section Wrapper: 64–80px desktop, 36–44px mobile, plain white background, official government feel -->
-    <section #sectionRef class="w-full bg-white py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
+    <!-- Section Wrapper: Plain white background framed with traditional Rajasthani decorative border strips -->
+    <section #sectionRef class="w-full bg-white border-b border-[#DCE4ED] flex flex-col justify-between" aria-labelledby="about-isms-heading">
       
+      <!-- Top Traditional Rajasthani Decorative Border Pattern Strip (Edge-to-Edge) -->
+      <div 
+        class="w-full h-3 sm:h-3.5 bg-repeat-x pointer-events-none select-none shrink-0" 
+        style="background-image: url('/rajasthan-border-pattern.png'); background-size: auto 100%;" 
+        aria-hidden="true">
+      </div>
+
       <!-- Centered Container: Max width 1440px with responsive padding (20px mobile) -->
-      <div class="w-full max-w-360 mx-auto px-5 sm:px-8 xl:px-12 box-border">
+      <div class="w-full max-w-360 mx-auto px-5 sm:px-8 xl:px-12 py-8 sm:py-12 md:py-16 xl:py-20 box-border grow flex flex-col justify-center">
         
         <!-- Two-Column Layout: Stacks on mobile, ~55% left & ~45% right on desktop with 40–48px gap, vertically centered -->
         <div class="flex flex-col lg:grid lg:grid-cols-[55fr_45fr] items-center gap-6 md:gap-8 lg:gap-12 w-full">
@@ -148,6 +156,14 @@ export interface AboutStatCard {
               class="relative overflow-hidden rounded-2xl flex items-center px-4 py-3.5 sm:px-5 sm:py-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 select-none"
               [ngClass]="card.cardClass"
             >
+              <!-- Background Thematic Watermark Artwork -->
+              <img 
+                [src]="card.bgImage" 
+                alt="" 
+                class="absolute inset-0 w-full h-full object-cover object-right pointer-events-none select-none opacity-85 z-0" 
+                aria-hidden="true"
+              />
+
               <!-- Circular Icon Container -->
               <div 
                 class="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center shrink-0 z-10"
@@ -181,6 +197,14 @@ export interface AboutStatCard {
         </div>
 
       </div>
+
+      <!-- Bottom Traditional Rajasthani Decorative Border Pattern Strip (Edge-to-Edge) -->
+      <div 
+        class="w-full h-3 sm:h-3.5 bg-repeat-x pointer-events-none select-none shrink-0" 
+        style="background-image: url('/rajasthan-border-pattern.png'); background-size: auto 100%;" 
+        aria-hidden="true">
+      </div>
+
     </section>
   `
 })
@@ -195,6 +219,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       label: 'Schemes',
       count: '18',
       icon: 'layers',
+      bgImage: '/card-bg-schemes.png',
       waveSrc: '/stat-wave-pink.png',
       cardClass: 'bg-linear-to-b from-[#FFF5F8] to-[#FFF9FB] border border-[#F8DCE6] shadow-card',
       iconBoxClass: 'bg-[#FDF0F6] border-[#F8D5E3]',
@@ -206,6 +231,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       label: 'Courses',
       count: '425',
       icon: 'graduation-cap',
+      bgImage: '/card-bg-courses.png',
       waveSrc: '/stat-wave-blue.png',
       cardClass: 'bg-linear-to-b from-[#F0F7FF] to-[#F8FAFF] border border-[#DBEAFE] shadow-card',
       iconBoxClass: 'bg-[#EFF6FF] border-[#BFDBFE]',
@@ -217,6 +243,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       label: 'Training Partners',
       count: '1,280',
       icon: 'school',
+      bgImage: '/card-bg-training-partners.png',
       waveSrc: '/stat-wave-green.png',
       cardClass: 'bg-linear-to-b from-[#F0FDF4] to-[#F9FDF9] border border-[#DCFCE7] shadow-card',
       iconBoxClass: 'bg-[#F0FDF4] border-[#BBF7D0]',
@@ -228,6 +255,7 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       label: 'Users',
       count: '25,640',
       icon: 'users',
+      bgImage: '/card-bg-users.png',
       waveSrc: '/stat-wave-purple.png',
       cardClass: 'bg-linear-to-b from-[#FAF5FF] to-[#FCFAFF] border border-[#EDE9FE] shadow-card',
       iconBoxClass: 'bg-[#FAF5FF] border-[#DDD6FE]',

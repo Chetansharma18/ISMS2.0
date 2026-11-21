@@ -10,7 +10,20 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ButtonComponent, IconComponent } from '../../../../shared';
+import { ButtonComponent, IconComponent, type IconName } from '../../../../shared';
+
+
+export interface AboutStatCard {
+  readonly label: string;
+  readonly count: string;
+  readonly icon: IconName;
+  readonly waveSrc: string;
+  readonly cardClass: string;
+  readonly iconBoxClass: string;
+  readonly iconColorClass: string;
+  readonly dividerClass: string;
+  readonly textColorClass: string;
+}
 
 @Component({
   selector: 'app-about-section',
@@ -128,6 +141,45 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
         </div>
 
+        <!-- Four Key Metrics Governance Cards Strip -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 mt-8 sm:mt-10 lg:mt-12 w-full">
+          @for (card of statCards; track card.label) {
+            <div 
+              class="relative overflow-hidden rounded-2xl flex items-center px-4 py-3.5 sm:px-5 sm:py-4 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 select-none"
+              [ngClass]="card.cardClass"
+            >
+              <!-- Circular Icon Container -->
+              <div 
+                class="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 flex items-center justify-center shrink-0 z-10"
+                [ngClass]="card.iconBoxClass"
+              >
+                <app-icon [name]="card.icon" size="lg" [ngClass]="card.iconColorClass" />
+              </div>
+
+              <!-- Vertical Divider -->
+              <div class="w-px h-9 sm:h-10 mx-3.5 sm:mx-4 shrink-0 z-10" [ngClass]="card.dividerClass"></div>
+
+              <!-- Label & Count Stack -->
+              <div class="flex flex-col min-w-0 z-10">
+                <span class="text-[13px] sm:text-[13.5px] font-bold leading-none tracking-tight mb-1" [ngClass]="card.textColorClass">
+                  {{ card.label }}
+                </span>
+                <span class="text-[26px] sm:text-[28px] lg:text-[30px] font-black leading-tight tracking-tight tabular-nums" [ngClass]="card.textColorClass">
+                  {{ card.count }}
+                </span>
+              </div>
+
+              <!-- Bottom Organic Wave Artwork -->
+              <img 
+                [src]="card.waveSrc" 
+                alt="" 
+                class="absolute bottom-0 inset-x-0 w-full h-5 sm:h-6 object-cover object-bottom pointer-events-none select-none opacity-85 z-0" 
+                aria-hidden="true"
+              />
+            </div>
+          }
+        </div>
+
       </div>
     </section>
   `
@@ -137,6 +189,53 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('sectionRef') sectionRef?: ElementRef<HTMLElement>;
   @ViewChild('videoRef') videoRef?: ElementRef<HTMLVideoElement>;
+
+  readonly statCards: readonly AboutStatCard[] = [
+    {
+      label: 'Schemes',
+      count: '18',
+      icon: 'layers',
+      waveSrc: '/stat-wave-pink.png',
+      cardClass: 'bg-linear-to-b from-[#FFF5F8] to-[#FFF9FB] border border-[#F8DCE6] shadow-card',
+      iconBoxClass: 'bg-[#FDF0F6] border-[#F8D5E3]',
+      iconColorClass: 'text-[#920129]',
+      dividerClass: 'bg-[#F0CBD8]',
+      textColorClass: 'text-[#920129]'
+    },
+    {
+      label: 'Courses',
+      count: '425',
+      icon: 'graduation-cap',
+      waveSrc: '/stat-wave-blue.png',
+      cardClass: 'bg-linear-to-b from-[#F0F7FF] to-[#F8FAFF] border border-[#DBEAFE] shadow-card',
+      iconBoxClass: 'bg-[#EFF6FF] border-[#BFDBFE]',
+      iconColorClass: 'text-[#022483]',
+      dividerClass: 'bg-[#BFDBFE]',
+      textColorClass: 'text-[#022483]'
+    },
+    {
+      label: 'Training Partners',
+      count: '1,280',
+      icon: 'school',
+      waveSrc: '/stat-wave-green.png',
+      cardClass: 'bg-linear-to-b from-[#F0FDF4] to-[#F9FDF9] border border-[#DCFCE7] shadow-card',
+      iconBoxClass: 'bg-[#F0FDF4] border-[#BBF7D0]',
+      iconColorClass: 'text-[#05831F]',
+      dividerClass: 'bg-[#BBF7D0]',
+      textColorClass: 'text-[#05831F]'
+    },
+    {
+      label: 'Users',
+      count: '25,640',
+      icon: 'users',
+      waveSrc: '/stat-wave-purple.png',
+      cardClass: 'bg-linear-to-b from-[#FAF5FF] to-[#FCFAFF] border border-[#EDE9FE] shadow-card',
+      iconBoxClass: 'bg-[#FAF5FF] border-[#DDD6FE]',
+      iconColorClass: 'text-[#370A7A]',
+      dividerClass: 'bg-[#DDD6FE]',
+      textColorClass: 'text-[#370A7A]'
+    }
+  ];
 
   readonly isPlaying = signal<boolean>(true);
   readonly isMuted = signal<boolean>(true); // Strictly sound off by default

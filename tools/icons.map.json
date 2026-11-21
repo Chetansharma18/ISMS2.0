@@ -38,6 +38,7 @@
   "inbox": "inbox",
   "info": "info",
   "info-circle": "info",
+  "layers": "layers",
   "list": "list",
   "location-marker": "map-pin",
   "lock": "lock",
@@ -79,5 +80,6 @@
   "warning-triangle": "triangle-alert",
   "zoom-in": "zoom-in",
   "pause": "pause",
-  "play": "play"
+  "play": "play",
+  "school": "school"
 }

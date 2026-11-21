@@ -73,4 +73,11 @@ describe('ProfilePageComponent - Sequential Steps', () => {
     expect(component.isStepAccessible(2)).toBe(true);
     expect(component.isStepAccessible(3)).toBe(false);
   });
+
+  it('shows "Preview" as title for Step 4 when user data is Submitted', () => {
+    otrFormService.loadExistingUserData();
+    fixture.detectChanges();
+    const list = component.sections();
+    expect(list[3].title).toBe('Preview');
+  });
 });

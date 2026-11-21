@@ -152,11 +152,27 @@ export interface RegistrationStepItem {
 
         <!-- Timeline Items List -->
         <div class="space-y-0 pt-2">
-          @for (step of sections(); track step.stepNumber; let last = $last) {
-            <div class="flex items-stretch gap-3 sm:gap-5">
+          @for (step of sections(); track step.stepNumber; let i = $index, last = $last, first = $first) {
+            <div class="flex items-stretch gap-3 sm:gap-5 mb-4 last:mb-0">
               
               <!-- Timeline Node: Number Circle + Vertical Connecting Line -->
-              <div class="flex flex-col items-center shrink-0 w-8">
+              <div class="relative flex flex-col items-center justify-center shrink-0 w-8">
+                <!-- Top connecting line: bridges the gap from previous row to this circle -->
+                @if (!first) {
+                  <div
+                    class="absolute -top-[18px] bottom-1/2 w-[2px] left-1/2 -translate-x-1/2 transition-colors"
+                    [ngClass]="sections()[i - 1]?.isCompleted ? 'bg-navy' : 'bg-slate-200'"
+                  ></div>
+                }
+
+                <!-- Bottom connecting line: goes from this circle to the bottom of this row -->
+                @if (!last) {
+                  <div
+                    class="absolute top-1/2 bottom-0 w-[2px] left-1/2 -translate-x-1/2 transition-colors"
+                    [ngClass]="step.isCompleted ? 'bg-navy' : 'bg-slate-200'"
+                  ></div>
+                }
+
                 <!-- Step Number Circle -->
                 <div
                   class="w-8 h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 z-10 shadow-2xs transition-colors"
@@ -167,19 +183,11 @@ export interface RegistrationStepItem {
                 >
                   {{ step.stepNumber }}
                 </div>
-
-                <!-- Vertical Connector Line -->
-                @if (!last) {
-                  <div
-                    class="w-[2px] flex-1 my-1 transition-colors"
-                    [ngClass]="step.isCompleted ? 'bg-navy' : 'bg-slate-200'"
-                  ></div>
-                }
               </div>
 
               <!-- Step Card Box -->
               <div
-                class="flex-1 bg-white rounded-[10px] border border-[#EADCE2] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-all mb-4"
+                class="flex-1 bg-white rounded-[10px] border border-[#EADCE2] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-all"
               >
                 <!-- Left: Icon Box + Title & Description -->
                 <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
@@ -283,6 +291,10 @@ export class ProfilePageComponent {
   readonly currentUser = this.authService.currentUser;
   readonly formData = this.otrFormService.formData;
 
+  readonly isExistingUser = computed(() => {
+    return this.currentUser()?.role === 'existing_user' || this.permissions.hasRole('existing_user') || this.formData().status === 'Submitted';
+  });
+
   readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
   readonly isAspirantComplete = this.aspirantPortal.isProfileComplete;
   readonly aspirantCompletionPercentage = computed(() => this.isAspirantComplete() ? 100 : 0);
@@ -330,8 +342,8 @@ export class ProfilePageComponent {
       {
         id: 'preview',
         stepNumber: 4,
-        title: 'Preview & Submit',
-        description: 'Review all details and submit your registration.',
+        title: this.isExistingUser() ? 'Preview' : 'Preview & Submit',
+        description: this.isExistingUser() ? 'Review all details.' : 'Review all details and submit your registration.',
         isCompleted: isStep4Complete,
         icon: 'document'
       }

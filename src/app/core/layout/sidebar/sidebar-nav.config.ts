@@ -22,6 +22,9 @@ export interface NavSubItem {
 }
 
 const PROFILE: NavItem = { key: 'profile', label: 'Profile', link: '/profile', icon: 'user' };
+
+/** Always shown with real sign-in, below the permission-driven groups. */
+export const PROFILE_NAV: NavItem = PROFILE;
 const ACTIVE_SCHEMES: NavItem = { key: 'active-schemes', label: 'Active Schemes', link: '/tenders', icon: 'briefcase' };
 
 export const ASPIRANT_NAV: NavItem[] = [

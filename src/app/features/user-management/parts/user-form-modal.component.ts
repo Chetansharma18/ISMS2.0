@@ -386,7 +386,7 @@ export class UserFormModalComponent {
     if (items && items.length > 0) {
       if (currentDistrict && currentDistrict !== 'All Districts') {
         const matching = items
-          .filter(i => i.districtName.toLowerCase() === currentDistrict.toLowerCase())
+          .filter(i => (i.districtName ?? '').toLowerCase() === currentDistrict.toLowerCase())
           .map(i => i.blockName)
           .filter(Boolean);
         if (matching.length > 0) {

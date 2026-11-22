@@ -54,14 +54,28 @@ export function resolveSessionRole(roleNames: readonly string[], chosenRoleName?
   return ROLE_PRIORITY.find(role => roles.includes(role)) ?? 'new_user';
 }
 
-/** The persona the rest of the portal works with, built from the signed-in backend user. */
-export function toPersona(user: BackendUser, role: UserRole): UserPersona {
+/** "superAdmin" -> "Super Admin", "Tp" -> "TP", "dept_user" -> "Dept User": the backend role name, readable. */
+export function humanizeRoleName(name: string): string {
+  const words = name
+    .replace(/[_-]+/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  return words.map(w => (w.length <= 2 ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1))).join(' ');
+}
+
+/**
+ * The persona the rest of the portal works with, built from the signed-in backend user. `backendRoleName` (the role the
+ * session is scoped to) becomes the label under the name; without it the portal role's label is used.
+ */
+export function toPersona(user: BackendUser, role: UserRole, backendRoleName?: string | null): UserPersona {
   const ssoId = user.SSOID || String(user.id);
   return {
     id: String(user.id ?? ssoId),
     ssoId,
     label: user.name?.trim() || user.displayName?.trim() || ssoId,
-    subLabel: ROLE_LABELS[role],
+    subLabel: backendRoleName ? humanizeRoleName(backendRoleName) : ROLE_LABELS[role],
     role,
     isProfileComplete: role !== 'new_user' && role !== 'aspirant'
   };

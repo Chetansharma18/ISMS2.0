@@ -55,10 +55,19 @@ export const API_ENDPOINTS = {
   AUTH: {
     VERIFY_LOGIN_TOKEN: endpoint('POST', '/auth/verify-login-token'),
     SELECT_ROLE: endpoint('POST', '/auth/select-role'),
+    /**
+     * Switch the signed-in session to another of the user's roles (body `{ roleId, client }`). Answers like select-role:
+     * a 2FA challenge when the target role needs it, otherwise a session scoped to the new role.
+     * Requires the backend endpoint described in documentation/API_INTEGRATION.md (not in the backend yet).
+     */
+    SWITCH_ROLE: endpoint('POST', '/auth/switch-role'),
     TWO_STEP_SEND_OTP: endpoint('POST', '/auth/two-step/send-otp'),
     TWO_STEP_VERIFY: endpoint('POST', '/auth/two-step/verify'),
-    /** Needs a signed-in session: the PIN cannot be set during sign-in. */
-    TWO_STEP_SET_PIN: endpoint('POST', '/auth/two-step/pin/set'),
+    /**
+     * Sets up a second factor: `?type=pin` (or mobile / auth-app). Works with a signed-in session (profile), or during
+     * sign-in with the `setupToken` the 2FA challenge returns when no allowed method is set up yet.
+     */
+    TWO_STEP_SET: endpoint('POST', '/auth/two-step/set'),
     REFRESH_TOKEN: endpoint('POST', '/auth/refresh-token'),
     SESSION: endpoint('GET', '/auth/me'),
     CHECK: endpoint('GET', '/auth/check'),

@@ -10,6 +10,7 @@ import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
 import { SsoLoginStepsModalComponent } from './core/auth/components/sso-login-steps-modal/sso-login-steps-modal.component';
 import { SsoLoginFlowService } from './core/auth/sso-login-flow.service';
+import { TableAccessService } from './core/permissions/table-access.service';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
@@ -133,7 +134,12 @@ export class AppComponent {
 
   constructor() {
     // RajSSO sends the user back through the backend with ?verifylogin=...; finish the sign-in from here.
-    inject(SsoLoginFlowService).handleReturn();
+    const ssoReturn = inject(SsoLoginFlowService).handleReturn();
+
+    // Already signed in (reload): refresh the table permissions in the background; the cached copy shows meanwhile.
+    if (!ssoReturn && !this.authService.isMockAuth() && this.authService.currentUser()) {
+      inject(TableAccessService).refresh();
+    }
 
     this.router.events
       .pipe(

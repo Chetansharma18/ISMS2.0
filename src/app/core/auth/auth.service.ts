@@ -6,7 +6,15 @@ import { StorageService } from '../services/storage.service';
 import { isMockEnabled } from '../mock/mock.config';
 import { environment } from '../../../environments/environment';
 import { AuthApiService } from './auth-api.service';
-import { landingRouteFor } from './sso-session.util';
+import type { BackendRoleSummary, BackendUser, CurrentUserResponse } from './auth-api.models';
+
+/** The user's roles and the one the backend session is scoped to (real sign-in). */
+export interface SessionRoles {
+  roles: BackendRoleSummary[];
+  activeRoleId: number | null;
+}
+import { humanizeRoleName, landingRouteFor, toPortalRole } from './sso-session.util';
+import { TableAccessService } from '../permissions/table-access.service';
 import { TokenService } from './token.service';
 
 // Canonical definitions live in core/models. Re-exported here so existing
@@ -94,7 +102,10 @@ export class AuthService {
   private storage = inject(StorageService);
   private tokens = inject(TokenService);
   private authApi = inject(AuthApiService);
+  private tableAccess = inject(TableAccessService);
   private readonly STORAGE_KEY = 'isms_user';
+  private readonly USER_DETAILS_KEY = 'isms_user_details';
+  private readonly SESSION_ROLES_KEY = 'isms_session_roles';
   private readonly OTP_VERIFIED_KEY = 'isms_dept_admin_otp_verified';
   private readonly OTR_PROMPT_DISMISSED_KEY = 'isms_otr_prompt_dismissed';
 
@@ -109,6 +120,9 @@ export class AuthService {
 
   /** Roles granted to the signed-in user. Empty when the user holds a single role. */
   readonly assignedRoles = computed<AssignedRole[]>(() => {
+    // Real sign-in: the backend session is scoped to the role chosen at sign-in (token `selected_role_id`), so the
+    // role can only change by signing in again. The in-browser switch is a mock-only demo.
+    if (!this.isMockAuth()) return [];
     const role = this.currentUser()?.role;
     const holdsBothRoles = role === 'dept_admin' || role === 'super_admin';
     return holdsBothRoles ? SWITCHABLE_ROLES : [];
@@ -127,6 +141,8 @@ export class AuthService {
   readonly activeRoleLabel = computed<string>(() => {
     const user = this.currentUser();
     if (!user) return '';
+    // Real sign-in: the backend role the session is scoped to (e.g. "Super Admin"), not a portal persona label.
+    if (!this.isMockAuth()) return user.subLabel || this.getRoleConfig(user.role).label;
     return this.activeRole()?.label
       ?? this.getRoleConfig(user.role).label;
   });
@@ -147,6 +163,8 @@ export class AuthService {
           this.storage.setItem(this.STORAGE_KEY, parsed);
         }
         this.currentUser.set(parsed);
+        this.userDetails.set(this.storage.getItem<BackendUser>(this.USER_DETAILS_KEY));
+        this.sessionRoles.set(this.storage.getItem<SessionRoles>(this.SESSION_ROLES_KEY) ?? { roles: [], activeRoleId: null });
       } else if (!this.isMockAuth()) {
         // Real sign-in: nobody is signed in until RajSSO says so.
         this.currentUser.set(null);
@@ -199,12 +217,87 @@ export class AuthService {
    * Opens the portal session for a user signed in through RajSSO (called by SsoLoginFlowService once the backend
    * session exists). The backend already ran the second-factor check, so the department OTP is not asked again.
    */
-  completeSignIn(persona: UserPersona): void {
+  completeSignIn(persona: UserPersona, details?: BackendUser | null, redirectTo?: string): void {
+    // Short user details from the sign-in response, cached so a reload keeps them without calling /auth/me.
+    if (details) {
+      this.userDetails.set(details);
+      this.storage.setItem(this.USER_DETAILS_KEY, details);
+    }
     this.storage.removeSessionItem(this.OTR_PROMPT_DISMISSED_KEY);
     this.login(persona, null);
     this.setDeptAdminOtpVerified(persona.role === 'dept_admin' || persona.role === 'super_admin');
-    const target = landingRouteFor(persona.role);
-    this.router.navigate([target.path], target.queryParams ? { queryParams: target.queryParams } : undefined);
+
+    // Load the table permissions (GET /auth/permissions), then open the first screen the user may use.
+    const goHome = () => {
+      // e.g. "Forgot PIN" opens the profile to set a new PIN.
+      if (redirectTo) {
+        this.router.navigateByUrl(redirectTo);
+        return;
+      }
+      const permitted = this.tableAccess.firstPermittedRoute();
+      if (permitted) {
+        this.router.navigateByUrl(permitted);
+        return;
+      }
+      const target = landingRouteFor(persona.role);
+      this.router.navigate([target.path], target.queryParams ? { queryParams: target.queryParams } : undefined);
+    };
+    this.tableAccess.clear();
+    this.tableAccess.load().subscribe({ next: goHome, error: goHome });
+  }
+
+  /**
+   * Real sign-in: all roles of the user (`{ id, name }`, from the sign-in steps or `/me.availableRoles`) and the one the
+   * backend session is scoped to. Drives "Switch Role" in the header; kept in localStorage.
+   */
+  readonly sessionRoles = signal<SessionRoles>({ roles: [], activeRoleId: null });
+  /** Roles the user can switch to (more than one role held). */
+  readonly switchableSessionRoles = computed(() => {
+    const { roles } = this.sessionRoles();
+    return roles.length > 1 ? roles : [];
+  });
+
+  setSessionRoles(roles: readonly BackendRoleSummary[], activeRoleId: number | null): void {
+    const unique = roles.filter((r, i) => roles.findIndex(x => x.id === r.id) === i);
+    const value: SessionRoles = { roles: unique, activeRoleId };
+    this.sessionRoles.set(value);
+    this.storage.setItem(this.SESSION_ROLES_KEY, value);
+  }
+
+  /** Short user details returned at sign-in (id, SSOID, name, email, mobile, roles); kept in localStorage. */
+  readonly userDetails = signal<BackendUser | null>(null);
+
+  /** Full profile from `/auth/me`; loaded only when the profile page opens (sign-in uses the short details). */
+  readonly profile = signal<CurrentUserResponse | null>(null);
+  readonly profileLoading = signal(false);
+
+  /** Loads the full profile (`/auth/me`) for the profile page. No-op with mock sign-in or when nobody is signed in. */
+  loadProfile(): void {
+    if (this.isMockAuth() || !this.currentUser() || this.profileLoading()) return;
+    this.profileLoading.set(true);
+    this.authApi.session().subscribe({
+      next: me => {
+        this.profile.set(me);
+        this.profileLoading.set(false);
+        // Keep the header in step with the server profile: the name, and the role the session is scoped to
+        // (`selectedRole`, the role chosen at sign-in).
+        const user = this.currentUser();
+        if (!user) return;
+        const name = me?.name?.trim() || me?.displayName?.trim() || user.label;
+        const sessionRoleName = me?.selectedRole?.name ?? (me?.roles?.length === 1 ? me.roles[0] : null);
+        const role = sessionRoleName ? toPortalRole(sessionRoleName) : user.role;
+        const subLabel = sessionRoleName ? humanizeRoleName(sessionRoleName) : user.subLabel;
+        if (name !== user.label || role !== user.role || subLabel !== user.subLabel) {
+          this.login({ ...user, label: name, role, subLabel }, null);
+        }
+        // Role list for "Switch Role": the backend's full list when it sends one, and the session's active role.
+        const current = this.sessionRoles();
+        const roles = me?.availableRoles?.length ? me.availableRoles : current.roles;
+        const activeRoleId = me?.selectedRoleId ?? me?.selectedRole?.id ?? current.activeRoleId;
+        this.setSessionRoles(roles, activeRoleId);
+      },
+      error: () => this.profileLoading.set(false)
+    });
   }
 
   login(persona: UserPersona, redirectUrl: string | null = '/registration'): void {
@@ -291,6 +384,12 @@ export class AuthService {
     this.setDeptAdminOtpVerified(false);
     this.storage.removeItem(this.STORAGE_KEY);
     this.storage.removeSessionItem(this.OTR_PROMPT_DISMISSED_KEY);
+    this.storage.removeItem(this.USER_DETAILS_KEY);
+    this.userDetails.set(null);
+    this.storage.removeItem(this.SESSION_ROLES_KEY);
+    this.sessionRoles.set({ roles: [], activeRoleId: null });
+    this.tableAccess.clear();
+    this.profile.set(null);
   }
 
   getRoleConfig(role: UserRole): RoleConfig {

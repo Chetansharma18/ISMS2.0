@@ -17,7 +17,7 @@ screen / feature service
 | File | What it holds |
 |---|---|
 | `src/environments/environment*.ts` | `apiUrl`, `api.clientId` / `apiKey` / `withCredentials` / `timeoutMs`, `useMockData` |
-| `proxy.conf.json` | `ng serve` forwards `/api` to the backend (default `http://localhost:5123`) |
+| `proxy.conf.json` | `ng serve` forwards `/api` to the backend (default `http://localhost:5132`) |
 | `core/config/api.config.ts` | `API_ENDPOINTS`: every URL and method, by resource key |
 | `core/mock/mock.config.ts` | One mock on/off flag per resource key |
 | `core/http/` | `HttpService`, interceptors, `ApiError`, query-param and response-envelope helpers, `LoadingService` |

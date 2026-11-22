@@ -51,6 +51,14 @@ export class AuthApiService {
     });
   }
 
+  /** Switches the signed-in session to another of the user's roles (2FA may be asked for the new role). */
+  switchRole(roleId: number): Observable<LoginStepResponse> {
+    return this.http.call<LoginStepResponse>(API_ENDPOINTS.AUTH.SWITCH_ROLE, {
+      body: { roleId, client: this.client },
+      flags: { skipErrorToast: true }
+    });
+  }
+
   /** Sends the OTP of the pending second-factor challenge to the user's registered mobile. */
   sendOtp(): Observable<unknown> {
     return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SEND_OTP, {
@@ -67,11 +75,15 @@ export class AuthApiService {
     });
   }
 
-  /** Sets or changes the signed-in user's security PIN (used for PIN sign-in). */
-  setPin(pin: string): Observable<{ success?: boolean; message?: string }> {
-    return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SET_PIN, {
-      body: { pin },
-      flags: { skipErrorToast: true }
+  /**
+   * Sets or changes the security PIN. With `setupToken` (sign-in, nothing set up yet) it works before the session
+   * exists; without it the signed-in session is used (profile). The backend replaces any earlier PIN.
+   */
+  setPin(pin: string, setupToken?: string | null): Observable<{ success?: boolean; message?: string }> {
+    return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SET, {
+      params: { type: 'pin' },
+      body: setupToken ? { pin, setupToken } : { pin },
+      flags: { skipErrorToast: true, skipAuth: !!setupToken }
     });
   }
 

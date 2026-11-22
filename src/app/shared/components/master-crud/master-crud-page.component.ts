@@ -27,6 +27,7 @@ import { InputDirective } from '../form-controls/input/input.directive';
 import { SwitchComponent } from '../switch/switch.component';
 import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
+import { TableAccessService } from '../../../core/permissions/table-access.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
 /**
@@ -69,17 +70,19 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [searchPlaceholder]="config.searchPlaceholder || 'Search...'"
         [(searchQuery)]="searchQuery"
       >
-        <!-- Add Button -->
-        <button
-          appButton
-          size="sm"
-          type="button"
-          (click)="openAddModal()"
-          class="shrink-0"
-        >
-          <app-icon name="plus" size="sm" />
-          <span>Add {{ config.entityLabel }}</span>
-        </button>
+        <!-- Add Button: only with a POST permission on the table (GET /auth/permissions) -->
+        @if (canAdd()) {
+          <button
+            appButton
+            size="sm"
+            type="button"
+            (click)="openAddModal()"
+            class="shrink-0"
+          >
+            <app-icon name="plus" size="sm" />
+            <span>Add {{ config.entityLabel }}</span>
+          </button>
+        }
       </app-page-header>
 
       <!-- Master Table -->
@@ -134,6 +137,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
             <span>View</span>
           </button>
 
+          <!-- Edit and status toggle: only with a PUT permission on the table (GET /auth/permissions) -->
+          @if (canEdit()) {
           <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
 
           <!-- Edit Button -->
@@ -166,6 +171,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
               {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
             </span>
           </div>
+          }
         </div>
       </ng-template>
 
@@ -357,6 +363,15 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 })
 export class MasterCrudPageComponent<T extends { id: string; status?: string } = any> implements OnInit, AfterViewInit {
   @Input({ required: true }) config!: MasterCrudConfig<T>;
+
+  // Table permissions from GET /auth/permissions (always true with mock sign-in).
+  private readonly tableAccess = inject(TableAccessService);
+  protected canAdd(): boolean {
+    return this.tableAccess.canDataKey(this.config?.dataKey, 'POST');
+  }
+  protected canEdit(): boolean {
+    return this.tableAccess.canDataKey(this.config?.dataKey, 'PUT');
+  }
 
   private _extraTemplates?: Record<string, TemplateRef<unknown>>;
 

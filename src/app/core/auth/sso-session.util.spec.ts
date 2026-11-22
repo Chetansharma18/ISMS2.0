@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  humanizeRoleName,
   landingRouteFor,
   resolveSessionRole,
   roleNamesOf,
@@ -42,6 +43,13 @@ describe('sso-session util', () => {
       isProfileComplete: true
     });
     expect(toPersona({ id: 8, SSOID: 'RJ.NEW' }, 'new_user')).toMatchObject({ label: 'RJ.NEW', isProfileComplete: false });
+  });
+
+  it('shows the backend role name readably under the user name', () => {
+    expect(humanizeRoleName('superAdmin')).toBe('Super Admin');
+    expect(humanizeRoleName('Tp')).toBe('TP');
+    expect(humanizeRoleName('dept_user')).toBe('Dept User');
+    expect(toPersona({ id: 1, SSOID: 'x' }, 'super_admin', 'superAdmin').subLabel).toBe('Super Admin');
   });
 
   it('lands each role on its home screen', () => {

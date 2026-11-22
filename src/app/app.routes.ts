@@ -362,6 +362,14 @@ export const routes: Routes = [
       )
   },
   {
+    // A permitted backend table that has no dedicated screen yet (linked from the permission-driven sidebar).
+    path: 'module/:tableName',
+    loadComponent: () =>
+      import('./features/modules/table-module-page.component').then(
+        (m) => m.TableModulePageComponent
+      )
+  },
+  {
     path: 'admin/master/:type',
     loadComponent: () =>
       import('./features/tenders/tenders-page.component').then(

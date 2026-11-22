@@ -19,9 +19,11 @@ import {
   MASTER_ICON,
   MASTER_NAV,
   NEW_USER_NAV,
+  PROFILE_NAV,
   USER_MANAGEMENT_ICON,
   USER_MANAGEMENT_NAV
 } from './sidebar-nav.config';
+import { TableAccessService } from '../../permissions/table-access.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -63,7 +65,80 @@ import {
 
         <!-- Navigation Links -->
         <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
-          @if (isAspirant()) {
+          @if (permissionDriven()) {
+            <!-- Real sign-in: links come from GET /auth/permissions, grouped by the backend's table categories -->
+            @for (group of navGroups(); track group.label) {
+              @if (group.standalone) {
+                <!-- "Own" category: top-level links, no parent group -->
+                @for (item of group.items; track item.key) {
+                  <a
+                    [routerLink]="item.route"
+                    [queryParams]="item.query"
+                    [title]="item.title"
+                    routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                    #ownRla="routerLinkActive"
+                    [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
+                    [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+                  >
+                    <app-icon [name]="item.icon" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                    <span class="tracking-tight truncate" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
+                  </a>
+                }
+              } @else {
+              <div class="flex flex-col">
+                <!-- ui-guard-allow: a section header is a navigation row, not a button -->
+                <button
+                  appButton
+                  variant="ghost"
+                  block
+                  type="button"
+                  (click)="toggleGroup(group.label)"
+                  [attr.aria-expanded]="isGroupOpen(group.label)"
+                  class="justify-between h-auto px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white group"
+                >
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <app-icon name="list" class="text-white/80 group-hover:text-white transition-colors" />
+                    <span class="tracking-tight font-medium text-white truncate">{{ group.label }}</span>
+                  </div>
+                  <app-icon
+                    name="chevron-down"
+                    size="sm"
+                    [stroke]="2"
+                    class="text-white/60 group-hover:text-white transition-transform duration-200"
+                    [ngClass]="{ 'transform rotate-180': isGroupOpen(group.label) }"
+                  />
+                </button>
+
+                @if (isGroupOpen(group.label)) {
+                  <div class="flex flex-col gap-0.5 pl-6 pr-1 pt-1 pb-1">
+                    @for (item of group.items; track item.key) {
+                      <a
+                        [routerLink]="item.route"
+                        [queryParams]="item.query"
+                        [title]="item.title"
+                        routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                        #permRla="routerLinkActive"
+                        [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
+                        [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                        class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
+                      >
+                        <app-icon [name]="item.icon" size="sm" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                        <span class="truncate" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+              }
+            } @empty {
+              <p class="px-3 py-2 text-[12px] leading-5 text-white/70 m-0">
+                {{ permissionsLoading() ? 'Loading your modules...' : 'No modules are assigned to your role yet.' }}
+              </p>
+            }
+
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: profileNav }" />
+          } @else if (isAspirant()) {
             @for (item of aspirantNav; track item.key) {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
             }
@@ -226,6 +301,28 @@ export class SidebarComponent {
   private destroyRef = inject(DestroyRef);
 
   readonly currentUser = this.authService.currentUser;
+
+  // ---- Permission-driven navigation (real sign-in) ----
+  private readonly tableAccess = inject(TableAccessService);
+  /** With real (RajSSO) sign-in the sidebar shows only what GET /auth/permissions allows. */
+  readonly permissionDriven = computed(() => !this.authService.isMockAuth() && !!this.currentUser());
+  readonly navGroups = this.tableAccess.navGroups;
+  readonly permissionsLoading = this.tableAccess.loading;
+  protected readonly profileNav = PROFILE_NAV;
+  /** Groups the user collapsed; all groups start open. */
+  private readonly collapsedGroups = signal<ReadonlySet<string>>(new Set());
+
+  isGroupOpen(label: string): boolean {
+    return !this.collapsedGroups().has(label);
+  }
+
+  toggleGroup(label: string): void {
+    this.collapsedGroups.update(set => {
+      const next = new Set(set);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
+  }
 
   readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
   readonly isAspirantProfilePending = computed(() => {

@@ -6,6 +6,7 @@ import { buildApiUrl } from '../config/api.config';
 import { provideApiHttp } from '../http/http.providers';
 import { isMockEnabled, setResourceMock } from '../mock/mock.config';
 import type { UserPersona } from '../models/user.model';
+import type { BackendUser } from './auth-api.models';
 import { NotificationService } from '../services/notification.service';
 import { AuthService } from './auth.service';
 import { SsoLoginFlowService } from './sso-login-flow.service';
@@ -15,7 +16,7 @@ const RETURN = 'http://localhost/?verifylogin=true';
 describe('SsoLoginFlowService', () => {
   let backend: HttpTestingController;
   let flow: SsoLoginFlowService;
-  let completeSignIn: ReturnType<typeof vi.fn<(persona: UserPersona) => void>>;
+  let completeSignIn: ReturnType<typeof vi.fn<(persona: UserPersona, details?: BackendUser | null, redirectTo?: string) => void>>;
   const authWasMocked = isMockEnabled('AUTH');
 
   beforeEach(() => {
@@ -26,7 +27,7 @@ describe('SsoLoginFlowService', () => {
       providers: [provideRouter([]), provideApiHttp(), provideHttpClientTesting()]
     });
     backend = TestBed.inject(HttpTestingController);
-    completeSignIn = vi.fn<(persona: UserPersona) => void>();
+    completeSignIn = vi.fn<(persona: UserPersona, details?: BackendUser | null, redirectTo?: string) => void>();
     TestBed.inject(AuthService).completeSignIn = completeSignIn;
     flow = TestBed.inject(SsoLoginFlowService);
   });
@@ -52,10 +53,11 @@ describe('SsoLoginFlowService', () => {
     expect(verify.request.withCredentials).toBe(true);
     verify.flush({ verified: true, user: { id: 5, SSOID: 'RJ.TP', name: 'Company 1', roles: [{ id: 3, name: 'Tp' }] } });
 
-    backend.expectOne(buildApiUrl('/auth/me')).flush({ id: 5, SSOID: 'RJ.TP', name: 'Company 1', roles: ['Tp'] });
+    backend.expectNone(buildApiUrl('/auth/me'));
 
     expect(completeSignIn).toHaveBeenCalledWith(
-      expect.objectContaining({ ssoId: 'RJ.TP', label: 'Company 1', role: 'existing_user', isProfileComplete: true })
+      expect.objectContaining({ ssoId: 'RJ.TP', label: 'Company 1', role: 'existing_user', isProfileComplete: true }),
+      expect.objectContaining({ SSOID: 'RJ.TP', name: 'Company 1' })
     );
     expect(flow.step()).toBe('idle');
   });
@@ -68,7 +70,7 @@ describe('SsoLoginFlowService', () => {
     expect(verify.request.body).toEqual({ token: 'abc.def.ghi', client: 'web' });
     expect(String(replace.mock.calls.at(-1)?.[2])).toBe('/');
     verify.flush({ verified: true, user: { id: 5, SSOID: 'RJ.TP', roles: [{ id: 3, name: 'Tp' }] } });
-    backend.expectOne(buildApiUrl('/auth/me')).flush({ id: 5, SSOID: 'RJ.TP', roles: ['Tp'] });
+    backend.expectNone(buildApiUrl('/auth/me'));
     expect(completeSignIn).toHaveBeenCalled();
     replace.mockRestore();
   });
@@ -102,10 +104,121 @@ describe('SsoLoginFlowService', () => {
     flow.verify('OTP', '123456');
     const twoStep = expectPost('/auth/two-step/verify');
     expect(twoStep.request.body).toEqual({ method: 'OTP', code: '123456', client: 'web' });
-    twoStep.flush({ success: true });
+    // two-step/verify sends the full user with roles as plain names; the chosen role (admin) must still win.
+    twoStep.flush({ success: true, user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: ['superAdmin', 'admin'] } });
 
-    backend.expectOne(buildApiUrl('/auth/me')).flush({ id: 9, SSOID: 'RJ.OFFICER', roles: ['superAdmin', 'admin'] });
-    expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'dept_admin', label: 'Scheme OIC' }));
+    backend.expectNone(buildApiUrl('/auth/me'));
+    expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'dept_admin', label: 'Scheme OIC' }), expect.objectContaining({ SSOID: 'RJ.OFFICER' }));
+  });
+
+  it('keeps the chosen role with the role-scoped responses of the updated backend', () => {
+    flow.handleReturn(RETURN);
+    expectPost('/auth/verify-login-token').flush({
+      verified: true,
+      requiresRoleSelection: true,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }] }
+    });
+
+    flow.chooseRole(2);
+    // select-role and two-step/verify now return only the chosen role, plus selectedRoleId.
+    expectPost('/auth/select-role').flush({
+      success: true,
+      requires2FA: true,
+      allowedMethods: ['OTP'],
+      selectedRoleId: 2,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 2, name: 'admin' }] }
+    });
+    flow.verify('OTP', '123456');
+    expectPost('/auth/two-step/verify').flush({
+      success: true,
+      selectedRoleId: 2,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 2, name: 'admin' }] }
+    });
+
+    expect(completeSignIn).toHaveBeenCalledWith(
+      expect.objectContaining({ role: 'dept_admin' }),
+      expect.objectContaining({ roles: [{ id: 2, name: 'admin' }] })
+    );
+  });
+
+  it('switches the session to another role, asking for 2FA when that role needs it', () => {
+    const auth = TestBed.inject(AuthService);
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    auth.userDetails.set({ id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 1, name: 'superAdmin' }] });
+
+    flow.switchRole(1); // already active -> nothing happens
+    backend.expectNone(buildApiUrl('/auth/switch-role'));
+
+    flow.switchRole(2);
+    expect(flow.step()).toBe('switching');
+    const sw = expectPost('/auth/switch-role');
+    expect(sw.request.body).toEqual({ roleId: 2, client: 'web' });
+    sw.flush({ success: true, requires2FA: true, allowedMethods: ['OTP'], selectedRoleId: 2 });
+    expect(flow.step()).toBe('two-step');
+
+    flow.verify('OTP', '123456');
+    expectPost('/auth/two-step/verify').flush({
+      success: true,
+      selectedRoleId: 2,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 2, name: 'admin' }] }
+    });
+
+    expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'dept_admin', subLabel: 'Admin' }), expect.anything());
+    expect(auth.sessionRoles()).toEqual({ roles: [{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], activeRoleId: 2 });
+  });
+
+  it('explains when the backend has no switch-role endpoint yet', () => {
+    const auth = TestBed.inject(AuthService);
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    flow.switchRole(2);
+    expectPost('/auth/switch-role').flush(null, { status: 404, statusText: 'Not Found' });
+    expect(flow.step()).toBe('idle');
+    expect(TestBed.inject(NotificationService).notifications().some(n => n.message.startsWith('Role switching is not available'))).toBe(true);
+    expect(completeSignIn).not.toHaveBeenCalled();
+  });
+
+  it('lets a user with nothing set up set a PIN with the setup token, then signs in with it', () => {
+    flow.handleReturn(RETURN);
+    expectPost('/auth/verify-login-token').flush({
+      verified: true,
+      requires2FA: true,
+      allowedMethods: ['PIN'],
+      selectedRoleId: 3,
+      twoStepStatus: { pin: { allowed: true, isSet: false, details: 'Not configured' } },
+      setupToken: 'setup.jwt',
+      user: { id: 5, SSOID: 'RJ.TP', name: 'Company 1', roles: [{ id: 3, name: 'Tp' }] }
+    });
+    expect(flow.pinSet()).toBe(false);
+    expect(flow.canSetPinNow()).toBe(true);
+
+    flow.setupPinAndSignIn('4812');
+    const set = backend.expectOne(r => r.method === 'POST' && r.url === buildApiUrl('/auth/two-step/set'));
+    expect(set.request.params.get('type')).toBe('pin');
+    expect(set.request.body).toEqual({ pin: '4812', setupToken: 'setup.jwt' });
+    set.flush({ success: true, type: 'pin', message: 'Security PIN configured successfully.' });
+
+    const verify = expectPost('/auth/two-step/verify');
+    expect(verify.request.body).toEqual({ method: 'PIN', code: '4812', client: 'web' });
+    verify.flush({ success: true });
+    expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'existing_user' }), expect.anything());
+  });
+
+  it('Forgot PIN signs in with OTP and opens the profile', () => {
+    flow.handleReturn(RETURN);
+    expectPost('/auth/verify-login-token').flush({
+      verified: true,
+      requires2FA: true,
+      allowedMethods: ['OTP', 'PIN'],
+      twoStepStatus: { pin: { allowed: true, isSet: true }, mobile: { allowed: true, isSet: true, details: '******3210' } },
+      user: { id: 5, SSOID: 'RJ.TP', roles: [{ id: 3, name: 'Tp' }] }
+    });
+    expect(flow.canSetPinNow()).toBe(false);
+    expect(flow.otpDestination()).toBe('******3210');
+
+    expect(flow.forgotPin()).toBe(true);
+    flow.verify('OTP', '123456');
+    expectPost('/auth/two-step/verify').flush({ success: true });
+    expect(completeSignIn).toHaveBeenCalledWith(expect.anything(), expect.anything(), '/profile');
   });
 
   it('reports a failed SSO return and a rejected login token', () => {

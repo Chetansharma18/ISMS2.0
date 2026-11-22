@@ -280,6 +280,11 @@ export class ProfilePageComponent {
   private router = inject(Router);
   private authService = inject(AuthService);
   protected readonly showSecurityPin = !this.authService.isMockAuth() && !!this.authService.currentUser();
+
+  constructor() {
+    // The full profile (/auth/me) is fetched only here; sign-in itself uses the short user details.
+    this.authService.loadProfile?.();
+  }
   private permissions = inject(PermissionService);
   private otrFormService = inject(OtrFormService);
   private validationService = inject(OtrValidationService);

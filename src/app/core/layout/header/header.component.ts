@@ -14,6 +14,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
+import { SsoLoginFlowService } from '../../auth/sso-login-flow.service';
+import { humanizeRoleName } from '../../auth/sso-session.util';
 import { PermissionService } from '../../permissions/permission.service';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { HeaderNotificationComponent } from './header-notification.component';
@@ -234,6 +236,34 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       }
                     }
 
+                    <!-- SWITCH ROLE (real sign-in): the user's backend roles; switching may ask for 2FA again -->
+                    @if (sessionSwitchRoles().length > 1) {
+                      <div class="my-1 border-t border-[#EADCE2]"></div>
+
+                      <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-[#7C0E44]" />
+                        <span>Switch Role</span>
+                      </div>
+
+                      @for (role of sessionSwitchRoles(); track role.id) {
+                        <button
+                          appButton
+                          size="sm"
+                          block
+                          [variant]="role.id === activeSessionRoleId() ? 'secondary' : 'ghost'"
+                          type="button"
+                          (click)="onSwitchSessionRole(role.id)"
+                          class="justify-between"
+                          [attr.aria-current]="role.id === activeSessionRoleId() ? 'true' : null"
+                        >
+                          <span class="truncate">{{ roleLabel(role.name) }}</span>
+                          @if (role.id === activeSessionRoleId()) {
+                            <app-icon name="check" />
+                          }
+                        </button>
+                      }
+                    }
+
                     <div class="my-1 border-t border-[#EADCE2]"></div>
 
                     <!-- Sign Out -->
@@ -390,5 +420,20 @@ export class HeaderComponent {
   onSelectRole(roleId: AssignedRole['id']): void {
     this.dropdownOpen.set(false);
     this.authService.switchActiveRole(roleId);
+  }
+
+  // ---- Real sign-in: switch the backend session to another role (may ask for 2FA) ----
+  private readonly loginFlow = inject(SsoLoginFlowService);
+  readonly sessionSwitchRoles = this.authService.switchableSessionRoles;
+  readonly activeSessionRoleId = computed(() => this.authService.sessionRoles().activeRoleId);
+
+  protected roleLabel(name: string): string {
+    return humanizeRoleName(name);
+  }
+
+  onSwitchSessionRole(roleId: number): void {
+    this.dropdownOpen.set(false);
+    if (roleId === this.activeSessionRoleId()) return;
+    this.loginFlow.switchRole(roleId);
   }
 }

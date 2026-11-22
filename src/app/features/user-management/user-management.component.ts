@@ -13,6 +13,7 @@ import {
   TableColumn
 } from '../../shared';
 import { DistrictBlockMasterItem, UserRoleMasterItem, SchemeMasterItem, DesignationMasterItem } from '../../core/models/admin-masters.model';
+import { toDistrictBlockItem } from '../../core/models/district-block.normalizer';
 import { UserManagementItem } from '../../core/models/user-management.model';
 import {
   ConfirmModalData,
@@ -210,7 +211,8 @@ export class UserManagementComponent {
   private dataEngine = inject(DataEngineService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
   private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES');
-  private districtRepo = this.dataEngine.for<DistrictBlockMasterItem>('DISTRICTS');
+  // Maps the backend block shape ({ name, code, district: { name } }) to the screen's district/block fields.
+  private districtRepo = this.dataEngine.for<DistrictBlockMasterItem>('DISTRICTS', { normalizer: item => toDistrictBlockItem(item) });
   private schemeRepo = this.dataEngine.for<SchemeMasterItem>('SCHEME_MASTERS');
   private designationRepo = this.dataEngine.for<DesignationMasterItem>('DESIGNATIONS');
   private route = inject(ActivatedRoute);

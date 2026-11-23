@@ -73,6 +73,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   itemUnit: 'schemes',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[840px]',
   filters: [
     {

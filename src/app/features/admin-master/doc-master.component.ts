@@ -24,7 +24,9 @@ import {
   InputDirective,
   PageShellComponent,
   SwitchComponent,
-  TableColumn
+  TableColumn,
+  MasterFilterBarComponent,
+  StatusFilterOption
 } from '../../shared';
 import { StorageService } from '../../core/services/storage.service';
 import { NotificationService } from '../../core/services/notification.service';
@@ -78,7 +80,8 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
     IconComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -87,9 +90,6 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
       <app-page-header
         title="Doc Master"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Doc Master' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by scheme name or document..."
-        [(searchQuery)]="searchQuery"
       >
         <!-- Add Doc Button -->
         <button
@@ -104,6 +104,19 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
         </button>
       </app-page-header>
 
+      <!-- Unified Master Filter & Search Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search by scheme name or document..."
+        [(status)]="statusFilter"
+        [showStatusFilter]="true"
+        [statusOptions]="statusFilterOptions()"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        itemUnit="documents"
+        (resetFilters)="resetFilters()"
+      />
+
       <!-- Table with Inactive Row Darkening (Consistent with other masters) -->
       <app-table
         [rowClass]="getRowClass"
@@ -117,25 +130,9 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
       >
       </app-table>
 
-      <!-- Action Cell Template: View, Edit, Active/Inactive Toggle -->
+      <!-- Action Cell Template: Edit, Active/Inactive Toggle -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            title="View Details"
-            aria-label="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-          </button>
-
-          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
-
           <!-- Edit Button -->
           <button
             appButton
@@ -278,47 +275,6 @@ export const INITIAL_DOC_ITEMS: DocMasterItem[] = [
         </div>
       </app-action-modal>
 
-      <!-- View Details Modal -->
-      <app-action-modal
-        [isOpen]="showViewModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        primaryLabel=""
-        secondaryLabel=""
-        maxWidthClass="max-w-[480px]"
-        (secondaryAction)="closeViewModal()"
-        (close)="closeViewModal()"
-      >
-        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Document Details
-        </h2>
-
-        @if (selectedDoc(); as doc) {
-          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100">
-            <div class="pt-1 flex flex-col gap-1">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Scheme Name</span>
-              <span class="text-sm font-semibold text-slate-800">{{ doc.schemeName }}</span>
-            </div>
-
-            <div class="pt-3 flex flex-col gap-1">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Documents</span>
-              <span class="text-sm font-medium text-slate-800">{{ doc.documents }}</span>
-            </div>
-
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
-                [ngClass]="doc.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
-              >
-                {{ doc.status }}
-              </span>
-            </div>
-          </div>
-        }
-      </app-action-modal>
-
     </app-page-shell>
   `
 })
@@ -366,22 +322,42 @@ export class DocMasterComponent implements OnInit, AfterViewInit {
   formData = { schemeName: '', docName: '' };
   isSchemeDropdownOpen = signal<boolean>(false);
 
-  // View Modal state
-  showViewModal = signal<boolean>(false);
-  selectedDoc = signal<DocMasterItem | null>(null);
+  readonly statusFilter = signal<string>('ALL');
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
+    const all = this.items();
+    const activeCount = all.filter((it) => it.status !== 'Inactive').length;
+    const inactiveCount = all.filter((it) => it.status === 'Inactive').length;
+    return [
+      { value: 'ALL', label: 'All', count: all.length },
+      { value: 'Active', label: 'Active', count: activeCount },
+      { value: 'Inactive', label: 'Inactive', count: inactiveCount }
+    ];
+  });
 
   customTemplates = signal<Record<string, TemplateRef<unknown>>>({});
 
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.items();
-    if (!q) return all;
-    return all.filter(
+    const st = this.statusFilter();
+    let list = this.items();
+
+    if (st !== 'ALL') {
+      list = list.filter((it) => (it.status || 'Active') === st);
+    }
+
+    if (!q) return list;
+    return list.filter(
       (item) =>
         item.schemeName.toLowerCase().includes(q) ||
         item.documents.toLowerCase().includes(q)
     );
   });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+  }
 
   getRowClass = (item: { status?: string }): string => {
     const isInactive = item.status === 'Inactive';
@@ -557,16 +533,6 @@ export class DocMasterComponent implements OnInit, AfterViewInit {
     }
 
     this.closeModal();
-  }
-
-  openViewModal(item: DocMasterItem): void {
-    this.selectedDoc.set(item);
-    this.showViewModal.set(true);
-  }
-
-  closeViewModal(): void {
-    this.showViewModal.set(false);
-    this.selectedDoc.set(null);
   }
 
   toggleStatus(item: DocMasterItem): void {

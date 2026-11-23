@@ -14,18 +14,23 @@ import {
   IconComponent,
   PageHeaderComponent,
   TableColumn,
-  formatInr
+  formatInr,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import {
   SchemeMasterItem,
   SchemeCategoryMasterItem,
   EoiCategoryItem,
-  DocMasterItem
+  DocMasterItem,
+  AnnexureMasterItem
 } from '../../core/models/admin-masters.model';
 import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
+import { ANNEXURE_MASTER_STORAGE_KEY, INITIAL_ANNEXURE_ITEMS } from '../admin-master/annexure-master.component';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
-import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
+import { EoiAttachment, EoiDocumentItem, EoiFormData, EoiRequiredInfoItem, SchemeTender } from './tenders.models';
 import {
   buildCorrigendumDoc,
   buildSchemeFromForm,
@@ -33,6 +38,8 @@ import {
   eoiFormFromScheme,
   filterActiveSchemes,
   isEoiFormValid,
+  isSchemeClosed,
+  parseMasterEntriesByScheme,
   validateEoiFormComplete
 } from './tenders-page/tenders-page.util';
 import { ConfigureEoiFormComponent } from './tenders-page/configure-eoi-form.component';
@@ -64,7 +71,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     AttachmentUploadModalComponent,
     CorrigendumModalComponent,
     SchemeRowActionsComponent,
-    SchemesHeaderComponent
+    SchemesHeaderComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <div class="w-full min-h-full text-slate-800 font-sans" style="background-color: #ffffff;">
@@ -124,6 +132,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               [requiredInfo]="eoiRequiredInfo"
               [schemeMasterItems]="schemeMasterItems()"
               [docMasterItems]="docMasterItems()"
+              [annexureMasterItems]="annexureMasterItems()"
               [existingRefNos]="existingRefNos()"
               [currentRefNo]="editingSchemeRefNo()"
               [externalVersion]="eoiFormVersion()"
@@ -133,6 +142,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               (removeAttachment)="removeAttachment($event)"
               (addDocument)="addEoiDocument()"
               (removeDocument)="removeEoiDocument($event)"
+              (addAnnexure)="addEoiAnnexure()"
+              (removeAnnexure)="removeEoiAnnexure($event)"
             ></app-configure-eoi-form>
 
             <!-- Card Footer / Actions -->
@@ -172,8 +183,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         <app-scheme-detail-view
           [scheme]="s"
           [rfpDocs]="rfpDocuments"
-          [annexures]="annexureDocuments"
-          [requiredInfo]="eoiRequiredInfo"
+          [annexures]="getSchemeAnnexures(s)"
+          [requiredInfo]="getSchemeRequiredDocs(s)"
           [hideApplyButton]="isSuperAdmin()"
           (back)="backToList()"
           (apply)="handleApplyForScheme()"
@@ -192,6 +203,21 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             (searchChange)="onSearchChange($event)"
             (configureEoi)="openConfigureScreen()"
           ></app-schemes-header>
+
+          <!-- Schemes Filter Bar (Dropdown filters - NO BUTTONS) -->
+          <app-master-filter-bar
+            [(searchQuery)]="searchQuery"
+            searchPlaceholder="Search by scheme name, ref no, category..."
+            [(status)]="statusFilter"
+            [showStatusFilter]="true"
+            [statusOptions]="statusFilterOptions()"
+            [filters]="schemeFilters()"
+            [(filterValues)]="filterValues"
+            [totalCount]="schemes().length"
+            [filteredCount]="filteredSchemes().length"
+            itemUnit="schemes"
+            (resetFilters)="resetFilters()"
+          />
 
           <!-- Unfinished EOI applications of the signed-in applicant -->
           @for (draft of pendingDrafts(); track draft.refNo) {
@@ -231,19 +257,38 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           >
           </app-table>
 
-          <!-- Scheme name, with a "pending" tag when the applicant left this application unfinished -->
+          <!-- Scheme name, with Government-style Blinking "NEW" / "Expired" badge and "pending" tag when the applicant left this application unfinished -->
           <ng-template #schemeNameTemplate let-item>
-            <div class="flex items-center gap-1.5 flex-wrap">
+            <div class="flex items-start justify-between gap-2">
               <span class="text-slate-800 font-medium text-[13px] leading-snug">{{ item.schemeName }}</span>
-              @if (draftFor(item.refNo); as draft) {
-                <span
-                  class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10px] font-semibold shrink-0"
-                  title="Application Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}"
-                >
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-                  Pending
-                </span>
-              }
+              <div class="inline-flex items-center gap-1.5 shrink-0 pt-0.5">
+                @if (isSchemeExpired(item)) {
+                  <span
+                    class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-rose-50 text-rose-700 border border-rose-200 shrink-0 shadow-2xs"
+                    title="Scheme Expired &bull; Closing Date: {{ item.closingDate }}"
+                  >
+                    <app-icon name="clock" size="xs" class="text-rose-500 shrink-0" />
+                    <span class="animate-blink font-extrabold text-rose-700">Expired</span>
+                  </span>
+                } @else if (isNewScheme(item)) {
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase bg-[#DC2626] text-white shadow-xs animate-blink shrink-0"
+                    title="Newly Added Scheme"
+                  >
+                    <app-icon name="bell" size="xs" class="text-white shrink-0" />
+                    <span>NEW</span>
+                  </span>
+                }
+                @if (draftFor(item.refNo); as draft) {
+                  <span
+                    class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10px] font-semibold shrink-0"
+                    title="Application Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                    Pending
+                  </span>
+                }
+              </div>
             </div>
           </ng-template>
 
@@ -356,6 +401,7 @@ export class TendersPageComponent {
 
   readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
   readonly docMasterItems = signal<DocMasterItem[]>([]);
+  readonly annexureMasterItems = signal<AnnexureMasterItem[]>([]);
   readonly schemeMasterNames = signal<string[]>([]);
   readonly schemeCategoryNames = signal<string[]>([]);
   readonly eoiCategoryNames = signal<string[]>([]);
@@ -417,7 +463,141 @@ export class TendersPageComponent {
       : this.draftService.drafts().filter(d => this.schemes().some(s => s.refNo === d.refNo))
   );
 
-  readonly filteredSchemes = computed(() => filterActiveSchemes(this.schemes(), this.searchQuery()));
+  readonly statusFilter = signal<string>('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
+    const all = this.schemes();
+    const active = all.filter(s => !isSchemeClosed(s)).length;
+    const expired = all.filter(s => isSchemeClosed(s)).length;
+    return [
+      { value: 'ALL', label: 'All Status', count: all.length },
+      { value: 'Active', label: 'Active', count: active },
+      { value: 'Expired', label: 'Expired', count: expired }
+    ];
+  });
+
+  readonly schemeFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'schemeCategory',
+      label: 'Scheme Category',
+      options: () => this.schemeCategoryOptions(),
+      placeholder: 'All Scheme Categories'
+    },
+    {
+      key: 'eoiCategory',
+      label: 'EOI Category',
+      options: () => this.eoiCategoryOptions(),
+      placeholder: 'All EOI Categories'
+    }
+  ]);
+
+  readonly filteredSchemes = computed(() => {
+    let list = this.schemes();
+    const q = this.searchQuery().toLowerCase().trim();
+
+    if (q) {
+      list = list.filter(s => {
+        const name = (s.schemeName || '').toLowerCase();
+        const title = (s.schemeTitle || '').toLowerCase();
+        const ref = (s.refNo || '').toLowerCase();
+        const desc = (s.eoiDescription || '').toLowerCase();
+        const cat = (s.schemeCategory || (s as any).category || '').toLowerCase();
+        const code = ((s as any).code || '').toLowerCase();
+        return (
+          name.includes(q) ||
+          title.includes(q) ||
+          ref.includes(q) ||
+          desc.includes(q) ||
+          cat.includes(q) ||
+          code.includes(q)
+        );
+      });
+    }
+
+    const st = this.statusFilter();
+    if (st === 'Active') {
+      list = list.filter(s => !isSchemeClosed(s));
+    } else if (st === 'Expired' || st === 'Inactive') {
+      list = list.filter(s => isSchemeClosed(s));
+    }
+
+    const schemeCat = this.filterValues()['schemeCategory'];
+    if (schemeCat) {
+      list = list.filter(s => {
+        const c = s.schemeCategory || (s as any).category || '';
+        return c.toLowerCase().includes(schemeCat.toLowerCase());
+      });
+    }
+
+    const eoiCat = this.filterValues()['eoiCategory'];
+    if (eoiCat) {
+      list = list.filter(s => {
+        const c = s.eoiCategory || (s as any).category || '';
+        return c.toLowerCase().includes(eoiCat.toLowerCase());
+      });
+    }
+
+    // Sort: New schemes at top, and current (newest) to old (oldest)
+    list = [...list].sort((a, b) => {
+      // 1. New flag priority: new schemes appear first
+      const aIsNew = this.isNewScheme(a) ? 1 : 0;
+      const bIsNew = this.isNewScheme(b) ? 1 : 0;
+      if (aIsNew !== bIsNew) {
+        return bIsNew - aIsNew;
+      }
+
+      // 2. Created timestamp (if available)
+      const aCreated = a.createdAt || 0;
+      const bCreated = b.createdAt || 0;
+      if (aCreated !== bCreated) {
+        return bCreated - aCreated;
+      }
+
+      // 3. Published date (current/newest date to oldest date)
+      const aPub = this.parseDate(a.datePublished);
+      const bPub = this.parseDate(b.datePublished);
+      if (aPub !== bPub) {
+        return bPub - aPub;
+      }
+
+      return 0;
+    });
+
+    return list.map((item, idx) => ({ ...item, sNo: idx + 1 }));
+  });
+
+  parseDate(dateStr?: string): number {
+    if (!dateStr) return 0;
+    const separator = dateStr.includes('/') ? '/' : dateStr.includes('-') ? '-' : null;
+    if (!separator) return 0;
+    const parts = dateStr.split(separator);
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).getTime();
+      }
+      return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])).getTime();
+    }
+    return 0;
+  }
+
+  isNewScheme(item: SchemeTender): boolean {
+    if (item.isNew) return true;
+    if (item.createdAt && (Date.now() - item.createdAt < 7 * 24 * 60 * 60 * 1000)) {
+      return true;
+    }
+    return false;
+  }
+
+  isSchemeExpired(item: SchemeTender): boolean {
+    return isSchemeClosed(item);
+  }
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+  }
 
   readonly searchSuggestions = computed(() => {
     const list: string[] = [];
@@ -729,13 +909,45 @@ export class TendersPageComponent {
         error: () => this.eoiCategoryNames.set([])
       });
 
-    // 4. Load Doc Master items (from storage or fallback)
-    const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
-    if (cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0) {
-      this.docMasterItems.set(cachedDocs);
-    } else {
-      this.docMasterItems.set(INITIAL_DOC_ITEMS);
-    }
+    // 4. Load Doc Master items (via dataEngine with storage fallback)
+    this.dataEngine
+      .for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          if (items && items.length > 0) {
+            this.docMasterItems.set(items);
+          } else {
+            const cached = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+            this.docMasterItems.set(cached?.length ? cached : INITIAL_DOC_ITEMS);
+          }
+        },
+        error: () => {
+          const cached = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+          this.docMasterItems.set(cached?.length ? cached : INITIAL_DOC_ITEMS);
+        }
+      });
+
+    // 5. Load Annexure Master items (via dataEngine with storage fallback)
+    this.dataEngine
+      .for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          if (items && items.length > 0) {
+            this.annexureMasterItems.set(items);
+          } else {
+            const cached = this.storage.getItem<AnnexureMasterItem[]>(ANNEXURE_MASTER_STORAGE_KEY);
+            this.annexureMasterItems.set(cached?.length ? cached : INITIAL_ANNEXURE_ITEMS);
+          }
+        },
+        error: () => {
+          const cached = this.storage.getItem<AnnexureMasterItem[]>(ANNEXURE_MASTER_STORAGE_KEY);
+          this.annexureMasterItems.set(cached?.length ? cached : INITIAL_ANNEXURE_ITEMS);
+        }
+      });
   }
 
   onSchemeSelected(schemeName: string): void {
@@ -759,21 +971,14 @@ export class TendersPageComponent {
 
     // 2. Auto-fill required documents from Doc Master
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const target = schemeName.trim().toLowerCase();
-    const docItem = masterList.find((d) => {
-      const s = (d.schemeName || '').trim().toLowerCase();
-      return s === target || s.includes(target) || target.includes(s);
-    });
-    if (docItem && docItem.documents) {
-      const docs = docItem.documents
-        .split(',')
-        .map((d) => d.trim())
-        .filter(Boolean);
-      if (docs.length > 0) {
-        this.newEoiData.documents = [...docs];
-        this.newEoiData.documentFiles = {};
-      }
-    }
+    const docs = parseMasterEntriesByScheme(masterList, schemeName, (d) => d.docName || d.documents);
+    this.newEoiData.documents = [...docs];
+    this.newEoiData.documentFiles = {};
+
+    // 3. Auto-fill annexures from Annexure Master
+    const annexList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const annexures = parseMasterEntriesByScheme(annexList, schemeName, (a) => a.annexureName || a.annexures);
+    this.newEoiData.annexures = [...annexures];
 
     this.eoiFormVersion.update((v) => v + 1);
     this.autoSaveDraft();
@@ -811,6 +1016,9 @@ export class TendersPageComponent {
         ...savedDraft,
         documentFiles: {}
       };
+      if (this.newEoiData.scheme && (!this.newEoiData.documents?.length || !this.newEoiData.annexures?.length)) {
+        this.onSchemeSelected(this.newEoiData.scheme);
+      }
     } else {
       this.newEoiData = createEmptyEoiForm();
     }
@@ -880,6 +1088,64 @@ export class TendersPageComponent {
     }
     this.eoiFormVersion.update((v) => v + 1);
     this.autoSaveDraft();
+  }
+
+  addEoiAnnexure(): void {
+    if (!this.newEoiData.annexures) {
+      this.newEoiData.annexures = [];
+    }
+    this.newEoiData.annexures.push('');
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
+  }
+
+  removeEoiAnnexure(index: number): void {
+    if (this.newEoiData.annexures && index >= 0 && index < this.newEoiData.annexures.length) {
+      this.newEoiData.annexures.splice(index, 1);
+      this.eoiFormVersion.update((v) => v + 1);
+      this.autoSaveDraft();
+    }
+  }
+
+  private resolveMasterSchemeList<T extends { schemeName?: string; schemes?: string[]; status?: string }>(
+    explicitItems: string[] | undefined,
+    masterList: T[],
+    scheme: SchemeTender,
+    fieldExtractor: (item: T) => string | undefined
+  ): string[] | null {
+    if (explicitItems && explicitItems.length > 0) {
+      return explicitItems;
+    }
+    const target = (scheme.schemeName || scheme.schemeTitle || '').trim();
+    if (!target) return null;
+    const items = parseMasterEntriesByScheme(masterList, target, fieldExtractor);
+    return items.length > 0 ? items : null;
+  }
+
+  getSchemeAnnexures(scheme: SchemeTender): EoiDocumentItem[] {
+    const masterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const items = this.resolveMasterSchemeList(scheme.annexures, masterList, scheme, (a) => a.annexureName || a.annexures);
+    if (items) {
+      return items.map((ann, idx) => ({
+        sNo: idx + 1,
+        name: ann,
+        size: '250 KB'
+      }));
+    }
+    return this.annexureDocuments;
+  }
+
+  getSchemeRequiredDocs(scheme: SchemeTender): EoiRequiredInfoItem[] {
+    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+    const items = this.resolveMasterSchemeList(scheme.requiredDocs, masterList, scheme, (d) => d.docName || d.documents);
+    if (items) {
+      return items.map((doc, idx) => ({
+        sNo: idx + 1,
+        name: doc,
+        note: 'Upload required'
+      }));
+    }
+    return this.eoiRequiredInfo;
   }
 
   // ---- Row actions ---------------------------------------------------------

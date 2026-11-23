@@ -24,6 +24,7 @@ import {
   PageShellComponent,
   SwitchComponent,
   MasterFilterBarComponent,
+  MasterFilterConfig,
   StatusFilterOption
 } from '../../shared';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
@@ -84,6 +85,8 @@ interface TwoStepFormData {
         [(status)]="statusFilter"
         [showStatusFilter]="true"
         [statusOptions]="statusFilterOptions()"
+        [filters]="filters()"
+        [(filterValues)]="filterValues"
         [totalCount]="items().length"
         [filteredCount]="filteredItems().length"
         itemUnit="configurations"
@@ -281,6 +284,16 @@ export class TwoStepVerificationComponent implements OnInit {
   isAuthDropdownOpen = signal<boolean>(false);
 
   readonly statusFilter = signal<string>('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly filters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'roleType',
+      label: 'Role',
+      options: () => this.availableRoles(),
+      placeholder: 'All Roles'
+    }
+  ]);
 
   readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
     const all = this.items();
@@ -319,10 +332,15 @@ export class TwoStepVerificationComponent implements OnInit {
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
     const st = this.statusFilter();
+    const role = this.filterValues()['roleType'];
     let list = this.items();
 
     if (st !== 'ALL') {
       list = list.filter(it => (it.status || 'Active') === st);
+    }
+
+    if (role) {
+      list = list.filter(it => it.roleType.toLowerCase() === role.toLowerCase());
     }
 
     if (!q) return list;
@@ -336,6 +354,7 @@ export class TwoStepVerificationComponent implements OnInit {
   resetFilters(): void {
     this.searchQuery.set('');
     this.statusFilter.set('ALL');
+    this.filterValues.set({});
   }
 
   ngOnInit(): void {

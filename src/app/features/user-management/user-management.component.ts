@@ -59,7 +59,6 @@ export type { UserManagementItem };
     ButtonComponent,
     IconComponent,
     PageShellComponent,
-    RoleFilterBarComponent,
     BlacklistSearchPanelComponent,
     SchemeStatusBadgeComponent,
     UserActionsCellComponent,
@@ -97,14 +96,8 @@ export type { UserManagementItem };
         }
       </app-page-header>
 
-      <!-- Users View: Role Filter Bar + Master Filter & Search -->
+      <!-- Users View: Master Filter & Search -->
       @if (!isBlacklistedView()) {
-        <app-role-filter-bar
-          [options]="roleFilterOptions()"
-          [selected]="selectedRoleFilter()"
-          (selectedChange)="selectedRoleFilter.set($event)"
-        />
-
         <app-master-filter-bar
           [(searchQuery)]="searchQuery"
           searchPlaceholder="Search Username, SSO ID, Role, District..."
@@ -399,6 +392,12 @@ export class UserManagementComponent {
 
   readonly userFilters = computed<MasterFilterConfig[]>(() => [
     {
+      key: 'role',
+      label: 'Role',
+      options: () => this.roleTypeOptions(),
+      placeholder: 'All Roles'
+    },
+    {
       key: 'district',
       label: 'District',
       options: () => this.districtOptions(),
@@ -434,7 +433,8 @@ export class UserManagementComponent {
       );
     }
 
-    let list = filterUsers(this.users(), this.selectedRoleFilter(), this.searchQuery());
+    const role = this.userFilterValues()['role'] || (this.selectedRoleFilter() !== 'blacklisted' ? this.selectedRoleFilter() : 'all');
+    let list = filterUsers(this.users(), role.toLowerCase(), this.searchQuery());
     const status = this.userStatusFilter();
     if (status !== 'ALL') {
       list = list.filter(u => u.schemeStatus === status);

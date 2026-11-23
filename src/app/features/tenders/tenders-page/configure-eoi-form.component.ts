@@ -1,14 +1,16 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EoiAttachment, EoiDocumentUpload, EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
-import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
+import { SchemeMasterItem, DocMasterItem, AnnexureMasterItem } from '../../../core/models/admin-masters.model';
 import { INITIAL_DOC_ITEMS } from '../../admin-master/doc-master.component';
+import { INITIAL_ANNEXURE_ITEMS } from '../../admin-master/annexure-master.component';
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, formatInr } from '../../../shared';
 import {
   formatBytes,
   getTodayKolkataDate,
   parseFeeNumber,
+  parseMasterEntriesByScheme,
   validateEoiFormComplete,
   validateUploadFile
 } from './tenders-page.util';
@@ -346,6 +348,85 @@ import {
           </div>
         }
       </section>
+
+      <!-- ====================================================================
+           EOI ANNEXURES (Matching Supporting Documents exactly)
+           ==================================================================== -->
+      <section class="space-y-3 pt-4 border-t border-[#E8EEF5]">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Annexures</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-0">Prescribed annexure formats for EOI submission (Upload PDF - max 25 MB)</p>
+          </div>
+          <button
+            appButton
+            variant="primary"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="addAnnexure.emit()"
+            title="Add Annexure"
+            aria-label="Add Annexure"
+          >
+            <app-icon name="plus" size="xs" />
+          </button>
+        </div>
+
+        @if (!data().annexures || data().annexures.length === 0) {
+          <div class="text-[13px] text-slate-500 italic py-6 px-4 text-center border border-dashed border-[#CBD5E1] rounded-lg bg-slate-50/40">
+            Select a scheme above to automatically load annexures from Annexure Master, or click + to add manually.
+          </div>
+        } @else {
+          <div class="space-y-2 mt-2">
+            @for (ann of data().annexures; track $index; let idx = $index) {
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
+                  <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
+                  <div class="flex-1 min-w-0">
+                    <app-dropdown
+                      [options]="getAvailableAnnexureOptionsForIndex(idx)"
+                      [(value)]="data().annexures[idx]"
+                      (valueChange)="onAnnexureChange(idx)"
+                      placeholder="-- Select Annexure Format --"
+                      size="sm"
+                      direction="up"
+                      [overlay]="true"
+                      [invalid]="hasAnnexureError(idx)"
+                      class="w-full"
+                    />
+                  </div>
+
+                  @if (isAnnexureMandatory(data().annexures[idx])) {
+                    <span
+                      class="text-[11px] font-semibold text-slate-600 bg-slate-200/70 border border-slate-300 px-2 py-1 rounded shrink-0"
+                      title="Mandatory annexure formats cannot be removed."
+                    >
+                      Mandatory
+                    </span>
+                  } @else {
+                    <button
+                      appButton
+                      variant="ghost"
+                      size="sm"
+                      iconOnly
+                      type="button"
+                      (click)="removeAnnexure.emit(idx)"
+                      class="shrink-0"
+                      title="Remove Annexure"
+                      aria-label="Remove Annexure"
+                    >
+                      <app-icon name="close" size="xs" />
+                    </button>
+                  }
+                </div>
+                @if (hasAnnexureError(idx)) {
+                  <p class="text-xs text-red-500 font-medium m-0 ml-7">{{ getAnnexureError(idx) }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
     </div>
   `
 })
@@ -367,6 +448,7 @@ export class ConfigureEoiFormComponent {
   readonly requiredInfo = input<EoiRequiredInfoItem[]>([]);
   readonly schemeMasterItems = input<SchemeMasterItem[]>([]);
   readonly docMasterItems = input<DocMasterItem[]>([]);
+  readonly annexureMasterItems = input<AnnexureMasterItem[]>([]);
   readonly existingRefNos = input<string[]>([]);
   readonly currentRefNo = input<string | null>(null);
   readonly externalVersion = input<number>(0);
@@ -379,15 +461,54 @@ export class ConfigureEoiFormComponent {
   readonly removeAttachment = output<number>();
   readonly addDocument = output<void>();
   readonly removeDocument = output<number>();
+  readonly addAnnexure = output<void>();
+  readonly removeAnnexure = output<number>();
 
   readonly docFileError = signal<string>('');
 
   /** Reactive version counter ensuring computed validation re-evaluates on any in-place mutation. */
   readonly formVersion = signal<number>(0);
 
+  constructor() {
+    // When master data loads or if a scheme is already selected (e.g. from draft or props)
+    // and documents / annexures are empty, auto-populate them from Doc Master & Annexure Master!
+    effect(() => {
+      const scheme = this.data()?.scheme;
+      if (!scheme) return;
+      const docMaster = this.docMasterItems();
+      const annexMaster = this.annexureMasterItems();
+
+      const masterList = docMaster.length > 0 ? docMaster : INITIAL_DOC_ITEMS;
+      const annexList = annexMaster.length > 0 ? annexMaster : INITIAL_ANNEXURE_ITEMS;
+
+      let mutated = false;
+      if (!this.data().documents || this.data().documents.length === 0) {
+        const docs = parseMasterEntriesByScheme(masterList, scheme, d => d.docName || d.documents);
+        if (docs.length > 0) {
+          this.data().documents = [...docs];
+          mutated = true;
+        }
+      }
+
+      if (!this.data().annexures || this.data().annexures.length === 0) {
+        const anns = parseMasterEntriesByScheme(annexList, scheme, a => a.annexureName || a.annexures);
+        if (anns.length > 0) {
+          this.data().annexures = [...anns];
+          mutated = true;
+        }
+      }
+
+      if (mutated) {
+        this.formVersion.update(v => v + 1);
+        this.formChange.emit();
+      }
+    });
+  }
+
   /** Tracking touched state per field for clean UX blur-based error display. */
   readonly touchedFields = signal<Record<string, boolean>>({});
   readonly touchedDocFields = signal<Record<number, boolean>>({});
+  readonly touchedAnnexureFields = signal<Record<number, boolean>>({});
 
   /** Minimum date selectable for submission deadline (publication date or today). */
   readonly minSubmissionDate = computed(() => {
@@ -443,8 +564,9 @@ export class ConfigureEoiFormComponent {
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
 
     masterList.forEach(item => {
-      if (item.documents) {
-        item.documents.split(',').forEach(d => {
+      const name = item.docName || item.documents;
+      if (name) {
+        name.split(',').forEach(d => {
           const trimmed = d.trim();
           if (trimmed) set.add(trimmed);
         });
@@ -476,13 +598,73 @@ export class ConfigureEoiFormComponent {
     const schemeName = this.data()?.scheme?.trim().toLowerCase();
     if (!schemeName) return false;
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const docItem = masterList.find(d => {
+    return masterList.some(d => {
+      const name = (d.docName || d.documents || '').trim().toLowerCase();
+      if (!name || (name !== docName.trim().toLowerCase() && !name.includes(docName.trim().toLowerCase()))) return false;
+      if (Array.isArray(d.schemes)) {
+        return d.schemes.some(s => {
+          const lower = s.trim().toLowerCase();
+          return lower === schemeName || lower.includes(schemeName) || schemeName.includes(lower);
+        });
+      }
       const s = (d.schemeName || '').trim().toLowerCase();
       return s === schemeName || s.includes(schemeName) || schemeName.includes(s);
     });
-    if (!docItem?.documents) return false;
-    const requiredList = docItem.documents.split(',').map(d => d.trim().toLowerCase());
-    return requiredList.includes(docName.trim().toLowerCase());
+  }
+
+  readonly availableAnnexureOptions = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    const set = new Set<string>();
+    const masterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+
+    masterList.forEach(item => {
+      const name = item.annexureName || item.annexures;
+      if (name) {
+        name.split(',').forEach(a => {
+          const trimmed = a.trim();
+          if (trimmed) set.add(trimmed);
+        });
+      }
+    });
+
+    (this.data()?.annexures || []).forEach(ann => {
+      if (ann?.trim()) set.add(ann.trim());
+    });
+
+    return Array.from(set);
+  });
+
+  getAvailableAnnexureOptionsForIndex(idx: number): string[] {
+    const allOptions = this.availableAnnexureOptions();
+    const currentVal = (this.data().annexures?.[idx] || '').trim().toLowerCase();
+    const otherSelected = new Set(
+      (this.data().annexures || [])
+        .filter((a, i) => i !== idx && a && a.trim())
+        .map(a => a.trim().toLowerCase())
+    );
+    return allOptions.filter(
+      opt => opt.trim().toLowerCase() === currentVal || !otherSelected.has(opt.trim().toLowerCase())
+    );
+  }
+
+  isAnnexureMandatory(annexureName?: string): boolean {
+    if (!annexureName) return false;
+    const schemeName = this.data()?.scheme?.trim().toLowerCase();
+    if (!schemeName) return false;
+    const masterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    return masterList.some(a => {
+      const name = (a.annexureName || a.annexures || '').trim().toLowerCase();
+      if (!name || (name !== annexureName.trim().toLowerCase() && !name.includes(annexureName.trim().toLowerCase()))) return false;
+      if (Array.isArray(a.schemes)) {
+        return a.schemes.some(s => {
+          const lower = s.trim().toLowerCase();
+          return lower === schemeName || lower.includes(schemeName) || schemeName.includes(lower);
+        });
+      }
+      const s = (a.schemeName || '').trim().toLowerCase();
+      return s === schemeName || s.includes(schemeName) || schemeName.includes(s);
+    });
   }
 
   private notifyMutation(field?: string): void {
@@ -553,6 +735,22 @@ export class ConfigureEoiFormComponent {
     return this.validation().docErrors[index] || '';
   }
 
+  onAnnexureChange(index: number): void {
+    this.touchedAnnexureFields.update(t => ({ ...t, [index]: true }));
+    this.formVersion.update(v => v + 1);
+    this.formChange.emit();
+  }
+
+  hasAnnexureError(index: number): boolean {
+    if (!this.submitted() && !this.touchedAnnexureFields()[index]) return false;
+    return !!this.validation().annexureErrors?.[index];
+  }
+
+  getAnnexureError(index: number): string {
+    if (!this.submitted() && !this.touchedAnnexureFields()[index]) return '';
+    return this.validation().annexureErrors?.[index] || '';
+  }
+
   onDocFileUpload(index: number, event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
@@ -610,6 +808,7 @@ export class ConfigureEoiFormComponent {
       this.data().emdFee = '';
       this.data().processFee = '';
       this.data().documents = [];
+      this.data().annexures = [];
       this.data().documentFiles = {};
       this.notifyMutation('scheme');
       this.schemeChange.emit(schemeName);
@@ -634,25 +833,15 @@ export class ConfigureEoiFormComponent {
 
     // 2. Auto-fill required documents from Doc Master
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const target = schemeName.trim().toLowerCase();
-    const docItem = masterList.find(d => {
-      const s = (d.schemeName || '').trim().toLowerCase();
-      return s === target || s.includes(target) || target.includes(s);
-    });
+    const docs = parseMasterEntriesByScheme(masterList, schemeName, d => d.docName || d.documents);
+    this.data().documents = [...docs];
+    this.data().documentFiles = {};
+    this.docFileError.set('');
 
-    if (docItem && docItem.documents) {
-      const docs = docItem.documents
-        .split(',')
-        .map(d => d.trim())
-        .filter(Boolean);
-      if (docs.length > 0) {
-        // Disallow duplicates from the master list
-        const uniqueDocs = Array.from(new Set(docs));
-        this.data().documents = [...uniqueDocs];
-        this.data().documentFiles = {};
-        this.docFileError.set('');
-      }
-    }
+    // 3. Auto-fill required annexures from Annexure Master
+    const annexMasterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const annexures = parseMasterEntriesByScheme(annexMasterList, schemeName, a => a.annexureName || a.annexures);
+    this.data().annexures = [...annexures];
 
     this.notifyMutation('scheme');
     this.schemeChange.emit(schemeName);

@@ -35,6 +35,7 @@ export interface SchemeTenderItem {
   createdBy?: string;
   isActive?: boolean;
   isFrozen?: boolean;
+  isNew?: boolean;
 }
 
 export const MOCK_AVAILABLE_ADMINS = [
@@ -117,10 +118,10 @@ export const MOCK_SCHEMES: SchemeTenderItem[] = resolveMock([
     schemeCategory: 'samarth',
     category: 'samarth',
     datePublished: '18/09/2026',
-    closingDate: '25/11/2026',
+    closingDate: '15/10/2026',
     eoiCategory: 'Special',
     eoiDescription: 'Expression of Interest for submission of proposal to undertake Skill Training under Mukhyamantri Yuva Swarojgar Yojana (2026)',
-    status: 'Open',
+    status: 'Closed',
     rfpDocSize: '3.1 MB',
     sopDocSize: '2.0 MB',
     preBidDate: '08-Oct-2026 11:00 AM',
@@ -215,7 +216,8 @@ export const MOCK_SCHEMES: SchemeTenderItem[] = resolveMock([
     techBidDate: '05-Jan-2027 02:30 PM',
     emdFee: '₹60,000',
     processFee: '₹12,000',
-    committeeMembers: []
+    committeeMembers: [],
+    isNew: true
   }
 ]);
 

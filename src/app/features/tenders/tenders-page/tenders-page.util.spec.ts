@@ -16,9 +16,11 @@ import {
   normalizeSchemeCategory,
   parseEoiDuration,
   parseFeeNumber,
+  parseMasterEntriesByScheme,
   sanitizeInput,
   toDisplayDate,
   toInputDate,
+  validateAnnexures,
   validateDocuments,
   validateEoiDescription,
   validateEoiDuration,
@@ -201,6 +203,25 @@ describe('tenders-page.util', () => {
       expect(validateUploadFile({ name: 'big.pdf', size: 25 * 1024 * 1024 + 1 })).toBe(
         'File size exceeds the 25MB limit.'
       );
+    });
+  });
+
+  describe('validateAnnexures', () => {
+    it('accepts empty or valid distinct annexures list', () => {
+      expect(validateAnnexures([]).isValid).toBe(true);
+      expect(validateAnnexures(['Annexure-1: Covering Letter', 'Annexure-3: Financials']).isValid).toBe(true);
+    });
+
+    it('rejects blank annexure entries', () => {
+      const res = validateAnnexures(['Annexure-1', '   ']);
+      expect(res.isValid).toBe(false);
+      expect(res.errors[1]).toBe('Please select an annexure format.');
+    });
+
+    it('rejects duplicate annexure entries', () => {
+      const res = validateAnnexures(['Annexure-1: Covering Letter', 'annexure-1: covering letter']);
+      expect(res.isValid).toBe(false);
+      expect(res.errors[1]).toBe('This annexure has already been added.');
     });
   });
 
@@ -576,6 +597,48 @@ describe('tenders-page.util', () => {
       };
       const scheduledRes = validateEoiFormComplete(scheduledForm, { ...standardOptions, isScheduled: true });
       expect(scheduledRes.isValid).toBe(true);
+    });
+
+    // 21. Scheme binding with Doc Master & Annexure Master
+    it('Scenario 21: binds scheme with documents and annexures correctly via parseMasterEntriesByScheme', () => {
+      const mockDocs = [
+        {
+          id: '1',
+          docName: 'PAN Card',
+          schemes: ['Scheme A', 'Scheme B'],
+          status: 'Active'
+        },
+        {
+          id: '2',
+          docName: 'Aadhaar Card',
+          schemes: ['Scheme B'],
+          status: 'Active'
+        },
+        {
+          id: '3',
+          docName: 'Old Inactive Doc',
+          schemes: ['Scheme A'],
+          status: 'Inactive'
+        },
+        {
+          id: '4',
+          docName: 'Universal Doc',
+          schemes: ['ALL'],
+          status: 'Active'
+        }
+      ];
+
+      const docsA = parseMasterEntriesByScheme(mockDocs, 'Scheme A', (d) => d.docName);
+      expect(docsA).toEqual(['PAN Card', 'Universal Doc']);
+
+      const docsB = parseMasterEntriesByScheme(mockDocs, 'Scheme B', (d) => d.docName);
+      expect(docsB).toEqual(['PAN Card', 'Aadhaar Card', 'Universal Doc']);
+
+      const docsC = parseMasterEntriesByScheme(mockDocs, 'Scheme C', (d) => d.docName);
+      expect(docsC).toEqual(['Universal Doc']);
+
+      // Empty scheme returns empty array
+      expect(parseMasterEntriesByScheme(mockDocs, '', (d) => d.docName)).toEqual([]);
     });
   });
 });

@@ -29,6 +29,8 @@ import {
   MOCK_SCHEME_CATEGORY_MASTER_ITEMS,
   MOCK_REMARK_MASTER_ITEMS,
   MOCK_GRADING_MASTER_ITEMS,
+  MOCK_DOC_MASTER_ITEMS,
+  MOCK_ANNEXURE_MASTER_ITEMS,
   MOCK_TWO_STEP_VERIFICATION_ITEMS,
   MOCK_CAMERA_BATCHES,
   MOCK_DYNAMIC_FORM_BUILDER_ITEMS
@@ -88,6 +90,8 @@ export class MockDatabaseService {
     SCHEME_CATEGORIES: MOCK_SCHEME_CATEGORY_MASTER_ITEMS,
     REMARK_MASTERS: MOCK_REMARK_MASTER_ITEMS,
     GRADING_MASTERS: MOCK_GRADING_MASTER_ITEMS,
+    DOC_MASTERS: MOCK_DOC_MASTER_ITEMS,
+    ANNEXURE_MASTERS: MOCK_ANNEXURE_MASTER_ITEMS,
     TWO_STEP_VERIFICATION: MOCK_TWO_STEP_VERIFICATION_ITEMS,
     DYNAMIC_FORM_BUILDER: MOCK_DYNAMIC_FORM_BUILDER_ITEMS
   };
@@ -180,6 +184,24 @@ export class MockDatabaseService {
             );
             this.store.set(key, filtered);
             this.saveToStorage(key, filtered);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'DOC_MASTERS') {
+          const hasOldSchema = !stored || stored.length === 0 || stored.some((item: any) => !item?.docName || !Array.isArray(item?.schemes));
+          if (hasOldSchema) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
+          } else {
+            this.store.set(key, stored);
+          }
+        } else if (key === 'ANNEXURE_MASTERS') {
+          const hasOldSchema = !stored || stored.length === 0 || stored.some((item: any) => !item?.annexureName || !Array.isArray(item?.schemes));
+          if (hasOldSchema) {
+            const fresh = this.deepClone(this.seeds[key]);
+            this.store.set(key, fresh);
+            this.saveToStorage(key, fresh);
           } else {
             this.store.set(key, stored);
           }

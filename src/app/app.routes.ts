@@ -373,6 +373,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/annexure',
+    loadComponent: () =>
+      import('./features/admin-master/annexure-master.component').then(
+        (m) => m.AnnexureMasterComponent
+      )
+  },
+  {
     path: 'admin/master/remark',
     loadComponent: () =>
       import('./features/admin-master/remark-master.component').then(

@@ -30,7 +30,8 @@
     "jspdf": "^4.2.1",
     "jszip": "^3.10.2",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "ux4g-web-components": "^3.4.0"
   },
   "devDependencies": {
     "@angular/build": "^21.2.24",

@@ -266,6 +266,23 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
                     <div class="my-1 border-t border-[#EADCE2]"></div>
 
+                    <!-- Back to SSO (real sign-in): return to the RajSSO portal, staying signed in to ISMS -->
+                    @if (canGoBackToSso()) {
+                      <button
+                        appButton
+                        variant="ghost"
+                        size="sm"
+                        block
+                        type="button"
+                        (click)="onBackToSso()"
+                        class="justify-start"
+                        role="menuitem"
+                      >
+                        <app-icon name="external-link" />
+                        <span>Back to SSO</span>
+                      </button>
+                    }
+
                     <!-- Sign Out -->
                     <button
                       appButton
@@ -415,6 +432,15 @@ export class HeaderComponent {
   onLogout(): void {
     this.dropdownOpen.set(false);
     this.authService.logout();
+  }
+
+  canGoBackToSso(): boolean {
+    return this.authService.canGoBackToSso();
+  }
+
+  onBackToSso(): void {
+    this.dropdownOpen.set(false);
+    this.authService.backToSso();
   }
 
   onSelectRole(roleId: AssignedRole['id']): void {

@@ -1,4 +1,5 @@
 import type { jsPDF } from 'jspdf';
+import { apiClientHeaders, isApiUrl } from '../../../../core/config/api.config';
 
 /** Page layout shared by the e-signed sanction order and IPA PDFs (A4, millimetres). */
 export const PAGE_WIDTH = 210;
@@ -27,7 +28,8 @@ export async function loadImage(url: string): Promise<string | null> {
   if (!url) return null;
   if (url.startsWith('data:')) return url;
   try {
-    const response = await fetch(url);
+    // ui-guard-allow: raw-http - binary image for the PDF; API URLs still get the mandatory client headers
+    const response = await fetch(url, isApiUrl(url) ? { headers: apiClientHeaders(), credentials: 'include' } : undefined);
     if (!response.ok) return null;
     const blob = await response.blob();
     return await new Promise<string | null>(resolve => {

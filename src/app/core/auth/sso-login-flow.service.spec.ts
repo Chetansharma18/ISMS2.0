@@ -151,9 +151,22 @@ describe('SsoLoginFlowService', () => {
 
     flow.switchRole(2);
     expect(flow.step()).toBe('switching');
+    expect(flow.switchTargetName()).toBe('admin');
     const sw = expectPost('/auth/switch-role');
     expect(sw.request.body).toEqual({ roleId: 2, client: 'web' });
-    sw.flush({ success: true, requires2FA: true, allowedMethods: ['OTP'], selectedRoleId: 2 });
+    // The backend ends the old session and hands back a fresh login token scoped to the new role.
+    sw.flush({ success: true, requires2FA: false, selectedRoleId: 2, loginCallbackToken: 'switch.token' });
+
+    // The sign-in steps after RajSSO run again with that token (no RajSSO round trip).
+    const verify = expectPost('/auth/verify-login-token');
+    expect(verify.request.body).toEqual({ token: 'switch.token', client: 'web' });
+    verify.flush({
+      verified: true,
+      requires2FA: true,
+      allowedMethods: ['OTP'],
+      selectedRoleId: 2,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }] }
+    });
     expect(flow.step()).toBe('two-step');
 
     flow.verify('OTP', '123456');
@@ -165,6 +178,66 @@ describe('SsoLoginFlowService', () => {
 
     expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'dept_admin', subLabel: 'Admin' }), expect.anything());
     expect(auth.sessionRoles()).toEqual({ roles: [{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], activeRoleId: 2 });
+  });
+
+  it('opens the new role at once when it needs no 2FA', () => {
+    const auth = TestBed.inject(AuthService);
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    flow.switchRole(2);
+    expectPost('/auth/switch-role').flush({ success: true, selectedRoleId: 2, loginCallbackToken: 'switch.token' });
+    expectPost('/auth/verify-login-token').flush({
+      verified: true,
+      selectedRoleId: 2,
+      user: { id: 9, SSOID: 'RJ.OFFICER', name: 'Scheme OIC', roles: [{ id: 2, name: 'admin' }] }
+    });
+    expect(completeSignIn).toHaveBeenCalledWith(expect.objectContaining({ role: 'dept_admin' }), expect.anything());
+    expect(auth.sessionRoles().activeRoleId).toBe(2);
+    expect(flow.step()).toBe('idle');
+  });
+
+  it('keeps the current session when switch-role is refused', () => {
+    const auth = TestBed.inject(AuthService);
+    const endSession = vi.spyOn(auth, 'endSessionLocally').mockImplementation(() => {});
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    flow.switchRole(2);
+    expectPost('/auth/switch-role').flush(
+      { success: false, message: 'The requested role (ID 2) is not assigned or active for this user.' },
+      { status: 400, statusText: 'Bad Request' }
+    );
+    backend.expectNone(buildApiUrl('/auth/verify-login-token'));
+    expect(endSession).not.toHaveBeenCalled();
+    expect(flow.step()).toBe('idle');
+    expect(TestBed.inject(NotificationService).notifications().some(n => n.message.includes('not assigned'))).toBe(true);
+  });
+
+  it('signs out of the portal when the 2FA of the new role is cancelled (the old session has ended)', () => {
+    const auth = TestBed.inject(AuthService);
+    const endSession = vi.spyOn(auth, 'endSessionLocally').mockImplementation(() => {});
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    flow.switchRole(2);
+    expectPost('/auth/switch-role').flush({ success: true, selectedRoleId: 2, loginCallbackToken: 'switch.token' });
+    expectPost('/auth/verify-login-token').flush({ verified: true, requires2FA: true, allowedMethods: ['OTP'], selectedRoleId: 2 });
+    expect(flow.step()).toBe('two-step');
+
+    flow.cancel();
+    expect(endSession).toHaveBeenCalledTimes(1);
+    expect(flow.step()).toBe('idle');
+    expect(flow.switchTargetName()).toBeNull();
+    expect(completeSignIn).not.toHaveBeenCalled();
+  });
+
+  it('signs out of the portal when the new login token is rejected', () => {
+    const auth = TestBed.inject(AuthService);
+    const endSession = vi.spyOn(auth, 'endSessionLocally').mockImplementation(() => {});
+    auth.setSessionRoles([{ id: 1, name: 'superAdmin' }, { id: 2, name: 'admin' }], 1);
+    flow.switchRole(2);
+    expectPost('/auth/switch-role').flush({ success: true, selectedRoleId: 2, loginCallbackToken: 'switch.token' });
+    expectPost('/auth/verify-login-token').flush(
+      { verified: false, message: 'Invalid or expired login token. Please sign in again.' },
+      { status: 400, statusText: 'Bad Request' }
+    );
+    expect(endSession).toHaveBeenCalledTimes(1);
+    expect(flow.step()).toBe('idle');
   });
 
   it('explains when the backend has no switch-role endpoint yet', () => {

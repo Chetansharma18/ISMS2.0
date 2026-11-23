@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { TableAccessService } from '../../core/permissions/table-access.service';
-import { humanizeTableName } from '../../core/permissions/permitted-tables.util';
+import { humanizeTableName, menuLabel } from '../../core/permissions/permitted-tables.util';
 import { EmptyStateComponent, PageHeaderComponent, PageShellComponent, SectionCardComponent } from '../../shared';
 
 const METHOD_LABELS: Record<string, string> = { GET: 'View', POST: 'Add', PUT: 'Edit', DELETE: 'Delete' };
@@ -47,6 +47,9 @@ export class TableModulePageComponent {
 
   protected readonly tableName = toSignal(this.route.paramMap.pipe(map(p => p.get('tableName') ?? '')), { initialValue: '' });
   protected readonly table = computed(() => this.tableAccess.table(this.tableName()));
-  protected readonly label = computed(() => humanizeTableName(this.tableName()));
+  protected readonly label = computed(() => {
+    const table = this.table();
+    return table ? menuLabel(table) : humanizeTableName(this.tableName());
+  });
   protected readonly access = computed(() => (this.table()?.methods ?? []).map(m => METHOD_LABELS[m] ?? m).join(', '));
 }

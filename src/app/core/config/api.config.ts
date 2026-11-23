@@ -73,7 +73,12 @@ export const API_ENDPOINTS = {
     CHECK: endpoint('GET', '/auth/check'),
     PERMISSIONS: endpoint('GET', '/auth/permissions'),
     KEEP_ALIVE: endpoint('POST', '/auth/sso/keep-alive'),
-    LOGOUT: endpoint('POST', '/auth/logout')
+    LOGOUT: endpoint('POST', '/auth/logout'),
+    /**
+     * Back to SSO (RajSSO spec 2.6): opened as a full-page navigation, not called over HTTP. The backend answers with
+     * a page that posts the user's SSO token to the RajSSO portal. The ISMS session stays signed in.
+     */
+    BACK_TO_SSO: endpoint('GET', '/auth/backtosso')
   },
 
   // One Time Registration (OTR)
@@ -197,10 +202,43 @@ export function buildApiUrl(path: string): string {
   return `${apiBaseUrl()}${cleanPath}`;
 }
 
-/** True when the URL points at our backend API (absolute or relative), so API-only headers can be added. */
+/** Resolves a URL (relative or absolute) against the page origin, or null when it is not a valid URL. */
+function resolveUrl(url: string): URL | null {
+  const origin =
+    typeof window !== 'undefined' && window.location?.origin && window.location.origin !== 'null'
+      ? window.location.origin
+      : 'http://localhost';
+  try {
+    return new URL(url, `${origin}/`);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * True when the URL points at our backend API, in any form: `/api/x`, `api/x`, `http://<this host>/api/x`, or the
+ * absolute `environment.apiUrl`; the path is compared case-insensitively. API-only headers are added to these.
+ */
 export function isApiUrl(url: string): boolean {
-  const base = apiBaseUrl();
-  return url === base || url.startsWith(`${base}/`) || url.startsWith(`${base}?`);
+  const target = resolveUrl(url);
+  const base = resolveUrl(apiBaseUrl());
+  if (!target || !base) return false;
+  if (target.origin.toLowerCase() !== base.origin.toLowerCase()) return false;
+  const basePath = base.pathname.replace(/\/+$/, '').toLowerCase();
+  const path = target.pathname.toLowerCase();
+  return basePath === '' || path === basePath || path.startsWith(`${basePath}/`);
+}
+
+/**
+ * The headers the backend requires on every API request (`x-client`, `x-api-key`). The HTTP interceptor adds them to
+ * every HttpClient call; code that cannot use HttpClient (a `fetch` for a file) must pass these itself.
+ */
+export function apiClientHeaders(): Record<string, string> {
+  const { clientId, apiKey } = environment.api;
+  const headers: Record<string, string> = {};
+  if (clientId) headers['x-client'] = clientId;
+  if (apiKey) headers['x-api-key'] = apiKey;
+  return headers;
 }
 
 /** Resolves dynamic endpoint URL from string or callback function. */

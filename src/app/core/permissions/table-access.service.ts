@@ -15,13 +15,21 @@ import {
   toPermittedTablesState
 } from './permitted-tables.util';
 import { TABLE_SCREENS } from './table-screens';
+import { FORBIDDEN_RELOAD_GAP_MS, isPermissionsCacheStale, permissionsVersionChanged } from './permissions-cache.util';
+import { isPublicPath, isSignedInPath } from './open-routes.util';
 
-const STORAGE_KEY = 'isms_permitted_tables';
+// v2: tables carry the menu fields (enableInMenu / menuCallingName). Copies under the old key are dropped.
+const STORAGE_KEY = 'isms_permitted_tables_v2';
+const OLD_STORAGE_KEY = 'isms_permitted_tables';
 
 /**
  * Table permissions of the signed-in user, from GET /auth/permissions (backend RolePermissions).
  *
- * - Loaded right after sign-in, refreshed when the app starts, cached in localStorage for reloads, cleared on logout.
+ * - Loaded right after sign-in (and after a role switch), cached in sessionStorage, cleared on logout.
+ *   A page reload uses the cache and does not call the API.
+ * - Reloaded only when they may have changed: the backend sends a different `X-Permissions-Version` header on any
+ *   response, an API call answers 403, or the cache is older than 15 minutes when the user reloads or returns to
+ *   the tab (`refreshIfStale`).
  * - `navGroups()` drives the sidebar: only permitted tables that have a screen, grouped by the API's categories.
  * - `can(table, method)` / `canDataKey(dataKey, method)` drive buttons; `tableAccessGuard` drives routes.
  *
@@ -32,8 +40,11 @@ export class TableAccessService {
   private readonly http = inject(HttpService);
   private readonly storage = inject(StorageService);
 
-  private readonly state = signal<PermittedTablesState | null>(this.storage.getItem<PermittedTablesState>(STORAGE_KEY));
+  private readonly state = signal<PermittedTablesState | null>(this.readCache());
   private inFlight$: Observable<void> | null = null;
+  /** Version header seen on the permissions response being loaded, stored with it. */
+  private incomingVersion: string | null = null;
+  private lastForbiddenReload = 0;
 
   /** True once permissions are known (from the API or the cache). */
   readonly loaded = computed(() => this.state() !== null);
@@ -56,10 +67,10 @@ export class TableAccessService {
     this.inFlight$ ??= this.http
       .call<unknown>(API_ENDPOINTS.AUTH.PERMISSIONS, { flags: { skipErrorToast: true } })
       .pipe(
-        map(res => toPermittedTablesState(res)),
+        map(res => ({ ...toPermittedTablesState(res), version: this.incomingVersion })),
         tap(state => {
           this.state.set(state);
-          this.storage.setItem(STORAGE_KEY, state);
+          this.storage.setSessionItem(STORAGE_KEY, state);
         }),
         map(() => undefined),
         finalize(() => {
@@ -72,9 +83,36 @@ export class TableAccessService {
     return this.inFlight$;
   }
 
-  /** Reloads in the background (app start). Keeps the cached permissions if the call fails. */
+  /** Reloads in the background. Keeps the cached permissions if the call fails. */
   refresh(): void {
     this.load().subscribe({ error: () => {} });
+  }
+
+  /** Reloads only when the cache is older than the allowed age (page reload, user returns to the tab). */
+  refreshIfStale(now: number = Date.now()): void {
+    if (this.isMock() || !this.loaded() || this.inFlight$) return;
+    if (isPermissionsCacheStale(this.state(), now)) this.refresh();
+  }
+
+  /**
+   * Called by `permissionsSyncInterceptor` for every API response that carries the version header.
+   * The permissions response itself records the version; any other response reloads when it differs.
+   */
+  noteVersion(version: string | null, fromPermissionsRequest: boolean): void {
+    if (this.isMock()) return;
+    if (fromPermissionsRequest) {
+      this.incomingVersion = version?.trim() || null;
+      return;
+    }
+    if (!this.inFlight$ && permissionsVersionChanged(this.state(), version)) this.refresh();
+  }
+
+  /** Called on a 403: the role may have lost access, so reload (at most once per short window). */
+  noteForbidden(now: number = Date.now()): void {
+    if (this.isMock() || !this.loaded() || this.inFlight$) return;
+    if (now - this.lastForbiddenReload < FORBIDDEN_RELOAD_GAP_MS) return;
+    this.lastForbiddenReload = now;
+    this.refresh();
   }
 
   /** Resolves once permissions are known: true when they are, false when they could not be loaded. */
@@ -107,13 +145,17 @@ export class TableAccessService {
     return governingRoute(url, this.routeTables.keys());
   }
 
-  /** True when the user may open the screen at the URL (URLs not tied to a table are always allowed). */
+  /**
+   * True when the signed-in user may open the screen at the URL: the landing, sign-in and profile pages, or a screen
+   * whose backend table the user may read. Any other screen (no table, or a table not permitted) is closed.
+   */
   canOpenUrl(url: string): boolean {
     if (this.isMock()) return true;
+    if (isPublicPath(url) || isSignedInPath(url)) return true;
     const moduleTable = tableNameFromModuleUrl(url);
     if (moduleTable !== null) return this.can(moduleTable, 'GET');
     const route = this.governingRoute(url);
-    if (!route) return true;
+    if (!route) return false;
     return (this.routeTables.get(route) ?? []).some(t => this.can(t, 'GET'));
   }
 
@@ -130,6 +172,19 @@ export class TableAccessService {
 
   clear(): void {
     this.state.set(null);
-    this.storage.removeItem(STORAGE_KEY);
+    this.incomingVersion = null;
+    this.storage.removeSessionItem(STORAGE_KEY);
+    this.dropOldCaches();
+  }
+
+  /** The tab's cached permissions. Drops the copies older builds kept (localStorage, pre-menu format). */
+  private readCache(): PermittedTablesState | null {
+    this.dropOldCaches();
+    return this.storage.getSessionItem<PermittedTablesState>(STORAGE_KEY);
+  }
+
+  private dropOldCaches(): void {
+    this.storage.removeItem(OLD_STORAGE_KEY);
+    this.storage.removeSessionItem(OLD_STORAGE_KEY);
   }
 }

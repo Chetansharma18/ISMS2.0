@@ -5,12 +5,14 @@ import { catchError, switchMap, throwError } from 'rxjs';
 import { isApiUrl } from '../config/api.config';
 import { SKIP_AUTH } from '../http/http-context';
 import { AuthApiService } from './auth-api.service';
+import { needsSessionRefresh } from './session-expiry.util';
 import { TokenService } from './token.service';
 
 /**
  * Authentication for API requests:
  * - attaches `Authorization: Bearer <token>` when TokenService holds one (cookie sessions need nothing extra);
- * - on a 401, refreshes the session once (parallel 401s share one refresh) and replays the request;
+ * - on a 401 (or a 400/403 saying the access token is missing or expired, see session-expiry.util), refreshes the
+ *   session once (parallel failures share one refresh) and replays the request;
  * - when the refresh fails, clears the token and sends the user to the sign-in page.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
@@ -27,7 +29,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(withToken(req)).pipe(
     catchError((error: unknown) => {
-      if (!(error instanceof HttpErrorResponse) || error.status !== 401) {
+      // 401, or an endpoint that checks the session itself and answers 400/403 "access token is required".
+      if (!(error instanceof HttpErrorResponse) || !needsSessionRefresh(error.status, error.error)) {
+        return throwError(() => error);
+      }
+      // Mid role switch the old session is gone on purpose and the new one is being opened: no refresh, no redirect.
+      if (authApi.sessionPaused) {
         return throwError(() => error);
       }
       return authApi.refreshOnce().pipe(

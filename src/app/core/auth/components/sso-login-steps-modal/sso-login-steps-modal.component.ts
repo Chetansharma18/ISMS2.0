@@ -8,6 +8,8 @@ import { ModalComponent } from '../../../../shared/components/modal/modal.compon
 import { OtpInputComponent } from '../../../../shared/components/otp-input/otp-input.component';
 import type { TwoStepMethod } from '../../auth-api.models';
 import { SsoLoginFlowService } from '../../sso-login-flow.service';
+import { humanizeRoleName } from '../../sso-session.util';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { PIN_MAX_LENGTH, PIN_MIN_LENGTH, isPinNotSetMessage, pinError } from '../../security-pin.util';
 
 const OTP_LENGTH = 6;
@@ -19,7 +21,7 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
   selector: 'app-sso-login-steps-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, InputDirective, LoaderComponent, ModalComponent, OtpInputComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, LoaderComponent, ModalComponent, OtpInputComponent],
   template: `
     @switch (flow.step()) {
       @case ('verifying') {
@@ -29,7 +31,7 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
       }
       @case ('switching') {
         <app-modal title="Switching role" [showClose]="false" [closeOnBackdrop]="false" size="sm">
-          <app-loader text="Switching to the selected role..." />
+          <app-loader [text]="switchingText()" />
         </app-modal>
       }
       @case ('finishing') {
@@ -38,23 +40,58 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
         </app-modal>
       }
       @case ('select-role') {
-        <app-modal title="Choose a role" subtitle="Your account has more than one role. Pick the one to sign in with." size="sm" (close)="flow.cancel()">
-          <div class="flex flex-col gap-2">
+        <app-modal
+          title="Choose a role"
+          subtitle="Your account has more than one role. Choose the one to continue with."
+          size="sm"
+          [closeOnBackdrop]="!flow.switchTargetName()"
+          (close)="flow.cancel()"
+        >
+          <div class="flex flex-col gap-2" role="group" aria-label="Your roles">
             @for (role of flow.roles(); track role.id) {
-              <button appButton variant="outline" type="button" class="w-full" [disabled]="flow.busy()" (click)="flow.chooseRole(role.id)">
-                {{ role.name }}
+              <button
+                appButton
+                variant="outline"
+                size="lg"
+                block
+                type="button"
+                class="justify-start gap-3"
+                [loading]="flow.busy() && chosenRoleId() === role.id"
+                [disabled]="flow.busy()"
+                (click)="chooseRole(role.id)"
+              >
+                @if (!(flow.busy() && chosenRoleId() === role.id)) {
+                  <span
+                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FCF0F2] text-xs font-bold uppercase text-[#7C0E44]"
+                    aria-hidden="true"
+                  >{{ roleInitial(role.name) }}</span>
+                }
+                <span class="min-w-0 flex-1 truncate text-left font-semibold">{{ roleLabel(role.name) }}</span>
+                <app-icon name="chevron-right" size="sm" class="shrink-0 opacity-60" />
               </button>
             } @empty {
               <p class="text-sm text-slate-600 m-0">No role is available for this account.</p>
             }
           </div>
           @if (flow.error()) {
-            <p class="mt-3 text-xs font-semibold text-rose-700 m-0">{{ flow.error() }}</p>
+            <p class="mt-3 text-xs font-semibold text-rose-700 m-0" role="alert">{{ flow.error() }}</p>
+          }
+          @if (flow.roles().length > 1) {
+            <p class="mt-4 mb-0 flex items-center gap-1.5 text-xs text-slate-500">
+              <app-icon name="switch-horizontal" size="sm" />
+              You can switch roles later from the menu under your name.
+            </p>
           }
         </app-modal>
       }
       @case ('two-step') {
-        <app-modal title="Two-Factor Authentication (2FA)" subtitle="Your role requires a second verification step. Verify with OTP or your security PIN to sign in." size="sm" (close)="flow.cancel()">
+        <app-modal
+          title="Two-Factor Authentication (2FA)"
+          [subtitle]="twoStepSubtitle()"
+          size="sm"
+          [closeOnBackdrop]="!flow.switchTargetName()"
+          (close)="flow.cancel()"
+        >
           @if (methodTabs().length > 1) {
             <!-- Method choice: radio options (a choice, not an action) -->
             <fieldset class="mb-4 border-0 p-0 m-0">
@@ -175,7 +212,10 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
           }
 
           <ng-container modalFooter>
-            <button appButton variant="outline" type="button" (click)="flow.cancel()">Cancel</button>
+            <!-- During a role switch the previous session has already ended, so cancelling signs out of the portal -->
+            <button appButton variant="outline" type="button" (click)="flow.cancel()">
+              {{ flow.switchTargetName() ? 'Cancel & sign out' : 'Cancel' }}
+            </button>
             @if (method() === 'OTP') {
               @if (flow.otpSent()) {
                 <button appButton variant="ghost" type="button" [disabled]="flow.busy()" (click)="flow.sendOtp()">Resend OTP</button>
@@ -256,6 +296,34 @@ export class SsoLoginStepsModalComponent {
         this.flow.error.set(null);
       });
     });
+  }
+
+  protected readonly switchingText = computed(() => {
+    const target = this.flow.switchTargetName();
+    return target ? `Switching to ${humanizeRoleName(target)}...` : 'Switching to the selected role...';
+  });
+
+  protected readonly twoStepSubtitle = computed(() => {
+    const target = this.flow.switchTargetName();
+    return target
+      ? `Switching to ${humanizeRoleName(target)}. This role requires a second verification step: verify with OTP or your security PIN to continue.`
+      : 'Your role requires a second verification step. Verify with OTP or your security PIN to sign in.';
+  });
+
+  /** The role the user clicked, so only its row shows the spinner. */
+  protected readonly chosenRoleId = signal<number | null>(null);
+
+  protected roleLabel(name: string): string {
+    return humanizeRoleName(name);
+  }
+
+  protected roleInitial(name: string): string {
+    return humanizeRoleName(name).charAt(0) || '?';
+  }
+
+  protected chooseRole(roleId: number): void {
+    this.chosenRoleId.set(roleId);
+    this.flow.chooseRole(roleId);
   }
 
   protected submit(): void {

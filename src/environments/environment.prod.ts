@@ -6,7 +6,8 @@ export const environment: AppEnvironment = {
   apiUrl: '/api',
   api: {
     clientId: 'web',
-    apiKey: '',
+    // Mandatory: the backend rejects API requests without x-api-key (MISSING_API_KEY). Must match the server's key.
+    apiKey: 'isms-secret-api-key-2026',
     withCredentials: true,
     timeoutMs: 30000
   },

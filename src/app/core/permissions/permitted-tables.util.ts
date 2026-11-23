@@ -34,6 +34,13 @@ const text = (value: unknown): string => (typeof value === 'string' ? value.trim
 const numberOrNull = (value: unknown): number | null =>
   typeof value === 'number' && Number.isFinite(value) ? value : typeof value === 'string' && value.trim() !== '' && !isNaN(+value) ? +value : null;
 
+const isTrue = (value: unknown): boolean => value === true || value === 1 || text(value).toLowerCase() === 'true';
+
+/** Sidebar label of a table: the backend `menuCallingName`, else the table name made readable. */
+export function menuLabel(table: Pick<PermittedTable, 'tableName' | 'menuName'>): string {
+  return table.menuName || humanizeTableName(table.tableName);
+}
+
 /** The allowed methods of a table row: from `allowedMethods`, else from the `methodAllow*` flags. */
 function methodsOf(row: Raw): TableMethod[] {
   const listed = asList(row['allowedMethods'] ?? row['allowed_methods'])
@@ -54,7 +61,9 @@ export function toPermittedTablesState(response: unknown, now: Date = new Date()
       tableName: text(row['tableName'] ?? row['table_name']),
       description: text(row['description']),
       categoryId: numberOrNull(row['tableCategoryId'] ?? row['tableCategory_Id']),
-      methods: methodsOf(row)
+      methods: methodsOf(row),
+      inMenu: isTrue(row['enableInMenu'] ?? row['enable_in_menu']),
+      menuName: text(row['menuCallingName'] ?? row['menu_calling_name']) || null
     }))
     .filter(t => t.tableName !== '' && t.methods.length > 0);
 
@@ -86,9 +95,9 @@ export function tableAllows(state: PermittedTablesState | null, tableName: strin
 }
 
 /**
- * The sidebar groups: one per API category, in the API's order, holding the permitted tables that have a screen.
- * Tables sharing a screen become one link; tables of an unknown category go to a trailing "Other" group.
- * Empty groups are left out.
+ * The sidebar groups: one per API category, in the API's order, holding the permitted tables marked
+ * `enableInMenu`, labelled with their `menuCallingName`. Tables sharing a screen become one link; tables of an
+ * unknown category go to a trailing "Other" group. Empty groups are left out.
  */
 export function buildNavGroups(
   state: PermittedTablesState | null,
@@ -110,6 +119,7 @@ export function buildNavGroups(
   ];
 
   for (const table of state.tables) {
+    if (!table.inMenu) continue; // The backend decides which tables get a sidebar link.
     if (!table.methods.includes('GET')) continue; // A screen needs read access.
     // Tables without a dedicated screen open the generic module page, so every permitted table is listed.
     const screen = screenOf(table.tableName) ?? { route: moduleRoute(table.tableName) };
@@ -120,14 +130,15 @@ export function buildNavGroups(
     if (existing) {
       // Tables sharing one screen (Block + District) become one link named after all of them.
       existing.tableNames.push(table.tableName);
-      existing.label = combinedLabel(existing.tableNames);
-      existing.title = existing.tableNames.map(humanizeTableName).join(', ');
+      const members = existing.tableNames.map(name => state.tables.find(t => t.tableName === name)!);
+      existing.label = sharedScreenLabel(members);
+      existing.title = [...new Set(members.map(menuLabel))].join(', ');
       continue;
     }
     group.items.push({
       key: `table:${table.tableName}`,
-      label: humanizeTableName(table.tableName),
-      title: table.description || humanizeTableName(table.tableName),
+      label: menuLabel(table),
+      title: table.description || menuLabel(table),
       route: screen.route,
       icon: screen.icon ?? 'list',
       query: screen.query,
@@ -149,6 +160,15 @@ export function tableNameFromModuleUrl(url: string): string | null {
   const path = url.split('?')[0].split('#')[0];
   const match = path.match(/^\/module\/([^/]+)\/?$/);
   return match ? decodeURIComponent(match[1]) : null;
+}
+
+/**
+ * Label of one link for several tables: their distinct menu names joined with " & " (one name when they share it);
+ * when none has a menu name, the combined table names ("Block & District Masters").
+ */
+function sharedScreenLabel(tables: readonly PermittedTable[]): string {
+  if (tables.every(t => !t.menuName)) return combinedLabel(tables.map(t => t.tableName));
+  return [...new Set(tables.map(menuLabel))].join(' & ');
 }
 
 /** "BlockMasters" + "DistrictMasters" -> "Block & District Masters"; otherwise the names joined with " & ". */

@@ -52,6 +52,12 @@ export interface LoginStepResponse {
   /** Only for mobile clients; web sessions use HttpOnly cookies. */
   accessToken?: string | null;
   token?: string | null;
+  /**
+   * switch-role: the backend has ended the current session (access / refresh cookies cleared) and issued this fresh
+   * one-time login token, scoped to the new role (web also gets it as the login_callback_token cookie). It is exchanged
+   * with verify-login-token, exactly like after RajSSO, so the user does not go back to RajSSO.
+   */
+  loginCallbackToken?: string | null;
 }
 
 /** Response of GET /auth/me. Scoped to the role chosen at sign-in: `roles` holds only that role. */

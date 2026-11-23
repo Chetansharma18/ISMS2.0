@@ -5,7 +5,14 @@ import { NotificationService } from '../services/notification.service';
 import type { BackendRoleSummary, BackendUser, LoginStepResponse, TwoStepMethod } from './auth-api.models';
 import { AuthApiService } from './auth-api.service';
 import { AuthService } from './auth.service';
-import { resolveSessionRole, roleNamesOf, selectableRolesOf, toPersona, toTwoStepMethods } from './sso-session.util';
+import {
+  humanizeRoleName,
+  resolveSessionRole,
+  roleNamesOf,
+  selectableRolesOf,
+  toPersona,
+  toTwoStepMethods
+} from './sso-session.util';
 
 /** Where the sign-in stands after RajSSO sent the user back. */
 export type SsoLoginStep = 'idle' | 'verifying' | 'switching' | 'select-role' | 'two-step' | 'finishing';
@@ -58,6 +65,10 @@ export class SsoLoginFlowService {
   private chosenRoleId: number | null = null;
   /** True while switching the role of an existing session (not a fresh sign-in). */
   private switching = false;
+  /** switch-role succeeded: the old session is gone, so giving up now means signing out of the portal. */
+  private sessionEnded = false;
+  /** Name of the role being switched to (null when not switching); the dialogs word their text with it. */
+  readonly switchTargetName = signal<string | null>(null);
   /** Setup token of the 2FA challenge (only when nothing is set up yet); lets the user set a PIN during sign-in. */
   private readonly setupToken = signal<string | null>(null);
   /** Role id -> name, from every sign-in response that listed `{ id, name }` roles. */
@@ -170,15 +181,31 @@ export class SsoLoginFlowService {
     this.resettingPin.set(false);
   }
 
-  /** Abandons the sign-in (or a role switch: the current session stays as it was). */
+  /**
+   * Abandons the sign-in. During a role switch the previous session has already ended on the server, so the user is
+   * signed out of the portal (RajSSO stays signed in: Login brings them back without credentials).
+   */
   cancel(): void {
+    const ended = this.sessionEnded;
     this.reset();
+    if (ended) {
+      this.auth.endSessionLocally();
+      this.notifications.info('Role switch cancelled. You have been signed out of the portal; sign in again to continue.');
+    }
   }
 
   /**
-   * Switches the signed-in session to another of the user's roles (POST /auth/switch-role). When the new role needs
-   * 2FA, the same "Two-Factor Authentication" dialog appears; on success the session, sidebar and permissions follow
-   * the new role. Cancelling keeps the current role.
+   * Switches the signed-in user to another of their roles, without going back to RajSSO:
+   *
+   * 1. `POST /auth/switch-role { roleId }`. The backend checks the role, ends the current session (clears the access
+   *    and refresh cookies) and returns a fresh one-time login token scoped to that role (`loginCallbackToken`; web
+   *    also gets it as the login_callback_token cookie).
+   * 2. `verify-login-token` with that token: the same steps as after RajSSO follow. When the new role needs 2FA the
+   *    "Two-Factor Authentication (2FA)" dialog appears; otherwise the new session opens at once.
+   * 3. The session, permissions and sidebar follow the new role, and the user lands on its first screen.
+   *
+   * If switch-role fails, the current session is untouched. Once it succeeded the old session no longer exists, so
+   * cancelling the 2FA step (or a failure after it) signs the user out of the portal (RajSSO stays signed in).
    */
   switchRole(roleId: number): void {
     const { roles, activeRoleId } = this.auth.sessionRoles();
@@ -189,25 +216,30 @@ export class SsoLoginFlowService {
     for (const r of roles) this.knownRoles.set(r.id, r.name);
     this.chosenRoleId = roleId;
     this.user = this.auth.userDetails();
+    this.switchTargetName.set(this.knownRoles.get(roleId) ?? null);
     this.step.set('switching');
     this.busy.set(true);
 
     this.authApi.switchRole(roleId).subscribe({
       next: res => {
-        this.busy.set(false);
-        // The response may leave the user out; the cached details (with the new role) are used then.
-        if (!res.user && this.user) {
-          this.user = { ...this.user, roles: [{ id: roleId, name: this.knownRoles.get(roleId) ?? '' }] };
+        if (res.success === false) {
+          // Refused before anything changed: the current session is still valid.
+          this.abort(res.message ?? 'Could not switch role. Please try again.');
+          return;
         }
-        this.advance(res);
+        // From here on the old session is gone; the new one opens with the login token, as after RajSSO.
+        this.sessionEnded = true;
+        this.authApi.sessionPaused = true;
+        if (res.user) this.user = res.user;
+        if (res.selectedRoleId) this.chosenRoleId = res.selectedRoleId;
+        this.run(this.authApi.verifyLoginToken(res.loginCallbackToken ?? null), true);
       },
       error: err => {
-        this.busy.set(false);
         const status = err?.status;
         this.abort(
           status === 404 || status === 405
             ? 'Role switching is not available on the server yet. Sign out and sign in again to use another role.'
-            : (err?.message ?? 'Could not switch role. Please try again.')
+            : (err?.error?.message ?? err?.message ?? 'Could not switch role. Please try again.')
         );
       }
     });
@@ -297,7 +329,9 @@ export class SsoLoginFlowService {
     }
     // "Forgot PIN": open the profile, where the signed-in user can set a new PIN.
     const redirectTo = this.resettingPin() ? '/profile' : undefined;
+    const switched = this.switching;
     this.reset();
+    if (switched && chosenName) this.notifications.success(`You are now working as ${humanizeRoleName(chosenName)}.`, 'Role switched');
     if (redirectTo) {
       this.auth.completeSignIn(persona, details, redirectTo);
     } else {
@@ -312,8 +346,22 @@ export class SsoLoginFlowService {
   }
 
   private abort(message?: string | null): void {
+    const switching = this.switching;
+    const ended = this.sessionEnded;
     this.reset();
-    this.notifications.error(message || 'Sign-in failed. Please sign in again.', 'Sign-in failed');
+    if (ended) {
+      // The previous session was already closed by switch-role and the new one could not be opened.
+      this.auth.endSessionLocally();
+      this.notifications.error(
+        `${message || 'The new role could not be opened.'} You have been signed out of the portal; sign in again to continue.`,
+        'Role switch failed'
+      );
+      return;
+    }
+    this.notifications.error(
+      message || (switching ? 'Could not switch role. Please try again.' : 'Sign-in failed. Please sign in again.'),
+      switching ? 'Role switch failed' : 'Sign-in failed'
+    );
   }
 
   private reset(): void {
@@ -331,5 +379,8 @@ export class SsoLoginFlowService {
     this.setupToken.set(null);
     this.resettingPin.set(false);
     this.switching = false;
+    this.sessionEnded = false;
+    this.authApi.sessionPaused = false;
+    this.switchTargetName.set(null);
   }
 }

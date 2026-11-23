@@ -23,14 +23,14 @@ const RESPONSE = {
     { id: 1, category: 'System', tablesCount: 1 }
   ],
   tables: [
-    { tableName: 'Users', description: 'User accounts and profiles.', tableCategoryId: 2, allowedMethods: ['GET', 'PUT'] },
-    { tableName: 'Roles', description: 'Security roles.', tableCategoryId: 2, allowedMethods: [], methodAllowGet: true },
-    { tableName: 'SectorMasters', description: 'Sector Master.', tableCategoryId: 3, allowedMethods: ['GET', 'POST', 'PUT', 'DELETE'] },
-    { tableName: 'DistrictMasters', description: 'District Master.', tableCategoryId: 3, allowedMethods: ['GET'] },
-    { tableName: 'BlockMasters', description: 'Block Master.', tableCategoryId: 3, allowedMethods: ['GET'] },
-    { tableName: 'AuditLogs', description: 'Audit logs.', tableCategoryId: 1, allowedMethods: ['GET'] },
-    { tableName: 'EoiCategoryMasters', description: 'EOI Category Master.', tableCategoryId: 99, allowedMethods: ['GET'] },
-    { tableName: 'GradingMasters', description: 'Grading Master.', tableCategoryId: 3, allowedMethods: ['POST'] },
+    { tableName: 'Users', description: 'User accounts and profiles.', tableCategoryId: 2, allowedMethods: ['GET', 'PUT'], enableInMenu: true },
+    { tableName: 'Roles', description: 'Security roles.', tableCategoryId: 2, allowedMethods: [], methodAllowGet: true, enableInMenu: true },
+    { tableName: 'SectorMasters', description: 'Sector Master.', tableCategoryId: 3, allowedMethods: ['GET', 'POST', 'PUT', 'DELETE'], enableInMenu: true },
+    { tableName: 'DistrictMasters', description: 'District Master.', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true },
+    { tableName: 'BlockMasters', description: 'Block Master.', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true },
+    { tableName: 'AuditLogs', description: 'Audit logs.', tableCategoryId: 1, allowedMethods: ['GET'], enableInMenu: true },
+    { tableName: 'EoiCategoryMasters', description: 'EOI Category Master.', tableCategoryId: 99, allowedMethods: ['GET'], enableInMenu: true },
+    { tableName: 'GradingMasters', description: 'Grading Master.', tableCategoryId: 3, allowedMethods: ['POST'], enableInMenu: true },
     { tableName: '', allowedMethods: ['GET'] }
   ]
 };
@@ -86,6 +86,38 @@ describe('permitted tables', () => {
     expect(groups[3].items.map(i => i.label)).toEqual(['EOI Category Masters']);
   });
 
+  it('shows only tables with enableInMenu, named by menuCallingName', () => {
+    const menu = toPermittedTablesState({
+      categories: [{ id: 2, category: 'User Management' }, { id: 3, category: 'Master Data' }],
+      tables: [
+        { tableName: 'Users', tableCategoryId: 2, allowedMethods: ['GET'], enableInMenu: true, menuCallingName: ' Portal Users ' },
+        { tableName: 'Roles', tableCategoryId: 2, allowedMethods: ['GET'], enableInMenu: false, menuCallingName: 'Roles' },
+        { tableName: 'AuditLogs', tableCategoryId: 2, allowedMethods: ['GET'] },
+        { tableName: 'SectorMasters', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true, menuCallingName: null },
+        { tableName: 'DistrictMasters', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true, menuCallingName: 'Districts' },
+        { tableName: 'BlockMasters', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true, menuCallingName: 'Blocks' }
+      ]
+    });
+    expect(menu.tables.find(t => t.tableName === 'Users')).toMatchObject({ inMenu: true, menuName: 'Portal Users' });
+    expect(menu.tables.find(t => t.tableName === 'AuditLogs')).toMatchObject({ inMenu: false, menuName: null });
+
+    const groups = buildNavGroups(menu, SCREENS);
+    // Roles (enableInMenu false) and AuditLogs (no flag) get no link.
+    expect(groups[0].items.map(i => i.label)).toEqual(['Portal Users']);
+    // No menu name -> the table name made readable; a shared screen joins the menu names.
+    expect(groups[1].items.map(i => i.label)).toEqual(['Sector Masters', 'Districts & Blocks']);
+    // Hidden from the menu does not remove access.
+    expect(tableAllows(menu, 'Roles', 'GET')).toBe(true);
+  });
+
+  it('drops a group whose tables are all hidden from the menu', () => {
+    const hidden = toPermittedTablesState({
+      categories: [{ id: 2, category: 'User Management' }],
+      tables: [{ tableName: 'Users', tableCategoryId: 2, allowedMethods: ['GET'], enableInMenu: false }]
+    });
+    expect(buildNavGroups(hidden, SCREENS)).toEqual([]);
+  });
+
   it('reads the table name from a generic module URL', () => {
     expect(tableNameFromModuleUrl('/module/AuditLogs?x=1')).toBe('AuditLogs');
     expect(tableNameFromModuleUrl('/admin/master/sector')).toBeNull();
@@ -96,8 +128,8 @@ describe('permitted tables', () => {
     const own = toPermittedTablesState({
       categories: [{ id: 1, category: 'Own', tablesCount: 1 }, { id: 3, category: 'Master Data', tablesCount: 1 }],
       tables: [
-        { tableName: 'Users', tableCategoryId: 1, allowedMethods: ['GET'] },
-        { tableName: 'SectorMasters', tableCategoryId: 3, allowedMethods: ['GET'] }
+        { tableName: 'Users', tableCategoryId: 1, allowedMethods: ['GET'], enableInMenu: true },
+        { tableName: 'SectorMasters', tableCategoryId: 3, allowedMethods: ['GET'], enableInMenu: true }
       ]
     });
     const groups = buildNavGroups(own, SCREENS);

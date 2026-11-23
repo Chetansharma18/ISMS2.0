@@ -1,7 +1,8 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { fromEvent } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { FooterComponent } from './core/layout/footer/footer.component';
@@ -136,10 +137,19 @@ export class AppComponent {
     // RajSSO sends the user back through the backend with ?verifylogin=...; finish the sign-in from here.
     const ssoReturn = inject(SsoLoginFlowService).handleReturn();
 
-    // Already signed in (reload): refresh the table permissions in the background; the cached copy shows meanwhile.
-    if (!ssoReturn && !this.authService.isMockAuth() && this.authService.currentUser()) {
-      inject(TableAccessService).refresh();
+    // Already signed in (reload): use the tab's cached permissions; reload them only when the cache is old.
+    // Changes in between arrive through permissionsSyncInterceptor (version header or 403).
+    const tableAccess = inject(TableAccessService);
+    if (!ssoReturn && this.authService.currentUser()) {
+      tableAccess.refreshIfStale();
     }
+    const doc = inject(DOCUMENT);
+    fromEvent(doc, 'visibilitychange')
+      .pipe(
+        filter(() => doc.visibilityState === 'visible' && !!this.authService.currentUser()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => tableAccess.refreshIfStale());
 
     this.router.events
       .pipe(

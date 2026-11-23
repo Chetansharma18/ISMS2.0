@@ -15,6 +15,10 @@ export interface PermittedTable {
   description: string;
   categoryId: number | null;
   methods: TableMethod[];
+  /** `enableInMenu`: the table gets a sidebar link only when true. Access (routes, buttons) does not depend on it. */
+  inMenu: boolean;
+  /** `menuCallingName`: the sidebar label; null when the backend sends none (the table name is shown readably). */
+  menuName: string | null;
 }
 
 /** What the frontend keeps from GET /auth/permissions. */
@@ -24,6 +28,8 @@ export interface PermittedTablesState {
   /** Backend role names the permissions were computed for. */
   roles: string[];
   loadedAt: string;
+  /** `X-Permissions-Version` the backend sent with the permissions, when it sends one. */
+  version?: string | null;
 }
 
 /**

@@ -5,6 +5,7 @@ import { UserPersona } from '../models/user.model';
 import { StorageService } from '../services/storage.service';
 import { isMockEnabled } from '../mock/mock.config';
 import { environment } from '../../../environments/environment';
+import { API_ENDPOINTS, buildApiUrl } from '../config/api.config';
 import { AuthApiService } from './auth-api.service';
 import type { BackendRoleSummary, BackendUser, CurrentUserResponse } from './auth-api.models';
 
@@ -13,7 +14,10 @@ export interface SessionRoles {
   roles: BackendRoleSummary[];
   activeRoleId: number | null;
 }
-import { humanizeRoleName, landingRouteFor, toPortalRole } from './sso-session.util';
+import { humanizeRoleName, toPortalRole } from './sso-session.util';
+
+/** Where a real sign-in lands when the backend menu has no item for the role. */
+const NO_MENU_LANDING = '/profile';
 import { TableAccessService } from '../permissions/table-access.service';
 import { TokenService } from './token.service';
 
@@ -208,6 +212,20 @@ export class AuthService {
     this.router.navigate(['/sso-login']);
   }
 
+  /** True when "Back to SSO" can be offered: only with real RajSSO sign-in. */
+  canGoBackToSso(): boolean {
+    return !this.isMockAuth() && !!this.currentUser();
+  }
+
+  /**
+   * Returns to the RajSSO portal without signing out of ISMS. The backend page posts the user's SSO token to RajSSO,
+   * so this is a full-page navigation (the browser sends the session cookie), not an HTTP call.
+   */
+  backToSso(): void {
+    if (!this.canGoBackToSso()) return;
+    window.location.assign(buildApiUrl(API_ENDPOINTS.AUTH.BACK_TO_SSO.url as string));
+  }
+
   /** True while sign-in is the local persona picker (resource AUTH mocked). */
   isMockAuth(): boolean {
     return isMockEnabled('AUTH');
@@ -234,13 +252,9 @@ export class AuthService {
         this.router.navigateByUrl(redirectTo);
         return;
       }
-      const permitted = this.tableAccess.firstPermittedRoute();
-      if (permitted) {
-        this.router.navigateByUrl(permitted);
-        return;
-      }
-      const target = landingRouteFor(persona.role);
-      this.router.navigate([target.path], target.queryParams ? { queryParams: target.queryParams } : undefined);
+      // The backend menu decides the first screen. With no menu item (all tables hidden or none permitted) the user
+      // lands on the profile; the old role default screens are never used with real sign-in.
+      this.router.navigateByUrl(this.tableAccess.firstPermittedRoute() ?? NO_MENU_LANDING);
     };
     this.tableAccess.clear();
     this.tableAccess.load().subscribe({ next: goHome, error: goHome });
@@ -376,6 +390,16 @@ export class AuthService {
       },
       error: () => this.router.navigate(['/'])
     });
+  }
+
+  /**
+   * A role switch ended the server session (switch-role clears the cookies) but the new role was not opened
+   * (cancelled or failed): the portal session ends here too. RajSSO stays signed in, so Login brings the user back
+   * without entering credentials again.
+   */
+  endSessionLocally(): void {
+    this.clearLocalSession();
+    this.router.navigate(['/']);
   }
 
   private clearLocalSession(): void {

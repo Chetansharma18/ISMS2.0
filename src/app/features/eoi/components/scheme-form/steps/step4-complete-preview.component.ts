@@ -328,12 +328,39 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
       </section>
 
       <!-- ====================================================================
-           4. PROPOSAL DOCUMENTS TABLE PREVIEW (Replace only on Edit)
+           SCHEME SPECIFIC PROPOSAL PARAMETERS (Read-Only)
+           ==================================================================== -->
+      @if (state.hasCustomFields() && state.schemeCustomFields().length > 0) {
+        <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+          <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
+              <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Scheme Proposal Parameters</h2>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4 text-xs">
+            @for (field of state.schemeCustomFields(); track field.id) {
+              <div>
+                <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">{{ field.label }}</span>
+                <span class="font-medium text-slate-900 text-[12.5px] block mt-1">
+                  {{ formatCustomVal(state.customFieldAnswers()[field.fieldKey]) }}
+                </span>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ====================================================================
+           PROPOSAL DOCUMENTS TABLE PREVIEW (Replace only on Edit)
            ==================================================================== -->
       <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">4</span>
+            <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">
+              {{ state.hasCustomFields() ? '5' : '4' }}
+            </span>
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} Uploaded)</h2>
           </div>
           <button
@@ -445,11 +472,11 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
            FOOTER ACTION BAR
            ==================================================================== -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(2)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexDocuments())">
           &larr; Back to Upload Documents
         </button>
 
-        <button appButton size="lg" (click)="state.goToStep(4)" [disabled]="!state.declarationAgreed()">
+        <button appButton size="lg" (click)="state.goToStep(state.stepIndexProcFee())" [disabled]="!state.declarationAgreed()">
           Proceed to Processing Fee Payment ({{ state.formattedProcessFee() }}) &rarr;
         </button>
       </div>
@@ -459,6 +486,13 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 })
 export class Step4CompletePreviewComponent {
   protected readonly state = inject(SchemeFormState);
+
+  protected formatCustomVal(val: any): string {
+    if (val === true) return 'Yes / Linkage Attached';
+    if (val === false) return 'No / Not Available';
+    if (val === null || val === undefined || val === '') return '—';
+    return String(val);
+  }
 
   protected readonly isEditingDocs = signal<boolean>(false);
   protected readonly accept = DOC_ACCEPT;

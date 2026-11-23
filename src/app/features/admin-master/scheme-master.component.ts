@@ -17,12 +17,14 @@ import {
   ButtonComponent,
   InputDirective,
   IconComponent,
+  SwitchComponent,
   formatInr
 } from '../../shared';
 import { SchemeMasterItem } from '../../core/models/admin-masters.model';
 import { PermissionService } from '../../core/permissions/permission.service';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { SchemeRequirementsModalComponent } from './scheme-requirements-modal.component';
 
 export type { SchemeMasterItem };
 
@@ -123,7 +125,16 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   selector: 'app-scheme-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, MasterCrudPageComponent, ButtonComponent, InputDirective, IconComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MasterCrudPageComponent,
+    ButtonComponent,
+    InputDirective,
+    IconComponent,
+    SwitchComponent,
+    SchemeRequirementsModalComponent
+  ],
   template: `
     <app-master-crud-page [config]="config" [extraTemplates]="extraTemplates">
     </app-master-crud-page>
@@ -187,10 +198,68 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
         </div>
       }
     </ng-template>
+
+    <!-- Action Cell Template: Requirements Manager + Edit + Switch -->
+    <ng-template #actionTemplate let-item>
+      <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+        <!-- Requirements Manager Button -->
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="$event.stopPropagation(); openRequirementsModal(item)"
+          title="Manage Scheme Requirements (Docs, Annexures, Custom Fields)"
+          aria-label="Manage Scheme Requirements"
+        >
+          <app-icon name="clipboard-check" size="sm" class="text-[#7C0E44]" />
+        </button>
+
+        <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+        <!-- Edit Button -->
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="$event.stopPropagation(); masterCrud?.openEditModal(item)"
+          title="Edit"
+          aria-label="Edit"
+        >
+          <app-icon name="edit" size="sm" />
+        </button>
+
+        <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+        <!-- Active / Inactive Toggle -->
+        <div
+          class="inline-flex items-center"
+          [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+          (click)="$event.stopPropagation()"
+        >
+          <app-switch
+            [checked]="item.status !== 'Inactive'"
+            [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+            (toggled)="masterCrud?.toggleStatus(item)"
+          />
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- 4-Tab Scheme Requirements Drawer / Modal -->
+    <app-scheme-requirements-modal
+      [isOpen]="isReqModalOpen()"
+      [scheme]="selectedSchemeForReq()"
+      (close)="closeRequirementsModal()"
+    />
   `
 })
 export class SchemeMasterComponent {
   @ViewChild('budgetTemplate', { static: true }) budgetTemplate!: TemplateRef<unknown>;
+  @ViewChild('actionTemplate', { static: true }) actionTemplate!: TemplateRef<unknown>;
   @ViewChild(MasterCrudPageComponent) masterCrud?: MasterCrudPageComponent<SchemeMasterItem>;
 
   private permissionService = inject(PermissionService);
@@ -206,8 +275,26 @@ export class SchemeMasterComponent {
   readonly editingItemId = signal<string | null>(null);
   readonly editingBudgetValue = signal<number>(0);
 
+  readonly isReqModalOpen = signal<boolean>(false);
+  readonly selectedSchemeForReq = signal<SchemeMasterItem | null>(null);
+
   get extraTemplates(): Record<string, TemplateRef<unknown>> {
-    return { budget: this.budgetTemplate };
+    return {
+      budget: this.budgetTemplate,
+      action: this.actionTemplate
+    };
+  }
+
+  openRequirementsModal(item: SchemeMasterItem): void {
+    this.selectedSchemeForReq.set(item);
+    this.isReqModalOpen.set(true);
+    this.cdr.markForCheck();
+  }
+
+  closeRequirementsModal(): void {
+    this.isReqModalOpen.set(false);
+    this.selectedSchemeForReq.set(null);
+    this.cdr.markForCheck();
   }
 
   formatBudget(val: number | undefined | null): string {

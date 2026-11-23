@@ -81,11 +81,11 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(1)">
-          &larr; Back to Registration Profile
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.hasCustomFields() ? 2 : 1)">
+          &larr; {{ state.hasCustomFields() ? 'Back to Scheme Proposal Details' : 'Back to Registration Profile' }}
         </button>
 
-        <button appButton size="lg" (click)="state.goToStep(3)">
+        <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">
           Proceed to Complete Preview &rarr;
         </button>
       </div>

@@ -21,11 +21,13 @@ import {
   SchemeMasterItem,
   SchemeCategoryMasterItem,
   EoiCategoryItem,
-  DocMasterItem
+  DocMasterItem,
+  AnnexureMasterItem
 } from '../../core/models/admin-masters.model';
 import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
+import { ANNEXURE_MASTER_STORAGE_KEY, INITIAL_ANNEXURE_ITEMS } from '../admin-master/annexure-master.component';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
-import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
+import { EoiAttachment, EoiDocumentItem, EoiFormData, EoiRequiredInfoItem, SchemeTender } from './tenders.models';
 import {
   buildCorrigendumDoc,
   buildSchemeFromForm,
@@ -33,6 +35,7 @@ import {
   eoiFormFromScheme,
   filterActiveSchemes,
   isEoiFormValid,
+  parseMasterEntriesByScheme,
   validateEoiFormComplete
 } from './tenders-page/tenders-page.util';
 import { ConfigureEoiFormComponent } from './tenders-page/configure-eoi-form.component';
@@ -124,6 +127,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               [requiredInfo]="eoiRequiredInfo"
               [schemeMasterItems]="schemeMasterItems()"
               [docMasterItems]="docMasterItems()"
+              [annexureMasterItems]="annexureMasterItems()"
               [existingRefNos]="existingRefNos()"
               [currentRefNo]="editingSchemeRefNo()"
               [externalVersion]="eoiFormVersion()"
@@ -133,6 +137,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               (removeAttachment)="removeAttachment($event)"
               (addDocument)="addEoiDocument()"
               (removeDocument)="removeEoiDocument($event)"
+              (addAnnexure)="addEoiAnnexure()"
+              (removeAnnexure)="removeEoiAnnexure($event)"
             ></app-configure-eoi-form>
 
             <!-- Card Footer / Actions -->
@@ -172,8 +178,8 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
         <app-scheme-detail-view
           [scheme]="s"
           [rfpDocs]="rfpDocuments"
-          [annexures]="annexureDocuments"
-          [requiredInfo]="eoiRequiredInfo"
+          [annexures]="getSchemeAnnexures(s)"
+          [requiredInfo]="getSchemeRequiredDocs(s)"
           [hideApplyButton]="isSuperAdmin()"
           (back)="backToList()"
           (apply)="handleApplyForScheme()"
@@ -356,6 +362,7 @@ export class TendersPageComponent {
 
   readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
   readonly docMasterItems = signal<DocMasterItem[]>([]);
+  readonly annexureMasterItems = signal<AnnexureMasterItem[]>([]);
   readonly schemeMasterNames = signal<string[]>([]);
   readonly schemeCategoryNames = signal<string[]>([]);
   readonly eoiCategoryNames = signal<string[]>([]);
@@ -699,13 +706,45 @@ export class TendersPageComponent {
         error: () => this.eoiCategoryNames.set([])
       });
 
-    // 4. Load Doc Master items (from storage or fallback)
-    const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
-    if (cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0) {
-      this.docMasterItems.set(cachedDocs);
-    } else {
-      this.docMasterItems.set(INITIAL_DOC_ITEMS);
-    }
+    // 4. Load Doc Master items (via dataEngine with storage fallback)
+    this.dataEngine
+      .for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          if (items && items.length > 0) {
+            this.docMasterItems.set(items);
+          } else {
+            const cached = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+            this.docMasterItems.set(cached?.length ? cached : INITIAL_DOC_ITEMS);
+          }
+        },
+        error: () => {
+          const cached = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+          this.docMasterItems.set(cached?.length ? cached : INITIAL_DOC_ITEMS);
+        }
+      });
+
+    // 5. Load Annexure Master items (via dataEngine with storage fallback)
+    this.dataEngine
+      .for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' })
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          if (items && items.length > 0) {
+            this.annexureMasterItems.set(items);
+          } else {
+            const cached = this.storage.getItem<AnnexureMasterItem[]>(ANNEXURE_MASTER_STORAGE_KEY);
+            this.annexureMasterItems.set(cached?.length ? cached : INITIAL_ANNEXURE_ITEMS);
+          }
+        },
+        error: () => {
+          const cached = this.storage.getItem<AnnexureMasterItem[]>(ANNEXURE_MASTER_STORAGE_KEY);
+          this.annexureMasterItems.set(cached?.length ? cached : INITIAL_ANNEXURE_ITEMS);
+        }
+      });
   }
 
   onSchemeSelected(schemeName: string): void {
@@ -729,21 +768,14 @@ export class TendersPageComponent {
 
     // 2. Auto-fill required documents from Doc Master
     const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const target = schemeName.trim().toLowerCase();
-    const docItem = masterList.find((d) => {
-      const s = (d.schemeName || '').trim().toLowerCase();
-      return s === target || s.includes(target) || target.includes(s);
-    });
-    if (docItem && docItem.documents) {
-      const docs = docItem.documents
-        .split(',')
-        .map((d) => d.trim())
-        .filter(Boolean);
-      if (docs.length > 0) {
-        this.newEoiData.documents = [...docs];
-        this.newEoiData.documentFiles = {};
-      }
-    }
+    const docs = parseMasterEntriesByScheme(masterList, schemeName, (d) => d.docName || d.documents);
+    this.newEoiData.documents = [...docs];
+    this.newEoiData.documentFiles = {};
+
+    // 3. Auto-fill annexures from Annexure Master
+    const annexList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const annexures = parseMasterEntriesByScheme(annexList, schemeName, (a) => a.annexureName || a.annexures);
+    this.newEoiData.annexures = [...annexures];
 
     this.eoiFormVersion.update((v) => v + 1);
     this.autoSaveDraft();
@@ -781,6 +813,9 @@ export class TendersPageComponent {
         ...savedDraft,
         documentFiles: {}
       };
+      if (this.newEoiData.scheme && (!this.newEoiData.documents?.length || !this.newEoiData.annexures?.length)) {
+        this.onSchemeSelected(this.newEoiData.scheme);
+      }
     } else {
       this.newEoiData = createEmptyEoiForm();
     }
@@ -850,6 +885,64 @@ export class TendersPageComponent {
     }
     this.eoiFormVersion.update((v) => v + 1);
     this.autoSaveDraft();
+  }
+
+  addEoiAnnexure(): void {
+    if (!this.newEoiData.annexures) {
+      this.newEoiData.annexures = [];
+    }
+    this.newEoiData.annexures.push('');
+    this.eoiFormVersion.update((v) => v + 1);
+    this.autoSaveDraft();
+  }
+
+  removeEoiAnnexure(index: number): void {
+    if (this.newEoiData.annexures && index >= 0 && index < this.newEoiData.annexures.length) {
+      this.newEoiData.annexures.splice(index, 1);
+      this.eoiFormVersion.update((v) => v + 1);
+      this.autoSaveDraft();
+    }
+  }
+
+  private resolveMasterSchemeList<T extends { schemeName?: string; schemes?: string[]; status?: string }>(
+    explicitItems: string[] | undefined,
+    masterList: T[],
+    scheme: SchemeTender,
+    fieldExtractor: (item: T) => string | undefined
+  ): string[] | null {
+    if (explicitItems && explicitItems.length > 0) {
+      return explicitItems;
+    }
+    const target = (scheme.schemeName || scheme.schemeTitle || '').trim();
+    if (!target) return null;
+    const items = parseMasterEntriesByScheme(masterList, target, fieldExtractor);
+    return items.length > 0 ? items : null;
+  }
+
+  getSchemeAnnexures(scheme: SchemeTender): EoiDocumentItem[] {
+    const masterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const items = this.resolveMasterSchemeList(scheme.annexures, masterList, scheme, (a) => a.annexureName || a.annexures);
+    if (items) {
+      return items.map((ann, idx) => ({
+        sNo: idx + 1,
+        name: ann,
+        size: '250 KB'
+      }));
+    }
+    return this.annexureDocuments;
+  }
+
+  getSchemeRequiredDocs(scheme: SchemeTender): EoiRequiredInfoItem[] {
+    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+    const items = this.resolveMasterSchemeList(scheme.requiredDocs, masterList, scheme, (d) => d.docName || d.documents);
+    if (items) {
+      return items.map((doc, idx) => ({
+        sNo: idx + 1,
+        name: doc,
+        note: 'Upload required'
+      }));
+    }
+    return this.eoiRequiredInfo;
   }
 
   // ---- Row actions ---------------------------------------------------------

@@ -181,6 +181,18 @@ export const API_ENDPOINTS = {
     UPDATE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'PUT' as ApiMethod },
     DELETE: { url: (id: string | number) => `/masters/gradings/${id}`, method: 'DELETE' as ApiMethod }
   },
+  DOC_MASTERS: {
+    LIST: { url: '/masters/docs', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/docs', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/docs/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/docs/${id}`, method: 'DELETE' as ApiMethod }
+  },
+  ANNEXURE_MASTERS: {
+    LIST: { url: '/masters/annexures', method: 'GET' as ApiMethod },
+    ADD: { url: '/masters/annexures', method: 'POST' as ApiMethod },
+    UPDATE: { url: (id: string | number) => `/masters/annexures/${id}`, method: 'PUT' as ApiMethod },
+    DELETE: { url: (id: string | number) => `/masters/annexures/${id}`, method: 'DELETE' as ApiMethod }
+  },
   TWO_STEP_VERIFICATION: {
     LIST: { url: '/admin/two-step-verification', method: 'GET' as ApiMethod },
     ADD: { url: '/admin/two-step-verification', method: 'POST' as ApiMethod },

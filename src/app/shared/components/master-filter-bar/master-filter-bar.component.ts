@@ -96,7 +96,7 @@ export interface StatusFilterOption {
               size="sm"
               [ngModel]="filterValues()[filter.key] || ''"
               (ngModelChange)="setFilterValue(filter.key, $event)"
-              class="text-xs font-medium max-w-[220px]"
+              class="text-xs font-medium min-w-[160px] max-w-[280px]"
             >
               <option value="">{{ filter.placeholder || 'All ' + filter.label }}</option>
               @for (opt of resolveFilterOptions(filter); track opt) {

@@ -403,6 +403,7 @@ export class TendersPageComponent {
   readonly showAttachmentModal = signal<boolean>(false);
   readonly showCorrigendumModal = signal<boolean>(false);
   private pendingEditScheme: SchemeTender | null = null;
+  private pendingApplyAfterOtrDismiss = false;
 
   pageSize = 10;
   searchQuery = signal<string>('');
@@ -532,6 +533,10 @@ export class TendersPageComponent {
     this.promptDismissed = true;
     this.storage.setSessionString('isms_otr_prompt_dismissed', 'true');
     this.storage.setString('isms_eoi_prompt_shown_new_user', 'true');
+    if (this.pendingApplyAfterOtrDismiss) {
+      this.pendingApplyAfterOtrDismiss = false;
+      this.navigateToSchemeForm(this.selectedScheme());
+    }
   }
 
   // Documents & requirements sourced from centralized mock/API store via SchemeService
@@ -623,20 +628,13 @@ export class TendersPageComponent {
   }
 
   backToList(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.selectedScheme.set(null);
     this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  handleApplyForScheme(): void {
-    // Check if profile is incomplete
-    if (this.isProfileIncomplete()) {
-      this.showOtrPromptModal.set(true);
-      return;
-    }
-
-    // Direct navigation to scheme proposal form without showing the registration preview modal
-    const scheme = this.selectedScheme();
+  private navigateToSchemeForm(scheme: SchemeTender | null): void {
     this.router.navigate(['/scheme-form'], {
       queryParams: {
         refNo: scheme?.refNo || 'RSLDC/EOI/VYUPY/2026-27/01',
@@ -653,12 +651,26 @@ export class TendersPageComponent {
     });
   }
 
+  handleApplyForScheme(): void {
+    // Check if profile is incomplete
+    if (this.isProfileIncomplete()) {
+      this.pendingApplyAfterOtrDismiss = true;
+      this.showOtrPromptModal.set(true);
+      return;
+    }
+
+    // Direct navigation to scheme proposal form without showing the registration preview modal
+    this.navigateToSchemeForm(this.selectedScheme());
+  }
+
   goToProfile(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.dismissOtrPrompt();
     this.router.navigate(['/profile']);
   }
 
   goToRegistration(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.dismissOtrPrompt();
     this.router.navigate(['/registration']);
   }

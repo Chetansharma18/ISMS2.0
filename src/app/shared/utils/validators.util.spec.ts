@@ -6,7 +6,8 @@ import {
   isValidMobile,
   isValidPincode,
   isValidIfsc,
-  isValidBankAccount
+  isValidBankAccount,
+  isValidEmail
 } from './validators.util';
 
 describe('validators.util', () => {
@@ -44,6 +45,18 @@ describe('validators.util', () => {
     expect(isValidBankAccount('123456789')).toBe(true);
     expect(isValidBankAccount('12345678')).toBe(false);
     expect(isValidBankAccount('1234567890123456789')).toBe(false);
+  });
+
+  it('validates official company email format and rejects malformed or spam formats', () => {
+    expect(isValidEmail('info@validcompany.com')).toBe(true);
+    expect(isValidEmail('contact@skilltech.org')).toBe(true);
+    expect(isValidEmail('admin@rajasthan.gov.in')).toBe(true);
+    expect(isValidEmail('user@portal.co.in')).toBe(true);
+
+    expect(isValidEmail('dfghgj')).toBe(false);
+    expect(isValidEmail('86rnvhgxchgn@gfhkj.cc')).toBe(false);
+    expect(isValidEmail('86rnvhgxchgnb@gfhkj.cc')).toBe(false);
+    expect(isValidEmail('')).toBe(false);
   });
 
   it('exposes stateless patterns that are safe to reuse (no global flag)', () => {

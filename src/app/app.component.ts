@@ -164,6 +164,15 @@ export class AppComponent {
         this.isSsoRoute.set(isSso);
         this.isHelpSupportRoute.set(isHelpSupport);
         this.isMobileSidebarOpen.set(false);
+
+        // Reset scroll position on route change so new pages open at the top
+        if (typeof document !== 'undefined') {
+          const scrollMains = document.querySelectorAll('main');
+          scrollMains.forEach(el => {
+            el.scrollTop = 0;
+          });
+          window.scrollTo(0, 0);
+        }
       });
   }
 

@@ -446,21 +446,24 @@ export class RegistrationShellComponent implements OnInit, OnDestroy {
       this.validationService.markStepSubmitted(1);
       const errors = this.validationService.validateStep1(data.step1);
       if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Details', 'error', 1);
+        const errorMsg = errors.find(e => e.includes('Invalid')) || 'Please fill all mandatory fields marked with * in Organisation Details';
+        this.validationService.showToast(errorMsg, 'error', 1);
         return;
       }
     } else if (current === 2) {
       this.validationService.markStepSubmitted(2);
       const errors = this.validationService.validateStep3(data.step3);
       if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with * in Authorized Person Details', 'error', 2);
+        const errorMsg = errors.find(e => e.includes('Invalid')) || 'Please fill all mandatory fields marked with * in Authorized Person Details';
+        this.validationService.showToast(errorMsg, 'error', 2);
         return;
       }
     } else if (current === 3) {
       this.validationService.markStepSubmitted(3);
       const errors = this.validationService.validateStep4(data.step4);
       if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Bank Details', 'error', 3);
+        const errorMsg = errors.find(e => e.includes('Invalid')) || 'Please fill all mandatory fields marked with * in Organisation Bank Details';
+        this.validationService.showToast(errorMsg, 'error', 3);
         return;
       }
     }

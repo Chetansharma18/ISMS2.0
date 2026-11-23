@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { Step1OrgDetailsComponent } from './step1-org-details.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { OtrFormService } from '../../services/otr-form.service';
 import { OtrValidationService } from '../../services/otr-validation.service';
 import { createExistingUserOtrData, STATES_MASTER, DISTRICTS_BY_STATE } from '../../models/otr-form.model';
@@ -124,6 +126,37 @@ describe('Step1OrgDetailsComponent - Heading-wise Grouping', () => {
     expect(component.data().stateOfLegalReg).toBe('');
   });
 
+  it('verifies Bug 2: State / UT of Registration search input has a working clear option', () => {
+    const selectDebugEls = fixture.debugElement.queryAll(By.directive(FormSelectComponent));
+    const stateSelectDebugEl = selectDebugEls.find(de => de.componentInstance.label === 'State / UT of Registration');
+    expect(stateSelectDebugEl).toBeDefined();
+
+    const stateSelect = stateSelectDebugEl!.componentInstance as FormSelectComponent;
+    stateSelect.isOpen.set(true);
+    fixture.detectChanges();
+
+    expect(stateSelect.shouldShowSearch()).toBe(true);
+    const searchInputEl = stateSelectDebugEl!.nativeElement.querySelector('input[placeholder="Search options..."]') as HTMLInputElement;
+    expect(searchInputEl).not.toBeNull();
+
+    expect(stateSelectDebugEl!.nativeElement.querySelector('.form-select-search-clear')).toBeNull();
+
+    stateSelect.searchQuery.set('Delhi');
+    fixture.detectChanges();
+
+    const clearBtn = stateSelectDebugEl!.nativeElement.querySelector('.form-select-search-clear') as HTMLButtonElement;
+    expect(clearBtn).not.toBeNull();
+    expect(clearBtn.getAttribute('aria-label')).toBe('Clear search');
+    expect(stateSelect.filteredEntries().length).toBe(1);
+
+    clearBtn.click();
+    fixture.detectChanges();
+
+    expect(stateSelect.searchQuery()).toBe('');
+    expect(stateSelect.filteredEntries().length).toBeGreaterThan(1);
+    expect(stateSelect.isOpen()).toBe(true);
+  });
+
   it('verifies Bug 5: Preferred Sector label has no "for" attribute linking to toggle button', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const labels = Array.from(compiled.querySelectorAll('label'));
@@ -138,6 +171,14 @@ describe('Step1OrgDetailsComponent - Heading-wise Grouping', () => {
     const dateLabel = labels.find(l => l.textContent?.includes('Date of Registration'));
     expect(dateLabel).toBeDefined();
     expect(dateLabel?.getAttribute('for')).toBeNull();
+  });
+
+  it('verifies Bug 6: Registration Number label has no "for" attribute linking to input', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const labels = Array.from(compiled.querySelectorAll('label'));
+    const regLabel = labels.find(l => l.querySelector('span')?.textContent?.trim() === 'Registration Number');
+    expect(regLabel).toBeDefined();
+    expect(regLabel?.getAttribute('for')).toBeNull();
   });
 
   it('verifies Bug 7: Contact number rejects invalid mobile numbers', () => {
@@ -156,7 +197,23 @@ describe('Step1OrgDetailsComponent - Heading-wise Grouping', () => {
     fixture.detectChanges();
     expect(component.getFieldError('emailId')).toBe('Invalid Email ID format');
 
+    formService.updateStep1({ emailId: 'dfghgj' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email ID format');
+
+    formService.updateStep1({ emailId: '86rnvhgxchgn@gfhkj.cc' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email ID format');
+
+    formService.updateStep1({ emailId: '86rnvhgxchgnb@gfhkj.cc' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email ID format');
+
     formService.updateStep1({ emailId: 'info@validcompany.com' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBeUndefined();
+
+    formService.updateStep1({ emailId: 'contact@skilltech.org' });
     fixture.detectChanges();
     expect(component.getFieldError('emailId')).toBeUndefined();
   });
@@ -165,6 +222,22 @@ describe('Step1OrgDetailsComponent - Heading-wise Grouping', () => {
     formService.updateStep1({ website: 'invalid url with spaces' });
     fixture.detectChanges();
     expect(component.getFieldError('website')).toBe('Invalid Website URL format');
+
+    formService.updateStep1({ website: '1' });
+    fixture.detectChanges();
+    expect(component.getFieldError('website')).toBe('Invalid Website URL format');
+
+    formService.updateStep1({ website: 'ab.dc' });
+    fixture.detectChanges();
+    expect(component.getFieldError('website')).toBe('Invalid Website URL format');
+
+    formService.updateStep1({ website: 'skilltech.org' });
+    fixture.detectChanges();
+    expect(component.getFieldError('website')).toBeUndefined();
+
+    formService.updateStep1({ website: 'https://skilltech.org' });
+    fixture.detectChanges();
+    expect(component.getFieldError('website')).toBeUndefined();
 
     formService.updateStep1({ website: 'https://www.validwebsite.gov.in' });
     fixture.detectChanges();

@@ -109,4 +109,28 @@ describe('HelpSupportComponent - Standalone FAQ Page', () => {
     expect(el.textContent).toContain('0141-2716091');
     expect(el.textContent).toContain('support@isms.rajasthan.gov.in');
   });
+
+  it('resets scroll to top on initialization and when scrollToTop is called', () => {
+    const mainEl = document.createElement('main');
+    mainEl.scrollTop = 500;
+    mainEl.appendChild(fixture.nativeElement);
+    document.body.appendChild(mainEl);
+
+    try {
+      const windowScrollSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+      const mainScrollSpy = vi.fn();
+      mainEl.scrollTo = mainScrollSpy;
+
+      component.scrollToTop(false);
+
+      expect(windowScrollSpy).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+      expect(mainScrollSpy).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+
+      component.scrollToTop(true);
+      expect(windowScrollSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+      expect(mainScrollSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+    } finally {
+      document.body.removeChild(mainEl);
+    }
+  });
 });

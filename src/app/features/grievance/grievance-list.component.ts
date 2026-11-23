@@ -256,11 +256,13 @@ export type { Grievance };
         @if (selectedTicket()) {
           <div class="mt-5 space-y-4 text-left">
             <div class="grid grid-cols-2 gap-4">
-              <div>
+              <div class="min-w-0">
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status</label>
-                <app-status-badge [variant]="statusVariant(selectedTicket()!.status)">
-                  {{ selectedTicket()!.status }}
-                </app-status-badge>
+                <div class="flex items-center">
+                  <app-status-badge [variant]="statusVariant(selectedTicket()!.status)" class="whitespace-nowrap min-w-fit">
+                    {{ selectedTicket()!.status }}
+                  </app-status-badge>
+                </div>
               </div>
               <div>
                 <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Issue Type</label>
@@ -358,7 +360,7 @@ export class GrievanceListComponent {
     { key: 'description', label: 'Description', cellClass: 'font-normal text-slate-700 min-w-[180px]' },
     { key: 'issueType', label: 'Issue Type', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'attachment', label: 'Attachment', align: 'center', type: 'custom' },
-    { key: 'status', label: 'Status', align: 'center', type: 'status', badgeVariantMap: GRIEVANCE_STATUS_BADGE },
+    { key: 'status', label: 'Status', align: 'center', type: 'status', badgeVariantMap: GRIEVANCE_STATUS_BADGE, width: 'w-28 min-w-[100px]' },
     { key: 'viewAction', label: 'View', align: 'center', width: 'w-16', type: 'custom' }
   ];
 

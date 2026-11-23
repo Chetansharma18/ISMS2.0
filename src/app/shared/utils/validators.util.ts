@@ -10,7 +10,7 @@ export const REGEX_PATTERNS = {
   MOBILE: /^[6-9]\d{9}$/,
   PINCODE: /^[1-9][0-9]{5}$/,
   IFSC: /^[A-Z]{4}0[A-Z0-9]{6}$/,
-  EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+  EMAIL: /^[a-zA-Z][a-zA-Z0-9._%+-]*@[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*\.(com|org|in|net|gov|edu|biz|info|co|io|tech|ai|me|app|dev|online|site|store|global|co\.in|org\.in|net\.in|gov\.in|nic\.in|ac\.in|edu\.in|gen\.in|res\.in)$/i,
   VOTER_ID: /^[A-Z]{3}[0-9]{7}$/,
   PASSPORT: /^[A-Z][0-9]{7}$/,
   DRIVING_LICENSE: /^[A-Z]{2}[0-9]{2}[0-9A-Z]{0,12}$/,
@@ -39,4 +39,8 @@ export function isValidIfsc(ifsc: string): boolean {
 
 export function isValidBankAccount(accountNo: string): boolean {
   return REGEX_PATTERNS.BANK_ACCOUNT.test((accountNo || '').trim());
+}
+
+export function isValidEmail(email: string): boolean {
+  return REGEX_PATTERNS.EMAIL.test((email || '').trim());
 }

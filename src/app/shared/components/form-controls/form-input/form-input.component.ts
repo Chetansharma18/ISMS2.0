@@ -13,7 +13,12 @@ import { IconComponent } from '../../icon/icon.component';
       <!-- Label Row with Required Star, optional infoTooltip, and Character Count -->
       @if (label) {
         <div class="flex items-center justify-between gap-2 mb-1">
-          <label [attr.for]="type === 'date' ? null : id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1">
+          <label
+            [attr.for]="(type === 'date' || disableLabelClick) ? null : id"
+            (click)="onLabelClick($event)"
+            class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1"
+            [class.cursor-default]="type === 'date' || disableLabelClick"
+          >
             <span>{{ label }}</span>
             @if (required) {
               <span class="text-rose-600 font-bold">*</span>
@@ -22,6 +27,7 @@ import { IconComponent } from '../../icon/icon.component';
               <span
                 class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-slate-400 text-slate-500 text-[10px] font-bold cursor-help hover:text-slate-800 hover:border-slate-600 transition-colors ml-0.5"
                 [title]="infoTooltip"
+                (click)="$event.stopPropagation(); $event.preventDefault()"
               >
                 i
               </span>
@@ -145,9 +151,17 @@ export class FormInputComponent {
   @Input() error?: string;
   @Input() infoTooltip?: string;
   @Input() showCharCount: boolean = false;
+  @Input() disableLabelClick: boolean = false;
 
   @Output() valueChange = new EventEmitter<string>();
   @Output() blur = new EventEmitter<FocusEvent>();
+
+  onLabelClick(event: MouseEvent): void {
+    if (this.type === 'date' || this.disableLabelClick) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;

@@ -61,14 +61,17 @@ describe('SsoLoginComponent - Direct Login Flow (Bug 4 Modal Removed)', () => {
     expect(authService.currentUser()?.role).toBe('aspirant');
   });
 
-  it('proceeds directly for existing_user persona', () => {
-    vi.useFakeTimers();
-    component.selectRole('existing_user');
+  it('navigates to department dashboard upon OTP verification without login flash', async () => {
+    const navigateSpy = vi.spyOn(router, 'navigate').mockResolvedValue(true as any);
+    component.showDeptAdminOtp.set(true);
 
-    component.handleLogin();
-    expect(component.isLoading()).toBe(true);
+    component.onDeptAdminOtpVerified('123456');
 
-    vi.runAllTimers();
-    expect(authService.currentUser()?.role).toBe('existing_user');
+    expect(authService.currentUser()?.role).toBe('dept_admin');
+    expect(authService.isDeptAdminOtpVerified()).toBe(true);
+    expect(navigateSpy).toHaveBeenCalledWith(['/admin/eoi-view']);
+
+    await Promise.resolve();
+    expect(component.showDeptAdminOtp()).toBe(false);
   });
 });

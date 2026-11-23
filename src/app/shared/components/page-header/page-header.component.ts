@@ -74,7 +74,7 @@ export interface BreadcrumbItem {
       <!-- Right Action Slot -->
       <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
         @if (searchable) {
-          <div class="relative w-full sm:w-80 md:w-96">
+          <div class="relative w-full sm:w-80 md:w-96 lg:w-[420px] max-w-full">
             <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"

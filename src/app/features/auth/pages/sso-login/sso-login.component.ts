@@ -309,11 +309,12 @@ export class SsoLoginComponent {
   }
 
   onDeptAdminOtpVerified(otp: string): void {
-    this.showDeptAdminOtp.set(false);
     const identifier = this.emailOrSsoId.trim() || 'dept_admin';
     this.authService.loginWithCredentials(identifier, 'dept_admin', null);
     this.authService.setDeptAdminOtpVerified(true);
-    this.router.navigate(['/admin/eoi-view']);
+    this.router.navigate(['/admin/eoi-view']).then(() => {
+      this.showDeptAdminOtp.set(false);
+    });
   }
 
   onDeptAdminOtpCancelled(): void {

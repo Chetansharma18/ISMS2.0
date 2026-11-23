@@ -62,7 +62,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </button>
           }
 
-          <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+          <a [routerLink]="homeRoute()" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
           <!-- Logos Group -->
           <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -315,6 +315,26 @@ export class HeaderComponent {
   readonly assignedRoles = this.authService.assignedRoles;
   readonly canSwitchRole = this.authService.canSwitchRole;
   readonly activeRoleLabel = this.authService.activeRoleLabel;
+
+  /** Role-based dashboard route for the emblem logo link */
+  readonly homeRoute = computed(() => {
+    const user = this.currentUser();
+    if (!user) return '/';
+    switch (user.role) {
+      case 'dept_admin':
+        return '/admin/eoi-view';
+      case 'super_admin':
+        return '/admin/eoi-configuration';
+      case 'existing_user':
+        return '/tenders';
+      case 'new_user':
+        return '/registration';
+      case 'aspirant':
+        return '/training-calendar';
+      default:
+        return '/';
+    }
+  });
 
   readonly displayName = computed(() => {
     const u = this.currentUser();

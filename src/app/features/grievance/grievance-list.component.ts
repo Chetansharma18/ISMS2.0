@@ -250,6 +250,7 @@ export type { Grievance };
         [showPrimaryArrow]="false"
         [showCloseButton]="true"
         [showAccentBar]="false"
+        [showFooterDivider]="false"
         (primaryAction)="closeViewModal()"
         (close)="closeViewModal()"
       >

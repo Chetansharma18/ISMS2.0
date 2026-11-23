@@ -73,16 +73,18 @@ import { IconComponent } from '../icon/icon.component';
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full flex-1 min-h-0 flex flex-col">
+            <div class="w-full flex-1 min-h-0 flex flex-col overflow-y-auto pr-0.5">
               <ng-content></ng-content>
             </div>
 
             <!-- Action Buttons Footer -->
             @if (primaryLabel || secondaryLabel) {
-              <div class="mt-auto">
-                <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
+              <div class="mt-auto shrink-0">
+                @if (showFooterDivider) {
+                  <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
+                }
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!secondaryLabel">
                   @if (secondaryLabel) {
                     <button
                       type="button"
@@ -130,6 +132,7 @@ export class ActionModalComponent {
   @Input() showAccentBar = false;
   @Input() accentBarClass = 'bg-navy';
   @Input() showCloseButton = false;
+  @Input() showFooterDivider = true;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;

@@ -16,7 +16,8 @@ import { BackdropComponent } from '../../../shared/components/backdrop/backdrop.
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased font-sans" style="background-color: #FFFFFF;">
       <app-header
-        class="shrink-0 z-40"
+        [isSticky]="true"
+        class="shrink-0 sticky top-0 z-50"
         (toggleMobileMenu)="toggleMobileSidebar()"
       ></app-header>
       

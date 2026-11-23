@@ -8,6 +8,7 @@ import { SchemesSectionComponent } from './components/schemes-section/schemes-se
 import { ServicesSectionComponent } from './components/services-section/services-section.component';
 import { AboutSectionComponent } from './components/about-section/about-section.component';
 import { ImportantLinksComponent } from './components/important-links/important-links.component';
+import { FooterComponent } from '../../core/layout/footer/footer.component';
 
 @Component({
   selector: 'app-landing',
@@ -18,7 +19,8 @@ import { ImportantLinksComponent } from './components/important-links/important-
     NewsTickerComponent,
     HeroSectionComponent,
     AboutSectionComponent,
-    ServicesSectionComponent
+    ServicesSectionComponent,
+    FooterComponent
   ],
   styleUrls: ['./landing.component.css'],
   host: {
@@ -37,6 +39,9 @@ import { ImportantLinksComponent } from './components/important-links/important-
 
       <!-- 4. Mobile App & Support -->
       <app-services-section></app-services-section>
+
+      <!-- 5. Portal Footer (Rendered exclusively with the landing page) -->
+      <app-footer class="shrink-0"></app-footer>
     </div>
   `
 })

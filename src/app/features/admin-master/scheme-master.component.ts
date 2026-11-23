@@ -73,12 +73,19 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   itemUnit: 'schemes',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[840px]',
   filters: [
     {
+      key: 'schemeCategory',
+      label: 'Scheme Category',
+      placeholder: 'All Scheme Categories',
+      options: ['Rajvik', 'samarth', 'saksham', 'na']
+    },
+    {
       key: 'categoryName',
       label: 'EOI Category',
-      placeholder: 'All Categories',
+      placeholder: 'All EOI Categories',
       options: CATEGORY_NAME_OPTIONS
     }
   ],

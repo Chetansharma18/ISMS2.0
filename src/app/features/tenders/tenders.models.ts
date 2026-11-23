@@ -39,6 +39,7 @@ export interface SchemeTender {
   scheduledDate?: string;
   isActive?: boolean;
   isFrozen?: boolean;
+  isNew?: boolean;
 }
 
 /** A required-information / supporting-document entry for an EOI. */

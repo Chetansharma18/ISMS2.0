@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, model } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, model, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -90,12 +90,26 @@ export class PageHeaderComponent {
   @Input() bgColor = 'var(--color-primary, #7C0E44)';
   @Input() searchable = false;
   @Input() searchPlaceholder = 'Search...';
+  @Input() suggestions: string[] = [];
 
   readonly searchQuery = model<string>('');
 
   @Output() back = new EventEmitter<void>();
   @Output() search = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
+  @Output() suggestionSelect = new EventEmitter<string>();
+
+  readonly isSearchFocused = signal<boolean>(false);
+
+  readonly filteredSuggestions = computed(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!query || !this.suggestions || this.suggestions.length === 0) {
+      return [];
+    }
+    return this.suggestions
+      .filter(s => s && s.toLowerCase().includes(query))
+      .slice(0, 8);
+  });
 
   constructor(private router: Router) { }
 
@@ -108,6 +122,19 @@ export class PageHeaderComponent {
     this.searchQuery.set('');
     this.search.emit('');
     this.clear.emit();
+  }
+
+  onBlur(): void {
+    setTimeout(() => {
+      this.isSearchFocused.set(false);
+    }, 200);
+  }
+
+  selectSuggestion(item: string): void {
+    this.searchQuery.set(item);
+    this.search.emit(item);
+    this.suggestionSelect.emit(item);
+    this.isSearchFocused.set(false);
   }
 
   onBackClick(): void {

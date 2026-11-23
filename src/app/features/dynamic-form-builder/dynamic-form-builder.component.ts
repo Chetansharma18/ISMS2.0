@@ -14,7 +14,16 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
+import {
+  ButtonComponent,
+  IconComponent,
+  InputDirective,
+  PageShellComponent,
+  SwitchComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption
+} from '../../shared';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { TableComponent } from '../../shared/components/table/table.component';
 import { TableColumn } from '../../shared/components/table/table.types';
@@ -75,7 +84,8 @@ interface FormBuilderFormData {
     IconComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -664,9 +674,6 @@ interface FormBuilderFormData {
         <app-page-header
           title="Dynamic Form Builder"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
-          [searchable]="true"
-          searchPlaceholder="Search by form name, step title, or field label..."
-          [(searchQuery)]="searchQuery"
         >
           <button
             appButton
@@ -679,6 +686,21 @@ interface FormBuilderFormData {
             <span>Add new Form</span>
           </button>
         </app-page-header>
+
+        <!-- Unified Master Filter Bar (Dropdown filters - NO BUTTONS) -->
+        <app-master-filter-bar
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search by form name, step title, or field label..."
+          [(status)]="statusFilter"
+          [showStatusFilter]="true"
+          [statusOptions]="statusFilterOptions()"
+          [filters]="formFilters()"
+          [(filterValues)]="formFilterValues"
+          [totalCount]="forms().length"
+          [filteredCount]="filteredForms().length"
+          itemUnit="forms"
+          (resetFilters)="resetFilters()"
+        />
 
         <!-- Template: Form Type Column (Title + Step Form / Direct Form without background) -->
         <ng-template #formTypeTemplate let-item>
@@ -2661,9 +2683,47 @@ export class DynamicFormBuilderComponent {
     });
   }
 
+  readonly statusFilter = signal<string>('ALL');
+  readonly formFilterValues = signal<Record<string, string>>({});
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
+    const all = this.forms();
+    const active = all.filter(f => f.status !== 'Inactive').length;
+    const inactive = all.filter(f => f.status === 'Inactive').length;
+    return [
+      { value: 'ALL', label: 'All', count: all.length },
+      { value: 'Active', label: 'Active', count: active },
+      { value: 'Inactive', label: 'Inactive', count: inactive }
+    ];
+  });
+
+  readonly formFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'type',
+      label: 'Form Type',
+      placeholder: 'All Form Types',
+      options: ['Step Form', 'Direct Form']
+    }
+  ]);
+
   readonly filteredForms = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const list = this.forms();
+    const st = this.statusFilter();
+    const type = this.formFilterValues()['type'];
+    let list = this.forms();
+
+    if (st !== 'ALL') {
+      list = list.filter(f => (f.status || 'Active') === st);
+    }
+
+    if (type) {
+      if (type === 'Step Form') {
+        list = list.filter(f => f.isStepForm);
+      } else if (type === 'Direct Form') {
+        list = list.filter(f => !f.isStepForm);
+      }
+    }
+
     if (!q) return list;
 
     return list.filter(form => {
@@ -2676,6 +2736,12 @@ export class DynamicFormBuilderComponent {
       return matchName || matchDirect || matchStep;
     });
   });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.formFilterValues.set({});
+  }
 
   // --- Step Management ---
 

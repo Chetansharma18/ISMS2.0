@@ -3,9 +3,10 @@ import { BreadcrumbItem, PageHeaderComponent } from '../../components/page-heade
 import { TableComponent } from '../../components/table/table.component';
 import { TableColumn } from '../../components/table/table.types';
 import { PageShellComponent } from '../page-shell/page-shell.component';
+import { MasterFilterBarComponent } from '../../components/master-filter-bar/master-filter-bar.component';
 
 /**
- * A complete list screen: page header with search, a table with pagination, and an empty message.
+ * A complete list screen: page header, a filter bar with search, a table with pagination, and an empty message.
  * A new list page is only its columns, its rows and the templates of its custom cells:
  *
  *   <app-list-page
@@ -25,20 +26,30 @@ import { PageShellComponent } from '../page-shell/page-shell.component';
   selector: 'app-list-page',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageShellComponent, PageHeaderComponent, TableComponent],
+  imports: [PageShellComponent, PageHeaderComponent, TableComponent, MasterFilterBarComponent],
   template: `
     <app-page-shell>
       <app-page-header
         [title]="title()"
         [breadcrumbs]="breadcrumbs()"
-        [searchable]="searchable()"
-        [searchPlaceholder]="searchPlaceholder()"
-        [(searchQuery)]="searchQuery"
       >
         <ng-content select="[headerActions]" />
       </app-page-header>
 
       <ng-content select="[beforeTable]" />
+
+      @if (searchable()) {
+        <app-master-filter-bar
+          [(searchQuery)]="searchQuery"
+          [searchPlaceholder]="searchPlaceholder()"
+          [showStatusFilter]="false"
+          [totalCount]="data().length"
+          [filteredCount]="data().length"
+          [itemUnit]="itemUnit()"
+          [showCount]="false"
+          (resetFilters)="searchQuery.set('')"
+        />
+      }
 
       <app-table
         [columns]="columns()"

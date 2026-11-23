@@ -3,8 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { filterTenders, TenderOpenEvent } from './tender-status.util';
-import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
-import { canAppeal } from './tender-appeal.util';
 
 @Component({
   selector: 'app-tender-list',
@@ -30,9 +28,6 @@ import { canAppeal } from './tender-appeal.util';
         schemeTitle: schemeTitleTemplate,
         schemeCategory: schemeCategoryTemplate,
         submittedStatus: submittedStatusTemplate,
-        rejectionReason: rejectionReasonTemplate,
-        appeal: appealTemplate,
-        shortfall: shortfallTemplate,
         view: viewTemplate
       }"
     >
@@ -73,80 +68,6 @@ import { canAppeal } from './tender-appeal.util';
         <span class="text-slate-800 font-normal text-[13px]">{{ tender.submittedStatus }}</span>
       </ng-template>
 
-      <!-- Custom Rejection Reason Template -->
-      <ng-template #rejectionReasonTemplate let-tender>
-        @if (tender.submittedStatus === 'Rejected') {
-          <span class="text-rose-600 text-[13px] leading-tight font-normal block max-w-sm text-left">
-            {{ tender.rejectionReason || 'Technical qualification criteria not met.' }}
-          </span>
-        } @else {
-          <span class="text-slate-400 font-normal text-center block text-[13px]">-</span>
-        }
-      </ng-template>
-
-      <!-- Appeal Request against a rejection: only visible in rejected status -->
-      <ng-template #appealTemplate let-tender>
-        @if (tender.submittedStatus === 'Rejected') {
-          @if (!tender.appeal) {
-            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Request appeal against rejection">
-              Appeal Request
-            </button>
-          } @else if (tender.appeal.status === 'Rejected') {
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-              Appeal Rejected
-            </span>
-          } @else if (tender.appeal.status === 'Accepted') {
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Appeal Accepted
-            </span>
-          } @else {
-            <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
-              Appeal Submitted
-            </button>
-          }
-        } @else {
-          <span class="text-slate-400 text-[13px]">-</span>
-        }
-      </ng-template>
-
-      <!-- Response to Appeal / Shortfall requests raised by the department: only shown when appeal has been submitted -->
-      <ng-template #shortfallTemplate let-tender>
-        @if (tender.appeal && tender.appeal.status !== 'Rejected') {
-          @switch (shortfallState(tender)) {
-            @case ('open') {
-              <button
-                appButton
-                variant="secondary"
-                size="sm"
-                type="button"
-                (click)="respond.emit(tender)"
-                title="The department has requested additional documents or clarification. Click to respond."
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-                Respond ({{ openCount(tender) }})
-              </button>
-            }
-            @case ('responded') {
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                type="button"
-                (click)="open.emit({ tender, tab: 'shortfall' })"
-                title="View responses"
-              >
-                Responded
-              </button>
-            }
-            @default {
-              <span class="text-slate-400 text-[13px]">-</span>
-            }
-          }
-        } @else {
-          <span class="text-slate-400 text-[13px]">-</span>
-        }
-      </ng-template>
-
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
         <button
@@ -178,7 +99,7 @@ export class TenderListComponent {
 
   readonly pageSize = 6;
 
-  // Clean Table Columns without Closing Date / Edits Used
+  // Clean Table Columns without Closing Date / Edits Used / Remarks / Appeal columns
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
@@ -198,23 +119,8 @@ export class TenderListComponent {
         'Rejected': 'danger'
       }
     },
-    { key: 'rejectionReason', label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
-    { key: 'appeal', label: 'Appeal Request', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'shortfall', label: 'Appeal Response', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+    { key: 'view', label: 'Action', align: 'center', width: 'w-20', type: 'custom' }
   ];
-
-  protected canAppeal(tender: SubmittedTender): boolean {
-    return canAppeal(tender);
-  }
-
-  protected shortfallState(tender: SubmittedTender): 'open' | 'responded' | 'none' {
-    return shortfallSummary(tender);
-  }
-
-  protected openCount(tender: SubmittedTender): number {
-    return openShortfalls(tender).length;
-  }
 
   readonly filteredTenders = computed(() => filterTenders(this.tenders(), this.searchQuery()));
 }

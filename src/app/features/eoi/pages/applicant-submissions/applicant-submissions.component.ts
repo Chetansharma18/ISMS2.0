@@ -101,7 +101,7 @@ import {
         <!-- Clean, Proper, Non-Colorful Status -->
         <ng-template #statusTemplate let-item>
           <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-            {{ (item.appeal && item.appeal.status === 'Pending') || item.status === 'REVERTED' ? 'Appeal Request' : item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : 'Rejected' }}
+            {{ item.appeal?.status === 'Accepted' ? 'Appeal Approved' : ((item.appeal && item.appeal.status === 'Pending') || item.status === 'REVERTED' ? 'Appeal Request' : item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : 'Rejected') }}
           </span>
         </ng-template>
 

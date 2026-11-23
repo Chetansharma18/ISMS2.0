@@ -59,7 +59,11 @@ export function isBeforeClosingDate(closingDateStr?: string, now: Date = new Dat
 }
 
 export function canEditTender(tender: SubmittedTender, now: Date = new Date()): boolean {
-  return isBeforeClosingDate(tender.closingDate, now) && (tender.editCount || 0) < (tender.maxEdits || 3);
+  return (
+    tender.submittedStatus === 'Submitted' &&
+    isBeforeClosingDate(tender.closingDate, now) &&
+    (tender.editCount || 0) < (tender.maxEdits || 3)
+  );
 }
 
 export function remainingEdits(tender: SubmittedTender): number {

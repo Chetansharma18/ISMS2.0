@@ -65,7 +65,7 @@ describe('isBeforeClosingDate', () => {
 describe('canEditTender / remainingEdits', () => {
   const now = new Date(2026, 5, 15, 12, 0, 0);
 
-  it('allows editing before closing while edits remain', () => {
+  it('allows editing before closing while edits remain for submitted status', () => {
     expect(canEditTender(makeTender({ editCount: 2 }), now)).toBe(true);
   });
 
@@ -75,6 +75,19 @@ describe('canEditTender / remainingEdits', () => {
 
   it('blocks editing after the closing date', () => {
     expect(canEditTender(makeTender({ closingDate: '01-Jan-2026' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Approved or Accepted', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Approved' }), now)).toBe(false);
+    expect(canEditTender(makeTender({ submittedStatus: 'Accepted' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Rejected', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Rejected' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Under Review', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Under Review' }), now)).toBe(false);
   });
 
   it('computes remaining edits and never goes negative', () => {

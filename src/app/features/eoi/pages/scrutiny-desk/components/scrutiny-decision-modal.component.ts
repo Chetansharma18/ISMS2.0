@@ -78,7 +78,7 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
                 class="w-full cursor-pointer"
               >
                 <option value="" [selected]="!grade()">Select grade</option>
-                @for (g of grades(); track g.grade) {
+                @for (g of uniqueGrades(); track g.grade) {
                   <option [value]="g.grade" [selected]="g.grade === grade()">{{ g.grade }}</option>
                 }
               </select>
@@ -128,6 +128,20 @@ export class ScrutinyDecisionModalComponent {
   readonly applicantLabel = input('');
   /** Grades from the Grading Master, used when approving. */
   readonly grades = input<GradeOption[]>([]);
+
+  readonly uniqueGrades = computed(() => {
+    const raw = this.grades();
+    const seen = new Set<string>();
+    const result: GradeOption[] = [];
+    for (const g of raw) {
+      const clean = g.grade?.trim();
+      if (clean && !seen.has(clean)) {
+        seen.add(clean);
+        result.push({ ...g, grade: clean });
+      }
+    }
+    return result;
+  });
 
   readonly confirmed = output<DecisionSubmission>();
   readonly close = output<void>();

@@ -49,7 +49,6 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"
-        (remarks)="openRemarksModal()"
         (reject)="openRejectModal()"
         (approve)="openApproveModal()"
       />
@@ -174,18 +173,28 @@ export class ScrutinyDeskComponent {
   /** Active grades from the Grading Master, highest first. */
   readonly grades = signal<GradeOption[]>([]);
 
-  /** Grades specifically linked to the applicant's scheme (or general/all schemes). */
+  /** Grades specifically linked to the applicant's scheme (or general/all schemes). Deduplicated to ensure each grade appears only once. */
   readonly schemeGrades = computed<GradeOption[]>(() => {
     const app = this.applicant();
     const all = this.grades();
-    if (!app?.schemeName) return all;
+    const deduplicate = (list: GradeOption[]) => {
+      const seen = new Set<string>();
+      return list.filter(g => {
+        const clean = g.grade?.trim();
+        if (!clean || seen.has(clean)) return false;
+        seen.add(clean);
+        return true;
+      });
+    };
+
+    if (!app?.schemeName) return deduplicate(all);
     const scheme = app.schemeName.toLowerCase().trim();
     const matched = all.filter(g => {
       if (!g.schemeName || g.schemeName === 'ALL Schemes' || g.schemeName === 'ALL') return true;
       const s = g.schemeName.toLowerCase().trim();
       return s === scheme || scheme.includes(s) || s.includes(scheme);
     });
-    return matched.length > 0 ? matched : all;
+    return deduplicate(matched.length > 0 ? matched : all);
   });
 
   // Document Viewer State
@@ -379,7 +388,7 @@ export class ScrutinyDeskComponent {
   }
 
   openAcceptAppealModal(): void {
-    this.showRevertModal.set(true);
+    this.openApproveModal();
   }
 
   openRejectAppealModal(): void {

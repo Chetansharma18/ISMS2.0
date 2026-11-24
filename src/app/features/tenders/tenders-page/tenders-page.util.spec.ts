@@ -640,5 +640,12 @@ describe('tenders-page.util', () => {
       // Empty scheme returns empty array
       expect(parseMasterEntriesByScheme(mockDocs, '', (d) => d.docName)).toEqual([]);
     });
+
+    // 22. Scheme Category dependency on Scheme
+    it('Scenario 22: requires scheme to be selected and validates scheme-category correlation', () => {
+      const emptySchemeForm = { ...validEoi(), scheme: '', schemeCategory: 'Rajvik' };
+      const res = validateEoiFormComplete(emptySchemeForm, standardOptions);
+      expect(res.errors['scheme']).toBe('Please select a valid scheme.');
+    });
   });
 });

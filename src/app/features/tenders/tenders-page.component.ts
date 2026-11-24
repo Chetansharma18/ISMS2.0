@@ -943,7 +943,16 @@ export class TendersPageComponent {
   }
 
   onSchemeSelected(schemeName: string): void {
-    if (!schemeName) return;
+    if (!schemeName) {
+      this.newEoiData.schemeCategory = '';
+      this.newEoiData.emdFee = '';
+      this.newEoiData.processFee = '';
+      this.newEoiData.documents = [];
+      this.newEoiData.annexures = [];
+      this.newEoiData.documentFiles = {};
+      this.eoiFormVersion.update((v) => v + 1);
+      return;
+    }
 
     // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
     const schemeItem = this.schemeMasterItems().find(

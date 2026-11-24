@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ButtonComponent, IconComponent } from '../../../../../shared';
 import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-state.service';
 
@@ -85,12 +85,22 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
 
         <!-- Body content -->
         <div class="p-5 sm:p-6 space-y-4 text-xs">
-          <!-- Rejection grounds if available -->
+          <!-- Rejection grounds / Decision context if available -->
           @if (rejectionReason()) {
-            <div class="bg-rose-50/70 border border-rose-200/80 rounded-lg p-3.5 space-y-1">
-              <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wide flex items-center gap-1.5">
-                <app-icon name="alert-triangle" size="xs" />
-                Original Disqualification / Rejection Reason
+            <div
+              class="border rounded-lg p-3.5 space-y-1"
+              [class.bg-rose-50/70]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+              [class.border-rose-200/80]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+              [class.bg-emerald-50/70]="isApprovedProposal()"
+              [class.border-emerald-200/80]="isApprovedProposal()"
+            >
+              <span
+                class="text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5"
+                [class.text-rose-800]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+                [class.text-emerald-800]="isApprovedProposal()"
+              >
+                <app-icon [name]="isApprovedProposal() ? 'check' : 'alert-triangle'" size="xs" />
+                {{ isApprovedProposal() ? 'Original Approved Proposal Decision' : 'Original Disqualification / Rejection Reason' }}
               </span>
               <p class="m-0 text-slate-800 leading-relaxed font-medium">
                 {{ rejectionReason() }}
@@ -108,43 +118,6 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
             </p>
           </div>
 
-          <!-- Applicant's Uploaded Supporting Documents -->
-          @if (appAppeal.files && appAppeal.files.length > 0) {
-            <div class="space-y-2">
-              <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-                Supporting Documents Uploaded by Applicant ({{ appAppeal.files.length }})
-              </span>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                @for (file of appAppeal.files; track file.fileName) {
-                  <div class="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition-colors shadow-2xs">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                      <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
-                      <div class="min-w-0">
-                        <span class="text-xs font-semibold text-slate-900 block truncate" [title]="file.fileName">
-                          {{ file.fileName }}
-                        </span>
-                        <span class="text-[11px] text-slate-500 block truncate">{{ file.fileSize }}</span>
-                      </div>
-                    </div>
-                    <button
-                      appButton
-                      variant="ghost"
-                      size="sm"
-                      iconOnly
-                      type="button"
-                      (click)="viewFile.emit({ title: 'Appeal Supporting Document', fileName: file.fileName, fileSize: file.fileSize })"
-                      class="shrink-0"
-                      title="View Document"
-                      aria-label="View Document"
-                    >
-                      <app-icon name="eye" size="sm" />
-                    </button>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-
           <!-- Outcome Notice -->
           @if (appAppeal.status === 'Accepted') {
             <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex items-start gap-2.5 text-emerald-900">
@@ -152,7 +125,7 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
               <div>
                 <span class="font-bold text-xs block">Appeal Approved by Scrutiny Committee</span>
                 <p class="text-xs text-emerald-800 mt-0.5 m-0 leading-relaxed">
-                  The scrutiny committee has verified the applicant's appeal remarks and supporting documents. The application has been approved.
+                  The scrutiny committee has reviewed the applicant's appeal remarks. The appeal and application have been approved.
                 </p>
               </div>
             </div>
@@ -180,4 +153,6 @@ export class ScrutinyAppealCardComponent {
   readonly accept = output<void>();
   readonly reject = output<void>();
   readonly viewFile = output<{ title: string; fileName: string; fileSize?: string }>();
+
+  protected readonly isApprovedProposal = computed(() => this.applicant()?.status === 'APPROVED');
 }

@@ -15,7 +15,7 @@ import { ShortfallResponseModalComponent, ShortfallSubmission } from './tender-s
 import { openShortfalls, withShortfallResponse } from './tender-status/tender-shortfall.util';
 import { TenderAppealSectionComponent } from './tender-status/tender-appeal-section.component';
 import { AppealModalComponent } from './tender-status/appeal-modal.component';
-import { canAppeal, remainingDaysText } from './tender-status/tender-appeal.util';
+import { canAppeal, getAppealDeadline, remainingAppealDaysText, remainingDaysText } from './tender-status/tender-appeal.util';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { TenderListComponent } from './tender-status/tender-list.component';
@@ -100,22 +100,35 @@ interface TenderDetailTabItem {
           @if (hasAlerts()) {
             <div class="space-y-1.5">
               @if (canAppealSelected()) {
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 text-xs" role="alert">
-                  <p class="m-0 text-xs leading-snug">
-                    <strong class="font-semibold">Rejected:</strong>
-                    {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
-                    <span class="text-rose-700 font-medium ml-1">(Action required: 7 days to appeal and respond with documents)</span>
-                  </p>
-                  <button appButton size="xs" type="button" (click)="openAppealFlow()" class="shrink-0">
-                    Appeal Request
-                  </button>
-                </div>
-              } @else if (selectedTender()?.submittedStatus === 'Rejected' && selectedTender()?.appeal?.status === 'Rejected') {
+                @if (selectedTender()!.submittedStatus === 'Rejected') {
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 text-xs" role="alert">
+                    <p class="m-0 text-xs leading-snug">
+                      <strong class="font-semibold">Rejected:</strong>
+                      {{ selectedTender()!.rejectionReason || 'Technical qualification criteria not met.' }}
+                      <span class="text-rose-700 font-medium ml-1">({{ appealDaysLabel(selectedTender()!) }})</span>
+                    </p>
+                    <button appButton size="xs" type="button" (click)="openAppealFlow()" class="shrink-0 font-semibold" title="Appeal Request">
+                      Appeal Request
+                    </button>
+                  </div>
+                } @else {
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-900 text-xs" role="alert">
+                    <p class="m-0 text-xs leading-snug">
+                      <strong class="font-semibold">Approved:</strong>
+                      Application approved by the department scrutiny committee.
+                      <span class="text-emerald-700 font-medium ml-1">({{ appealDaysLabel(selectedTender()!) }})</span>
+                    </p>
+                    <button appButton size="xs" type="button" (click)="openAppealFlow()" class="shrink-0 font-semibold" title="Appeal Request">
+                      Appeal Request
+                    </button>
+                  </div>
+                }
+              } @else if (selectedTender()?.appeal?.status === 'Rejected') {
                 <div class="flex items-start gap-2 px-3 py-1.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-900 text-xs" role="alert">
                   <app-icon name="close" size="sm" class="text-rose-600 shrink-0 mt-0.5" />
                   <div class="space-y-0.5">
                     <p class="m-0 text-xs leading-snug">
-                      <strong class="font-semibold">Application Rejected:</strong>
+                      <strong class="font-semibold">Appeal Rejected:</strong>
                       {{ selectedTender()!.appeal?.rejectionReason || selectedTender()!.rejectionReason || 'Appeal rejected after review.' }}
                     </p>
                     <p class="m-0 text-[11px] text-rose-700">
@@ -123,12 +136,12 @@ interface TenderDetailTabItem {
                     </p>
                   </div>
                 </div>
-              } @else if (selectedTender()?.appeal && selectedTender()?.appeal?.status !== 'Rejected' && selectedTender()?.submittedStatus !== 'Approved') {
+              } @else if (selectedTender()?.appeal && selectedTender()?.appeal?.status !== 'Rejected') {
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 text-xs" role="alert">
                   <app-icon name="alert-triangle" size="sm" class="text-amber-600 shrink-0" />
                   <p class="m-0 text-xs leading-snug">
                     <strong class="font-semibold">Appeal Under Review:</strong>
-                    Your appeal request and supporting documents submitted on {{ selectedTender()!.appeal!.submittedOn }} are currently under review by the department scrutiny committee.
+                    Your appeal remarks submitted on {{ selectedTender()!.appeal!.submittedOn }} are currently under review by the department scrutiny committee.
                   </p>
                 </div>
               }
@@ -298,6 +311,10 @@ export class TenderStatusComponent {
     return remainingDaysText(dueDate);
   }
 
+  appealDaysLabel(tender: SubmittedTender): string {
+    return remainingAppealDaysText(tender);
+  }
+
   /** The rejected application whose appeal form is open. */
   readonly appealingTender = signal<SubmittedTender | null>(null);
 
@@ -313,8 +330,7 @@ export class TenderStatusComponent {
     if (!t) return false;
     return (
       this.canAppealSelected() ||
-      (t.submittedStatus === 'Rejected' && t.appeal?.status === 'Rejected') ||
-      (!!t.appeal && t.appeal.status !== 'Rejected' && t.submittedStatus !== 'Approved') ||
+      !!t.appeal ||
       this.isEditing()
     );
   });
@@ -323,7 +339,7 @@ export class TenderStatusComponent {
   readonly tabs = computed<TenderDetailTabItem[]>(() => {
     const tender = this.selectedTender();
     const shortfalls = this.pendingNoticeCount();
-    const hasAppeal = tender ? !!tender.appeal || tender.submittedStatus === 'Rejected' : false;
+    const hasAppeal = tender ? !!tender.appeal || tender.submittedStatus === 'Rejected' || tender.submittedStatus === 'Approved' || tender.submittedStatus === 'Accepted' : false;
 
     const tabs: TenderDetailTabItem[] = [
       { id: 'organisation', label: 'Organisation', icon: 'building' },
@@ -338,7 +354,7 @@ export class TenderStatusComponent {
         id: 'shortfall',
         label: 'Appeal',
         icon: 'alert-triangle',
-        badgeColor: shortfalls > 0 ? 'amber' : (tender?.appeal?.status === 'Pending' ? 'amber' : 'rose')
+        badgeColor: shortfalls > 0 ? 'amber' : (tender?.appeal?.status === 'Pending' ? 'amber' : (tender?.submittedStatus === 'Approved' && !tender?.appeal ? undefined : 'rose'))
       });
     }
 

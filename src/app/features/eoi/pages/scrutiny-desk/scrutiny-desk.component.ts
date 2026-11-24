@@ -267,6 +267,9 @@ export class ScrutinyDeskComponent {
   }
 
   protected getRejectionReason(app: ApplicantResponse): string {
+    if (app.status === 'APPROVED') {
+      return app.scrutinyDetails?.remarks || 'Application proposal approved by the scrutiny committee.';
+    }
     const disqualification = app.scrutinyDetails?.disqualificationReason;
     if (disqualification && disqualification !== app.appeal?.reply) {
       return disqualification;
@@ -451,7 +454,7 @@ export class ScrutinyDeskComponent {
       activityLog: [...this.getActivityLog(), newActivity]
     });
 
-    this.shortfallBridge.syncStatusToTender(app.id, 'APPROVED').pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.shortfallBridge.syncStatusToTender(app.id, 'APPROVED', submission.remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
 
     this.closeModals();
     this.notifications.success(`${app.anonymousLabel} has been approved (grade ${grade}).`, 'Application Approved');

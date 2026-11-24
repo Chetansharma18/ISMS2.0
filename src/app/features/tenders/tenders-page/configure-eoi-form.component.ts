@@ -77,11 +77,11 @@ import {
           </label>
           <app-dropdown
             inputId="eoiSchemeCategorySelect"
-            [options]="schemeCategoryOptions()"
+            [options]="availableSchemeCategoryOptions()"
             [value]="data().schemeCategory"
             (valueChange)="data().schemeCategory = $event; onFieldChange('schemeCategory')"
             [disabled]="isCategoryLocked()"
-            placeholder="-- Select Scheme Category --"
+            [placeholder]="data().scheme ? '-- Select Scheme Category --' : 'Auto-filled from Scheme'"
             [invalid]="hasError('schemeCategory')"
           />
           @if (hasError('schemeCategory')) {
@@ -512,16 +512,25 @@ export class ConfigureEoiFormComponent {
     return '2099-12-31';
   });
 
-  /** Whether the Scheme Category is locked because the Scheme has a single designated category. */
+  /** Available options for Scheme Category (empty when no scheme is selected). */
+  readonly availableSchemeCategoryOptions = computed(() => {
+    this.formVersion();
+    this.externalVersion();
+    const schemeName = this.data()?.scheme?.trim();
+    if (!schemeName) return [];
+    return this.schemeCategoryOptions();
+  });
+
+  /** Whether the Scheme Category is locked (locked when no scheme is selected or when auto-filled from scheme master). */
   readonly isCategoryLocked = computed(() => {
     this.formVersion();
     this.externalVersion();
     const schemeName = this.data()?.scheme?.trim().toLowerCase();
-    if (!schemeName) return false;
+    if (!schemeName) return true;
     const match = this.schemeMasterItems().find(
       s => s.schemeName?.trim().toLowerCase() === schemeName
     );
-    return !!match?.schemeCategory;
+    return !!match?.schemeCategory || !!this.data()?.schemeCategory;
   });
 
   /** Real-time form validation state using government standards. */

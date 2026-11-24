@@ -23,12 +23,12 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
       [showAccentBar]="false"
       [primaryLabel]="editing() ? 'Save Changes' : 'Submit'"
       secondaryLabel=""
-      maxWidthClass="max-w-[780px]"
+      size="xl"
       (primaryAction)="save.emit()"
       (secondaryAction)="cancelled.emit()"
       (close)="cancelled.emit()"
     >
-      <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+      <h2 class="m-0 text-[#7C0E44] text-[18px] font-semibold leading-6 tracking-tight">
         {{ editing() ? 'Edit User' : 'Add New User' }}
       </h2>
 

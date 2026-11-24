@@ -6,12 +6,18 @@ import {
   signal,
   ElementRef,
   HostListener,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  ViewChild,
+  Injector,
+  afterNextRender,
+  inject,
+  OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../icon/icon.component';
 import { ButtonComponent } from '../../button/button.component';
+import { OverlayService, ConnectedOverlayRef } from '../../../services/overlay.service';
 
 /** One choice of a select: the value it stores and the text it shows. */
 export interface SelectItem {
@@ -45,6 +51,7 @@ export interface SelectItem {
 
       <!-- Select Button / Display Box -->
       <button
+        #trigger
         [id]="id"
         type="button"
         (click)="toggleDropdown()"
@@ -95,11 +102,8 @@ export interface SelectItem {
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
       @if (isOpen()) {
         <div
-          class="absolute left-0 right-0 z-50 bg-white rounded-[4px] border border-theme shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
-          [class.top-full]="openDirection() === 'down'"
-          [class.mt-1]="openDirection() === 'down'"
-          [class.bottom-full]="openDirection() === 'up'"
-          [class.mb-1]="openDirection() === 'up'"
+          #panel
+          class="bg-white rounded-[6px] border border-theme shadow-[0_12px_32px_rgba(31,41,51,0.16)] overflow-hidden font-sans"
           role="listbox"
         >
           <!-- Search input for large lists -->
@@ -232,9 +236,16 @@ export interface SelectItem {
     }
   `]
 })
-export class FormSelectComponent {
+export class FormSelectComponent implements OnDestroy {
   private static nextId = 0;
   readonly id = `form-select-${++FormSelectComponent.nextId}`;
+
+  @ViewChild('trigger') triggerElement?: ElementRef<HTMLButtonElement>;
+  @ViewChild('panel') panelElement?: ElementRef<HTMLElement>;
+
+  private overlayService = inject(OverlayService);
+  private injector = inject(Injector);
+  private overlayRef: ConnectedOverlayRef | null = null;
 
   @Input() label: string = '';
   @Input() value: string = '';
@@ -317,9 +328,40 @@ export class FormSelectComponent {
       this.searchQuery.set('');
       if (willOpen) {
         this.updateDirection();
+        afterNextRender(() => {
+          const panel = this.panelElement?.nativeElement;
+          const trigger = this.triggerElement?.nativeElement;
+          if (panel && trigger) {
+            this.overlayRef = this.overlayService.attachConnectedOverlay(
+              trigger,
+              panel,
+              { preferredMaxHeight: 280, gap: 4 },
+              () => this.closeDropdown()
+            );
+          }
+        }, { injector: this.injector });
       } else {
-        this.blur.emit();
+        this.closeDropdown();
       }
+    }
+  }
+
+  closeDropdown(): void {
+    if (!this.isOpen()) return;
+    this.isOpen.set(false);
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
+    this.blur.emit();
+  }
+
+  ngOnDestroy(): void {
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
     }
   }
 
@@ -437,10 +479,12 @@ export class FormSelectComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
+    const target = event.target as Node;
+    const inHost = this.elementRef.nativeElement.contains(target);
+    const inPanel = this.panelElement?.nativeElement?.contains(target);
+    if (!inHost && !inPanel) {
       if (this.isOpen()) {
-        this.isOpen.set(false);
-        this.blur.emit();
+        this.closeDropdown();
       }
     }
   }

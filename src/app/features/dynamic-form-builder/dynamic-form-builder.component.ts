@@ -110,14 +110,11 @@ interface FormBuilderFormData {
             </button>
           </div>
 
-          <!-- Page Title & Subtitle Matching Government Theme -->
+          <!-- Page Title Matching Government Theme -->
           <div>
             <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
               {{ isEditing() ? 'Edit Dynamic Form' : 'Create Dynamic Form' }}
             </h1>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">
-              Configure form name, choose whether it's a step-form wizard, and design fields. Drag fields to reorder.
-            </p>
           </div>
 
           <!-- Main White Card Container -->
@@ -676,9 +673,7 @@ interface FormBuilderFormData {
         <app-page-header
           title="Dynamic Form Builder"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
-          [searchable]="true"
-          searchPlaceholder="Search by form name, step, or field..."
-          [(searchQuery)]="searchQuery"
+          [searchable]="false"
         >
           <button
             appButton

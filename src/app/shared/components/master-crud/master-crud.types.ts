@@ -28,6 +28,13 @@ export interface MasterFilterConfig {
 }
 
 export interface MasterCrudConfig<T extends { id: string; status?: string } = any> {
+  /**
+   * Display mode for Add/Edit form and View Details:
+   * - 'modal' (default): opens centered popup modal dialogs
+   * - 'screen': seamlessly switches the current page view into an in-screen form/detail view with Back button,
+   *   ideal when there is extensive information (like Course Master with 12+ fields).
+   */
+  displayMode?: 'modal' | 'screen';
   /** DataEngineService resource key, e.g. 'SECTORS', 'DESIGNATIONS' */
   dataKey: string;
   /** Human label for the entity, e.g. "Sector", "Designation" */

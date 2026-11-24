@@ -11,7 +11,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
-  ActionModalComponent,
   ButtonComponent,
   IconComponent,
   InputDirective
@@ -33,85 +32,116 @@ import { DataEngineService } from '../../core/services/data-engine.service';
   imports: [
     CommonModule,
     FormsModule,
-    ActionModalComponent,
     ButtonComponent,
     IconComponent,
     InputDirective
   ],
   template: `
-    <app-action-modal
-      [isOpen]="isOpen()"
-      [showCloseButton]="true"
-      [closeOnBackdrop]="true"
-      [showAccentBar]="false"
-      primaryLabel="Done"
-      secondaryLabel=""
-      maxWidthClass="max-w-[760px]"
-      (primaryAction)="closeModal()"
-      (secondaryAction)="closeModal()"
-      (close)="closeModal()"
-    >
-      <!-- Modal Header -->
-      <div class="border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2.5">
-          <span class="w-8 h-8 rounded-lg bg-[#F8EDF1] text-[#7C0E44] flex items-center justify-center shrink-0">
-            <app-icon name="clipboard-check" size="md" />
-          </span>
-          <div class="min-w-0">
-            <h2 class="m-0 text-base sm:text-lg font-bold text-slate-900 leading-tight">
-              Scheme Requirements &amp; Fields Manager
-            </h2>
-            <p class="m-0 text-xs text-slate-500 mt-0.5 truncate">
-              {{ scheme()?.schemeName }}
-            </p>
+    <div class="space-y-5 animate-in fade-in duration-150 font-sans">
+      <!-- Top Navigation Bar: Back & Done -->
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <button
+          appButton
+          variant="outline"
+          size="sm"
+          type="button"
+          (click)="closeModal()"
+          class="group inline-flex items-center gap-2"
+        >
+          <app-icon name="back" size="sm" />
+          <span>Back to Scheme Master</span>
+        </button>
+
+        <button
+          appButton
+          size="sm"
+          type="button"
+          (click)="closeModal()"
+          class="inline-flex items-center gap-1.5"
+        >
+          <app-icon name="check" size="xs" />
+          <span>Done</span>
+        </button>
+      </div>
+
+      <!-- Main White Container Card -->
+      <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 space-y-6">
+        <!-- Header -->
+        <div class="border-b border-slate-200 pb-4">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-lg bg-[#F8EDF1] text-[#7C0E44] flex items-center justify-center shrink-0">
+                <app-icon name="clipboard-check" size="lg" />
+              </span>
+              <div class="min-w-0">
+                <h1 class="m-0 text-xl sm:text-2xl font-bold text-[#7C0E44] tracking-tight leading-tight">
+                  Scheme Documents, Annexures &amp; Field Configuration
+                </h1>
+                <div class="flex items-center gap-2.5 mt-1.5 flex-wrap">
+                  <span class="text-xs text-slate-500 font-medium">Scheme:</span>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                    {{ scheme()?.schemeName }}
+                  </span>
+                  @if (scheme()?.schemeCategory) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                      Category: {{ scheme()?.schemeCategory }}
+                    </span>
+                  }
+                  @if (scheme()?.categoryName) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700">
+                      EOI Category: {{ scheme()?.categoryName }}
+                    </span>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab Bar -->
+          <div class="mt-5 flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
+            <button
+              appButton
+              [variant]="activeTab() === 'docs' ? 'primary' : 'ghost'"
+              size="sm"
+              type="button"
+              (click)="activeTab.set('docs')"
+            >
+              Documents ({{ documents().length }})
+            </button>
+            <button
+              appButton
+              [variant]="activeTab() === 'annexures' ? 'primary' : 'ghost'"
+              size="sm"
+              type="button"
+              (click)="activeTab.set('annexures')"
+            >
+              Annexures ({{ annexures().length }})
+            </button>
+            <button
+              appButton
+              [variant]="activeTab() === 'fields' ? 'primary' : 'ghost'"
+              size="sm"
+              type="button"
+              (click)="activeTab.set('fields')"
+            >
+              Proposal Fields ({{ customFields().length }})
+            </button>
+            <button
+              appButton
+              [variant]="activeTab() === 'snapshots' ? 'primary' : 'ghost'"
+              size="sm"
+              type="button"
+              (click)="activeTab.set('snapshots')"
+            >
+              EOI Usage &amp; History
+            </button>
           </div>
         </div>
-
-        <!-- Tab Bar -->
-        <div class="mt-4 flex flex-wrap items-center gap-2 border-b border-slate-200 pb-2">
-          <button
-            appButton
-            [variant]="activeTab() === 'docs' ? 'primary' : 'ghost'"
-            size="sm"
-            type="button"
-            (click)="activeTab.set('docs')"
-          >
-            Documents ({{ documents().length }})
-          </button>
-          <button
-            appButton
-            [variant]="activeTab() === 'annexures' ? 'primary' : 'ghost'"
-            size="sm"
-            type="button"
-            (click)="activeTab.set('annexures')"
-          >
-            Annexures ({{ annexures().length }})
-          </button>
-          <button
-            appButton
-            [variant]="activeTab() === 'fields' ? 'primary' : 'ghost'"
-            size="sm"
-            type="button"
-            (click)="activeTab.set('fields')"
-          >
-            Proposal Fields ({{ customFields().length }})
-          </button>
-          <button
-            appButton
-            [variant]="activeTab() === 'snapshots' ? 'primary' : 'ghost'"
-            size="sm"
-            type="button"
-            (click)="activeTab.set('snapshots')"
-          >
-            EOI Usage &amp; History
-          </button>
-        </div>
-      </div>
 
       <!-- Tab 1: Documents -->
       @if (activeTab() === 'docs') {
         <div class="space-y-4 pt-3">
-          <div class="max-h-[300px] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg">
+          <div class="max-h-[46vh] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg shadow-2xs bg-white">
             @if (documents().length === 0) {
               <div class="p-5 text-center text-xs text-slate-500">
                 No documents currently mapped to this scheme. Add one from the library below.
@@ -204,7 +234,7 @@ import { DataEngineService } from '../../core/services/data-engine.service';
       <!-- Tab 2: Annexures -->
       @if (activeTab() === 'annexures') {
         <div class="space-y-4 pt-3">
-          <div class="max-h-[300px] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg">
+          <div class="max-h-[46vh] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg shadow-2xs bg-white">
             @if (annexures().length === 0) {
               <div class="p-5 text-center text-xs text-slate-500">
                 No annexures currently mapped to this scheme. Add one from the library below.
@@ -297,7 +327,7 @@ import { DataEngineService } from '../../core/services/data-engine.service';
       <!-- Tab 3: Custom Proposal Dynamic Fields -->
       @if (activeTab() === 'fields') {
         <div class="space-y-4 pt-3">
-          <div class="max-h-[260px] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg">
+          <div class="max-h-[42vh] overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg shadow-2xs bg-white">
             @if (customFields().length === 0) {
               <div class="p-5 text-center text-xs text-slate-500">
                 No scheme-specific custom fields configured. Add fields below to display Step 2 "Scheme Proposal Details" in the EOI form.
@@ -455,7 +485,8 @@ import { DataEngineService } from '../../core/services/data-engine.service';
           </div>
         </div>
       }
-    </app-action-modal>
+      </div>
+    </div>
   `
 })
 export class SchemeRequirementsModalComponent {

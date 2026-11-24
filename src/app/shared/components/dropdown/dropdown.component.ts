@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   Injector,
+  OnDestroy,
   afterNextRender,
   booleanAttribute,
   computed,
@@ -16,6 +17,7 @@ import {
 import { ButtonComponent } from '../button/button.component';
 import { InputDirective } from '../form-controls/input/input.directive';
 import { IconComponent } from '../icon/icon.component';
+import { OverlayService, ConnectedOverlayRef } from '../../services/overlay.service';
 
 /** One entry of the list. A plain string is used as both the value and the label. */
 export interface DropdownItem {
@@ -113,17 +115,12 @@ let nextDropdownId = 0;
 
     @if (isOpen()) {
       <div
-        class="bg-white border border-theme rounded-[4px] overflow-hidden"
+        #dropdownPanel
+        class="bg-white border border-theme rounded-[6px] overflow-hidden"
         [class.mt-1]="!overlay() || resolvedDirection() === 'down'"
-        [class.mb-1]="overlay() && resolvedDirection() === 'up'"
+        [class.mb-1]="!overlay() && resolvedDirection() === 'up'"
         [class.shadow-xs]="!overlay()"
-        [class.absolute]="overlay()"
-        [class.left-0]="overlay()"
-        [class.right-0]="overlay()"
-        [class.top-full]="overlay() && resolvedDirection() === 'down'"
-        [class.bottom-full]="overlay() && resolvedDirection() === 'up'"
-        [class.z-50]="overlay()"
-        [class.shadow-[0_8px_24px_rgba(31,41,51,0.12)]]="overlay()"
+        [class.shadow-[0_12px_32px_rgba(31,41,51,0.16)]]="overlay()"
       >
         @if (searchable()) {
           <div class="p-2 border-b border-theme bg-surface-muted">
@@ -209,12 +206,15 @@ let nextDropdownId = 0;
     }
   `
 })
-export class DropdownComponent {
+export class DropdownComponent implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
+  private readonly overlayService = inject(OverlayService);
+  private overlayRef: ConnectedOverlayRef | null = null;
 
   private readonly trigger = viewChild.required<ElementRef<HTMLButtonElement>>('trigger');
   private readonly searchBox = viewChild<ElementRef<HTMLInputElement>>('search');
+  private readonly dropdownPanel = viewChild<ElementRef<HTMLElement>>('dropdownPanel');
 
   /** `string[]` or `{ value, label, disabled? }[]`. */
   readonly options = input<readonly DropdownOption[]>([]);
@@ -248,7 +248,9 @@ export class DropdownComponent {
   /** Multi mode shows the joined labels up to this many options, then "n selected". 0 always shows the count. */
   readonly maxLabels = input(2);
   /** Float the list over the content below instead of pushing it down. Defaults to true. */
-  readonly overlay = input(true, { transform: booleanAttribute });
+  readonly overlay = input<boolean, unknown>(true, {
+    transform: (v: unknown) => (v === undefined || v === '' ? true : booleanAttribute(v))
+  });
   /** Multi mode: footer with the selected count and a Done button. */
   readonly footer = input(false, { transform: booleanAttribute });
   /** Opening direction: 'down' (default), 'up' (drop-up), or 'auto' (detects available space in viewport). */
@@ -358,7 +360,20 @@ export class DropdownComponent {
     if (!this.isOpen()) return;
     this.isOpen.set(false);
     this.activeIndex.set(-1);
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
     if (restoreFocus) this.trigger().nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
   }
 
   private openPanel(): void {
@@ -369,6 +384,14 @@ export class DropdownComponent {
     this.activeIndex.set(selected);
     afterNextRender(
       () => {
+        if (this.overlay() && this.dropdownPanel() && this.trigger()) {
+          this.overlayRef = this.overlayService.attachConnectedOverlay(
+            this.trigger().nativeElement,
+            this.dropdownPanel()!.nativeElement,
+            { preferredMaxHeight: 280, gap: 4 },
+            () => this.close()
+          );
+        }
         this.searchBox()?.nativeElement.focus();
         this.scrollActiveIntoView();
       },
@@ -487,7 +510,13 @@ export class DropdownComponent {
 
   /** Host listener: a click or focus outside the dropdown closes the list. */
   onOutside(event: Event): void {
-    if (this.isOpen() && !event.composedPath().includes(this.host.nativeElement)) this.close();
+    if (!this.isOpen()) return;
+    const path = event.composedPath();
+    const inHost = path.includes(this.host.nativeElement);
+    const inPanel = this.dropdownPanel() ? path.includes(this.dropdownPanel()!.nativeElement) : false;
+    if (!inHost && !inPanel) {
+      this.close();
+    }
   }
 
   private move(delta: 1 | -1): void {

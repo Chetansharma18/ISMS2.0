@@ -17,13 +17,7 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
     <app-page-header
       title="Active Schemes"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Configuration' }, { label: 'Active Schemes' }]"
-      [searchable]="true"
-      searchPlaceholder="Search by scheme name, ref no, category..."
-      [(searchQuery)]="searchQuery"
-      [suggestions]="suggestions()"
-      (search)="searchChange.emit($event)"
-      (clear)="searchChange.emit('')"
-      (suggestionSelect)="searchChange.emit($event)"
+      [searchable]="false"
     >
       @if (isSuperAdmin()) {
         <button

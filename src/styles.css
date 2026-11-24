@@ -102,24 +102,36 @@
   --color-border: #EADCE2;
   --color-field-border: #E5D6DE;
 
-  /* Typography System (Strict Inter Font & Standardized Clean Sizing) */
+  /* Typography System (Strict Inter Font & Enterprise Scale) */
   --font-family-base: var(--font-sans);
 
-  /* Enterprise Portal Header & Content Tokens (Compact & Standardized) */
+  /* Enterprise Scale Tokens */
+  --font-size-page-title: 24px;
+  --font-size-section-title: 18px;
+  --font-size-modal-title: 18px;
+  --font-size-modal-desc: 13px;
+  --font-size-form-label: 13px;
+  --font-size-input-value: 14px;
+  --font-size-dropdown-option: 14px;
+  --font-size-table-header: 13px;
+  --font-size-table-content: 14px;
+  --font-size-readonly-label: 12px;
+  --font-size-readonly-value: 14px;
+  --font-size-button: 14px;
+  --font-size-helper: 12px;
+  --font-size-validation: 12px;
+
+  /* Legacy aliases for compatibility */
   --portal-font-size-title: 18px;
-  --portal-font-size-body: 15px;
-  --portal-font-size-label: 14px;
+  --portal-font-size-body: 14px;
+  --portal-font-size-label: 13px;
   --portal-font-size-table: 14px;
   --portal-font-size-small: 13px;
-
-  /* Standardized Global Heading & Body Sizing */
-  --font-size-page-title: 22px;
-  --font-size-section-title: 18px;
   --font-size-card-title: 16px;
-  --font-size-body: 15px;
-  --font-size-label: 14px;
+  --font-size-body: 14px;
+  --font-size-label: 13px;
   --font-size-table: 14px;
-  --font-size-small: 13px;
+  --font-size-small: 12px;
   --font-size-caption: 12px;
 
   /* Font Weights */
@@ -132,7 +144,7 @@
   --line-height-body: 20px;
   --line-height-heading: 24px;
 
-  /* Spacing */
+  /* Spacing Tokens */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -143,14 +155,36 @@
   --space-8: 40px;
   --space-9: 48px;
 
-  /* Radius */
-  --radius-control: 4px;
-  --radius-card: 6px;
-  --radius-modal: 8px;
+  /* Form & Component Gaps */
+  --gap-field: 16px;
+  --gap-label-input: 6px;
+  --gap-validation: 4px;
 
-  /* Control Heights */
-  --height-input: 38px;
-  --height-button: 38px;
+  /* Radius Tokens */
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* Dimensions */
+  --height-input: 40px;
+  --height-button: 40px;
+  --modal-max-height: 90dvh;
+  --modal-padding-desktop: 24px;
+  --modal-padding-mobile: 16px;
+
+  /* Semantic Feedback Colors */
+  --color-success: #10B981;
+  --color-success-dark: #059669;
+  --color-success-light: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-warning-dark: #D97706;
+  --color-warning-light: #FFFBEB;
+  --color-error: #EF4444;
+  --color-error-dark: #DC2626;
+  --color-error-light: #FEF2F2;
+  --color-info: #3B82F6;
+  --color-info-dark: #2563EB;
+  --color-info-light: #EFF6FF;
 
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(31, 41, 51, 0.06);

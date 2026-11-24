@@ -82,7 +82,6 @@ interface EditPermissionForm {
       <!-- Page Header -->
       <app-page-header
         title="Permission Management"
-        subtitle="Configure page-level access permissions (View, Edit, Delete) for system roles"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Permission Management' }]"
       >
         <!-- Add Permission Button -->

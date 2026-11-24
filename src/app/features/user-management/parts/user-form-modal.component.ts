@@ -132,6 +132,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="10"
               placeholder="10-digit mobile number"
               [(ngModel)]="f.mobileNo"
+              (keydown)="filterNumericKey($event)"
+              (input)="onMobileInput($event)"
               [invalid]="isSubmitted && !f.mobileNo"
               class="w-full"
             />
@@ -147,6 +149,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               appInput
               size="sm"
               type="date"
+              [max]="maxDateOfBirth"
               [(ngModel)]="f.dateOfBirth"
               class="w-full"
             />
@@ -161,6 +164,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="12"
               placeholder="12-digit Aadhaar number"
               [(ngModel)]="f.aadhaarId"
+              (keydown)="filterNumericKey($event)"
+              (input)="onAadhaarInput($event)"
               class="w-full tabular-nums"
             />
           </div>
@@ -220,7 +225,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               appInput
               size="sm"
               [(ngModel)]="f.blockName"
-              class="w-full"
+              class="w-full transition-none"
+              style="transition: none !important;"
             >
               <option value="All Blocks">All Blocks</option>
               @for (block of activeBlockOptions(); track block) {
@@ -251,6 +257,34 @@ export class UserFormModalComponent {
 
   readonly save = output<void>();
   readonly cancelled = output<void>();
+
+  readonly maxDateOfBirth = new Date().toISOString().split('T')[0];
+
+  filterNumericKey(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'
+    ];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 10);
+    input.value = cleaned;
+    this.formData().mobileNo = cleaned;
+  }
+
+  onAadhaarInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 12);
+    input.value = cleaned;
+    this.formData().aadhaarId = cleaned;
+  }
 
   isRoleDisabled(role: string): boolean {
     const r = (role || '').trim().toLowerCase();

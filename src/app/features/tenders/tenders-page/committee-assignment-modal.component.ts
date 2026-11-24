@@ -51,7 +51,7 @@ import { filterAdmins } from './tenders-page.util';
               </span>
             </div>
             <p
-              class="text-[11px] text-slate-600 m-0 line-clamp-1 hover:line-clamp-none transition-all cursor-default"
+              class="text-[11px] text-slate-600 m-0 leading-relaxed max-h-24 overflow-y-auto pr-1"
               [title]="s.eoiDescription"
             >
               {{ s.eoiDescription }}

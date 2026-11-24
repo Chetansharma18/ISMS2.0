@@ -68,7 +68,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   dataKey: 'SCHEME_MASTERS',
   entityLabel: 'Scheme',
   title: 'Scheme Master',
-  searchPlaceholder: 'Search by scheme name, category, or EOI category...',
+  searchPlaceholder: 'Search schemes, categories...',
   searchFields: ['schemeName', 'schemeCategory', 'categoryName'],
   itemUnit: 'schemes',
   columns: COLUMNS,

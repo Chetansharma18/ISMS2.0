@@ -1798,7 +1798,7 @@ interface FormBuilderFormData {
               </button>
 
             <!-- Title & Mandatory Notice -->
-            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
+            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1 pr-12">
               <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight m-0">
                 {{ form.formType }}
               </h1>
@@ -3417,6 +3417,20 @@ export class DynamicFormBuilderComponent {
 
   previewNextStep(form: DynamicFormBuilderItem): void {
     if (form.steps && this.previewStepIndex() < form.steps.length - 1) {
+      const currentStep = form.steps[this.previewStepIndex()];
+      if (currentStep && currentStep.fields) {
+        const missingMandatory = currentStep.fields.filter(f => {
+          if (!f.mandatory) return false;
+          if (f.type === 'heading' || f.type === 'divider') return false;
+          const val = this.previewFormValues[f.id];
+          return val === undefined || val === null || String(val).trim() === '';
+        });
+        if (missingMandatory.length > 0) {
+          const names = missingMandatory.map(f => f.label).slice(0, 2).join(', ');
+          this.notification.error(`Please fill in mandatory fields (${names}) before proceeding.`);
+          return;
+        }
+      }
       this.previewStepIndex.update(idx => idx + 1);
     }
   }

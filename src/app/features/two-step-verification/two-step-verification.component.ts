@@ -424,8 +424,8 @@ export class TwoStepVerificationComponent implements OnInit {
     const unconfigured = this.availableRoles().find(r => !existingRoles.includes(r));
 
     this.formData = {
-      roleType: unconfigured || this.availableRoles()[0] || '',
-      authTypes: ['OTP']
+      roleType: '',
+      authTypes: []
     };
     this.showModal.set(true);
   }

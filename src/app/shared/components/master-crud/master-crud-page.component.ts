@@ -75,7 +75,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           size="sm"
           type="button"
           (click)="openAddModal()"
-          class="shrink-0"
+          class="btn btn-primary btn-sm shrink-0"
         >
           <app-icon name="plus" size="sm" />
           <span>Add {{ config.entityLabel }}</span>
@@ -193,8 +193,9 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
+        [showFooterDivider]="false"
         [primaryLabel]="config.primaryActionLabel || 'Save'"
-        secondaryLabel=""
+        secondaryLabel="Cancel"
         [maxWidthClass]="config.modalWidthClass || 'max-w-[520px]'"
         (primaryAction)="submit()"
         (secondaryAction)="closeModal()"
@@ -204,7 +205,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
         </h2>
 
-        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto px-2 py-1">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @for (field of config.fields; track field.key) {
               <div [ngClass]="colSpanClass(field)">
@@ -222,13 +223,19 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                       [(ngModel)]="formData[field.key]"
                       class="w-full"
                     ></textarea>
+                    @if (field.maxLength) {
+                      <div class="text-right text-[11px] text-slate-400 mt-1 tabular-nums">
+                        {{ (formData[field.key] || '').length }}/{{ field.maxLength }}
+                      </div>
+                    }
                   }
                   @case ('select') {
                     <select
                       appInput
                       [(ngModel)]="formData[field.key]"
                       [invalid]="fieldInvalid(field)"
-                      class="w-full"
+                      class="w-full transition-none"
+                      style="transition: none !important;"
                     >
                       <option value="" disabled selected>Select {{ field.label }}</option>
                       @for (opt of resolveOptions(field); track opt) {

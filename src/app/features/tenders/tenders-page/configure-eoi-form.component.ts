@@ -69,7 +69,7 @@ import {
             (ngModelChange)="onSchemeChange($event)"
             (blur)="onBlur('scheme')"
             [invalid]="hasError('scheme')"
-            class="w-full"
+            class="w-full pr-10"
           >
             <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
             @for (name of schemeNameOptions(); track name) {
@@ -95,7 +95,7 @@ import {
             [class.bg-slate-50]="isCategoryLocked()"
             [class.cursor-not-allowed]="isCategoryLocked()"
             [invalid]="hasError('schemeCategory')"
-            class="w-full"
+            class="w-full pr-10"
           >
             <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
             @for (cat of schemeCategoryOptions(); track cat) {
@@ -119,7 +119,7 @@ import {
             (blur)="onBlur('eoiCategory')"
             (ngModelChange)="onFieldChange('eoiCategory')"
             [invalid]="hasError('eoiCategory')"
-            class="w-full"
+            class="w-full pr-10"
           >
             <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
             @for (eoiCat of eoiCategoryOptions(); track eoiCat) {

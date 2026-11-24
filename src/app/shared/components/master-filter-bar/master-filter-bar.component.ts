@@ -42,7 +42,7 @@ export interface StatusFilterOption {
               [placeholder]="searchPlaceholder()"
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
-              class="w-full pl-8 pr-7 text-xs font-medium"
+              class="w-full pl-8 pr-7 text-xs font-medium focus:outline-none"
             />
             @if (searchQuery()) {
               <button

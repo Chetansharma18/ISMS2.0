@@ -8,209 +8,94 @@ import { StorageService } from '../../../../core/services/storage.service';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
 import { AspirantPortalService } from '../../../aspirant/services/aspirant-portal.service';
 import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dept-admin-otp-modal/dept-admin-otp-modal.component';
-import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
+import { ButtonComponent, IconComponent, IconName } from '../../../../shared';
 
 @Component({
   selector: 'app-sso-login',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent, ButtonComponent, IconComponent, InputDirective],
+  imports: [CommonModule, FormsModule, RouterModule, DeptAdminOtpModalComponent, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full min-h-full flex flex-col bg-white'
   },
   template: `
-    <div class="w-full min-h-full flex flex-col justify-between bg-white text-slate-800 font-sans selection:bg-sso-blue selection:text-white">
+    <div class="w-full min-h-full flex flex-col justify-between bg-white text-slate-800 font-sans">
       
-      <!-- Top Notice Banner -->
-      <div class="bg-amber-50 border-b border-amber-200 px-3 sm:px-4 py-2 text-center shrink-0">
-        <div class="max-w-8xl mx-auto flex items-center justify-center gap-2 text-xs sm:text-sm md:text-[15px] font-semibold text-amber-900">
-          <span>
-            <strong class="font-bold">PROTOTYPE NOTICE:</strong> This is a dummy login screen for testing and demonstration purposes. It will be replaced by the official Rajasthan SSO (sso.rajasthan.gov.in) portal integration.
-          </span>
-        </div>
-      </div>
-
-      <!-- Main Two-Column Layout (Generous spacing between left & right, direct-on-screen right form) -->
-      <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-8 lg:px-16 py-4 sm:py-6">
-        <div class="max-w-6xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-24 xl:gap-32 items-center">
+      <!-- Main Content: Roles Selection Screen -->
+      <main class="flex-1 w-full flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 bg-slate-50/50">
+        <div class="max-w-xl w-full mx-auto bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
           
-          <!-- Left Column: Official Statistics (G2G, G2C/G2B, IDENTITIES) with enlarged typography -->
-          <div class="space-y-6 lg:space-y-8">
-            
-            <!-- G2G APPS -->
-            <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
-                G2G APPS
-              </div>
-              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
-                421
-              </div>
-              <div class="w-full h-px bg-slate-200 mt-6"></div>
+          <!-- Header -->
+          <div class="text-center mb-6">
+            <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
+              <app-icon name="user" size="lg" />
             </div>
-
-            <!-- G2C/ G2B APPS -->
-            <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
-                G2C/ G2B APPS
-              </div>
-              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
-                263
-              </div>
-              <div class="w-full h-px bg-slate-200 mt-6"></div>
-            </div>
-
-            <!-- IDENTITIES -->
-            <div>
-              <div class="text-3xl sm:text-4xl lg:text-[44px] font-black text-sso-blue tracking-tight leading-none mb-3">
-                IDENTITIES
-              </div>
-              <div class="inline-block px-4.5 py-1.5 rounded-lg bg-slate-100 border border-slate-300 text-lg sm:text-xl font-bold text-slate-800 shadow-2xs">
-                34, 204, 388
-              </div>
-            </div>
-
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-tight">
+              Select User Role
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+              Choose a role persona to sign in and access the portal.
+            </p>
           </div>
 
-          <!-- Right Column: Rajasthan SSO Login Form (Direct on screen, NO CARD) -->
-          <div class="w-full max-w-115 mx-auto lg:mx-0">
-            
-            <!-- Direct Title Heading -->
-            <div class="pb-3 border-b-2 border-slate-200 mb-5">
-              <div class="text-base sm:text-lg lg:text-xl font-black text-sso-blue uppercase tracking-wider">
-                RAJASTHAN SSO LOGIN - SIGN IN
-              </div>
-            </div>
-
-            <!-- Direct Form Body -->
-            <form (ngSubmit)="handleLogin()" class="space-y-4">
-              
-              <!-- Email ID / SSOID Field (Underline style) -->
-              <div>
-                <label for="emailOrSsoIdInput" class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1">
-                  SSOID / Email ID
-                </label>
-                <input
-                  appInput
-                  variant="underline"
-                  id="emailOrSsoIdInput"
-                  name="emailOrSsoId"
-                  type="text"
-                  [(ngModel)]="emailOrSsoId"
-                  placeholder="Enter SSOID or Email ID"
-                  class="w-full text-base sm:text-lg"
-                  required
-                />
-              </div>
-
-              <!-- Password Field (Underline style) -->
-              <div>
-                <label for="passwordInput" class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1">
-                  Password
-                </label>
-                <input
-                  appInput
-                  variant="underline"
-                  id="passwordInput"
-                  name="password"
-                  type="password"
-                  [(ngModel)]="password"
-                  placeholder="Enter Password"
-                  class="w-full text-base sm:text-lg tracking-widest"
-                  required
-                />
-              </div>
-
-              <!-- Captcha Row (Security Verification) -->
-              <div>
-                <label class="block text-sm sm:text-[14.5px] font-bold text-slate-700 mb-1.5">
-                  Security Verification
-                </label>
-                <div class="flex items-center gap-3">
-                  <!-- Dotted pattern captcha display -->
+          <!-- Role Cards -->
+          <div class="space-y-3">
+            @for (r of availableRoles; track r.role) {
+              <div
+                (click)="selectAndLogin(r.role)"
+                class="group p-3.5 sm:p-4 rounded-xl border cursor-pointer transition-all flex items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
+                [class]="selectedRole() === r.role ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-slate-200 hover:border-primary/60 hover:bg-slate-50/80'"
+                role="button"
+                tabindex="0"
+                (keydown.enter)="selectAndLogin(r.role)"
+                (keydown.space)="selectAndLogin(r.role); $event.preventDefault()"
+              >
+                <div class="flex items-center gap-3.5 min-w-0">
                   <div
-                    class="px-4 py-2 border border-slate-300 bg-slate-100 rounded-md select-none tabular-nums text-base sm:text-lg font-black text-slate-800 tracking-[0.25em] flex items-center justify-center min-w-30"
-                    style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 6px 6px;"
-                    aria-label="Captcha code"
+                    class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 transition-colors"
+                    [class]="selectedRole() === r.role ? 'bg-primary text-white' : 'bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white'"
                   >
-                    {{ captchaCode() }}
+                    <app-icon [name]="getRoleIcon(r.role)" size="md" />
                   </div>
-
-                  <!-- Captcha Input Box -->
-                  <input
-                    appInput
-                    name="enteredCaptcha"
-                    type="text"
-                    [(ngModel)]="enteredCaptcha"
-                    placeholder="Captcha"
-                    class="w-32 sm:w-36"
-                    required
-                  />
-
-                  <!-- Refresh captcha icon -->
-                  <button
-                    appButton
-                    variant="ghost"
-                    iconOnly
-                    type="button"
-                    (click)="refreshCaptcha()"
-                    title="Refresh Captcha"
-                    aria-label="Refresh Captcha"
-                  >
-                    <app-icon name="refresh" size="lg" [stroke]="2" />
-                  </button>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-bold text-slate-800 text-sm sm:text-base group-hover:text-primary transition-colors">
+                        {{ r.label }}
+                      </span>
+                      <span class="text-[11px] font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">
+                        {{ r.badge }}
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">
+                      {{ r.description }}
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 flex items-center text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all">
+                  <app-icon name="arrow-right" size="sm" />
                 </div>
               </div>
+            }
+          </div>
 
-              <!-- Role Selector Toolbar (Positioned below Security Verification) -->
-              <div class="pt-3 border-t border-slate-200">
-                <span class="block text-xs sm:text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Select Test Persona Role:
-                </span>
-                <div class="grid grid-cols-2 gap-2">
-                  @for (r of availableRoles; track r.role) {
-                    <button
-                      appButton
-                      size="sm"
-                      type="button"
-                      [variant]="selectedRole() === r.role ? 'primary' : 'outline'"
-                      (click)="selectRole(r.role)"
-                      class="justify-between"
-                    >
-                      <span class="truncate">{{ r.label }}</span>
-                      @if (selectedRole() === r.role) {
-                        <span class="text-xs font-bold">&check;</span>
-                      }
-                    </button>
-                  }
-                </div>
-              </div>
-
-              <!-- Submit Button: Verify & Continue -->
-              <div class="pt-2">
-                <button
-                  appButton
-                  size="lg"
-                  block
-                  type="submit"
-                  [loading]="isLoading()"
-                >
-                  @if (isLoading()) {
-                    <span>Verifying with RajSSO...</span>
-                  } @else {
-                    <span>Verify &amp; Continue &rarr;</span>
-                  }
-                </button>
-              </div>
-
-            </form>
-
+          <!-- Bottom Footer Action -->
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+            <span class="text-xs text-slate-400">ISMS 2.0 Portal</span>
+            <button
+              appButton
+              variant="primary"
+              size="md"
+              type="button"
+              (click)="handleLogin()"
+              [loading]="isLoading()"
+            >
+              <span>Sign in as {{ getRoleLabel(selectedRole()) }}</span>
+              <app-icon name="arrow-right" size="xs" />
+            </button>
           </div>
 
         </div>
       </main>
-
-      <!-- Bottom Spacer to keep layout balanced without scrolling -->
-      <div class="shrink-0 h-2"></div>
 
       <!-- Department Admin 6-Digit OTP Modal -->
       <app-dept-admin-otp-modal
@@ -234,27 +119,38 @@ export class SsoLoginComponent {
   selectedRole = signal<UserRole>('new_user');
 
   emailOrSsoId = 'new_user';
-  password = '••••••••••••';
-  enteredCaptcha = '313198';
-  captchaCode = signal<string>('3 1 3 1 9 8');
   isLoading = signal<boolean>(false);
   showDeptAdminOtp = signal<boolean>(false);
+
+  getRoleIcon(role: UserRole): IconName {
+    switch (role) {
+      case 'new_user':
+        return 'user';
+      case 'existing_user':
+        return 'briefcase';
+      case 'dept_admin':
+        return 'building';
+      case 'super_admin':
+        return 'shield-check';
+      case 'aspirant':
+        return 'academic-cap';
+      default:
+        return 'user';
+    }
+  }
+
+  getRoleLabel(role: UserRole): string {
+    return this.availableRoles.find(r => r.role === role)?.label || role;
+  }
 
   selectRole(role: UserRole): void {
     this.selectedRole.set(role);
     this.emailOrSsoId = role === 'aspirant' ? 'aspirant_user' : role;
   }
 
-  refreshCaptcha(): void {
-    const d1 = Math.floor(1 + Math.random() * 9);
-    const d2 = Math.floor(1 + Math.random() * 9);
-    const d3 = Math.floor(1 + Math.random() * 9);
-    const d4 = Math.floor(1 + Math.random() * 9);
-    const d5 = Math.floor(1 + Math.random() * 9);
-    const d6 = Math.floor(1 + Math.random() * 9);
-    const formatted = `${d1} ${d2} ${d3} ${d4} ${d5} ${d6}`;
-    this.captchaCode.set(formatted);
-    this.enteredCaptcha = `${d1}${d2}${d3}${d4}${d5}${d6}`;
+  selectAndLogin(role: UserRole): void {
+    this.selectRole(role);
+    this.executeLogin(role);
   }
 
   handleLogin(): void {
@@ -270,7 +166,6 @@ export class SsoLoginComponent {
       const identifier = this.emailOrSsoId.trim() || (role === 'aspirant' ? 'aspirant_user' : 'new_user');
 
       if (role === 'dept_admin') {
-        // Department Admin requires 6-digit OTP verification first
         this.showDeptAdminOtp.set(true);
         return;
       }
@@ -292,20 +187,16 @@ export class SsoLoginComponent {
       this.authService.loginWithCredentials(identifier, role, null);
 
       if (role === 'super_admin') {
-        // Super Admin navigates directly to EOI Configuration / Masters
         this.router.navigate(['/admin/eoi-configuration']);
       } else if (role === 'aspirant') {
         this.storage.removeSessionItem('isms_aspirant_prompt_dismissed');
         this.router.navigate(['/training-calendar'], { queryParams: { fromLogin: 'true' } });
       } else {
-        // Reset the dismissed flag upon fresh login so the OTR prompt triggers
         this.storage.removeSessionItem('isms_otr_prompt_dismissed');
         this.storage.removeItem('isms_eoi_prompt_shown_new_user');
-
-        // Directly show tenders with fromLogin query param
         this.router.navigate(['/tenders'], { queryParams: { fromLogin: 'true' } });
       }
-    }, 600);
+    }, 200);
   }
 
   onDeptAdminOtpVerified(otp: string): void {

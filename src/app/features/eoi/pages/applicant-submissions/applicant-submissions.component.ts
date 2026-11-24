@@ -10,12 +10,13 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
 import { GenerateEmpanelmentOrderModalComponent } from '../../components/generate-empanelment-order-modal/generate-empanelment-order-modal.component';
 import { OrderViewerModalComponent } from '../../components/order-viewer-modal/order-viewer-modal.component';
-import { downloadEvaluationExcelFile } from '../../utils/eoi-evaluation-excel.util';
+import { downloadEvaluationExcelFile, parseEvaluationSpreadsheet, ParsedEvaluationRow } from '../../utils/eoi-evaluation-excel.util';
 import { formatDate } from '../../../../shared/utils';
 import {
   ButtonComponent,
   IconComponent,
   ListPageComponent,
+  ModalComponent,
   TableColumn
 } from '../../../../shared';
 
@@ -29,6 +30,7 @@ import {
     ListPageComponent,
     ButtonComponent,
     IconComponent,
+    ModalComponent,
     GenerateEmpanelmentOrderModalComponent,
     OrderViewerModalComponent
   ],
@@ -73,19 +75,32 @@ import {
               title="Download Evaluation Excel with Dropdowns for Status and Grading"
             >
               <app-icon name="download" size="sm" />
-              <span>{{ isDownloadingExcel() ? 'Generating Excel...' : 'Download Evaluation Excel' }}</span>
+              <span>{{ isDownloadingExcel() ? 'Generating Excel...' : 'Download Excel' }}</span>
             </button>
 
-            <!-- Generate Empanelment Order Button -->
+            <!-- Upload Excel Button -->
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="shrink-0"
+              (click)="openUploadExcelModal()"
+              title="Upload evaluated Excel spreadsheet (.xlsx, .xls)"
+            >
+              <app-icon name="upload" size="sm" />
+              <span>Upload Excel</span>
+            </button>
+
+            <!-- Generate Implement Order Button -->
             <button
               appButton
               size="sm"
               class="shrink-0"
               (click)="showGenerateOrderModal.set(true)"
-              title="Upload evaluated Excel to generate Empanelment and Rejection Orders"
+              title="Generate Implement Order"
             >
               <app-icon name="clipboard-check" size="sm" />
-              <span>Generate Empanelment Order</span>
+              <span>Generate Implement Order</span>
             </button>
           </div>
 
@@ -131,6 +146,98 @@ import {
 
     </app-list-page>
 
+    <!-- Upload Excel Modal -->
+    @if (showUploadModal()) {
+      <app-modal
+        title="Upload Evaluation Excel"
+        subtitle="Upload evaluated spreadsheet (.xlsx, .xls) to update applicant statuses"
+        size="md"
+        (close)="closeUploadExcelModal()"
+      >
+        <div class="space-y-4">
+          <!-- Hidden native file input -->
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            accept=".xlsx,.xls"
+            (change)="onUploadFileSelected($event)"
+          />
+
+          <!-- Upload Dropzone Area -->
+          <div
+            (click)="fileInput.click()"
+            class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
+          >
+            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+              <app-icon name="upload" size="lg" />
+            </div>
+            <p class="text-sm font-semibold text-slate-800 mb-1">
+              Click to choose an Excel file
+            </p>
+            <p class="text-xs text-slate-500">
+              Supports .xlsx and .xls formats
+            </p>
+          </div>
+
+          <!-- Selected File Display -->
+          @if (selectedUploadFile()) {
+            <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2 truncate">
+                <app-icon name="file" size="sm" class="text-primary shrink-0" />
+                <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
+                <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
+              </div>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                (click)="removeSelectedUploadFile($event)"
+                title="Remove file"
+              >
+                <app-icon name="close" size="xs" />
+              </button>
+            </div>
+          }
+
+          <!-- Validation Error Alert -->
+          @if (uploadError()) {
+            <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+              <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
+              <span>{{ uploadError() }}</span>
+            </div>
+          }
+
+          <!-- Success Alert -->
+          @if (uploadSuccessMessage()) {
+            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+              <app-icon name="check-circle" size="xs" />
+              <span>{{ uploadSuccessMessage() }}</span>
+            </div>
+          }
+        </div>
+
+        <ng-container modalFooter>
+          <button appButton variant="outline" size="sm" (click)="closeUploadExcelModal()" [disabled]="isUploading()">
+            <span>Cancel</span>
+          </button>
+          <button
+            appButton
+            variant="primary"
+            size="sm"
+            [disabled]="!selectedUploadFile() || isUploading()"
+            (click)="submitExcelUpload()"
+            [loading]="isUploading()"
+          >
+            <app-icon name="upload" size="xs" />
+            <span>{{ isUploading() ? 'Uploading...' : 'Submit Upload' }}</span>
+          </button>
+        </ng-container>
+      </app-modal>
+    }
+
     <!-- Modal for Generating Empanelment & Rejection Orders via Excel upload & Multi-Party E-Sign -->
     @if (showGenerateOrderModal()) {
       <app-generate-empanelment-order-modal
@@ -150,6 +257,7 @@ import {
       <app-order-viewer-modal
         [order]="selectedViewOrder()"
         [orderType]="selectedViewOrderType()"
+        [isEditable]="true"
         (close)="showOrderViewerModal.set(false)"
       />
     }
@@ -173,6 +281,13 @@ export class ApplicantSubmissionsComponent {
   showOrderViewerModal = signal<boolean>(false);
   selectedViewOrder = signal<EmpanelmentOrder | null>(null);
   selectedViewOrderType = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
+
+  // Excel Upload Modal State
+  showUploadModal = signal<boolean>(false);
+  selectedUploadFile = signal<File | null>(null);
+  uploadError = signal<string>('');
+  uploadSuccessMessage = signal<string>('');
+  isUploading = signal<boolean>(false);
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -258,6 +373,130 @@ export class ApplicantSubmissionsComponent {
     this.selectedViewOrderType.set('REJECTION');
     this.showGenerateOrderModal.set(false);
     this.showOrderViewerModal.set(true);
+  }
+
+  openUploadExcelModal(): void {
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+    this.isUploading.set(false);
+    this.showUploadModal.set(true);
+  }
+
+  closeUploadExcelModal(): void {
+    this.showUploadModal.set(false);
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+    this.isUploading.set(false);
+  }
+
+  onUploadFileSelected(event: Event): void {
+    const inputEl = event.target as HTMLInputElement;
+    if (!inputEl.files || inputEl.files.length === 0) return;
+
+    const file = inputEl.files[0];
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (ext !== '.xlsx' && ext !== '.xls') {
+      this.uploadError.set('Unsupported file format. Please upload a valid .xlsx or .xls file.');
+      this.selectedUploadFile.set(null);
+      return;
+    }
+
+    this.selectedUploadFile.set(file);
+  }
+
+  removeSelectedUploadFile(event: Event): void {
+    event.stopPropagation();
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  async submitExcelUpload(): Promise<void> {
+    const file = this.selectedUploadFile();
+    if (!file) {
+      this.uploadError.set('Please select an Excel file to upload.');
+      return;
+    }
+
+    this.isUploading.set(true);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+
+    try {
+      const parsed = await parseEvaluationSpreadsheet(file);
+      if (!parsed.isValid && parsed.errors && parsed.errors.length > 0) {
+        this.uploadError.set(parsed.errors[0]);
+        this.isUploading.set(false);
+        return;
+      }
+
+      const acceptedMap = new Map<string, ParsedEvaluationRow>();
+      parsed.accepted.forEach(r => {
+        acceptedMap.set(r.refNo.toLowerCase().trim(), r);
+      });
+
+      const rejectedMap = new Map<string, ParsedEvaluationRow>();
+      parsed.rejected.forEach(r => {
+        rejectedMap.set(r.refNo.toLowerCase().trim(), r);
+      });
+
+      this.responses.update(list =>
+        list.map(item => {
+          const key1 = item.regNumber.toLowerCase().trim();
+          const key2 = item.id.toLowerCase().trim();
+
+          const acc = acceptedMap.get(key1) || acceptedMap.get(key2);
+          if (acc) {
+            return {
+              ...item,
+              status: 'APPROVED' as const,
+              statusDisplay: 'Approved',
+              evaluationStatus: 'Approved',
+              evaluationGrade: acc.grade,
+              evaluationRemarks: acc.reason
+            };
+          }
+
+          const rej = rejectedMap.get(key1) || rejectedMap.get(key2);
+          if (rej) {
+            return {
+              ...item,
+              status: 'REJECTED' as const,
+              statusDisplay: 'Rejected',
+              evaluationStatus: 'Rejected',
+              evaluationGrade: rej.grade,
+              evaluationRemarks: rej.reason
+            };
+          }
+
+          return item;
+        })
+      );
+
+      this.uploadSuccessMessage.set(
+        `Upload processed successfully: ${parsed.accepted.length} Approved, ${parsed.rejected.length} Rejected.`
+      );
+
+      setTimeout(() => {
+        this.closeUploadExcelModal();
+      }, 1200);
+    } catch (err: any) {
+      console.error('Error uploading evaluation excel:', err);
+      this.uploadError.set(err?.message || 'Failed to process Excel file. Please ensure valid OpenXML structure.');
+    } finally {
+      this.isUploading.set(false);
+    }
   }
 
   /**

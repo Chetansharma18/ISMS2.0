@@ -87,12 +87,12 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             [title]="editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI'"
             [breadcrumbs]="[
               { label: 'Home', url: '/' },
-              { label: 'Active Schemes', url: '/admin/eoi-configuration' },
-              { label: editingSchemeRefNo() ? 'Edit EOI' : 'Configure New EOI' }
+              { label: 'EOI Configuration', url: '/admin/eoi-configuration' },
+              { label: editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI' }
             ]"
             [showBack]="true"
             (back)="closeConfigureScreen()"
-            backTitle="Back to Active Schemes"
+            backTitle="Back to EOI Configuration"
           >
           </app-page-header>
 

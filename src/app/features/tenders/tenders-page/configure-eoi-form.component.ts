@@ -52,17 +52,17 @@ import {
           }
         </div>
 
-        <!-- Row 1, Col 2: Scheme * -->
+        <!-- Row 1, Col 2: Scheme Name * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiSchemeSelect">
-            Scheme <span class="text-[#DC2626] font-bold">*</span>
+            Scheme Name <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <app-dropdown
             inputId="eoiSchemeSelect"
             [options]="schemeNameOptions()"
             [value]="data().scheme"
             (valueChange)="onSchemeChange($event)"
-            placeholder="-- Select Scheme --"
+            placeholder="-- Select Scheme Name --"
             [invalid]="hasError('scheme')"
           />
           @if (hasError('scheme')) {
@@ -107,10 +107,10 @@ import {
           }
         </div>
 
-        <!-- Row 3, Col 1: Date of EOI Published * -->
+        <!-- Row 3, Col 1: EOI Publication Date * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiPublishedDateInput">
-            Date of EOI Published <span class="text-[#DC2626] font-bold">*</span>
+            EOI Publication Date <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
             id="eoiPublishedDateInput"
@@ -128,10 +128,10 @@ import {
           }
         </div>
 
-        <!-- Row 3, Col 2: Last Date of EOI Submission * -->
+        <!-- Row 3, Col 2: Date of Closing (Last Date of Submission) * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiSubmissionDateInput">
-            Last Date of EOI Submission <span class="text-[#DC2626] font-bold">*</span>
+            Date of Closing (Last Date of Submission) <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
             id="eoiSubmissionDateInput"
@@ -206,10 +206,10 @@ import {
           }
         </div>
 
-        <!-- Row 5, Col 1: EMD Fee * -->
+        <!-- Row 5, Col 1: EMD Amount (₹) * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiEmdFeeInput">
-            EMD Fee <span class="text-[#DC2626] font-bold">*</span>
+            EMD Amount (₹) <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
             id="eoiEmdFeeInput"
@@ -228,10 +228,10 @@ import {
           }
         </div>
 
-        <!-- Row 5, Col 2: Process Fee * -->
+        <!-- Row 5, Col 2: Process Fees (₹) * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiProcessFeeInput">
-            Process Fee <span class="text-[#DC2626] font-bold">*</span>
+            Process Fees (₹) <span class="text-[#DC2626] font-bold">*</span>
           </label>
           <input
             id="eoiProcessFeeInput"
@@ -257,8 +257,8 @@ import {
       <section class="space-y-3 pt-4 border-t border-[#E8EEF5]">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Supporting Documents</h3>
-            <p class="text-xs text-slate-500 mt-1 mb-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
+            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Required Documents (Doc Master)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-0">Required documents from Doc Master for proposal submission (PDF, image, or TXT - max 25 MB)</p>
           </div>
           <button
             appButton
@@ -267,8 +267,8 @@ import {
             iconOnly
             type="button"
             (click)="addDocument.emit()"
-            title="Add Document"
-            aria-label="Add Document"
+            title="Add Document (Doc Master)"
+            aria-label="Add Document (Doc Master)"
           >
             <app-icon name="plus" size="xs" />
           </button>
@@ -276,7 +276,7 @@ import {
 
         @if (data().documents.length === 0) {
           <div class="text-[13px] text-slate-500 italic py-6 px-4 text-center border border-dashed border-[#CBD5E1] rounded-lg bg-slate-50/40">
-            Select a scheme above to automatically load required documents from Doc Master, or click + to add manually.
+            Select a scheme name above to automatically load required documents from Doc Master, or click + to add manually.
           </div>
         } @else {
           <div class="space-y-2 mt-2">
@@ -289,7 +289,7 @@ import {
                       [options]="getAvailableOptionsForIndex(idx)"
                       [(value)]="data().documents[idx]"
                       (valueChange)="onDocChange(idx)"
-                      placeholder="-- Select Document Required --"
+                      placeholder="-- Select Document (from Doc Master) --"
                       size="sm"
                       direction="up"
                       [overlay]="true"
@@ -336,8 +336,8 @@ import {
       <section class="space-y-3 pt-4 border-t border-[#E8EEF5]">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Annexures</h3>
-            <p class="text-xs text-slate-500 mt-1 mb-0">Prescribed annexure formats for EOI submission (Upload PDF - max 25 MB)</p>
+            <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Prescribed Annexures (Annexure Master)</h3>
+            <p class="text-xs text-slate-500 mt-1 mb-0">Prescribed annexure formats from Annexure Master for EOI submission (Upload PDF - max 25 MB)</p>
           </div>
           <button
             appButton
@@ -346,8 +346,8 @@ import {
             iconOnly
             type="button"
             (click)="addAnnexure.emit()"
-            title="Add Annexure"
-            aria-label="Add Annexure"
+            title="Add Annexure (Annexure Master)"
+            aria-label="Add Annexure (Annexure Master)"
           >
             <app-icon name="plus" size="xs" />
           </button>
@@ -355,7 +355,7 @@ import {
 
         @if (!data().annexures || data().annexures.length === 0) {
           <div class="text-[13px] text-slate-500 italic py-6 px-4 text-center border border-dashed border-[#CBD5E1] rounded-lg bg-slate-50/40">
-            Select a scheme above to automatically load annexures from Annexure Master, or click + to add manually.
+            Select a scheme name above to automatically load annexures from Annexure Master, or click + to add manually.
           </div>
         } @else {
           <div class="space-y-2 mt-2">
@@ -368,7 +368,7 @@ import {
                       [options]="getAvailableAnnexureOptionsForIndex(idx)"
                       [(value)]="data().annexures[idx]"
                       (valueChange)="onAnnexureChange(idx)"
-                      placeholder="-- Select Annexure Format --"
+                      placeholder="-- Select Annexure (from Annexure Master) --"
                       size="sm"
                       direction="up"
                       [overlay]="true"

@@ -126,10 +126,10 @@ export class OtrValidationService {
     }
     if (!step1.emailId?.trim()) {
       errors.push('Official Company Email-ID is mandatory.');
-    } else if (!REGEX.EMAIL.test(step1.emailId)) {
+    } else if (!REGEX.EMAIL.test(step1.emailId.trim())) {
       errors.push('Invalid Official Company Email-ID format.');
     }
-    if (step1.website?.trim() && !REGEX.URL.test(step1.website)) {
+    if (step1.website?.trim() && !REGEX.URL.test(step1.website.trim())) {
       errors.push('Invalid Website URL format.');
     }
 
@@ -307,7 +307,7 @@ export class OtrValidationService {
     }
     if (!step3.emailId?.trim()) {
       errors.push('Email Address is mandatory.');
-    } else if (!REGEX.EMAIL.test(step3.emailId)) {
+    } else if (!REGEX.EMAIL.test(step3.emailId.trim())) {
       errors.push('Invalid Email Address format.');
     }
 
@@ -396,15 +396,15 @@ export class OtrValidationService {
     }
     if (!step4.accountNo?.trim()) {
       errors.push('Bank Account Number is mandatory.');
-    } else if (!REGEX.BANK_ACCOUNT.test(step4.accountNo)) {
+    } else if (!REGEX.BANK_ACCOUNT.test(step4.accountNo.trim())) {
       errors.push('Invalid Bank Account Number (Must be 9 to 18 numeric digits).');
     }
     if (!step4.ifscCode?.trim()) {
       errors.push('IFSC Code is mandatory.');
-    } else if (!REGEX.IFSC.test(step4.ifscCode.toUpperCase())) {
+    } else if (!REGEX.IFSC.test(step4.ifscCode.trim().toUpperCase())) {
       errors.push('Invalid IFSC Code (11 alphanumeric characters, 5th character strictly 0, e.g. SBIN0031804).');
     }
-    if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode)) {
+    if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode.trim())) {
       errors.push('Invalid MICR Code (Must be exactly 9 numeric digits).');
     }
     if (!step4.cancelledChequeDoc || step4.cancelledChequeDoc.status !== 'uploaded') {

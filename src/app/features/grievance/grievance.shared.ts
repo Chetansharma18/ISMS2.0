@@ -16,15 +16,20 @@ export interface AdminGrievance extends AdminGrievanceItem {
 
 export type GrievanceStatus = GrievanceItem['status'];
 
-export const GRIEVANCE_STATUS_BADGE: Record<GrievanceStatus, BadgeVariant> = {
+export const GRIEVANCE_STATUS_BADGE: Record<string, BadgeVariant> = {
   'Open': 'info',
+  'open': 'info',
   'In progress': 'warning',
+  'In Progress': 'warning',
   'Resolved': 'success',
-  'closed': 'neutral'
+  'resolved': 'success',
+  'closed': 'neutral',
+  'Closed': 'neutral'
 };
 
 export function grievanceStatusVariant(status: GrievanceStatus | string | undefined): BadgeVariant {
-  return GRIEVANCE_STATUS_BADGE[status as GrievanceStatus] ?? 'neutral';
+  if (!status) return 'neutral';
+  return GRIEVANCE_STATUS_BADGE[status] ?? 'neutral';
 }
 
 export const DEFAULT_GRIEVANCE_SCHEMES: readonly string[] = [

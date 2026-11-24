@@ -193,6 +193,15 @@ describe('OtrValidationService - Step 1 Sub-sections', () => {
       };
       const errors = service.validateStep1SubStep3(invalid);
       expect(errors.some(e => e.includes('Email'))).toBe(true);
+
+      // Rejects reported invalid email formats (dfghgj, 86rnvhgxchgn@gfhkj.cc)
+      expect(service.validateStep1SubStep3({ ...validStep1, emailId: 'dfghgj' }).some(e => e.includes('Email'))).toBe(true);
+      expect(service.validateStep1SubStep3({ ...validStep1, emailId: '86rnvhgxchgn@gfhkj.cc' }).some(e => e.includes('Email'))).toBe(true);
+      expect(service.validateStep1SubStep3({ ...validStep1, emailId: '86rnvhgxchgnb@gfhkj.cc' }).some(e => e.includes('Email'))).toBe(true);
+
+      // Accepts valid email formats
+      expect(service.validateStep1SubStep3({ ...validStep1, emailId: 'contact@skilltech.org' })).toEqual([]);
+      expect(service.validateStep1SubStep3({ ...validStep1, emailId: 'info@validcompany.com' })).toEqual([]);
     });
 
     it('validates website format when entered, but accepts empty website', () => {
@@ -208,6 +217,15 @@ describe('OtrValidationService - Step 1 Sub-sections', () => {
       };
       const errors = service.validateStep1SubStep3(invalidWebsite);
       expect(errors.some(e => e.includes('Website'))).toBe(true);
+
+      // Rejects reported invalid website formats (1, ab.dc)
+      expect(service.validateStep1SubStep3({ ...validStep1, website: '1' }).some(e => e.includes('Website'))).toBe(true);
+      expect(service.validateStep1SubStep3({ ...validStep1, website: 'ab.dc' }).some(e => e.includes('Website'))).toBe(true);
+
+      // Accepts valid website formats with and without https
+      expect(service.validateStep1SubStep3({ ...validStep1, website: 'skilltech.org' })).toEqual([]);
+      expect(service.validateStep1SubStep3({ ...validStep1, website: 'https://skilltech.org' })).toEqual([]);
+      expect(service.validateStep1SubStep3({ ...validStep1, website: 'https://www.validwebsite.gov.in' })).toEqual([]);
     });
   });
 
@@ -328,6 +346,10 @@ describe('OtrValidationService - Step 1 Sub-sections', () => {
       expect(errors.some(e => e.includes('First Name'))).toBe(true);
       expect(errors.some(e => e.includes('Mobile Number'))).toBe(true);
       expect(errors.some(e => e.includes('Email Address'))).toBe(true);
+
+      // Rejects 86rnvhgxchgnb@gfhkj.cc and dfghgj
+      expect(service.validateStep3({ ...validStep3, emailId: '86rnvhgxchgnb@gfhkj.cc' }).some(e => e.includes('Email Address'))).toBe(true);
+      expect(service.validateStep3({ ...validStep3, emailId: 'dfghgj' }).some(e => e.includes('Email Address'))).toBe(true);
     });
 
     it('validates dynamic document number based on selected document type', () => {

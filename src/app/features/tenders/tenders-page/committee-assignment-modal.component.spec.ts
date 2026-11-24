@@ -121,4 +121,18 @@ describe('CommitteeAssignmentModalComponent', () => {
       members: ['Ram Shyaam', 'Siddesh']
     });
   });
+
+  it('displays validation error and blocks emission when Save Committee is clicked with blank fields', () => {
+    const comp = createComponent();
+    let emitted = false;
+    comp.save.subscribe(() => {
+      emitted = true;
+    });
+
+    comp.onSave();
+
+    expect(emitted).toBe(false);
+    expect(comp.submitted()).toBe(true);
+    expect(comp.errorMessage()).toContain('Please select an Approver');
+  });
 });

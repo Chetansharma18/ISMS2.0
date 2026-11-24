@@ -153,6 +153,7 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
                 [value]="formData.sector ?? ''"
                 (valueChange)="onSectorChange($event)"
                 [error]="errs['sector']"
+                [hint]="sectorLocked && !formData.district ? 'Select the District First' : ''"
               ></app-form-select>
             </div>
 
@@ -161,6 +162,7 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
                 label="Proposed Start Date"
                 type="date"
                 [required]="true"
+                [min]="todayIso"
                 [value]="formData.proposedStartDate"
                 (valueChange)="formData.proposedStartDate = $event"
                 [error]="errs['proposedStartDate']"
@@ -194,6 +196,7 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
               <app-form-input
                 label="Total TP Trained Aspirant"
                 type="number"
+                min="0"
                 placeholder="Enter number"
                 [value]="numText.totalTrainedAspirants"
                 (valueChange)="setNumber('totalTrainedAspirants', $event)"
@@ -205,6 +208,7 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
               <app-form-input
                 label="Total TP Placed Aspirant"
                 type="number"
+                min="0"
                 placeholder="Enter number"
                 [value]="numText.totalPlacedAspirants"
                 (valueChange)="setNumber('totalPlacedAspirants', $event)"
@@ -322,6 +326,7 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
                 placeholder="6-digit pin code"
                 [required]="true"
                 [maxLength]="6"
+                [numericOnly]="true"
                 [value]="formData.pincode"
                 (valueChange)="formData.pincode = $event"
                 [error]="errs['pincode']"
@@ -332,8 +337,10 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
               <app-form-input
                 label="Latitude (GPS)"
                 placeholder="e.g. 26.9124"
+                [coordinateOnly]="true"
                 [value]="numText.latitude"
-                (valueChange)="setNumber('latitude', $event)"
+                (valueChange)="onCoordinateChange('latitude', $event)"
+                (blur)="onCoordBlur('latitude')"
                 [error]="errs['latitude']"
               ></app-form-input>
             </div>
@@ -342,8 +349,10 @@ const NO_LOCATION: DistrictInfo = { division: '', assemblyConstituencies: [], pa
               <app-form-input
                 label="Longitude (GPS)"
                 placeholder="e.g. 75.7873"
+                [coordinateOnly]="true"
                 [value]="numText.longitude"
-                (valueChange)="setNumber('longitude', $event)"
+                (valueChange)="onCoordinateChange('longitude', $event)"
+                (blur)="onCoordBlur('longitude')"
                 [error]="errs['longitude']"
               ></app-form-input>
             </div>
@@ -402,6 +411,10 @@ export class SdcCreateComponent implements OnInit {
   readonly minPhotos = MIN_PHOTOS;
   readonly hostelOptions = HOSTEL_CATEGORY_OPTIONS;
   readonly stateOptions = ['Rajasthan'];
+  readonly todayIso = (() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  })();
 
   /** The IPA this SDC is registered against (empty for an SDC registered without one). */
   readonly ipa = signal<ResolvedIpa | null>(null);
@@ -461,6 +474,8 @@ export class SdcCreateComponent implements OnInit {
     latitude: '',
     longitude: ''
   };
+
+  readonly touchedCoords = signal<{ latitude?: boolean; longitude?: boolean }>({});
 
   /** District data for the dependent dropdowns (assembly, parliament, block); empty until a district is chosen. */
   get locationInfo(): DistrictInfo {
@@ -542,16 +557,56 @@ export class SdcCreateComponent implements OnInit {
   }
 
   setNumber(key: NumberKey, raw: string): void {
-    this.numText[key] = raw;
-    const text = raw.trim();
-    this.formData[key] = text === '' || Number.isNaN(Number(text)) ? null : Number(text);
+    let clean = raw;
+    if (key === 'totalTrainedAspirants' || key === 'totalPlacedAspirants') {
+      clean = raw.replace(/[^\d]/g, '');
+    }
+    this.numText[key] = clean;
+    const text = clean.trim();
+    const val = text === '' || Number.isNaN(Number(text)) ? null : Number(text);
+    this.formData[key] = val != null && (key === 'totalTrainedAspirants' || key === 'totalPlacedAspirants') ? Math.max(0, val) : val;
   }
 
-  /** Field messages (empty until the first submit attempt). */
+  onCoordBlur(key: 'latitude' | 'longitude'): void {
+    this.touchedCoords.update(t => ({ ...t, [key]: true }));
+  }
+
+  onCoordinateChange(key: 'latitude' | 'longitude', raw: string): void {
+    let filtered = raw.replace(/[^0-9.-]/g, '');
+    const isNegative = filtered.startsWith('-');
+    filtered = (isNegative ? '-' : '') + filtered.replace(/-/g, '');
+    const parts = filtered.split('.');
+    if (parts.length > 2) {
+      filtered = parts[0] + '.' + parts.slice(1).join('');
+    }
+    this.numText[key] = filtered;
+    const trimmed = filtered.trim();
+    const num = trimmed === '' || trimmed === '-' || trimmed === '.' || trimmed === '-.' ? null : Number(trimmed);
+    this.formData[key] = num != null && !Number.isNaN(num) ? num : null;
+  }
+
+  /** Field messages (empty until the first submit attempt or touched coordinates). */
   errors(): Record<string, string> {
-    if (!this.submitted()) return {};
     const f = this.formData;
     const e: Record<string, string> = {};
+
+    const latStr = this.numText.latitude.trim();
+    if ((this.submitted() || this.touchedCoords().latitude) && latStr !== '') {
+      const latNum = Number(latStr);
+      if (Number.isNaN(latNum) || f.latitude == null || latNum < -90 || latNum > 90) {
+        e['latitude'] = 'Latitude must be between -90 and 90';
+      }
+    }
+
+    const lngStr = this.numText.longitude.trim();
+    if ((this.submitted() || this.touchedCoords().longitude) && lngStr !== '') {
+      const lngNum = Number(lngStr);
+      if (Number.isNaN(lngNum) || f.longitude == null || lngNum < -180 || lngNum > 180) {
+        e['longitude'] = 'Longitude must be between -180 and 180';
+      }
+    }
+
+    if (!this.submitted()) return e;
 
     if (!f.sdcName?.trim()) e['sdcName'] = 'Center Name is required';
     if (!f.district) e['district'] = 'Please select a District';
@@ -569,7 +624,11 @@ export class SdcCreateComponent implements OnInit {
     } else if (f.sdcCapacity == null || f.sdcCapacity < 1 || f.sdcCapacity > 5000) {
       e['sdcCapacity'] = 'Enter a capacity between 1 and 5000';
     }
-    if (!f.proposedStartDate) e['proposedStartDate'] = 'Proposed Start Date is required';
+    if (!f.proposedStartDate) {
+      e['proposedStartDate'] = 'Proposed Start Date is required';
+    } else if (f.proposedStartDate < this.todayIso) {
+      e['proposedStartDate'] = 'Proposed Start Date cannot be in the past';
+    }
     if (f.totalTrainedAspirants != null && f.totalTrainedAspirants < 0) e['totalTrainedAspirants'] = 'Enter 0 or more';
     if (f.totalPlacedAspirants != null && f.totalPlacedAspirants < 0) e['totalPlacedAspirants'] = 'Enter 0 or more';
 
@@ -581,13 +640,6 @@ export class SdcCreateComponent implements OnInit {
     if (!f.block) e['block'] = 'Please select a Block';
     if (!REGEX_PATTERNS.PINCODE.test((f.pincode ?? '').trim())) e['pincode'] = 'Pin Code must be a 6-digit numeric code';
     if ((f.fullAddress ?? '').trim().length < 10) e['fullAddress'] = 'Address must be at least 10 characters';
-
-    if (this.numText.latitude.trim() !== '' && (f.latitude == null || f.latitude < -90 || f.latitude > 90)) {
-      e['latitude'] = 'Latitude must be between -90 and 90';
-    }
-    if (this.numText.longitude.trim() !== '' && (f.longitude == null || f.longitude < -180 || f.longitude > 180)) {
-      e['longitude'] = 'Longitude must be between -180 and 180';
-    }
 
     if ((f.centerPhotos?.length ?? 0) < MIN_PHOTOS) e['centerPhotos'] = `Upload at least ${MIN_PHOTOS} center photos`;
 

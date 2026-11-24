@@ -151,12 +151,24 @@ describe('Step3AuthPersonComponent - Heading-wise Grouping & Dynamic Identity Ve
     fixture.detectChanges();
     expect(component.getFieldError('mobileNo')).toBeUndefined();
 
-    // Email format
+    // Email format (Bug 3)
     formService.updateStep3({ emailId: 'invalid-email' });
     fixture.detectChanges();
     expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
 
+    formService.updateStep3({ emailId: '86rnvhgxchgnb@gfhkj.cc' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
+
+    formService.updateStep3({ emailId: 'dfghgj' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
+
     formService.updateStep3({ emailId: 'person@example.com' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBeUndefined();
+
+    formService.updateStep3({ emailId: 'contact@skilltech.org' });
     fixture.detectChanges();
     expect(component.getFieldError('emailId')).toBeUndefined();
 

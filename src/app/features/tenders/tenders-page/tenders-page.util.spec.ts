@@ -472,6 +472,12 @@ describe('tenders-page.util', () => {
       expect(res.errors['publishedDate']).toBe('EOI Publication Date cannot be a future date.');
     });
 
+    it('rejects publication date in past year', () => {
+      const form = { ...validEoi(), publishedDate: '2025-12-31' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['publishedDate']).toBe('EOI Publication Date cannot be from a past year.');
+    });
+
     // 6. Invalid calendar dates
     it('Scenario 6: rejects invalid calendar dates such as 31 February or 29 Feb in non-leap year', () => {
       expect(isValidCalendarDate('2026-02-31')).toBe(false);

@@ -343,6 +343,14 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600 {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:hover:not(.cursor-not-allowed) {
+      border-color: #DC2626 !important;
+    }
+
     :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
       border-color: #DC2626 !important;
       box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
@@ -575,8 +583,9 @@ export class Step3AuthPersonComponent {
     }
 
     if (field === 'emailId') {
-      if ((isSubmitted || isTouched) && !d.emailId?.trim()) return 'Email Address is required';
-      if (d.emailId?.trim() && !REGEX.EMAIL.test(d.emailId)) return 'Invalid Email Address format';
+      const email = d.emailId?.trim();
+      if ((isSubmitted || isTouched) && !email) return 'Email Address is required';
+      if (email && !REGEX.EMAIL.test(email)) return 'Invalid Email Address format';
       return undefined;
     }
 

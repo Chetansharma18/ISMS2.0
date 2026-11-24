@@ -48,7 +48,7 @@ import { FilterTabsComponent } from '../../../shared';
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management' }]"
           [searchable]="true"
           [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search TP name, SDC, code, sector, district..."
+          searchPlaceholder="Search TP, SDC, code, sector, district..."
         ></app-page-header>
 
         <!-- Success Alert Notification -->

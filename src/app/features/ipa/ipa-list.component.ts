@@ -91,7 +91,7 @@ interface IpaRow {
           size="sm"
           [disabled]="row.full"
           (click)="newSdc(row)"
-          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register the new SDC for this IPA'"
+          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register SDC'"
         >
           New SDC
         </button>

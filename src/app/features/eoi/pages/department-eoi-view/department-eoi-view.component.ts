@@ -30,7 +30,7 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
       title="EOI Responses"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
       [(searchQuery)]="searchQuery"
-      searchPlaceholder="Search Scheme Name, Ref No, Category..."
+      searchPlaceholder="Search Scheme, Ref No, Category..."
       [columns]="schemeColumns"
       [data]="filteredSchemes()"
       [pagination]="true"

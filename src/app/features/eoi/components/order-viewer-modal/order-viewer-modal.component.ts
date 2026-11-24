@@ -31,11 +31,13 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
         <!-- Official Government Header -->
         <div class="text-center border-b-2 border-slate-800 pb-4 mb-4">
           <div class="flex items-center justify-between gap-4 mb-2">
-            <!-- Left Emblem / Seal -->
+            <!-- Left Official Emblem -->
             <div class="w-14 h-14 flex items-center justify-center shrink-0">
-              <div class="w-12 h-12 rounded-full border border-slate-700 flex items-center justify-center text-[10px] font-bold uppercase tracking-tighter text-slate-700">
-                GOVT OF RAJASTHAN
-              </div>
+              <img
+                src="/Rajasthan-Sarkar.png"
+                alt="Government of Rajasthan"
+                class="w-12 h-12 object-contain"
+              />
             </div>
 
             <!-- Central Heading -->
@@ -51,11 +53,13 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
               </p>
             </div>
 
-            <!-- Right Seal -->
+            <!-- Right Official Logo -->
             <div class="w-14 h-14 flex items-center justify-center shrink-0">
-              <div class="w-12 h-12 rounded-full border border-slate-700 flex items-center justify-center text-[9px] font-bold uppercase text-center text-slate-700">
-                RSLDC JAIPUR
-              </div>
+              <img
+                src="/rsldc-logo.png"
+                alt="RSLDC Jaipur"
+                class="w-12 h-12 object-contain"
+              />
             </div>
           </div>
 

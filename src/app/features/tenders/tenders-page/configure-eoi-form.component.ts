@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { FormsModule } from '@angular/forms';
 import { EoiAttachment, EoiDocumentUpload, EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 import { SchemeMasterItem, DocMasterItem } from '../../../core/models/admin-masters.model';
-import { INITIAL_DOC_ITEMS } from '../../admin-master/doc-master.component';
+import { INITIAL_DOC_ITEMS } from '../../admin-master/doc-master.data';
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
 import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, formatInr } from '../../../shared';
 import { formatBytes } from './tenders-page.util';

@@ -23,7 +23,7 @@ import {
   EoiCategoryItem,
   DocMasterItem
 } from '../../core/models/admin-masters.model';
-import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
+import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.data';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
 import { EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTender } from './tenders.models';
 import {
@@ -686,13 +686,22 @@ export class TendersPageComponent {
         error: () => this.eoiCategoryNames.set([])
       });
 
-    // 4. Load Doc Master items (from storage or fallback)
-    const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
-    if (cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0) {
-      this.docMasterItems.set(cachedDocs);
-    } else {
-      this.docMasterItems.set(INITIAL_DOC_ITEMS);
-    }
+    // 4. Load active Doc Master items (API); fall back to an older browser copy, then to the sample rows.
+    const fallbackDocs = (): DocMasterItem[] => {
+      const cachedDocs = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
+      return cachedDocs && Array.isArray(cachedDocs) && cachedDocs.length > 0 ? cachedDocs : INITIAL_DOC_ITEMS;
+    };
+    this.dataEngine
+      .for<DocMasterItem>('DOC_MASTERS')
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          const active = (items || []).filter((d) => d.status !== 'Inactive');
+          this.docMasterItems.set(active.length > 0 ? active : fallbackDocs());
+        },
+        error: () => this.docMasterItems.set(fallbackDocs())
+      });
   }
 
   onSchemeSelected(schemeName: string): void {

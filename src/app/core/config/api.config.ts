@@ -128,6 +128,14 @@ export const API_ENDPOINTS = {
 
   // Users
   USERS: crud('/users'),
+  /** GET /users/sso/{ssoId}: the portal user with this SSO ID (with roles), 404 when there is none. */
+  USER_BY_SSO: { GET: endpoint('GET', (ssoId: string | number) => `/users/sso/${encodeURIComponent(String(ssoId))}`) },
+  /** Department users: SSO ID mapped to a role, designation, schemes, districts and blocks (activated separately). */
+  DEPARTMENT_USERS: {
+    ...crud('/department-users'),
+    /** POST: checks the SSO ID exists as a portal user, assigns the role and marks the record active. */
+    ACTIVATE: endpoint('POST', (id: string | number) => `/department-users/${encodeURIComponent(String(id))}/activate`)
+  },
   /** SSO directory lookup by SSO ID */
   SSO_DIRECTORY: readOnly('/sso/users'),
 
@@ -169,12 +177,52 @@ export const API_ENDPOINTS = {
   SECTORS: crud('/master/sectors'),
   DESIGNATIONS: crud('/master/designations'),
   COURSES: crud('/master/courses'),
+  /** District & Block screen rows: blocks (`{ id, districtId, name, code, isActive }`); create/update by district name or code. */
   DISTRICTS: crud('/master/district-blocks'),
+  /** Districts on their own (`{ id, name, code, state, isActive }`): names for the block rows, dropdowns. */
+  DISTRICT_MASTERS: crud('/master/districts'),
+  /** Document Master (`{ id, schemeName, documentName, allowedExtensions, maxFileSizeMb, isMandatory, isActive }`). */
+  DOC_MASTERS: crud('/master/doc-masters'),
+  /** Distinct departments of the designations (string[]). */
+  DESIGNATION_DEPARTMENTS: { LIST: endpoint('GET', '/master/designations/departments') },
+  /** Remark types for the dropdown (defaults + any stored ones, string[]). */
+  REMARK_TYPES: { LIST: endpoint('GET', '/master/remarks/types') },
   EOI_CATEGORIES: crud('/master/eoi-categories'),
   PERMISSIONS: crud('/permissions'),
   SCHEME_MASTERS: crud('/master/schemes'),
   SCHEME_CATEGORIES: crud('/master/scheme-categories'),
+  /** Roles: `{ id, name, description, isActive, userCount, permissions[] }` (see core/models/role.normalizer). */
   USER_ROLES: crud('/roles'),
+  /** Table permissions of one role (backend RolePermissions, managed through the role). */
+  ROLE_PERMISSIONS: {
+    /** GET /roles/{roleId}/permissions */
+    LIST: endpoint('GET', (roleId: string | number) => `/roles/${encodeURIComponent(String(roleId))}/permissions`),
+    /** POST /roles/{roleId}/permissions `{ permissions: [...] }`: adds or updates by table, keeps the others. */
+    ASSIGN: endpoint('POST', (roleId: string | number) => `/roles/${encodeURIComponent(String(roleId))}/permissions`),
+    /** DELETE /roles/{roleId}/permissions/{permissionId}; call with the id `${roleId}/${permissionId}`. */
+    REMOVE: endpoint('DELETE', (key: string | number) => {
+      const [roleId, permissionId] = String(key).split('/');
+      return `/roles/${encodeURIComponent(roleId)}/permissions/${encodeURIComponent(permissionId ?? '')}`;
+    })
+  },
+  /** Users holding a role (backend UserRoles, managed through the role; users are identified by email). */
+  ROLE_USERS: {
+    /** GET /roles/{roleId}/users */
+    LIST: endpoint('GET', (roleId: string | number) => `/roles/${encodeURIComponent(String(roleId))}/users`),
+    /** POST /roles/{roleId}/users `{ email }` */
+    ASSIGN: endpoint('POST', (roleId: string | number) => `/roles/${encodeURIComponent(String(roleId))}/users`),
+    /** DELETE /roles/{roleId}/users/{email}; call with the id `${roleId}/${email}`. */
+    REVOKE: endpoint('DELETE', (key: string | number) => {
+      const value = String(key);
+      const slash = value.indexOf('/');
+      return `/roles/${encodeURIComponent(value.slice(0, slash))}/users/${encodeURIComponent(value.slice(slash + 1))}`;
+    })
+  },
+  /** Every backend table a permission can be granted on: `{ id, tableName, description, tableCategoryId }`. */
+  TABLE_LIST: {
+    LIST: endpoint('GET', '/tablelist'),
+    CATEGORIES: endpoint('GET', '/tablelist/categories')
+  },
   REMARK_MASTERS: crud('/master/remarks'),
   GRADING_MASTERS: crud('/master/gradings'),
 

@@ -1,15 +1,18 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   MasterCrudPageComponent,
   MasterCrudConfig,
   TableColumn
 } from '../../shared';
-import { CourseMasterItem } from '../../core/models/admin-masters.model';
+import { CourseMasterItem, SectorMasterItem } from '../../core/models/admin-masters.model';
+import { DataEngineService } from '../../core/services/data-engine.service';
 import { SKILL_SECTOR_NAMES } from '../../core/config/sector.config';
 
 export type { CourseMasterItem };
 
-const SECTOR_OPTIONS = [...SKILL_SECTOR_NAMES];
+/** Sector names for the dropdown: active sectors of the Sector Master once loaded, the built-in list until then. */
+const sectorOptions = signal<string[]>([...SKILL_SECTOR_NAMES]);
 
 const COMMON_NORMS_OPTIONS = ['I', 'II', 'III'];
 
@@ -50,7 +53,7 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
   hasStatus: true,
   modalWidthClass: 'max-w-[720px]',
   fields: [
-    { key: 'sector', label: 'Sector', type: 'select', required: true, options: SECTOR_OPTIONS, colSpan: 2 },
+    { key: 'sector', label: 'Sector', type: 'select', required: true, options: () => sectorOptions(), colSpan: 2 },
     { key: 'jobRoleName', label: 'QP/Job Role Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter job role name', colSpan: 1 },
     { key: 'jobRoleCode', label: 'QP/Job Role Code', type: 'text', required: true, placeholder: 'e.g. AAS/Q6301', colSpan: 1 },
     { key: 'version', label: 'Version', type: 'text', placeholder: 'e.g. 1.0, 2.0', colSpan: 1 },
@@ -104,4 +107,19 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
 })
 export class CourseMasterComponent {
   readonly config = CONFIG;
+
+  constructor() {
+    // The backend links a course to the sector by name, so the dropdown offers the Sector Master's names.
+    inject(DataEngineService)
+      .for<SectorMasterItem>('SECTORS')
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: sectors => {
+          const names = [...new Set(sectors.filter(s => s.status !== 'Inactive').map(s => s.sectorName).filter(Boolean))];
+          if (names.length > 0) sectorOptions.set(names.sort((a, b) => a.localeCompare(b)));
+        },
+        error: () => {}
+      });
+  }
 }

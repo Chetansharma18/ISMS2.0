@@ -19,20 +19,24 @@ import {
   IconComponent,
   formatInr
 } from '../../shared';
-import { SchemeMasterItem } from '../../core/models/admin-masters.model';
+import { EoiCategoryItem, SchemeCategoryMasterItem, SchemeMasterItem } from '../../core/models/admin-masters.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PermissionService } from '../../core/permissions/permission.service';
 import { DataEngineService } from '../../core/services/data-engine.service';
 import { NotificationService } from '../../core/services/notification.service';
 
 export type { SchemeMasterItem };
 
-const SCHEME_CATEGORY_OPTIONS = ['ALL', 'Rajvik', 'samarth', 'saksham', 'na'];
-const CATEGORY_NAME_OPTIONS = [
+// Built-in choices until the Scheme Category and EOI Category masters are loaded ('ALL' and 'na' always stay).
+const DEFAULT_SCHEME_CATEGORIES = ['Rajvik', 'samarth', 'saksham'];
+const DEFAULT_EOI_CATEGORIES = [
   'GENERAL',
   'GOVERNMENT INSTITUTION/PSU',
   'GOVERNMENT INSTITUTION/INSTITUTION',
   'SPECIAL TARGET GROUP'
 ];
+const schemeCategoryOptions = signal<string[]>(['ALL', ...DEFAULT_SCHEME_CATEGORIES, 'na']);
+const eoiCategoryOptions = signal<string[]>(DEFAULT_EOI_CATEGORIES);
 
 const COLUMNS: TableColumn<SchemeMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
@@ -76,8 +80,8 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   modalWidthClass: 'max-w-[680px]',
   fields: [
     { key: 'schemeName', label: 'Scheme Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter scheme name', colSpan: 3 },
-    { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: SCHEME_CATEGORY_OPTIONS, colSpan: 2 },
-    { key: 'categoryName', label: 'EOI Category', type: 'select', required: true, options: CATEGORY_NAME_OPTIONS, colSpan: 1 },
+    { key: 'schemeCategory', label: 'Scheme Category', type: 'multiselect', required: true, options: () => schemeCategoryOptions(), colSpan: 2 },
+    { key: 'categoryName', label: 'EOI Category', type: 'select', required: true, options: () => eoiCategoryOptions(), colSpan: 1 },
     { key: 'budget', label: 'Budget (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter budget amount', colSpan: 1 },
     { key: 'amount', label: 'EMD amount (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter amount', colSpan: 1 },
     { key: 'processFees', label: 'Process Fees (\u20B9)', type: 'number', required: true, min: 0, placeholder: 'Enter process fees', colSpan: 1 }
@@ -190,6 +194,35 @@ export class SchemeMasterComponent {
 
   readonly editingItemId = signal<string | null>(null);
   readonly editingBudgetValue = signal<number>(0);
+
+  constructor() {
+    // The dropdowns offer the active records of the Scheme Category and EOI Category masters.
+    const activeNames = (rows: { status?: string }[], key: string): string[] =>
+      [...new Set(rows.filter(r => r.status !== 'Inactive').map(r => String((r as Record<string, unknown>)[key] ?? '').trim()).filter(Boolean))];
+
+    this.dataEngine
+      .for<SchemeCategoryMasterItem>('SCHEME_CATEGORIES')
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: rows => {
+          const names = activeNames(rows, 'categoryName').filter(n => n !== 'ALL' && n.toLowerCase() !== 'na');
+          if (names.length > 0) schemeCategoryOptions.set(['ALL', ...names, 'na']);
+        },
+        error: () => {}
+      });
+    this.dataEngine
+      .for<EoiCategoryItem>('EOI_CATEGORIES')
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: rows => {
+          const names = activeNames(rows, 'categoryTitle');
+          if (names.length > 0) eoiCategoryOptions.set(names);
+        },
+        error: () => {}
+      });
+  }
 
   get extraTemplates(): Record<string, TemplateRef<unknown>> {
     return { budget: this.budgetTemplate };

@@ -83,9 +83,32 @@ export interface SchemeMasterItem {
 export interface UserRoleMasterItem {
   sNo: number;
   id: string;
+  /** The role name (backend `name`, e.g. "superAdmin"). */
   roleTypeName: string;
   permissions: string[];
   status: 'Active' | 'Inactive';
+  /** Backend fields (GET /api/roles); absent in mock data. */
+  description?: string;
+  userCount?: number;
+  /** The role's table permissions (backend `permissions`). */
+  tablePermissions?: RoleTablePermission[];
+}
+
+/** One table permission of a role (backend RolePermission, GET /api/roles and /api/roles/{id}/permissions). */
+export interface RoleTablePermission {
+  id: number;
+  roleId: number;
+  tableName: string;
+  /** false: the grant exists but is switched off. */
+  status: boolean;
+  get: boolean;
+  post: boolean;
+  put: boolean;
+  delete: boolean;
+  /** The table gets a sidebar link for this role. */
+  enableInMenu: boolean;
+  /** Sidebar label; null means the table name is shown. */
+  menuCallingName: string | null;
 }
 
 export interface SchemeCategoryMasterItem {
@@ -100,7 +123,14 @@ export interface DocMasterItem {
   id: string;
   sNo?: number;
   schemeName: string;
+  /** Document name (backend `documentName`). */
   documents: string;
+  /** e.g. ".pdf,.jpg,.jpeg,.png" */
+  allowedExtensions?: string;
+  maxFileSizeMb?: number | null;
+  isMandatory?: boolean;
+  /** isMandatory as the form's Yes / No choice. */
+  mandatory?: 'Yes' | 'No';
   status: 'Active' | 'Inactive';
 }
 

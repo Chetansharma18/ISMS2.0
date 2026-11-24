@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { catchError, map, of } from 'rxjs';
 import {
   MasterCrudPageComponent,
   MasterCrudConfig,
   TableColumn
 } from '../../shared';
 import { DistrictBlockMasterItem } from '../../core/models/admin-masters.model';
+import { withDistrictNames } from '../../core/models/master-adapters';
+import { DataEngineService } from '../../core/services/data-engine.service';
 
 export type { DistrictBlockMasterItem };
 
@@ -52,6 +55,11 @@ const CONFIG: MasterCrudConfig<DistrictBlockMasterItem> = {
   deleteConfirmText: (item) => `Are you sure you want to delete "${item.blockName}" block in "${item.districtName}"?`
 };
 
+/**
+ * District & Block Master. Rows are blocks (`/api/master/district-blocks`); a block record carries only its
+ * districtId, so the district name and code come from `/api/master/districts`. A new block names its district by
+ * name and code; the backend links an existing district or creates it.
+ */
 @Component({
   selector: 'app-district-block-master',
   standalone: true,
@@ -60,5 +68,18 @@ const CONFIG: MasterCrudConfig<DistrictBlockMasterItem> = {
   template: `<app-master-crud-page [config]="config"></app-master-crud-page>`
 })
 export class DistrictBlockMasterComponent {
-  readonly config = CONFIG;
+  private readonly dataEngine = inject(DataEngineService);
+
+  readonly config: MasterCrudConfig<DistrictBlockMasterItem> = {
+    ...CONFIG,
+    // The saved block comes back without its district, so the list is read again.
+    reloadAfterSave: true,
+    afterLoad: rows =>
+      this.dataEngine.isMock('DISTRICT_MASTERS') || this.dataEngine.isMock('DISTRICTS')
+        ? of(rows)
+        : this.dataEngine.for<unknown>('DISTRICT_MASTERS').getAll().pipe(
+            map(districts => withDistrictNames(rows, districts)),
+            catchError(() => of(rows))
+          )
+  };
 }

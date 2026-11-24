@@ -55,4 +55,18 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   buildPayload: (formData: any) => Partial<T>;
   /** Optional custom confirmation text for delete */
   deleteConfirmText?: (item: T) => string;
+  /**
+   * Converts one record as the API (or mock store) returns it into the row the screen shows.
+   * Needed when the backend field names differ from the screen's (e.g. `name` / `isActive` vs `roleTypeName` / `status`).
+   */
+  normalizer?: (raw: unknown, index: number) => T;
+  /**
+   * API mode only: builds the request body from the screen payload (`buildPayload`, or `{ status }` for the status
+   * switch) and the row being edited (null when adding). Lets an endpoint that needs the full record (PUT) get it.
+   */
+  toApiPayload?: (payload: Partial<T>, current: T | null) => unknown;
+  /** Completes the loaded rows (e.g. fills in names from another master); runs after every load. */
+  afterLoad?: (rows: T[]) => import('rxjs').Observable<T[]>;
+  /** Reload the list after a save instead of using the saved record from the response (when it lacks joined fields). */
+  reloadAfterSave?: boolean;
 }

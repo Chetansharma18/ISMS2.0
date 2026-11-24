@@ -7,6 +7,7 @@ import {
   governingRoute,
   humanizeTableName,
   tableAllows,
+  tablesByRoute,
   toPermittedTablesState
 } from './permitted-tables.util';
 import type { TableScreen } from './permitted-tables.model';
@@ -140,6 +141,12 @@ describe('permitted tables', () => {
   it('names tables readably', () => {
     expect(humanizeTableName('RolePermissions')).toBe('Role Permissions');
     expect(humanizeTableName('EoiCategoryMasters')).toBe('EOI Category Masters');
+  });
+
+  it('lets one permission open the extra pages its screen leads to', () => {
+    const map = tablesByRoute({ EoiApplications: { route: '/tenders', alsoGoverns: ['/scheme-form'] } });
+    expect(map.get('/tenders')).toEqual(['EoiApplications']);
+    expect(map.get('/scheme-form')).toEqual(['EoiApplications']);
   });
 
   it('finds the screen route that governs a URL', () => {

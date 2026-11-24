@@ -15,6 +15,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { of, switchMap } from 'rxjs';
 
 import { PageHeaderComponent } from '../page-header/page-header.component';
 import { TableComponent } from '../table/table.component';
@@ -415,7 +416,12 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   customTemplates = signal<Record<string, TemplateRef<unknown>>>({});
 
   ngOnInit(): void {
-    this.repo = this.dataEngine.for<T>(this.config.dataKey, { idKey: 'id' });
+    const normalize = this.config.normalizer;
+    let index = 0;
+    this.repo = this.dataEngine.for<T>(this.config.dataKey, {
+      idKey: 'id',
+      normalizer: normalize ? (raw: unknown) => normalize(raw, index++) : undefined
+    });
     this.buildColumns();
     this.load();
   }
@@ -446,11 +452,23 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.tableColumns.set(cols);
   }
 
+  /** The request body for the API: the config's converter when it has one (API mode only). */
+  private apiBody(payload: Partial<T>, current: T | null): Partial<T> {
+    const convert = this.config.toApiPayload;
+    if (!convert || this.dataEngine.isMock(this.config.dataKey)) return payload;
+    return convert(payload, current) as Partial<T>;
+  }
+
   load(): void {
     this.loading.set(true);
-    this.repo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+    const afterLoad = this.config.afterLoad;
+    this.repo.getAll().pipe(
+      switchMap((list: T[]) => (afterLoad ? afterLoad(list) : of(list))),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (list: T[]) => {
-        this.items.set(list);
+        // Row numbers follow the list order, whatever the normalizer counted before.
+        this.items.set(this.config.normalizer ? list.map((it: any, i) => ({ ...it, sNo: i + 1 })) : list);
         this.loading.set(false);
       },
       error: () => this.loading.set(false)
@@ -625,14 +643,23 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     const editId = this.editingId();
 
     if (editId) {
-      this.repo.update(editId, payload).subscribe((updated: T) => {
-        this.items.update(current => current.map(it => (it.id === editId ? updated : it)));
+      const currentItem = this.items().find(it => it.id === editId) ?? null;
+      // Only the Active switch changes the status: an edit keeps it (many payloads default it to 'Active').
+      if (currentItem && 'status' in (payload as object) && currentItem.status) {
+        (payload as any).status = currentItem.status;
+      }
+      this.repo.update(editId, this.apiBody(payload, currentItem)).subscribe((updated: T) => {
         this.showModal.set(false);
+        if (this.config.reloadAfterSave) return this.load();
+        // Keep the row's place and number; fields the response leaves out keep their current value.
+        const keep = currentItem ? { sNo: (currentItem as any).sNo } : {};
+        this.items.update(current => current.map(it => (it.id === editId ? { ...it, ...updated, ...keep } : it)));
       });
     } else {
-      this.repo.create(payload).subscribe((created: T) => {
-        this.items.update(current => [created, ...current]);
+      this.repo.create(this.apiBody(payload, null)).subscribe((created: T) => {
         this.showModal.set(false);
+        if (this.config.reloadAfterSave) return this.load();
+        this.items.update(current => [created, ...current].map((it: any, i) => ({ ...it, sNo: i + 1 })));
       });
     }
   }
@@ -692,7 +719,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   toggleStatus(item: T): void {
     const currentStatus = item.status === 'Inactive' ? 'Inactive' : 'Active';
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-    this.repo.update(item.id, { status: newStatus } as any).subscribe((updated: T) => {
+    this.repo.update(item.id, this.apiBody({ status: newStatus } as Partial<T>, item)).subscribe(() => {
       this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
     });
   }

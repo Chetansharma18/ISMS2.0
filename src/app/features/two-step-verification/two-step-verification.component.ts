@@ -19,6 +19,7 @@ import { ActionModalComponent } from '../../shared/components/action-modal/actio
 import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
 import { AuthMethodType, TwoStepVerificationItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
+import { toUserRoleItem } from '../../core/models/role.normalizer';
 
 export type { TwoStepVerificationItem, AuthMethodType };
 
@@ -363,7 +364,7 @@ export class TwoStepVerificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.twoStepRepo = this.dataEngine.for<TwoStepVerificationItem>('TWO_STEP_VERIFICATION', { idKey: 'id' });
-    this.roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES', { idKey: 'id' });
+    this.roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES', { idKey: 'id', normalizer: item => toUserRoleItem(item) });
 
     this.loadData();
     this.loadRoles();

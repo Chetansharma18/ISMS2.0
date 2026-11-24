@@ -43,6 +43,8 @@ export interface TableScreen {
   dataKey?: string;
   /** Extra query params of the link (e.g. Users / Blacklisted users share one screen). */
   query?: Record<string, string>;
+  /** Other pages the screen leads to that the same permission opens (no sidebar link of their own). */
+  alsoGoverns?: string[];
 }
 
 /** One link of the permission-driven sidebar. */

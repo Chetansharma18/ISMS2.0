@@ -362,6 +362,30 @@ export const routes: Routes = [
       )
   },
   {
+    // Backend users (/api/users) with their profile details and roles.
+    path: 'admin/users',
+    loadComponent: () =>
+      import('./features/users/users-page.component').then(
+        (m) => m.UsersPageComponent
+      )
+  },
+  {
+    // Department users (backend /api/department-users): SSO ID -> role, designation, schemes, districts, blocks.
+    path: 'admin/department-users',
+    loadComponent: () =>
+      import('./features/department-users/department-users-page.component').then(
+        (m) => m.DepartmentUsersPageComponent
+      )
+  },
+  {
+    // Which user holds which role (backend UserRoles); assign and revoke roles.
+    path: 'admin/user-roles',
+    loadComponent: () =>
+      import('./features/users/user-roles-page.component').then(
+        (m) => m.UserRolesPageComponent
+      )
+  },
+  {
     // A permitted backend table that has no dedicated screen yet (linked from the permission-driven sidebar).
     path: 'module/:tableName',
     loadComponent: () =>

@@ -184,7 +184,9 @@ export function combinedLabel(tableNames: readonly string[]): string {
 export function tablesByRoute(screens: Readonly<Record<string, TableScreen>>): Map<string, string[]> {
   const map = new Map<string, string[]>();
   for (const [tableName, screen] of Object.entries(screens)) {
-    map.set(screen.route, [...(map.get(screen.route) ?? []), tableName]);
+    for (const route of [screen.route, ...(screen.alsoGoverns ?? [])]) {
+      map.set(route, [...(map.get(route) ?? []), tableName]);
+    }
   }
   return map;
 }

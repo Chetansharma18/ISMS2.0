@@ -39,7 +39,16 @@ const CONFIG: MasterCrudConfig<DesignationMasterItem> = {
   itemUnit: 'designations',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[520px]',
+  filters: [
+    {
+      key: 'departmentWing',
+      label: 'Department',
+      placeholder: 'All Departments',
+      options: () => departmentOptions()
+    }
+  ],
   fields: [
     { key: 'designationName', label: 'Designation Name', type: 'text', required: true, maxLength: 100, placeholder: 'Enter designation name (e.g. Joint Director)', colSpan: 3 },
     { key: 'designationCode', label: 'Designation Code', type: 'text', required: true, maxLength: 30, placeholder: 'e.g. JD', uppercase: true, colSpan: 3 },

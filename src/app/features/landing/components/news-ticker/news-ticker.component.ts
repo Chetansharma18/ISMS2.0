@@ -20,6 +20,7 @@ export interface AnnouncementItem {
   text: string;
   pdfUrl: string;
   fileName: string;
+  lang: 'hi' | 'en';
 }
 
 @Component({
@@ -83,10 +84,15 @@ export interface AnnouncementItem {
                   [href]="item.pdfUrl"
                   [download]="item.fileName"
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0 focus:outline-none focus:text-[#F28C28]"
+                  [attr.lang]="item.lang"
                 >
                   <!-- Date Badge -->
                   <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
+                  </span>
+                  <!-- Language Badge -->
+                  <span class="bg-white/10 text-white/90 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap shrink-0">
+                    {{ item.lang === 'hi' ? 'HI' : 'EN' }}
                   </span>
                   <!-- Announcement Text (Hindi / English - explicitly pure white) -->
                   <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
@@ -106,10 +112,15 @@ export interface AnnouncementItem {
                   [download]="item.fileName"
                   tabindex="-1"
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0"
+                  [attr.lang]="item.lang"
                 >
                   <!-- Date Badge -->
                   <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
+                  </span>
+                  <!-- Language Badge -->
+                  <span class="bg-white/10 text-white/90 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border border-white/20 whitespace-nowrap shrink-0">
+                    {{ item.lang === 'hi' ? 'HI' : 'EN' }}
                   </span>
                   <!-- Announcement Text -->
                   <span class="ticker-text font-normal text-[12.5px] sm:text-[13.5px] lg:text-[14.5px] text-white font-sans whitespace-nowrap group-hover:text-[#F28C28] group-hover:underline">
@@ -220,28 +231,55 @@ export class NewsTickerComponent implements AfterViewInit, OnDestroy {
   readonly isVisible = signal(true);
   readonly isTabActive = signal(true);
 
-  /** Preserved Announcement Data with existing dates, text, and PDF download links */
+  /** Preserved Announcement Data with existing dates, text, language metadata and PDF download links */
   readonly announcements: AnnouncementItem[] = [
     {
       id: 'item-1',
       date: '17 Aug, 2026',
       text: 'राज्य कौशल एवं उद्यमिता समिति की प्रथम बैठक आयोजित',
       pdfUrl: '/dummy.pdf',
-      fileName: 'news-17-aug.pdf'
+      fileName: 'news-17-aug.pdf',
+      lang: 'hi'
     },
     {
       id: 'item-2',
-      date: '15 Jul, 2026',
-      text: 'विश्व युवा कौशल दिवस पर राज्य स्तरीय कार्यक्रम आयोजित',
+      date: '28 Aug, 2026',
+      text: 'Expression of Interest (EOI) invited for Empanelment of Training Partners under MMKVY Scheme',
       pdfUrl: '/dummy.pdf',
-      fileName: 'news-15-jul.pdf'
+      fileName: 'news-28-aug.pdf',
+      lang: 'en'
     },
     {
       id: 'item-3',
+      date: '15 Jul, 2026',
+      text: 'विश्व युवा कौशल दिवस पर राज्य स्तरीय कार्यक्रम आयोजित',
+      pdfUrl: '/dummy.pdf',
+      fileName: 'news-15-jul.pdf',
+      lang: 'hi'
+    },
+    {
+      id: 'item-4',
+      date: '12 Jun, 2026',
+      text: 'RSLDC signs MoU with Sector Skill Councils for industry-aligned certified skill training programs',
+      pdfUrl: '/dummy.pdf',
+      fileName: 'news-12-jun.pdf',
+      lang: 'en'
+    },
+    {
+      id: 'item-5',
       date: '23 Apr, 2026',
       text: 'राज्य की 2 हजार युवतियों को डिजिटल सशक्त बनाने के लिए यूनिसेफ एफडीसीआर के माध्यम से करेगा प्रशिक्षित',
       pdfUrl: '/dummy.pdf',
-      fileName: 'news-23-apr.pdf'
+      fileName: 'news-23-apr.pdf',
+      lang: 'hi'
+    },
+    {
+      id: 'item-6',
+      date: '04 May, 2026',
+      text: 'State Level Skill Development Review Committee approves new batch allocations for FY 2026-27',
+      pdfUrl: '/dummy.pdf',
+      fileName: 'news-04-may.pdf',
+      lang: 'en'
     }
   ];
 
@@ -267,7 +305,7 @@ export class NewsTickerComponent implements AfterViewInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const el = this.tickerSectionRef?.nativeElement;
-    if (el) {
+    if (el && typeof IntersectionObserver !== 'undefined') {
       this.observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {

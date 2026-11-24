@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -60,6 +60,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="Branch Name"
               [value]="data().branchName"
               (valueChange)="update('branchName', $event)"
+              (blur)="markTouched('branchName')"
               placeholder="Enter branch name"
               [required]="true"
               [maxLength]="150"
@@ -73,6 +74,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="Account Holder Name"
               [value]="data().accountHolderName"
               (valueChange)="update('accountHolderName', $event)"
+              (blur)="markTouched('accountHolderName')"
               placeholder="Enter account holder name"
               [required]="true"
               [maxLength]="200"
@@ -85,8 +87,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             <app-form-input
               label="Account Number"
               type="tel"
+              [numericOnly]="true"
               [value]="data().accountNo"
               (valueChange)="update('accountNo', $event)"
+              (blur)="markTouched('accountNo')"
               placeholder="Enter account number"
               [required]="true"
               [maxLength]="30"
@@ -100,6 +104,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="IFSC Code"
               [value]="data().ifscCode"
               (valueChange)="update('ifscCode', $event)"
+              (blur)="markTouched('ifscCode')"
               placeholder="Enter IFSC code"
               [required]="true"
               [uppercase]="true"
@@ -114,8 +119,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
             <app-form-input
               label="MICR Code (Optional)"
               type="tel"
+              [numericOnly]="true"
               [value]="data().micrCode"
               (valueChange)="update('micrCode', $event)"
+              (blur)="markTouched('micrCode')"
               placeholder="Enter MICR code (9 digits)"
               [maxLength]="9"
               [error]="getFieldError('micrCode')"
@@ -147,7 +154,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               (fileChange)="updateFileDoc('cancelledChequeDoc', $event)"
               [required]="true"
               accept=".pdf,.jpg,.jpeg,.png"
-              [maxSizeMb]="5"
+              [maxSizeMb]="25"
               [error]="getFieldError('cancelledChequeDoc')"
             ></app-form-file-upload>
           </div>
@@ -190,9 +197,14 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       border-color: #B5CBE0 !important;
     }
 
-    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+    :host ::ng-deep app-form-input > div > div.relative:not(.border-rose-600):focus-within {
       border-color: #477DAF !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
     }
 
     :host ::ng-deep app-form-input input {
@@ -249,39 +261,55 @@ export class Step4BankDetailsComponent {
   readonly accountTypes = ACCOUNT_TYPES;
   readonly data = computed(() => this.otrFormService.step4());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(3));
+  readonly touchedFields = signal<Set<string>>(new Set<string>());
+
+  markTouched(field: string): void {
+    this.touchedFields.update(set => {
+      if (set.has(field)) return set;
+      const next = new Set(set);
+      next.add(field);
+      return next;
+    });
+  }
 
   getFieldError(field: string): string | undefined {
-    if (!this.isSubmitted()) return undefined;
+    const isSubmitted = this.isSubmitted();
+    const isTouched = this.touchedFields().has(field);
     const d = this.data();
-    switch (field) {
-      case 'bankName':
-        if (!d.bankName?.trim()) return 'Bank Name is required';
-        return undefined;
-      case 'branchName':
-        if (!d.branchName?.trim()) return 'Branch Name is required';
-        return undefined;
-      case 'accountHolderName':
-        if (!d.accountHolderName?.trim()) return 'Account Holder Name is required';
-        return undefined;
-      case 'accountNo':
-        if (!d.accountNo?.trim()) return 'Bank Account Number is required';
-        if (!REGEX.BANK_ACCOUNT.test(d.accountNo)) return 'Invalid Account Number (9 to 18 digits)';
-        return undefined;
-      case 'ifscCode':
-        if (!d.ifscCode?.trim()) return 'IFSC Code is required';
-        if (!REGEX.IFSC.test(d.ifscCode.toUpperCase())) return 'Invalid IFSC Code (e.g. SBIN0031804)';
-        return undefined;
-      case 'micrCode':
-        if (d.micrCode?.trim() && !REGEX.MICR.test(d.micrCode)) return 'Invalid MICR Code (9 digits)';
-        return undefined;
-      case 'cancelledChequeDoc':
-        if (!d.cancelledChequeDoc || d.cancelledChequeDoc.status !== 'uploaded') {
-          return 'Cancelled Cheque or Bank Passbook upload is required';
-        }
-        return undefined;
-      default:
-        return undefined;
+
+    if (field === 'bankName') {
+      if ((isSubmitted || isTouched) && !d.bankName?.trim()) return 'Bank Name is required';
+      return undefined;
     }
+    if (field === 'branchName') {
+      if ((isSubmitted || isTouched) && !d.branchName?.trim()) return 'Branch Name is required';
+      return undefined;
+    }
+    if (field === 'accountHolderName') {
+      if ((isSubmitted || isTouched) && !d.accountHolderName?.trim()) return 'Account Holder Name is required';
+      return undefined;
+    }
+    if (field === 'accountNo') {
+      if ((isSubmitted || isTouched) && !d.accountNo?.trim()) return 'Bank Account Number is required';
+      if (d.accountNo?.trim() && !REGEX.BANK_ACCOUNT.test(d.accountNo)) return 'Invalid Account Number (9 to 18 digits)';
+      return undefined;
+    }
+    if (field === 'ifscCode') {
+      if ((isSubmitted || isTouched) && !d.ifscCode?.trim()) return 'IFSC Code is required';
+      if (d.ifscCode?.trim() && !REGEX.IFSC.test(d.ifscCode.toUpperCase())) return 'Invalid IFSC Code (e.g. SBIN0031804)';
+      return undefined;
+    }
+    if (field === 'micrCode') {
+      if (d.micrCode?.trim() && !REGEX.MICR.test(d.micrCode)) return 'Invalid MICR Code (9 digits)';
+      return undefined;
+    }
+    if (field === 'cancelledChequeDoc') {
+      if (isSubmitted && (!d.cancelledChequeDoc || d.cancelledChequeDoc.status !== 'uploaded')) {
+        return 'Cancelled Cheque or Bank Passbook upload is required';
+      }
+      return undefined;
+    }
+    return undefined;
   }
 
   update(field: keyof Step4BankDetails, value: string): void {

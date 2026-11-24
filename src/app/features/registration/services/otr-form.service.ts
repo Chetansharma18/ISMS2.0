@@ -98,6 +98,12 @@ export class OtrFormService {
     this.storage.setItem(this.STORAGE_KEY, data);
   }
 
+  /** The registration the backend returned (GET /otr/me), for the screens that read this service. */
+  applyServerData(data: OtrFormData): void {
+    this._formData.set(data);
+    this.persistDraft(data);
+  }
+
   resetToInitialDraft(): void {
     const data = createInitialOtrFormData();
     this._formData.set(data);

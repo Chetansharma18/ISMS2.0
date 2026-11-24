@@ -12,6 +12,7 @@ describe('open routes', () => {
     expect(isPublicPath('/')).toBe(true);
     expect(isPublicPath('/?verifylogin=true&token=x')).toBe(true);
     expect(isPublicPath('/sso-login')).toBe(true);
+    expect(isPublicPath('/help-support')).toBe(true);
     expect(isPublicPath('/admin/eoi-configuration')).toBe(false);
     expect(isPublicPath('/tenders')).toBe(false);
   });

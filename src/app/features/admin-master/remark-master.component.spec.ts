@@ -8,12 +8,15 @@ describe('RemarkMasterComponent', () => {
     expect(comp.config.title).toBe('Remark Master');
     expect(comp.config.entityLabel).toBe('Remarks');
     expect(comp.config.dataKey).toBe('REMARK_MASTERS');
+    expect(comp.config.hideViewAction).toBe(true);
 
     const columnKeys = comp.config.columns.map((c) => c.key);
     expect(columnKeys).toContain('sNo');
     expect(columnKeys).toContain('remarkType');
     expect(columnKeys).toContain('description');
-    expect(columnKeys).toContain('status');
+    // Status is the master page's own Active switch column, not a config column.
+    expect(columnKeys).not.toContain('status');
+    expect(comp.config.hasStatus).toBe(true);
   });
 
   it('configures form fields for remarkType (dropdown) and description', () => {

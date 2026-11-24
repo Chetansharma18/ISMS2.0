@@ -93,7 +93,8 @@ describe('PermissionMasterComponent (backend roles API)', () => {
       ['admin', 'SectorMasters']
     ]);
     expect(comp.tableOptions().map(o => o.value)).toEqual(['News', 'SectorMasters', 'Users']);
-    comp.roleFilter.set('2');
+    comp.filterValues.set({ role: 'admin' });
+    expect(comp.roleFilter()).toBe('2');
     expect(comp.visibleRows().map(r => r.tableName)).toEqual(['SectorMasters']);
   });
 

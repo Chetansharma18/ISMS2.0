@@ -87,6 +87,7 @@ export class GradingMasterComponent {
         { key: 'range', label: 'Range', cellClass: 'whitespace-nowrap font-medium text-slate-700' }
       ],
       hasStatus: true,
+      hideViewAction: true,
       modalWidthClass: 'max-w-[520px]',
       fields: [
         {

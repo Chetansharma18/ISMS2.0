@@ -38,7 +38,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     IPA: true,
     MASTERS: true,
     GRIEVANCES: true,
-    REGISTRATION: true,
+    OTR: false,
     AUTH: true,
     ADMIN_GRIEVANCES: true,
     SUBMITTED_TENDERS: true,

@@ -27,6 +27,7 @@ import { DropdownComponent } from '../dropdown/dropdown.component';
 import { InputDirective } from '../form-controls/input/input.directive';
 import { SwitchComponent } from '../switch/switch.component';
 import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
+import { MasterFilterBarComponent, StatusFilterOption } from '../master-filter-bar/master-filter-bar.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
 import { TableAccessService } from '../../../core/permissions/table-access.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
@@ -58,7 +59,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
     DropdownComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -66,10 +68,8 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Page Header -->
       <app-page-header
         [title]="config.title"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: config.title }]"
-        [searchable]="true"
-        [searchPlaceholder]="config.searchPlaceholder || 'Search...'"
-        [(searchQuery)]="searchQuery"
+        [subtitle]="config.subtitle"
+        [breadcrumbs]="config.breadcrumbs || [{ label: 'Home', url: '/' }, { label: config.title }]"
       >
         <!-- Add Button: only with a POST permission on the table (GET /auth/permissions) -->
         @if (canAdd()) {
@@ -85,6 +85,21 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           </button>
         }
       </app-page-header>
+
+      <!-- Unified Master Filter & Search Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        [searchPlaceholder]="config.searchPlaceholder || 'Search ' + config.entityLabel.toLowerCase() + '...'"
+        [(status)]="statusFilter"
+        [showStatusFilter]="!!(config.hasStatus && !config.hideStatusFilter)"
+        [statusOptions]="statusFilterOptions()"
+        [filters]="config.filters || []"
+        [(filterValues)]="filterValues"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        [itemUnit]="config.itemUnit"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Master Table -->
       <app-table
@@ -113,30 +128,34 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
       <!-- Status badge cell template -->
       <ng-template #statusTemplate let-item>
         <span
-          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[13px] font-normal border select-none"
+          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
           [ngClass]="item.status === 'Inactive'
-            ? 'bg-slate-50 text-slate-600 border-slate-200'
-            : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
+            ? 'bg-slate-100 text-slate-600 border-slate-300'
+            : 'bg-emerald-50 text-emerald-700 border-emerald-300'"
         >
-          {{ item.status }}
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="item.status === 'Inactive' ? 'bg-slate-400' : 'bg-emerald-500'"></span>
+          {{ item.status || 'Active' }}
         </span>
       </ng-template>
 
       <!-- Action cell template: View + Edit + Active/Inactive toggle -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            title="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-            <span>View</span>
-          </button>
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+          @if (!config.hideViewAction) {
+            <!-- View Button -->
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); openViewModal(item)"
+              title="View Details"
+              aria-label="View Details"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
+          }
 
           <!-- Edit and status toggle: only with a PUT permission on the table (GET /auth/permissions) -->
           @if (canEdit()) {
@@ -147,30 +166,28 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
             title="Edit"
+            aria-label="Edit"
           >
             <app-icon name="edit" size="sm" />
-            <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Active / Inactive Toggle -->
-          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
+          <div
+            class="inline-flex items-center"
+            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+            (click)="$event.stopPropagation()"
+          >
             <app-switch
               [checked]="item.status !== 'Inactive'"
-              label="Toggle Active Status"
+              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
               (toggled)="toggleStatus(item)"
             />
-            <span
-              class="font-medium text-[12px] select-none transition-colors cursor-pointer"
-              (click)="toggleStatus(item)"
-              [ngClass]="item.status === 'Inactive' ? 'text-slate-700 font-semibold hover:text-slate-900' : 'text-emerald-600 hover:text-emerald-700'"
-            >
-              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-            </span>
           </div>
           }
         </div>
@@ -184,7 +201,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [reverseButtons]="true"
         [showAccentBar]="false"
         [primaryLabel]="config.primaryActionLabel || 'Save'"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         [maxWidthClass]="config.modalWidthClass || 'max-w-[520px]'"
         (primaryAction)="submit()"
         (secondaryAction)="closeModal()"
@@ -194,7 +211,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
         </h2>
 
-        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        <div class="mt-4 font-sans text-[13px] space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @for (field of config.fields; track field.key) {
               <div [ngClass]="colSpanClass(field)">
@@ -214,28 +231,24 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                     ></textarea>
                   }
                   @case ('select') {
-                    <select
-                      appInput
-                      [(ngModel)]="formData[field.key]"
+                    <app-dropdown
+                      [options]="resolveOptions(field)"
+                      [(value)]="formData[field.key]"
+                      [placeholder]="field.placeholder || ('Select ' + field.label)"
                       [invalid]="fieldInvalid(field)"
-                      class="w-full"
-                    >
-                      <option value="" disabled selected>Select {{ field.label }}</option>
-                      @for (opt of resolveOptions(field); track opt) {
-                        <option [value]="opt">{{ opt }}</option>
-                      }
-                    </select>
+                    />
                   }
                   @case ('multiselect') {
                     <app-dropdown
                       multiple
-                      overlay
                       [options]="resolveOptions(field)"
                       [values]="valuesOf(field)"
-                      [placeholder]="'Select ' + field.label"
+                      [placeholder]="field.placeholder || ('Select ' + field.label)"
                       [summary]="getMultiselectLabel(field)"
                       [invalid]="fieldInvalid(field)"
+                      [selectAllLabel]="field.key === 'schemes' ? 'All Schemes' : 'Select All'"
                       (optionToggled)="toggleMultiselectOption(field, $event)"
+                      (selectAllToggled)="toggleAllMultiselect(field)"
                     />
                   }
                   @case ('number') {
@@ -251,16 +264,12 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                   }
                   @case ('permissions') {
                     <div class="flex items-center gap-2">
-                      <select
-                        appInput
-                        [(ngModel)]="pendingPermission"
+                      <app-dropdown
                         class="flex-1"
-                      >
-                        <option value="" disabled selected>Select permission to add...</option>
-                        @for (opt of unselectedPermissions(field); track opt) {
-                          <option [value]="opt">{{ opt }}</option>
-                        }
-                      </select>
+                        [options]="unselectedPermissions(field)"
+                        [(value)]="pendingPermission"
+                        placeholder="Select permission to add..."
+                      />
                       <button
                         appButton
                         iconOnly
@@ -318,36 +327,51 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         [closeOnBackdrop]="true"
         [showAccentBar]="false"
         primaryLabel=""
-        secondaryLabel="Close"
-        [maxWidthClass]="config.modalWidthClass || 'max-w-[500px]'"
+        secondaryLabel=""
+        [maxWidthClass]="config.viewModalWidthClass || (config.modalWidthClass ? 'max-w-[620px]' : 'max-w-[540px]')"
         (secondaryAction)="closeViewModal()"
         (close)="closeViewModal()"
       >
-        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+        <h2 class="m-0 text-brand-dark pb-2.5 border-b border-slate-100" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
           {{ config.entityLabel }} Details
         </h2>
 
         @if (selectedViewItem(); as viewItem) {
-          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100 max-h-[65vh] overflow-y-auto pr-1">
+          <div class="mt-2.5 font-sans text-xs divide-y divide-slate-100">
             @for (col of viewableColumns(); track col.key) {
-              <div class="pt-2.5 flex flex-col gap-1 first:pt-0">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ col.label }}</span>
-                @if (isTagArray(col.key, viewItem)) {
-                  <div class="flex flex-wrap gap-1.5 pt-0.5">
-                    @for (tag of viewItem[col.key]; track tag) {
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
-                        {{ tag }}
-                      </span>
-                    }
-                  </div>
-                } @else {
-                  <span class="text-sm font-medium text-slate-800 break-words">{{ formatViewValue(col, viewItem) }}</span>
-                }
-              </div>
+              @if (isLongText(col, viewItem)) {
+                <div class="py-1.5 flex flex-col gap-0.5 text-xs first:pt-0">
+                  <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                    {{ col.label }}
+                  </span>
+                  <span class="text-xs font-semibold text-slate-800 break-words leading-relaxed">
+                    {{ formatViewValue(col, viewItem) }}
+                  </span>
+                </div>
+              } @else {
+                <div class="py-1.5 flex items-center justify-between gap-4 text-xs first:pt-0">
+                  <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider shrink-0 max-w-[55%]">
+                    {{ col.label }}
+                  </span>
+                  @if (isTagArray(col.key, viewItem)) {
+                    <div class="flex flex-wrap justify-end gap-1.5 max-w-[45%]">
+                      @for (tag of viewItem[col.key]; track tag) {
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-sky-50 text-brand border border-sky-200">
+                          {{ tag }}
+                        </span>
+                      }
+                    </div>
+                  } @else {
+                    <span class="text-xs sm:text-[13px] font-semibold text-slate-800 text-right break-words max-w-[45%]">
+                      {{ formatViewValue(col, viewItem) }}
+                    </span>
+                  }
+                </div>
+              }
             }
 
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
+            <div class="py-1.5 flex items-center justify-between gap-4 text-xs last:pb-0">
+              <span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</span>
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
                 [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
@@ -403,13 +427,88 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   formData: Record<string, any> = {};
   pendingPermission = '';
 
+  readonly statusFilter = signal<'ALL' | 'Active' | 'Inactive'>('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly activeCount = computed(() => {
+    return this.items().filter((it: any) => it.status !== 'Inactive').length;
+  });
+
+  readonly inactiveCount = computed(() => {
+    return this.items().filter((it: any) => it.status === 'Inactive').length;
+  });
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
+
+  readonly isFilterActive = computed(() => {
+    if (this.statusFilter() !== 'ALL') return true;
+    const fv = this.filterValues();
+    return Object.values(fv).some(v => !!v);
+  });
+
+  setStatusFilter(status: 'ALL' | 'Active' | 'Inactive'): void {
+    this.statusFilter.set(status);
+  }
+
+  setFilterValue(key: string, value: string): void {
+    this.filterValues.update(prev => ({ ...prev, [key]: value }));
+  }
+
+  resetFilters(): void {
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+    this.searchQuery.set('');
+  }
+
+  resolveFilterOptions(filter: { options: string[] | (() => string[]) }): string[] {
+    if (!filter.options) return [];
+    return typeof filter.options === 'function' ? filter.options() : filter.options;
+  }
+
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.items();
-    if (!q) return all;
-    return all.filter((item: any) =>
-      this.config.searchFields.some(f => String(item[f] ?? '').toLowerCase().includes(q))
-    );
+    const status = this.statusFilter();
+    const fv = this.filterValues();
+    let list = this.items();
+
+    // 1. Status Filter
+    if (status !== 'ALL') {
+      list = list.filter((item: any) => {
+        if (status === 'Inactive') return item.status === 'Inactive';
+        return item.status !== 'Inactive';
+      });
+    }
+
+    // 2. Custom Dropdown Filters
+    const activeFilters = Object.entries(fv).filter(([_, val]) => !!val);
+    if (activeFilters.length > 0) {
+      list = list.filter((item: any) => {
+        return activeFilters.every(([key, val]) => {
+          const itemVal = item[key];
+          if (Array.isArray(itemVal)) {
+            return itemVal.some((v: any) => String(v).trim().toLowerCase() === val.trim().toLowerCase());
+          }
+          if (typeof itemVal === 'string' && itemVal.includes(',')) {
+            const parts = itemVal.split(',').map((s: string) => s.trim().toLowerCase());
+            return parts.includes(val.trim().toLowerCase());
+          }
+          return String(itemVal ?? '').trim().toLowerCase() === val.trim().toLowerCase();
+        });
+      });
+    }
+
+    // 3. Search query
+    if (q) {
+      list = list.filter((item: any) =>
+        this.config.searchFields.some(f => String(item[f] ?? '').toLowerCase().includes(q))
+      );
+    }
+
+    return list;
   });
 
   tableColumns = signal<TableColumn<T>[]>([]);
@@ -448,7 +547,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   private buildColumns(): void {
     const cols = [...this.config.columns];
-    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'min-w-[210px]' });
+    const actionWidth = this.config.hideViewAction ? 'w-28 min-w-[105px]' : 'w-36 min-w-[130px]';
+    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: actionWidth });
     this.tableColumns.set(cols);
   }
 
@@ -579,10 +679,27 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.syncMultiselectValues(field);
   }
 
+  toggleAllMultiselect(field: MasterFieldConfig): void {
+    const current: string[] = Array.isArray(this.formData[field.key])
+      ? [...this.formData[field.key]]
+      : [];
+    const allApplicable = this.resolveOptions(field).filter(
+      (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+    );
+    const allSelected = allApplicable.length > 0 && allApplicable.every((o) => current.includes(o));
+    if (allSelected) {
+      this.formData[field.key] = current.filter((o) => !allApplicable.includes(o));
+    } else {
+      const naSelected = current.filter((o) => o.toLowerCase() === 'na');
+      this.formData[field.key] = [...allApplicable, ...naSelected];
+    }
+    this.syncMultiselectValues(field);
+  }
+
   getMultiselectLabel(field: MasterFieldConfig): string {
     const selected: string[] = this.formData[field.key] || [];
     if (!selected || selected.length === 0) {
-      return `Select ${field.label}`;
+      return field.placeholder || `Select ${field.label}`;
     }
     const allApplicable = this.resolveOptions(field).filter(
       (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
@@ -592,7 +709,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
     if (hasAllApplicable) {
       const hasNa = selected.some((o) => o.toLowerCase() === 'na');
-      return hasNa ? 'ALL, na' : 'ALL';
+      const allLabel = field.key === 'schemes' ? 'All Schemes' : 'ALL';
+      return hasNa ? `${allLabel}, na` : allLabel;
     }
     return selected.join(', ');
   }
@@ -681,7 +799,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   selectedViewItem = signal<any | null>(null);
 
   readonly viewableColumns = computed(() => {
-    return this.config.columns.filter(c => c.key !== 'sNo' && c.key !== 'action' && c.key !== 'status');
+    const cols = this.config.viewColumns || this.config.columns;
+    return cols.filter(c => c.key !== 'sNo' && c.key !== 'action' && c.key !== 'status');
   });
 
   isTagsColumn(key: string): boolean {
@@ -690,6 +809,11 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   isTagArray(key: string, item: Record<string, unknown>): boolean {
     return this.isTagsColumn(key) && Array.isArray(item[key]);
+  }
+
+  isLongText(col: TableColumn<T>, item: any): boolean {
+    const val = item[col.key];
+    return typeof val === 'string' && val.length > 70;
   }
 
   formatViewValue(col: TableColumn<T>, item: any): string {

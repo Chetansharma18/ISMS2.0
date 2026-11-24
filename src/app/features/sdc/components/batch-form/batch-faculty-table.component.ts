@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime, filter, map, switchMap } from 'rxjs';
 import { FacultyItem } from './batch-form.util';
 import { SsoDirectoryService } from '../../services/sso-directory.service';
-import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
 
 /** An SSO ID shorter than this is not looked up yet. */
 const MIN_SSO_ID_LENGTH = 4;
@@ -18,7 +18,7 @@ type LookupState = 'loading' | 'notFound';
 @Component({
   selector: 'app-batch-faculty-table',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent, DropdownComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-2.5">
@@ -76,21 +76,24 @@ type LookupState = 'loading' | 'notFound';
 
       <!-- Trainer Type -->
       <ng-template #typeTpl let-faculty let-i="index">
-        <select appInput size="sm" [(ngModel)]="faculty.trainerType" [name]="'faculty_type_' + i" class="w-full">
-          <option value="Primary Trainer">Primary Trainer</option>
-          <option value="Assistant Trainer">Assistant Trainer</option>
-          <option value="Domain Trainer">Domain Trainer</option>
-          <option value="Master Trainer">Master Trainer</option>
-        </select>
+        <app-dropdown
+          size="sm"
+          [options]="trainerTypeOptions"
+          [(value)]="faculty.trainerType"
+          placeholder="Select Trainer Type"
+          class="w-full"
+        />
       </ng-template>
 
       <!-- Qualification / Experience (Options: Graduate, Post Graduate, PhD) -->
       <ng-template #qualTpl let-faculty let-i="index">
-        <select appInput size="sm" [(ngModel)]="faculty.qualification" [name]="'faculty_qual_' + i" class="w-full">
-          <option value="Graduate (B.A / B.Sc / B.Com / B.Tech)">Graduate (B.A / B.Sc / B.Com / B.Tech)</option>
-          <option value="Post Graduate (M.A / M.Sc / M.Tech)">Post Graduate (M.A / M.Sc / M.Tech)</option>
-          <option value="PhD">PhD</option>
-        </select>
+        <app-dropdown
+          size="sm"
+          [options]="qualificationOptions"
+          [(value)]="faculty.qualification"
+          placeholder="Select Qualification"
+          class="w-full"
+        />
       </ng-template>
 
       <!-- Action: Remove -->
@@ -123,6 +126,19 @@ export class BatchFacultyTableComponent {
   readonly removeFaculty = output<number>();
   /** Emits the row index when its SSO ID is edited (parent clears the error flag). */
   readonly nameEdited = output<number>();
+
+  readonly trainerTypeOptions = [
+    'Primary Trainer',
+    'Assistant Trainer',
+    'Domain Trainer',
+    'Master Trainer'
+  ];
+
+  readonly qualificationOptions = [
+    'Graduate (B.A / B.Sc / B.Com / B.Tech)',
+    'Post Graduate (M.A / M.Sc / M.Tech)',
+    'PhD'
+  ];
 
   /** Bumped after each add/remove/answer so `rows` becomes a new array even though the parent mutates its own. */
   private readonly version = signal(0);

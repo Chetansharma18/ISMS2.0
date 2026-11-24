@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CAMERA_VENDORS, CameraItem } from './batch-form.util';
-import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
 
 // Default change detection: the parent pushes/splices cameraList in place and rewrites cameraErrors.
 // app-table is OnPush and only refreshes on a new array, so the grid is fed a shallow copy (`rows`) that is
@@ -9,7 +9,7 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
 @Component({
   selector: 'app-batch-camera-table',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent, DropdownComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-2.5">
@@ -44,12 +44,14 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
       />
 
       <ng-template #vendorTpl let-camera let-i="index">
-        <select appInput size="sm" [(ngModel)]="camera.vendor" [name]="'camera_vendor_' + i" class="w-full" [invalid]="!!cameraErrors()[i]">
-          <option value="">Select vendor</option>
-          @for (vendor of vendors; track vendor) {
-            <option [value]="vendor">{{ vendor }}</option>
-          }
-        </select>
+        <app-dropdown
+          size="sm"
+          [options]="vendors"
+          [(value)]="camera.vendor"
+          placeholder="Select vendor"
+          [invalid]="!!cameraErrors()[i]"
+          class="w-full"
+        />
       </ng-template>
 
       <ng-template #ipTpl let-camera let-i="index">

@@ -117,7 +117,6 @@ const CONTENT: Record<SdcDecisionMode, { title: string; label: string; required:
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" (click)="close.emit()">Cancel</button>
         <button appButton [variant]="mode() === 'reject' ? 'danger' : 'primary'" (click)="submit()" [disabled]="!isValid()">
           {{ content().action }}
         </button>

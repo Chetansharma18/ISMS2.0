@@ -6,7 +6,14 @@ import { ApplicantResponse, EoiStateService, Scheme } from '../../services/eoi-s
 import { SanctionPdfService } from '../eoi-sanction-editor/sanction-pdf.service';
 import { formatDateTime } from '../../../../shared/utils';
 import { TpSanctionOrderService } from '../../services/tp-sanction-order.service';
-import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../../shared';
+import {
+  ButtonComponent,
+  IconComponent,
+  ListPageComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  TableColumn
+} from '../../../../shared';
 
 /** One scheme with a released sanction order. */
 interface SanctionOrderRow {
@@ -41,13 +48,12 @@ export function categoryLabel(value: string | undefined): string {
   selector: 'app-sanction-order-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ListPageComponent, ButtonComponent, IconComponent, SanctionTargetsModalComponent],
+  imports: [ListPageComponent, ButtonComponent, IconComponent, SanctionTargetsModalComponent, MasterFilterBarComponent],
   template: `
     <app-list-page
       title="Sanction Order"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Sanction Order' }]"
-      searchPlaceholder="Search Scheme, Ref No., Category..."
-      [(searchQuery)]="searchQuery"
+      [searchable]="false"
       [columns]="schemeColumns"
       [data]="rows()"
       itemUnit="schemes"
@@ -59,6 +65,17 @@ export function categoryLabel(value: string | undefined): string {
         action: actionTemplate
       }"
     >
+      <!-- Filter Bar with Search & Dropdowns -->
+      <app-master-filter-bar
+        beforeTable
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search Scheme, Ref No., Category..."
+        [showStatusFilter]="false"
+        [filters]="schemeFilters()"
+        [(filterValues)]="filterValues"
+        (resetFilters)="resetFilters()"
+      />
+
       @if (selected(); as row) {
         <app-sanction-targets-modal
           [schemeTitle]="row.schemeTitle"
@@ -74,9 +91,16 @@ export function categoryLabel(value: string | undefined): string {
     </ng-template>
 
     <ng-template #viewSanctionOrderTemplate let-row>
-      <button appButton variant="outline" size="sm" (click)="viewSanctionOrder(row)" title="Open the e-signed sanction order">
+      <button
+        appButton
+        variant="ghost"
+        size="sm"
+        iconOnly
+        (click)="viewSanctionOrder(row)"
+        title="Open the e-signed sanction order"
+        aria-label="View Sanction Order"
+      >
         <app-icon name="eye" size="sm" />
-        <span>{{ viewOnly ? 'View' : 'View Sanction Order' }}</span>
       </button>
     </ng-template>
 
@@ -101,12 +125,13 @@ export class SanctionOrderListComponent {
   private schemes = signal<Scheme[]>([]);
   private responses = signal<ApplicantResponse[]>([]);
   searchQuery = signal('');
+  readonly filterValues = signal<Record<string, string>>({});
 
-  readonly rows = computed<SanctionOrderRow[]>(() => {
-    const query = this.searchQuery().trim().toLowerCase();
+  /** The training partner only views released orders: one View button, no MoU draft or company list. */
+  protected readonly viewOnly = inject(ActivatedRoute).snapshot.data['viewOnly'] === true;
+
+  readonly allSanctionRows = computed<SanctionOrderRow[]>(() => {
     const responses = this.responses();
-
-    // Training partner: dummy orders, shown as that partner sees them (not linked to the real applications yet).
     if (this.viewOnly) {
       return this.tpSanctionOrders.orders().map(order => ({
         id: order.id,
@@ -121,29 +146,138 @@ export class SanctionOrderListComponent {
         sector: order.sector,
         grade: order.grade,
         myTarget: String(order.target)
-      })).filter(
-        row =>
-          !query ||
-          `${row.orderNo} ${row.schemeTitle} ${row.refNo} ${row.category} ${row.district} ${row.sector} ${row.grade}`.toLowerCase().includes(query)
+      }));
+    }
+    return this.schemes()
+      .map(scheme => this.toRow(scheme, responses))
+      .filter((row): row is SanctionOrderRow => row !== null);
+  });
+
+  readonly schemeTitleOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSanctionRows()) {
+      if (r.schemeTitle) set.add(r.schemeTitle);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly categoryOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSanctionRows()) {
+      if (r.category && r.category !== '-') set.add(r.category);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly districtOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSanctionRows()) {
+      if (r.district) {
+        r.district.split(',').map(d => d.trim()).filter(Boolean).forEach(d => set.add(d));
+      }
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly sectorOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSanctionRows()) {
+      if (r.sector) {
+        r.sector.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s));
+      }
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly schemeFilters = computed<MasterFilterConfig[]>(() => {
+    const configs: MasterFilterConfig[] = [
+      {
+        key: 'schemeTitle',
+        label: 'Scheme Name',
+        options: () => this.schemeTitleOptions(),
+        placeholder: 'All Scheme Names'
+      },
+      {
+        key: 'category',
+        label: 'Category',
+        options: () => this.categoryOptions(),
+        placeholder: 'All Categories'
+      }
+    ];
+
+    if (this.viewOnly) {
+      configs.push(
+        {
+          key: 'district',
+          label: 'Sanctioned District',
+          options: () => this.districtOptions(),
+          placeholder: 'All Districts'
+        },
+        {
+          key: 'sector',
+          label: 'Sanctioned Sector',
+          options: () => this.sectorOptions(),
+          placeholder: 'All Sectors'
+        }
       );
     }
 
-    // Only schemes whose sanction order has been released are listed.
-    return this.schemes()
-      .map(scheme => this.toRow(scheme, responses))
-      .filter((row): row is SanctionOrderRow => row !== null)
-      .filter(
-        row =>
-          !query ||
-          row.orderNo.toLowerCase().includes(query) ||
-          row.schemeTitle.toLowerCase().includes(query) ||
-          row.refNo.toLowerCase().includes(query) ||
-          row.category.toLowerCase().includes(query)
-      );
+    return configs;
   });
 
-  /** The training partner only views released orders: one View button, no MoU draft or company list. */
-  protected readonly viewOnly = inject(ActivatedRoute).snapshot.data['viewOnly'] === true;
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.filterValues.set({});
+  }
+
+  readonly rows = computed<SanctionOrderRow[]>(() => {
+    const query = this.searchQuery().trim().toLowerCase();
+    const fv = this.filterValues();
+    const selectedScheme = (fv['schemeTitle'] || '').trim();
+    const selectedCat = (fv['category'] || '').trim();
+    const selectedDistrict = (fv['district'] || '').trim();
+    const selectedSector = (fv['sector'] || '').trim();
+
+    return this.allSanctionRows().filter(row => {
+      // 1. Text search
+      if (query) {
+        const text = this.viewOnly
+          ? `${row.orderNo} ${row.schemeTitle} ${row.refNo} ${row.category} ${row.district} ${row.sector} ${row.grade}`.toLowerCase()
+          : `${row.orderNo} ${row.schemeTitle} ${row.refNo} ${row.category}`.toLowerCase();
+        if (!text.includes(query)) return false;
+      }
+
+      // 2. Scheme Name filter
+      if (selectedScheme && selectedScheme !== 'ALL') {
+        if (row.schemeTitle !== selectedScheme && !row.schemeTitle.toLowerCase().includes(selectedScheme.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Category filter
+      if (selectedCat && selectedCat !== 'ALL') {
+        if (row.category.toLowerCase() !== selectedCat.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 4. District filter
+      if (selectedDistrict && selectedDistrict !== 'ALL') {
+        if (!row.district.toLowerCase().includes(selectedDistrict.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 5. Sector filter
+      if (selectedSector && selectedSector !== 'ALL') {
+        if (!row.sector.toLowerCase().includes(selectedSector.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  });
 
   readonly schemeColumns: TableColumn<SanctionOrderRow>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -152,23 +286,23 @@ export class SanctionOrderListComponent {
     { key: 'category', label: 'Category', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     ...(this.viewOnly
       ? ([
-          { key: 'district', label: 'Sanctioned District', width: 'min-w-[130px]', cellClass: 'font-normal text-slate-700' },
-          { key: 'sector', label: 'Sanctioned Sector', width: 'min-w-[170px]', cellClass: 'font-normal text-slate-700' },
-          { key: 'grade', label: 'Grade', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-          { key: 'myTarget', label: 'Target', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-700' }
-        ] as TableColumn<SanctionOrderRow>[])
+        { key: 'district', label: 'Sanctioned District', width: 'min-w-[130px]', cellClass: 'font-normal text-slate-700' },
+        { key: 'sector', label: 'Sanctioned Sector', width: 'min-w-[170px]', cellClass: 'font-normal text-slate-700' },
+        { key: 'grade', label: 'Grade', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+        { key: 'myTarget', label: 'Target', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-700' }
+      ] as TableColumn<SanctionOrderRow>[])
       : ([
-          { key: 'approvedCompanies', label: 'Approved TPs', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
-          { key: 'totalTarget', label: 'Total Target', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' }
-        ] as TableColumn<SanctionOrderRow>[])),
+        { key: 'approvedCompanies', label: 'Approved TPs', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
+        { key: 'totalTarget', label: 'Total Target', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' }
+      ] as TableColumn<SanctionOrderRow>[])),
     { key: 'releasedOn', label: 'Released On', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     ...(this.viewOnly
       ? ([{ key: 'viewSanctionOrder', label: 'Action', align: 'center', width: 'w-32', type: 'custom' }] as TableColumn<SanctionOrderRow>[])
       : ([
-          { key: 'viewSanctionOrder', label: 'Sanction Order', align: 'center', width: 'w-44', type: 'custom' },
-          { key: 'mou', label: 'MoU', align: 'center', width: 'w-36', type: 'custom' },
-          { key: 'action', label: 'Action', align: 'center', width: 'w-36', type: 'custom' }
-        ] as TableColumn<SanctionOrderRow>[]))
+        { key: 'viewSanctionOrder', label: 'Sanction Order', align: 'center', width: 'w-44', type: 'custom' },
+        { key: 'mou', label: 'MoU', align: 'center', width: 'w-36', type: 'custom' },
+        { key: 'action', label: 'Action', align: 'center', width: 'w-36', type: 'custom' }
+      ] as TableColumn<SanctionOrderRow>[]))
   ];
 
   constructor() {

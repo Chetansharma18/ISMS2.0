@@ -1,25 +1,29 @@
 import { ChangeDetectionStrategy, Component, computed, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../../shared';
+import {
+  ButtonComponent,
+  IconComponent,
+  ListPageComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption,
+  TableColumn
+} from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
 import { filterTenders, TenderOpenEvent } from './tender-status.util';
-import { openShortfalls, shortfallSummary } from './tender-shortfall.util';
-import { canAppeal } from './tender-appeal.util';
 
 @Component({
   selector: 'app-tender-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ListPageComponent, ButtonComponent, IconComponent],
+  imports: [FormsModule, ListPageComponent, ButtonComponent, IconComponent, MasterFilterBarComponent],
   host: { class: 'block' },
   template: `
     <!-- Page header with search + status table via the shared list page -->
     <app-list-page
       title="EOI Status"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Status' }]"
-      [searchable]="true"
-      [(searchQuery)]="searchQuery"
-      searchPlaceholder="Search Ref, Scheme, Category..."
+      [searchable]="false"
       [columns]="tenderColumns"
       [data]="filteredTenders()"
       [pagination]="true"
@@ -30,12 +34,22 @@ import { canAppeal } from './tender-appeal.util';
         schemeTitle: schemeTitleTemplate,
         schemeCategory: schemeCategoryTemplate,
         submittedStatus: submittedStatusTemplate,
-        rejectionReason: rejectionReasonTemplate,
-        appeal: appealTemplate,
-        shortfall: shortfallTemplate,
         view: viewTemplate
       }"
     >
+
+      <!-- Filters Toolbar: Search, Status, Scheme Name & Scheme Category -->
+      <app-master-filter-bar
+        beforeTable
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search Ref, Scheme, Category..."
+        [(status)]="statusFilter"
+        [showStatusFilter]="true"
+        [statusOptions]="statusFilterOptions()"
+        [filters]="tenderFilters()"
+        [(filterValues)]="filterValues"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Custom App Ref Template -->
       <ng-template #appRefTemplate let-tender>
@@ -44,7 +58,7 @@ import { canAppeal } from './tender-appeal.util';
           variant="ghost"
           size="sm"
           type="button"
-          (click)="open.emit({ tender, tab: 'overview' })"
+          (click)="open.emit({ tender, tab: 'organisation' })"
           class="tabular-nums"
           title="Open Application Details Page"
         >
@@ -55,7 +69,7 @@ import { canAppeal } from './tender-appeal.util';
       <!-- Custom Scheme Title Template -->
       <ng-template #schemeTitleTemplate let-tender>
         <span
-          (click)="open.emit({ tender, tab: 'overview' })"
+          (click)="open.emit({ tender, tab: 'organisation' })"
           class="font-normal text-slate-800 hover:text-navy hover:underline cursor-pointer transition-colors text-[13px]"
           title="Open {{ tender.schemeTitle }}"
         >
@@ -73,85 +87,19 @@ import { canAppeal } from './tender-appeal.util';
         <span class="text-slate-800 font-normal text-[13px]">{{ tender.submittedStatus }}</span>
       </ng-template>
 
-      <!-- Custom Rejection Reason Template -->
-      <ng-template #rejectionReasonTemplate let-tender>
-        @if (tender.submittedStatus === 'Rejected') {
-          <span class="text-rose-600 text-[13px] leading-tight font-normal block max-w-sm text-left">
-            {{ tender.rejectionReason || 'Technical qualification criteria not met.' }}
-          </span>
-        } @else {
-          <span class="text-slate-400 font-normal text-center block text-[13px]">-</span>
-        }
-      </ng-template>
-
-      <!-- Appeal Request against a rejection: only visible in rejected status -->
-      <ng-template #appealTemplate let-tender>
-        @if (tender.submittedStatus === 'Rejected') {
-          @if (!tender.appeal) {
-            <button appButton variant="secondary" size="sm" type="button" (click)="appeal.emit(tender)" title="Request appeal against rejection">
-              Appeal Request
-            </button>
-          } @else if (tender.appeal.status === 'Rejected') {
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
-              Appeal Rejected
-            </span>
-          } @else if (tender.appeal.status === 'Accepted') {
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Appeal Accepted
-            </span>
-          } @else {
-            <button appButton variant="ghost" size="sm" type="button" (click)="open.emit({ tender, tab: 'shortfall' })" title="View your appeal request">
-              Appeal Submitted
-            </button>
-          }
-        } @else {
-          <span class="text-slate-400 text-[13px]">-</span>
-        }
-      </ng-template>
-
-      <!-- Response to Appeal / Shortfall requests raised by the department: only shown when appeal has been submitted -->
-      <ng-template #shortfallTemplate let-tender>
-        @if (tender.appeal && tender.appeal.status !== 'Rejected') {
-          @switch (shortfallState(tender)) {
-            @case ('open') {
-              <button
-                appButton
-                variant="secondary"
-                size="sm"
-                type="button"
-                (click)="respond.emit(tender)"
-                title="The department has requested additional documents or clarification. Click to respond."
-              >
-                <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-                Respond ({{ openCount(tender) }})
-              </button>
-            }
-            @case ('responded') {
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                type="button"
-                (click)="open.emit({ tender, tab: 'shortfall' })"
-                title="View responses"
-              >
-                Responded
-              </button>
-            }
-            @default {
-              <span class="text-slate-400 text-[13px]">-</span>
-            }
-          }
-        } @else {
-          <span class="text-slate-400 text-[13px]">-</span>
-        }
-      </ng-template>
-
       <!-- Custom View Action Button Template -->
       <ng-template #viewTemplate let-tender>
-        <button appButton size="sm" type="button" (click)="open.emit({ tender, tab: 'overview' })" title="Open Application Details Page">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          type="button"
+          (click)="open.emit({ tender, tab: 'organisation' })"
+          title="Open Application Details Page"
+          aria-label="View Details"
+        >
           <app-icon name="eye" size="sm" />
-          <span>View</span>
         </button>
       </ng-template>
 
@@ -162,6 +110,9 @@ export class TenderListComponent {
   readonly tenders = input.required<SubmittedTender[]>();
   /** Search text; owned by the container so it survives opening a detail page. */
   readonly searchQuery = model('');
+  readonly statusFilter = model('ALL');
+  readonly filterValues = model<Record<string, string>>({});
+
   readonly open = output<TenderOpenEvent>();
   /** The applicant wants to answer an open revert request. */
   readonly respond = output<SubmittedTender>();
@@ -170,7 +121,55 @@ export class TenderListComponent {
 
   readonly pageSize = 6;
 
-  // Clean Table Columns without Closing Date / Edits Used
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All Status' },
+    { value: 'Submitted', label: 'Submitted' },
+    { value: 'Under Review', label: 'Under Review' },
+    { value: 'Approved', label: 'Approved' },
+    { value: 'Rejected', label: 'Rejected' }
+  ]);
+
+  readonly schemeNameOptions = computed<string[]>(() => {
+    const list = this.tenders();
+    const set = new Set<string>();
+    for (const t of list) {
+      if (t.schemeTitle) set.add(t.schemeTitle);
+      else if (t.schemeName) set.add(t.schemeName);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly schemeCategoryOptions = computed<string[]>(() => {
+    const list = this.tenders();
+    const set = new Set<string>();
+    for (const t of list) {
+      if (t.schemeCategory) set.add(t.schemeCategory);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly tenderFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'schemeName',
+      label: 'Scheme Name',
+      options: () => this.schemeNameOptions(),
+      placeholder: 'All Scheme Names'
+    },
+    {
+      key: 'schemeCategory',
+      label: 'Scheme Category',
+      options: () => this.schemeCategoryOptions(),
+      placeholder: 'All Scheme Categories'
+    }
+  ]);
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+  }
+
+  // Clean Table Columns without Closing Date / Edits Used / Remarks / Appeal columns
   readonly tenderColumns: TableColumn<SubmittedTender>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
     { key: 'appRef', label: 'Application Ref. No.', cellClass: 'whitespace-nowrap font-normal text-slate-800', type: 'custom' },
@@ -190,23 +189,15 @@ export class TenderListComponent {
         'Rejected': 'danger'
       }
     },
-    { key: 'rejectionReason', label: 'Remarks', align: 'center', type: 'custom', cellClass: 'min-w-[200px]' },
-    { key: 'appeal', label: 'Appeal Request', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'shortfall', label: 'Appeal Response', align: 'center', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'view', label: 'View', align: 'center', width: 'w-20', type: 'custom' }
+    { key: 'view', label: 'Action', align: 'center', width: 'w-20', type: 'custom' }
   ];
 
-  protected canAppeal(tender: SubmittedTender): boolean {
-    return canAppeal(tender);
-  }
-
-  protected shortfallState(tender: SubmittedTender): 'open' | 'responded' | 'none' {
-    return shortfallSummary(tender);
-  }
-
-  protected openCount(tender: SubmittedTender): number {
-    return openShortfalls(tender).length;
-  }
-
-  readonly filteredTenders = computed(() => filterTenders(this.tenders(), this.searchQuery()));
+  readonly filteredTenders = computed(() =>
+    filterTenders(this.tenders(), {
+      searchQuery: this.searchQuery(),
+      status: this.statusFilter(),
+      schemeName: this.filterValues()['schemeName'],
+      schemeCategory: this.filterValues()['schemeCategory']
+    })
+  );
 }

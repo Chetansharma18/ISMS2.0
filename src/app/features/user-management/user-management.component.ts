@@ -10,13 +10,17 @@ import {
   ButtonComponent,
   IconComponent,
   PageShellComponent,
-  TableColumn
+  TableColumn,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption
 } from '../../shared';
 import { DistrictBlockMasterItem, UserRoleMasterItem, SchemeMasterItem, DesignationMasterItem } from '../../core/models/admin-masters.model';
 import { toDistrictBlockItem } from '../../core/models/district-block.normalizer';
 import { toUserRoleItem } from '../../core/models/role.normalizer';
 import { UserManagementItem } from '../../core/models/user-management.model';
 import {
+  BLACKLIST_DURATION_OPTIONS,
   ConfirmModalData,
   ROLE_FILTER_OPTIONS,
   UserFormData,
@@ -57,28 +61,30 @@ export type { UserManagementItem };
     ButtonComponent,
     IconComponent,
     PageShellComponent,
-    RoleFilterBarComponent,
     BlacklistSearchPanelComponent,
     SchemeStatusBadgeComponent,
     UserActionsCellComponent,
     UserDetailsModalComponent,
     UserFormModalComponent,
     UserConfirmModalComponent,
-    UserBlacklistModalComponent
+    UserBlacklistModalComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
       
       <!-- Page Header -->
       <app-page-header
-        title="User Management"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }]"
-        [searchable]="true"
-        searchPlaceholder="Search Username, SSO ID, Role, District..."
-        [(searchQuery)]="searchQuery"
+        [title]="isBlacklistedView() ? 'Blacklisted Users' : 'Users'"
+        [subtitle]="isBlacklistedView()
+          ? 'Search SSO ID to debar users, monitor blacklisted training partners, and filter scheme-wise'
+          : 'Manage system administrators, department officers, scrutiny officers, and training partners'"
+        [breadcrumbs]="isBlacklistedView()
+          ? [{ label: 'Home', url: '/' }, { label: 'User Management', url: '/admin/user-management?filter=all' }, { label: 'Blacklisted Users' }]
+          : [{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Users' }]"
       >
-        <!-- Add User Button -->
-        @if (selectedRoleFilter() !== 'blacklisted') {
+        <!-- Add User Button (only for regular users view) -->
+        @if (!isBlacklistedView()) {
           <button
             appButton
             size="sm"
@@ -92,16 +98,25 @@ export type { UserManagementItem };
         }
       </app-page-header>
 
-      <!-- Role Filters -->
-      @if (selectedRoleFilter() !== 'blacklisted') {
-        <app-role-filter-bar
-          [options]="roleFilterOptions()"
-          [selected]="selectedRoleFilter()"
-          (selectedChange)="selectedRoleFilter.set($event)"
+      <!-- Users View: Master Filter & Search -->
+      @if (!isBlacklistedView()) {
+        <app-master-filter-bar
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search Username, SSO ID, Role, District..."
+          [(status)]="userStatusFilter"
+          [showStatusFilter]="true"
+          [statusOptions]="userStatusOptions()"
+          [filters]="userFilters()"
+          [(filterValues)]="userFilterValues"
+          [totalCount]="users().length"
+          [filteredCount]="filteredUsers().length"
+          itemUnit="users"
+          (resetFilters)="resetUserFilters()"
         />
       }
 
-      @if (selectedRoleFilter() === 'blacklisted') {
+      <!-- Blacklisted Users View: SSO Blacklist Action Panel + Scheme/SSO Filter Bar -->
+      @if (isBlacklistedView()) {
         <app-blacklist-search-panel
           [value]="blacklistInput()"
           [error]="blacklistError()"
@@ -109,20 +124,34 @@ export type { UserManagementItem };
           (valueChange)="blacklistInput.set($event)"
           (blacklist)="blacklistUserBySearch()"
         />
+
+        <app-master-filter-bar
+          [(searchQuery)]="blacklistSearchQuery"
+          searchPlaceholder="Search blacklisted SSO ID, Name, Order Ref, District..."
+          [showStatusFilter]="false"
+          [filters]="blacklistFilters()"
+          [(filterValues)]="blacklistFilterValues"
+          [totalCount]="blacklistedTotalCount()"
+          [filteredCount]="filteredUsers().length"
+          itemUnit="blacklisted users"
+          (resetFilters)="resetBlacklistFilters()"
+        />
       }
 
       <!-- Users Table -->
       <app-table
         [rowClass]="getRowClass"
-        [columns]="columns"
+        [columns]="isBlacklistedView() ? blacklistedColumns : columns"
         [data]="filteredUsers()"
         [pagination]="true"
         [pageSize]="10"
-        itemUnit="users"
+        [itemUnit]="isBlacklistedView() ? 'blacklisted users' : 'users'"
         [customTemplates]="{
           roleType: roleTypeTemplate,
           schemeStatus: schemeStatusTemplate,
-          action: actionTemplate
+          blacklistScheme: blacklistSchemeTemplate,
+          blacklistDuration: blacklistDurationTemplate,
+          action: isBlacklistedView() ? blacklistedActionTemplate : actionTemplate
         }"
       >
       </app-table>
@@ -137,7 +166,7 @@ export type { UserManagementItem };
         <app-scheme-status-badge [status]="item.schemeStatus" />
       </ng-template>
 
-      <!-- Custom Template for Action Column (View, Edit, Mark Inactive/Blacklisted) -->
+      <!-- Custom Template for Action Column (Regular Users: View, Edit, Active/Inactive switch, Blacklist) -->
       <ng-template #actionTemplate let-item>
         <app-user-actions-cell
           [user]="item"
@@ -146,6 +175,57 @@ export type { UserManagementItem };
           (toggleStatus)="toggleUserStatus($event)"
           (toggleBlacklist)="requestBlacklistToggle($event)"
         />
+      </ng-template>
+
+      <!-- Custom Template for Debarred Scheme -->
+      <ng-template #blacklistSchemeTemplate let-item>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+          {{ item.blacklistScheme || 'All Schemes' }}
+        </span>
+      </ng-template>
+
+      <!-- Custom Template for Debarment Duration -->
+      <ng-template #blacklistDurationTemplate let-item>
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <app-icon name="clock" size="xs" />
+          <span>{{ item.blacklistDuration || '3 Years' }}</span>
+        </span>
+      </ng-template>
+
+      <!-- Custom Template for Blacklisted Action Column (View Details, Restore/Un-blacklist) -->
+      <ng-template #blacklistedActionTemplate let-item>
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+          <!-- View Details -->
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="$event.stopPropagation(); openViewModal(item)"
+            title="View Details"
+            aria-label="View Details"
+          >
+            <app-icon name="eye" size="sm" />
+          </button>
+
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+          <!-- Restore / Remove from Blacklist -->
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            type="button"
+            (click)="$event.stopPropagation(); requestBlacklistToggle(item)"
+            title="Remove from Blacklist"
+            aria-label="Remove Blacklist"
+            class="shrink-0"
+          >
+            <app-icon name="check-circle" size="sm" class="text-emerald-600" />
+            <span>Restore</span>
+          </button>
+        </div>
       </ng-template>
 
       <!-- Modal: View User Details -->
@@ -295,9 +375,90 @@ export class UserManagementComponent {
     return options;
   });
 
-  readonly filteredUsers = computed(() =>
-    filterUsers(this.users(), this.selectedRoleFilter(), this.searchQuery())
+  readonly isBlacklistedView = computed(() => this.selectedRoleFilter() === 'blacklisted');
+
+  readonly blacklistedTotalCount = computed(() =>
+    this.users().filter(u => u.schemeStatus === 'Blacklisted').length
   );
+
+  readonly userStatusFilter = signal<'ALL' | 'Active' | 'Inactive'>('ALL');
+  readonly userFilterValues = signal<Record<string, string>>({});
+  readonly blacklistFilterValues = signal<Record<string, string>>({});
+  readonly blacklistSearchQuery = signal<string>('');
+  readonly blacklistDurationOptions = BLACKLIST_DURATION_OPTIONS;
+
+  readonly userStatusOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
+
+  readonly userFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'role',
+      label: 'Role',
+      options: () => this.roleTypeOptions(),
+      placeholder: 'All Roles'
+    },
+    {
+      key: 'district',
+      label: 'District',
+      options: () => this.districtOptions(),
+      placeholder: 'All Districts'
+    }
+  ]);
+
+  readonly blacklistFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'scheme',
+      label: 'Scheme',
+      options: () => this.schemeOptions(),
+      placeholder: 'All Schemes'
+    },
+    {
+      key: 'duration',
+      label: 'Duration',
+      options: BLACKLIST_DURATION_OPTIONS,
+      placeholder: 'All Durations'
+    }
+  ]);
+
+  readonly filteredUsers = computed(() => {
+    if (this.isBlacklistedView()) {
+      return filterUsers(
+        this.users(),
+        'blacklisted',
+        this.blacklistSearchQuery(),
+        {
+          scheme: this.blacklistFilterValues()['scheme'],
+          duration: this.blacklistFilterValues()['duration']
+        }
+      );
+    }
+
+    const role = this.userFilterValues()['role'] || (this.selectedRoleFilter() !== 'blacklisted' ? this.selectedRoleFilter() : 'all');
+    let list = filterUsers(this.users(), role.toLowerCase(), this.searchQuery());
+    const status = this.userStatusFilter();
+    if (status !== 'ALL') {
+      list = list.filter(u => u.schemeStatus === status);
+    }
+    const district = this.userFilterValues()['district'];
+    if (district) {
+      list = list.filter(u => u.districtName === district);
+    }
+    return list;
+  });
+
+  resetUserFilters(): void {
+    this.searchQuery.set('');
+    this.userStatusFilter.set('ALL');
+    this.userFilterValues.set({});
+  }
+
+  resetBlacklistFilters(): void {
+    this.blacklistSearchQuery.set('');
+    this.blacklistFilterValues.set({});
+  }
 
   blacklistInput = signal('');
   blacklistError = signal('');
@@ -358,8 +519,51 @@ export class UserManagementComponent {
       cellClass: 'whitespace-nowrap text-slate-700'
     },
     {
+      key: 'action',
+      label: 'Actions',
+      align: 'center',
+      type: 'custom',
+      width: 'min-w-[430px]'
+    }
+  ];
+
+  readonly blacklistedColumns: TableColumn<UserManagementItem>[] = [
+    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
+    {
+      key: 'username',
+      label: 'Training Partner / Name',
+      cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[180px]'
+    },
+    {
+      key: 'ssoId',
+      label: 'SSO ID',
+      cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700 min-w-[130px]'
+    },
+    {
+      key: 'districtName',
+      label: 'District',
+      cellClass: 'whitespace-nowrap text-slate-700 min-w-[110px]'
+    },
+    {
+      key: 'blacklistScheme',
+      label: 'Debarred Scheme',
+      type: 'custom',
+      cellClass: 'min-w-[200px]'
+    },
+    {
+      key: 'blacklistDuration',
+      label: 'Duration',
+      type: 'custom',
+      cellClass: 'whitespace-nowrap min-w-[120px]'
+    },
+    {
+      key: 'blacklistedAt',
+      label: 'Debarred Date',
+      cellClass: 'whitespace-nowrap text-xs text-slate-600 min-w-[110px]'
+    },
+    {
       key: 'schemeStatus',
-      label: 'Scheme Status',
+      label: 'Status',
       align: 'center',
       type: 'custom',
       width: 'w-32'
@@ -369,7 +573,7 @@ export class UserManagementComponent {
       label: 'Actions',
       align: 'center',
       type: 'custom',
-      width: 'min-w-[430px]'
+      width: 'w-40 min-w-[140px]'
     }
   ];
 

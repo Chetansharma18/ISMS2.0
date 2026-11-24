@@ -13,7 +13,7 @@ import { IconComponent } from '../../icon/icon.component';
       <!-- Label Row with Required Star, optional infoTooltip, and Character Count -->
       @if (label) {
         <div class="flex items-center justify-between gap-2 mb-1">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1">
+          <label [attr.for]="type === 'date' ? null : id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1">
             <span>{{ label }}</span>
             @if (required) {
               <span class="text-rose-600 font-bold">*</span>
@@ -38,7 +38,7 @@ import { IconComponent } from '../../icon/icon.component';
 
       <!-- Input Box Wrapper with Prefix & Suffix -->
       <div
-        class="relative flex items-center h-[35px] rounded-[4px] border transition-all duration-150 bg-white"
+        class="relative flex items-center h-[35px] rounded-[4px] border transition-colors duration-150 bg-white"
         [class.border-theme]="!error"
         [class.border-rose-600]="!!error"
         [class.ring-1]="!!error"
@@ -48,6 +48,8 @@ import { IconComponent } from '../../icon/icon.component';
         [class.focus-within:border-primary]="!error && !disabled"
         [class.focus-within:ring-2]="!error && !disabled"
         [class.focus-within:ring-primary-light]="!error && !disabled"
+        [class.focus-within:border-rose-600]="!!error && !disabled"
+        [class.focus-within:ring-rose-200]="!!error && !disabled"
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
@@ -62,11 +64,18 @@ import { IconComponent } from '../../icon/icon.component';
           [type]="type"
           [value]="value || ''"
           (input)="onInput($event)"
+          (keydown)="onKeyDown($event)"
+          (paste)="onPaste($event)"
+          (blur)="onBlur($event)"
           [placeholder]="placeholder"
           [disabled]="disabled"
           [readOnly]="readonly"
           [attr.maxlength]="maxLength || null"
-          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted focus:outline-none bg-transparent placeholder:normal-case"
+          [attr.max]="max || null"
+          [attr.min]="min || null"
+          [attr.aria-invalid]="!!error"
+          [style.color-scheme]="type === 'date' ? 'light' : null"
+          class="flex-1 min-w-0 w-full h-full px-2.5 text-xs sm:text-[13px] leading-[20px] text-primary placeholder:text-muted focus:outline-none focus-visible:outline-none bg-transparent placeholder:normal-case"
           [class.uppercase]="uppercase"
           [class.cursor-not-allowed]="disabled"
           [class.text-muted]="disabled"
@@ -100,6 +109,9 @@ import { IconComponent } from '../../icon/icon.component';
     input::placeholder {
       text-transform: none !important;
     }
+    input:focus-visible {
+      outline: none !important;
+    }
     .form-error-text {
       font-size: 11px !important;
       line-height: 14px !important;
@@ -122,7 +134,10 @@ export class FormInputComponent {
   @Input() disabled: boolean = false;
   @Input() readonly: boolean = false;
   @Input() uppercase: boolean = false;
+  @Input() numericOnly: boolean = false;
   @Input() maxLength?: number;
+  @Input() max?: string;
+  @Input() min?: string;
   @Input() prefixText?: string;
   @Input() suffixText?: string;
   @Input() hint?: string;
@@ -131,15 +146,54 @@ export class FormInputComponent {
   @Input() showCharCount: boolean = false;
 
   @Output() valueChange = new EventEmitter<string>();
+  @Output() blur = new EventEmitter<FocusEvent>();
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let val = input.value;
+    if (this.numericOnly) {
+      val = val.replace(/\D/g, '');
+      input.value = val;
+    }
     if (this.uppercase) {
       val = val.toUpperCase();
       input.value = val;
     }
     this.value = val;
     this.valueChange.emit(val);
+  }
+
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.numericOnly) return;
+    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onPaste(event: ClipboardEvent): void {
+    if (!this.numericOnly) return;
+    event.preventDefault();
+    const text = event.clipboardData?.getData('text') || '';
+    const digits = text.replace(/\D/g, '');
+    if (!digits) return;
+    const input = event.target as HTMLInputElement;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    const current = input.value;
+    let nextVal = current.slice(0, start) + digits + current.slice(end);
+    if (this.maxLength) {
+      nextVal = nextVal.slice(0, this.maxLength);
+    }
+    input.value = nextVal;
+    this.value = nextVal;
+    this.valueChange.emit(nextVal);
+  }
+
+  onBlur(event: FocusEvent): void {
+    this.blur.emit(event);
   }
 }

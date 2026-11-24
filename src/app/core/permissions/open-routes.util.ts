@@ -3,8 +3,8 @@
  * permissions (GET /auth/permissions) allow its table; typing any other URL sends the user away.
  */
 
-/** Open to everyone, signed in or not: the landing page and the sign-in page. */
-export const PUBLIC_PATHS: readonly string[] = ['/', '/sso-login'];
+/** Open to everyone, signed in or not: the landing page, the sign-in page and Help & Support. */
+export const PUBLIC_PATHS: readonly string[] = ['/', '/sso-login', '/help-support'];
 
 /** Open to every signed-in user, whatever their permissions. */
 export const SIGNED_IN_PATHS: readonly string[] = ['/profile'];

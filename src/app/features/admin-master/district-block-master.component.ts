@@ -28,7 +28,16 @@ const CONFIG: MasterCrudConfig<DistrictBlockMasterItem> = {
   itemUnit: 'entries',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[540px]',
+  filters: [
+    {
+      key: 'districtName',
+      label: 'District',
+      placeholder: 'All Districts',
+      options: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar', 'Bharatpur', 'Bhilwara']
+    }
+  ],
   fields: [
     { key: 'districtName', label: 'District Name', type: 'text', required: true, maxLength: 80, placeholder: 'Enter district name (e.g. Jaipur)', colSpan: 2 },
     { key: 'districtCode', label: 'District Code', type: 'text', required: true, maxLength: 20, placeholder: 'e.g. JPR', uppercase: true, colSpan: 1 },

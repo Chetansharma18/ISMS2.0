@@ -42,6 +42,7 @@ export const TABLE_SCREENS: Readonly<Record<string, TableScreen>> = {
   BlockMasters: { route: '/admin/master/district-block', icon: 'list', dataKey: 'DISTRICTS' },
   DesignationMasters: { route: '/admin/master/designation', icon: 'list', dataKey: 'DESIGNATIONS' },
   DocMasters: { route: '/admin/master/doc', icon: 'list', dataKey: 'DOC_MASTERS' },
+  AnnexureMasters: { route: '/admin/master/annexure', icon: 'list', dataKey: 'ANNEXURE_MASTERS' },
   RemarkMasters: { route: '/admin/master/remark', icon: 'list', dataKey: 'REMARK_MASTERS' },
   GradingMasters: { route: '/admin/master/grading', icon: 'list', dataKey: 'GRADING_MASTERS' }
 };

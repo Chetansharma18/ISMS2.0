@@ -51,11 +51,12 @@ export function isTrainingPartner(item: UserManagementItem): boolean {
   return item.userType === 'TP' || rt === 'tp' || rt === 'training partner';
 }
 
-/** Applies the role filter ('all' | 'blacklisted' | role keyword) and the free-text search. */
+/** Applies the role filter ('all' | 'blacklisted' | role keyword), extra filters, and the free-text search. */
 export function filterUsers(
   users: UserManagementItem[],
   roleFilter: string,
-  searchQuery: string
+  searchQuery: string,
+  extraFilters?: { scheme?: string; duration?: string; sso?: string }
 ): UserManagementItem[] {
   const q = searchQuery.toLowerCase().trim();
   const filter = roleFilter.toLowerCase().trim();
@@ -64,6 +65,30 @@ export function filterUsers(
 
   if (filter === 'blacklisted') {
     filtered = filtered.filter(u => u.schemeStatus === 'Blacklisted');
+
+    if (extraFilters?.scheme) {
+      const targetScheme = extraFilters.scheme.toLowerCase().trim();
+      filtered = filtered.filter(u =>
+        (u.blacklistScheme && u.blacklistScheme.toLowerCase().includes(targetScheme)) ||
+        (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(targetScheme)) ||
+        (u.schemeName && u.schemeName.toLowerCase().includes(targetScheme))
+      );
+    }
+
+    if (extraFilters?.duration) {
+      const targetDuration = extraFilters.duration.toLowerCase().trim();
+      filtered = filtered.filter(u =>
+        u.blacklistDuration && u.blacklistDuration.toLowerCase().includes(targetDuration)
+      );
+    }
+
+    if (extraFilters?.sso) {
+      const targetSso = extraFilters.sso.toLowerCase().trim();
+      filtered = filtered.filter(u =>
+        (u.ssoId && u.ssoId.toLowerCase().includes(targetSso)) ||
+        (u.userId && u.userId.toLowerCase().includes(targetSso))
+      );
+    }
   } else if (filter !== 'all') {
     filtered = filtered.filter(u => {
       const rt = (u.roleType || '').toLowerCase();
@@ -91,7 +116,10 @@ export function filterUsers(
     (u.roleType && u.roleType.toLowerCase().includes(q)) ||
     roleTypeLabel(u.roleType).toLowerCase().includes(q) ||
     (u.districtName && u.districtName.toLowerCase().includes(q)) ||
-    (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q))
+    (u.schemeDepartment && u.schemeDepartment.toLowerCase().includes(q)) ||
+    (u.blacklistScheme && u.blacklistScheme.toLowerCase().includes(q)) ||
+    (u.blacklistDuration && u.blacklistDuration.toLowerCase().includes(q)) ||
+    (u.blacklistRemarks && u.blacklistRemarks.toLowerCase().includes(q))
   );
 }
 

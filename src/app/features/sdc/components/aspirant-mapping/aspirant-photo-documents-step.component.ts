@@ -86,13 +86,15 @@ export interface AspirantDocumentSelection {
                 <!-- View Option (only when photo is uploaded) -->
                 <button
                   appButton
-                  variant="outline"
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
                   type="button"
                   (click)="viewPhoto.emit()"
                   title="View candidate photograph"
+                  aria-label="View candidate photograph"
                 >
                   <app-icon name="eye" size="sm" />
-                  <span>View</span>
                 </button>
               }
 

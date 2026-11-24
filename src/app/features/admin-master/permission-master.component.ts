@@ -7,12 +7,14 @@ import {
   DropdownComponent,
   IconComponent,
   InputDirective,
+  MasterFilterBarComponent,
   PageHeaderComponent,
   PageShellComponent,
   SwitchComponent,
   TableColumn,
   TableComponent
 } from '../../shared';
+import type { MasterFilterConfig } from '../../shared/components/master-crud/master-crud.types';
 import type { DropdownItem } from '../../shared/components/dropdown/dropdown.component';
 import { API_ENDPOINTS } from '../../core/config/api.config';
 import { HttpService } from '../../core/http/http.service';
@@ -84,30 +86,16 @@ const emptyForm = (roleId = ''): PermissionForm => ({
     PageHeaderComponent,
     PageShellComponent,
     SwitchComponent,
-    TableComponent
+    TableComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
       <app-page-header
         title="Role Permissions"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Role Permissions' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by role, table or menu name..."
-        [(searchQuery)]="searchQuery"
+        subtitle="Grant roles access (View, Add, Edit, Delete) to backend tables and choose their menu links"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Role Permissions' }]"
       >
-        <select
-          appInput
-          size="sm"
-          aria-label="Filter by role"
-          class="w-auto whitespace-nowrap shrink-0"
-          [ngModel]="roleFilter()"
-          (ngModelChange)="roleFilter.set($event)"
-        >
-          <option value="all">All roles</option>
-          @for (role of roles(); track role.id) {
-            <option [value]="role.id">{{ role.roleTypeName }}</option>
-          }
-        </select>
         @if (canAdd()) {
           <button appButton size="sm" type="button" class="shrink-0" (click)="openAdd()">
             <app-icon name="plus" size="sm" />
@@ -115,6 +103,19 @@ const emptyForm = (roleId = ''): PermissionForm => ({
           </button>
         }
       </app-page-header>
+
+      <!-- The masters' shared filter bar: search, grant status and role -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search by role, table or menu name..."
+        [(status)]="statusFilter"
+        [filters]="filterConfigs()"
+        [(filterValues)]="filterValues"
+        [totalCount]="rows().length"
+        [filteredCount]="visibleRows().length"
+        itemUnit="permissions"
+        (resetFilters)="resetFilters()"
+      />
 
       <app-table
         [columns]="columns"
@@ -331,7 +332,18 @@ export class PermissionMasterComponent {
   readonly loading = signal(true);
   readonly saving = signal(false);
   readonly searchQuery = signal('');
-  readonly roleFilter = signal('all');
+  /** Filter bar: 'ALL', 'Active' or 'Inactive' (the grant's Active switch). */
+  readonly statusFilter = signal('ALL');
+  /** Filter bar dropdowns; `role` holds a role name. */
+  readonly filterValues = signal<Record<string, string>>({});
+  readonly filterConfigs = computed<MasterFilterConfig[]>(() => [
+    { key: 'role', label: 'Role', placeholder: 'All Roles', options: this.roles().map(r => r.roleTypeName) }
+  ]);
+  /** The role chosen in the filter bar, as a role id ('all' when none). */
+  readonly roleFilter = computed(() => {
+    const name = this.filterValues()['role'];
+    return (name && this.roles().find(r => r.roleTypeName === name)?.id) || 'all';
+  });
 
   readonly modalOpen = signal(false);
   readonly editing = signal<PermissionRow | null>(null);
@@ -339,7 +351,18 @@ export class PermissionMasterComponent {
   form: PermissionForm = emptyForm();
 
   readonly rows = computed(() => toPermissionRows(this.roles()));
-  readonly visibleRows = computed(() => filterPermissionRows(this.rows(), this.roleFilter(), this.searchQuery()));
+  readonly visibleRows = computed(() => {
+    const status = this.statusFilter();
+    return filterPermissionRows(this.rows(), this.roleFilter(), this.searchQuery()).filter(
+      row => status === 'ALL' || (status === 'Active' ? row.status : !row.status)
+    );
+  });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+  }
 
   /** Tables to choose from: the table list, plus any table a role already has a grant on. */
   readonly tableOptions = computed<DropdownItem[]>(() => {
@@ -392,7 +415,7 @@ export class PermissionMasterComponent {
   }
 
   openAdd(): void {
-    const filtered = this.roleFilter() !== 'all' ? this.roleFilter() : '';
+    const filtered = this.roleFilter() !== 'all' ? String(this.roleFilter()) : '';
     this.form = emptyForm(filtered);
     this.editing.set(null);
     this.submitted.set(false);

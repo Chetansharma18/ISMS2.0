@@ -780,6 +780,22 @@ table.table tbody tr:hover {
   font-weight: var(--font-weight-medium);
 }
 
+/* Government Portal Style Blinking Badge Animation */
+@keyframes isms-blink {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.45));
+  }
+  50% {
+    opacity: 0.28;
+    filter: none;
+  }
+}
+
+.animate-blink {
+  animation: isms-blink 1.2s ease-in-out infinite;
+}
+
 .badge-success {
   background-color: #E4F4E8;
   color: #18733B;
@@ -875,6 +891,14 @@ table.table tbody tr:hover {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+:focus-visible:is(.is-invalid, [aria-invalid="true"], :invalid),
+.is-invalid :focus-visible,
+[data-invalid="true"] :focus-visible,
+.border-rose-600 :focus-visible,
+.border-rose-600:focus-within {
+  outline-color: #DC2626 !important;
 }
 
 button:disabled,

@@ -1,4 +1,5 @@
 import type {
+  AnnexureMasterItem,
   CourseMasterItem,
   DesignationMasterItem,
   DistrictBlockMasterItem,
@@ -295,33 +296,104 @@ export const GRADING_ADAPTER: ResourceAdapter<GradingMasterItem> = {
     )
 };
 
-// ---- Doc Master: { id, code, schemeName, schemeId, documentName, allowedExtensions, maxFileSizeMb, isMandatory, isActive } ----
+/**
+ * The applicable schemes of a Doc / Annexure Master record: `applicableSchemes: [{ id, schemeName }]`
+ * (older records / the mock store: `schemes: string[]` or a single `schemeName`).
+ */
+function applicableSchemesOf(raw: Raw): { names: string[]; ids: number[] } {
+  const list = Array.isArray(raw['applicableSchemes']) ? (raw['applicableSchemes'] as unknown[]).map(asRaw) : null;
+  if (list) {
+    return {
+      names: list.map(s => firstText(s, 'schemeName', 'name')).filter(Boolean),
+      ids: list.map(s => num(s['id'], 0)).filter(id => id > 0)
+    };
+  }
+  if (Array.isArray(raw['schemes'])) return { names: (raw['schemes'] as unknown[]).map(text).filter(Boolean), ids: [] };
+  const single = firstText(raw, 'schemeName');
+  return { names: single ? [single] : [], ids: [] };
+}
+
+/** The scheme names a record should be linked to, without the screens' "ALL Schemes" pseudo-choice. */
+function schemeNamesFor(value: unknown): string[] {
+  const names = (Array.isArray(value) ? value : [value]).map(text).filter(Boolean);
+  return [...new Set(names.filter(n => n.toLowerCase() !== ALL_SCHEMES.toLowerCase() && n.toLowerCase() !== 'all'))];
+}
+
+/** Fields Doc and Annexure Master share: upload rules, status and the applicable schemes. */
+function linkedMasterFromApi(raw: Raw) {
+  const schemes = applicableSchemesOf(raw);
+  const mandatory = raw['isMandatory'] === true || raw['isMandatory'] === 'Yes';
+  return {
+    schemes: schemes.names,
+    schemeIds: schemes.ids,
+    // Comma-separated, for code that still reads one scheme name.
+    schemeName: schemes.names.join(', '),
+    schemeCount: num(raw['schemeCount'], schemes.names.length),
+    allowedExtensions: firstText(raw, 'allowedExtensions'),
+    maxFileSizeMb: numOrNull(raw['maxFileSizeMb']),
+    isMandatory: mandatory,
+    mandatory: (mandatory ? 'Yes' : 'No') as 'Yes' | 'No',
+    description: firstText(raw, 'description'),
+    status: statusOf(raw)
+  };
+}
+
+/**
+ * Request body shared by Doc and Annexure Master. Schemes go out as `schemeNames` (the backend matches them to Scheme
+ * Master and replaces the record's whole set on update); a legacy single `schemeName` counts when no list is sent.
+ */
+function linkedMasterToApi(patch: Raw, nameKey: 'documentName' | 'annexureName', nameAliases: string[]): Record<string, unknown> {
+  const { schemes, schemeName, schemeIds, ...rest } = patch;
+  const body = buildRequest(
+    rest,
+    {
+      ...Object.fromEntries(nameAliases.map(a => [a, nameKey])),
+      maxFileSizeMb: v => ['maxFileSizeMb', numOrNull(v)],
+      isMandatory: v => ['isMandatory', v === true || v === 'Yes']
+    },
+    ['mandatory', 'schemeCount']
+  );
+  // The form's Yes / No choice wins over a stale isMandatory copied from the row.
+  if (patch['mandatory'] === 'Yes' || patch['mandatory'] === 'No') body['isMandatory'] = patch['mandatory'] === 'Yes';
+  if (schemes !== undefined) body['schemeNames'] = schemeNamesFor(schemes);
+  else if (schemeName !== undefined) body['schemeNames'] = schemeNamesFor(String(schemeName).split(','));
+  else if (Array.isArray(schemeIds)) body['schemeIds'] = schemeIds.map(id => num(id, 0)).filter(id => id > 0);
+  return body;
+}
+
+// ---- Doc Master: { id, code, documentName, applicableSchemes, schemeCount, category, allowedExtensions,
+//      maxFileSizeMb, isMandatory, description, isActive } ----
 export const DOC_ADAPTER: ResourceAdapter<DocMasterItem> = {
   fromApi: (item, index) => {
     const raw = asRaw(item);
+    const name = firstText(raw, 'documentName', 'docName', 'documents');
     return {
       sNo: sNoOf(raw, index),
       id: text(raw['id']),
-      schemeName: firstText(raw, 'schemeName', 'category') || ALL_SCHEMES,
-      documents: firstText(raw, 'documents', 'documentName', 'docName'),
-      allowedExtensions: firstText(raw, 'allowedExtensions'),
-      maxFileSizeMb: numOrNull(raw['maxFileSizeMb']),
-      isMandatory: raw['isMandatory'] === true || raw['isMandatory'] === 'Yes',
-      mandatory: raw['isMandatory'] === true || raw['isMandatory'] === 'Yes' ? 'Yes' : 'No',
-      status: statusOf(raw)
+      docName: name,
+      documents: name,
+      category: firstText(raw, 'category'),
+      ...linkedMasterFromApi(raw)
     };
   },
-  toApi: patch =>
-    buildRequest(
-      patch as Raw,
-      {
-        schemeName: v => ['schemeName', schemeOrAll(v)],
-        documents: 'documentName',
-        maxFileSizeMb: v => ['maxFileSizeMb', numOrNull(v)],
-        isMandatory: v => ['isMandatory', v === true || v === 'Yes']
-      },
-      ['mandatory']
-    )
+  toApi: patch => linkedMasterToApi(patch as Raw, 'documentName', ['docName', 'documents'])
+};
+
+// ---- Annexure Master: { id, code, annexureName, applicableSchemes, schemeCount, allowedExtensions, maxFileSizeMb,
+//      isMandatory, description, isActive } ----
+export const ANNEXURE_ADAPTER: ResourceAdapter<AnnexureMasterItem> = {
+  fromApi: (item, index) => {
+    const raw = asRaw(item);
+    const name = firstText(raw, 'annexureName', 'name', 'annexures');
+    return {
+      sNo: sNoOf(raw, index),
+      id: text(raw['id']),
+      annexureName: name,
+      annexures: name,
+      ...linkedMasterFromApi(raw)
+    };
+  },
+  toApi: patch => linkedMasterToApi(patch as Raw, 'annexureName', ['annexureName', 'annexures'])
 };
 
 /** Adapter of every master resource (DataEngine dataKey). */
@@ -335,5 +407,6 @@ export const MASTER_ADAPTERS: Readonly<Record<string, ResourceAdapter>> = {
   DISTRICTS: DISTRICT_BLOCK_ADAPTER,
   REMARK_MASTERS: REMARK_ADAPTER,
   GRADING_MASTERS: GRADING_ADAPTER,
-  DOC_MASTERS: DOC_ADAPTER
+  DOC_MASTERS: DOC_ADAPTER,
+  ANNEXURE_MASTERS: ANNEXURE_ADAPTER
 };

@@ -52,10 +52,8 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           >
             <div class="flex items-center justify-between gap-3">
               <div class="flex items-start gap-3 min-w-0">
-                <!-- Red PDF Icon matching Image 4 -->
-                <div class="w-8 h-8 rounded bg-[#D92D20] flex items-center justify-center text-white text-[10px] font-bold tracking-tight shrink-0 mt-0.5 shadow-2xs group-hover:scale-105 transition-transform">
-                  PDF
-                </div>
+                <!-- Authentic Adobe Red PDF Badge -->
+                <app-icon name="pdf-badge" solid size="auto" class="w-7 h-7 text-[#E5252A] select-none shrink-0 mt-0.5 group-hover:scale-105 transition-transform" />
 
                 <div class="min-w-0">
                   <span class="font-semibold text-slate-900 group-hover:text-navy transition-colors block text-[13px] leading-snug truncate" [title]="doc.title">
@@ -68,7 +66,9 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
               </div>
 
               <!-- View Document Button -->
-              <button appButton variant="secondary" size="sm" class="shrink-0" (click)="viewDocument.emit(doc); $event.stopPropagation()">View</button>
+              <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="viewDocument.emit(doc); $event.stopPropagation()" title="View Document" aria-label="View Document">
+                <app-icon name="eye" size="sm" />
+              </button>
             </div>
 
             @if (doc.comment) {

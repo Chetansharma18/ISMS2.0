@@ -20,7 +20,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       >
         <div class="flex items-center gap-2">
           <h2 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-navy transition-colors">
-            Required Supporting Documents
+            Supporting Documents
           </h2>
         </div>
 
@@ -37,37 +37,41 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
       @if (isOpen()) {
         <div class="p-4 sm:p-5 border-t border-slate-200 bg-white animate-in fade-in duration-150">
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-2.5">
-            <!-- Left Column (first half) -->
-            <div class="space-y-2 text-[13.5px] sm:text-[14px] text-slate-800 leading-relaxed">
-              @for (req of columns().left; track req.sNo) {
-                <div class="flex items-baseline gap-2.5">
-                  <span class="w-5 text-right text-slate-500 shrink-0 font-medium text-[13px] sm:text-[13.5px]">{{ req.sNo }}.</span>
-                  <div>
-                    <span class="font-normal text-slate-900">{{ req.name }}</span>
-                    @if (req.note) {
-                      <span class="text-slate-500 text-[12.5px] sm:text-[13px]"> ({{ req.note }})</span>
-                    }
+          @if (requiredInfo().length === 0) {
+            <p class="text-xs text-slate-500 italic m-0">No supporting documents configured for this scheme.</p>
+          } @else {
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-2.5">
+              <!-- Left Column (first half) -->
+              <div class="space-y-2 text-[13.5px] sm:text-[14px] text-slate-800 leading-relaxed">
+                @for (req of columns().left; track req.sNo) {
+                  <div class="flex items-baseline gap-2.5">
+                    <span class="w-5 text-right text-slate-500 shrink-0 font-medium text-[13px] sm:text-[13.5px]">{{ req.sNo }}.</span>
+                    <div>
+                      <span class="font-normal text-slate-900">{{ req.name }}</span>
+                      @if (req.note) {
+                        <span class="text-slate-500 text-[12.5px] sm:text-[13px]"> ({{ req.note }})</span>
+                      }
+                    </div>
                   </div>
-                </div>
-              }
-            </div>
+                }
+              </div>
 
-            <!-- Right Column (second half) -->
-            <div class="space-y-2 text-[13.5px] sm:text-[14px] text-slate-800 leading-relaxed">
-              @for (req of columns().right; track req.sNo) {
-                <div class="flex items-baseline gap-2.5">
-                  <span class="w-5 text-right text-slate-500 shrink-0 font-medium text-[13px] sm:text-[13.5px]">{{ req.sNo }}.</span>
-                  <div>
-                    <span class="font-normal text-slate-900">{{ req.name }}</span>
-                    @if (req.note) {
-                      <span class="text-slate-500 text-[12.5px] sm:text-[13px]"> ({{ req.note }})</span>
-                    }
+              <!-- Right Column (second half) -->
+              <div class="space-y-2 text-[13.5px] sm:text-[14px] text-slate-800 leading-relaxed">
+                @for (req of columns().right; track req.sNo) {
+                  <div class="flex items-baseline gap-2.5">
+                    <span class="w-5 text-right text-slate-500 shrink-0 font-medium text-[13px] sm:text-[13.5px]">{{ req.sNo }}.</span>
+                    <div>
+                      <span class="font-normal text-slate-900">{{ req.name }}</span>
+                      @if (req.note) {
+                        <span class="text-slate-500 text-[12.5px] sm:text-[13px]"> ({{ req.note }})</span>
+                      }
+                    </div>
                   </div>
-                </div>
-              }
+                }
+              </div>
             </div>
-          </div>
+          }
         </div>
       }
     </div>

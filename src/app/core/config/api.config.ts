@@ -81,13 +81,25 @@ export const API_ENDPOINTS = {
     BACK_TO_SSO: endpoint('GET', '/auth/backtosso')
   },
 
-  // One Time Registration (OTR)
-  REGISTRATION: {
-    OTR_SAVE: endpoint('POST', '/registration/otr/save'),
-    OTR_SUBMIT: endpoint('POST', '/registration/otr/submit'),
-    OTR_DETAILS: endpoint('GET', '/registration/otr'),
-    VERIFY_AADHAAR: endpoint('POST', '/registration/verify-aadhaar'),
-    VERIFY_PAN: endpoint('POST', '/registration/verify-pan')
+  // One Time Registration (OTR) of the signed-in organisation. FORM returns the steps and their fields (plus any
+  // FormManager fields attached to a step); each step is its own record, saved with PUT and checked by the backend
+  // (400 with the failing field names). Needs the OtrRegistrations permission.
+  OTR: {
+    FORM: endpoint('GET', '/otr/form'),
+    /** Organisation details (step 1); empty until saved. Its `status` is the registration status. */
+    ME: endpoint('GET', '/otr/me'),
+    SAVE_ORGANISATION: endpoint('PUT', '/otr/me/organisation'),
+    AUTHORIZED_PERSON: endpoint('GET', '/otr/me/authorized-person'),
+    SAVE_AUTHORIZED_PERSON: endpoint('PUT', '/otr/me/authorized-person'),
+    BANK_DETAILS: endpoint('GET', '/otr/me/bank-details'),
+    SAVE_BANK_DETAILS: endpoint('PUT', '/otr/me/bank-details'),
+    UPDATE_LOGS: endpoint('GET', '/otr/me/update-logs'),
+    /** multipart/form-data with the file in a part named "file"; id = document type (pan-card, cancelled-cheque ...). */
+    UPLOAD_DOCUMENT: endpoint('POST', byId('/otr/me/documents')),
+    DELETE_DOCUMENT: endpoint('DELETE', byId('/otr/me/documents')),
+    DOCUMENT: endpoint('GET', byId('/otr/me/documents')),
+    /** Body: `{ declarationAccepted }`. */
+    SUBMIT: endpoint('POST', '/otr/me/submit')
   },
 
   // Schemes & Tenders
@@ -181,8 +193,10 @@ export const API_ENDPOINTS = {
   DISTRICTS: crud('/master/district-blocks'),
   /** Districts on their own (`{ id, name, code, state, isActive }`): names for the block rows, dropdowns. */
   DISTRICT_MASTERS: crud('/master/districts'),
-  /** Document Master (`{ id, schemeName, documentName, allowedExtensions, maxFileSizeMb, isMandatory, isActive }`). */
+  /** Document Master (`{ id, documentName, applicableSchemes: [{ id, schemeName }], allowedExtensions, ... }`). */
   DOC_MASTERS: crud('/master/doc-masters'),
+  /** Annexure Master (`{ id, annexureName, applicableSchemes: [{ id, schemeName }], allowedExtensions, ... }`). */
+  ANNEXURE_MASTERS: crud('/master/annexures'),
   /** Distinct departments of the designations (string[]). */
   DESIGNATION_DEPARTMENTS: { LIST: endpoint('GET', '/master/designations/departments') },
   /** Remark types for the dropdown (defaults + any stored ones, string[]). */

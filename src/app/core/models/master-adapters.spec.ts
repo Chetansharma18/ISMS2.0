@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  ANNEXURE_ADAPTER,
   COURSE_ADAPTER,
   DESIGNATION_ADAPTER,
   DISTRICT_BLOCK_ADAPTER,
@@ -93,11 +94,52 @@ describe('master adapters', () => {
       schemeName: '', grade: 'A', minimum: 80, maximum: 100
     });
 
-    expect(DOC_ADAPTER.fromApi({ id: 3, schemeName: 'MMKVY', documentName: 'PAN Card', isMandatory: true, maxFileSizeMb: 5 }, 0)).toMatchObject({
-      schemeName: 'MMKVY', documents: 'PAN Card', isMandatory: true, mandatory: 'Yes', maxFileSizeMb: 5
+  });
+
+  it('doc master: one document, many applicable schemes', () => {
+    const row = DOC_ADAPTER.fromApi(
+      {
+        id: 3,
+        code: 'DOC-PAN',
+        documentName: 'Company PAN Card',
+        applicableSchemes: [{ id: 5, schemeName: 'MMKVY' }, { id: 6, schemeName: 'PMKVY' }],
+        schemeCount: 2,
+        category: 'Statutory',
+        allowedExtensions: '.pdf',
+        maxFileSizeMb: 5,
+        isMandatory: true,
+        isActive: false
+      },
+      0
+    );
+    expect(row).toMatchObject({
+      id: '3', docName: 'Company PAN Card', documents: 'Company PAN Card', schemes: ['MMKVY', 'PMKVY'], schemeIds: [5, 6],
+      schemeName: 'MMKVY, PMKVY', schemeCount: 2, category: 'Statutory', isMandatory: true, mandatory: 'Yes', status: 'Inactive'
     });
-    expect(DOC_ADAPTER.toApi({ schemeName: 'ALL Schemes', documents: 'PAN Card', isMandatory: false, mandatory: 'No' })).toEqual({
-      schemeName: '', documentName: 'PAN Card', isMandatory: false
+
+    // Schemes go out as names; the form's Yes / No sets isMandatory; screen-only keys stay out.
+    expect(
+      DOC_ADAPTER.toApi({ ...row, schemes: ['MMKVY', 'ALL', 'Rajvik'], mandatory: 'No', status: 'Active' })
+    ).toEqual({
+      documentName: 'Company PAN Card',
+      category: 'Statutory',
+      allowedExtensions: '.pdf',
+      maxFileSizeMb: 5,
+      isMandatory: false,
+      description: '',
+      isActive: true,
+      schemeNames: ['MMKVY', 'Rajvik']
+    });
+    // The status switch sends only the status.
+    expect(DOC_ADAPTER.toApi({ status: 'Inactive' })).toEqual({ isActive: false });
+  });
+
+  it('annexure master: same shape with annexureName', () => {
+    const row = ANNEXURE_ADAPTER.fromApi({ id: 9, annexureName: 'Annexure-1: Covering Letter', applicableSchemes: [{ id: 5, schemeName: 'MMKVY' }] }, 1);
+    expect(row).toMatchObject({ sNo: 2, id: '9', annexureName: 'Annexure-1: Covering Letter', schemes: ['MMKVY'], status: 'Active' });
+    expect(ANNEXURE_ADAPTER.toApi({ annexureName: ' Annexure-2 ', schemes: ['MMKVY'] })).toEqual({
+      annexureName: 'Annexure-2',
+      schemeNames: ['MMKVY']
     });
   });
 

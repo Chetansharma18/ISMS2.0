@@ -14,6 +14,8 @@ import {
   SchemeCategoryMasterItem,
   RemarkMasterItem,
   GradingMasterItem,
+  DocMasterItem,
+  AnnexureMasterItem,
   TwoStepVerificationItem,
   AuthMethodType,
   DynamicFormBuilderItem,
@@ -35,6 +37,8 @@ export type {
   SchemeCategoryMasterItem,
   RemarkMasterItem,
   GradingMasterItem,
+  DocMasterItem,
+  AnnexureMasterItem,
   TwoStepVerificationItem,
   AuthMethodType,
   DynamicFormBuilderItem,
@@ -183,11 +187,13 @@ export const MOCK_PERMISSION_MASTER_ITEMS: PermissionMasterItem[] = resolveMock(
 ]);
 
 export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
-  { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 5000000, processFees: 10000, status: 'Active' },
-  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', budget: 75000000, amount: 7500000, processFees: 15000, status: 'Active' },
-  { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', budget: 25000000, amount: 2500000, processFees: 5000, status: 'Active' },
-  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', budget: 100000000, amount: 10000000, processFees: 25000, status: 'Active' },
-  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 5000000, processFees: 2000, status: 'Active' }
+  { sNo: 1, id: 'sch-1', schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 50000, processFees: 10000, status: 'Active' },
+  { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', budget: 75000000, amount: 75000, processFees: 15000, status: 'Active' },
+  { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', budget: 25000000, amount: 25000, processFees: 5000, status: 'Active' },
+  { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', budget: 100000000, amount: 100000, processFees: 25000, status: 'Active' },
+  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 50000, processFees: 2000, status: 'Active' },
+  { sNo: 6, id: 'sch-6', schemeName: 'Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)', schemeCategory: 'PMKVY, Central', categoryName: 'GENERAL', budget: 80000000, amount: 50000, processFees: 10000, status: 'Active' },
+  { sNo: 7, id: 'sch-7', schemeName: 'Rooftop Solar Skill Development Scheme (Surya Ghar Yojana)', schemeCategory: 'Solar, Rajvik', categoryName: 'SPECIAL TARGET GROUP', budget: 60000000, amount: 60000, processFees: 12000, status: 'Active' }
 ]);
 
 export const MOCK_USER_ROLE_MASTER_ITEMS: UserRoleMasterItem[] = resolveMock([
@@ -485,6 +491,287 @@ export const MOCK_GRADING_MASTER_ITEMS: GradingMasterItem[] = resolveMock([
     minimum: 0,
     maximum: 39,
     range: '0 - 39',
+    status: 'Active'
+  }
+]);
+
+export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'doc-1',
+    docName: 'Company PAN Card',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana',
+      'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: 'doc-2',
+    docName: 'GST Registration Certificate',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana',
+      'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: 'doc-3',
+    docName: 'Certificate of Incorporation / Registration',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: 'doc-4',
+    docName: 'MSME / Udyam Registration Certificate',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 5,
+    id: 'doc-5',
+    docName: 'Audited Financial Statements',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 6,
+    id: 'doc-6',
+    docName: 'CA-Certified Turnover Certificate',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 7,
+    id: 'doc-7',
+    docName: 'Affidavit for not being blacklisted by any Govt. / PSU',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana',
+      'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 8,
+    id: 'doc-8',
+    docName: 'Authorized Person / Signatory Details',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 9,
+    id: 'doc-9',
+    docName: 'Details of Officer In-Charge (OIC)',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 10,
+    id: 'doc-10',
+    docName: 'Bank Account Details with Cancelled Cheque',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 11,
+    id: 'doc-11',
+    docName: 'Training Centre Infrastructure Details',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 12,
+    id: 'doc-12',
+    docName: 'Placement & Training Track Record',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 13,
+    id: 'doc-13',
+    docName: 'NSDC Partnership Certificate',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 14,
+    id: 'doc-14',
+    docName: 'EOI Document with Sign & Seal on each page',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  }
+]);
+
+export const MOCK_ANNEXURE_MASTER_ITEMS: AnnexureMasterItem[] = resolveMock([
+  {
+    sNo: 1,
+    id: 'annex-1',
+    annexureName: 'Annexure-1: Covering Letter',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana',
+      'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 2,
+    id: 'annex-2',
+    annexureName: 'Annexure-3: Audited Financial Statements Format for Last Three Consecutive Financial Years',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 3,
+    id: 'annex-3',
+    annexureName: 'Annexure-4: Details of Active Skill Development Centre Format',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 4,
+    id: 'annex-4',
+    annexureName: 'Annexure-5: Training and Placement Details Format',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 5,
+    id: 'annex-5',
+    annexureName: 'Annexure-6: Affidavit Format for Not Being Blacklisted by Govt. / PSU',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 6,
+    id: 'annex-6',
+    annexureName: 'Annexure-7: Self-Certificate / Declaration Format as per Annexure-7',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Swarojgar Yojana (2026)'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 7,
+    id: 'annex-7',
+    annexureName: 'Annexure-8: Details of Board of Directors Format',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 8,
+    id: 'annex-8',
+    annexureName: 'Annexure-9: Details of Placement Partnership / Industry Tie-ups Format',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 9,
+    id: 'annex-9',
+    annexureName: 'Annexure-10: Details of Working Experience in Relevant Sector Format',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 10,
+    id: 'annex-10',
+    annexureName: 'Annexure-11: List of Divisions and Group of District',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 11,
+    id: 'annex-11',
+    annexureName: 'Annexure-12: Proposed Evaluation Matrix Template',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhya Mantri Yuva Kaushal Yojana'
+    ],
+    status: 'Active'
+  },
+  {
+    sNo: 12,
+    id: 'annex-12',
+    annexureName: 'Annexure-13: Supporting Documents Checklist',
+    schemes: [
+      'Vishwakarma Yuva Udyami Protsahan Yojana',
+      'Mukhyamantri Yuva Sambal Yojana'
+    ],
     status: 'Active'
   }
 ]);

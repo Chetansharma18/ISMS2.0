@@ -75,7 +75,7 @@ interface EditPermissionForm {
   selector: 'app-permission-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent, MasterFilterBarComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, PageShellComponent, SwitchComponent, MasterFilterBarComponent],
   template: `
     <app-page-shell>
       
@@ -236,17 +236,13 @@ interface EditPermissionForm {
           <!-- 1. Role Type -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-            <select
-              appInput
-              [(ngModel)]="addForm.roleType"
-              class="w-full"
+            <app-dropdown
+              [options]="activeRoleOptions()"
+              [(value)]="addForm.roleType"
+              placeholder="Select Role Type"
               [invalid]="submitted() && !addForm.roleType"
-            >
-              <option value="" disabled selected>Select Role Type</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
+              class="w-full"
+            />
             @if (submitted() && !addForm.roleType) {
               <div class="text-xs text-red-500 mt-1 font-medium">Role Type is required</div>
             }
@@ -361,29 +357,23 @@ interface EditPermissionForm {
             <!-- Role Type -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Role Type</label>
-              <select
-                appInput
-                [(ngModel)]="ef.roleType"
+              <app-dropdown
+                [options]="activeRoleOptions()"
+                [(value)]="ef.roleType"
+                placeholder="Select Role Type"
                 class="w-full"
-              >
-                @for (role of activeRoleOptions(); track role) {
-                  <option [value]="role">{{ role }}</option>
-                }
-              </select>
+              />
             </div>
 
             <!-- Model (Page) -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Model (Page)</label>
-              <select
-                appInput
-                [(ngModel)]="ef.moduleName"
+              <app-dropdown
+                [options]="availableModels"
+                [(value)]="ef.moduleName"
+                placeholder="Select Model (Page)"
                 class="w-full"
-              >
-                @for (m of availableModels; track m) {
-                  <option [value]="m">{{ m }}</option>
-                }
-              </select>
+              />
             </div>
 
             <!-- Permissions Checkboxes -->
@@ -422,14 +412,12 @@ interface EditPermissionForm {
             <!-- Status Toggle -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Status</label>
-              <select
-                appInput
-                [(ngModel)]="ef.status"
+              <app-dropdown
+                [options]="['Active', 'Inactive']"
+                [(value)]="ef.status"
+                placeholder="Select Status"
                 class="w-full"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
+              />
             </div>
           </div>
         }

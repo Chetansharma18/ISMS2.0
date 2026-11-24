@@ -232,7 +232,56 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
         </section>
       }
 
-      <!-- 4. Documents -->
+      <!-- Scheme Specific Proposal Parameters (Dynamic Fields) -->
+      @if (app.customFields && app.customFields.length > 0) {
+        <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="custom-fields-heading">
+          <div
+            (click)="toggleSection(5)"
+            class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
+            [class.border-b]="isCustomFieldsOpen()"
+            [class.border-slate-200]="isCustomFieldsOpen()"
+            [attr.aria-expanded]="isCustomFieldsOpen()"
+            role="button"
+            tabindex="0"
+            (keydown.enter)="toggleSection(5)"
+            (keydown.space)="$event.preventDefault(); toggleSection(5)"
+          >
+            <div class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
+              <h2 id="custom-fields-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
+                Scheme Proposal Parameters
+              </h2>
+              <span class="text-xs text-slate-500 font-normal">({{ app.customFields.length }} Parameters)</span>
+            </div>
+            <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
+              <span class="hidden sm:inline">{{ isCustomFieldsOpen() ? 'Hide Details' : 'View Details' }}</span>
+              <app-icon
+                name="chevron-down"
+                size="md"
+                class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
+                [class.rotate-180]="isCustomFieldsOpen()"
+              />
+            </div>
+          </div>
+
+          @if (isCustomFieldsOpen()) {
+            <div class="p-5 sm:p-6 animate-in fade-in duration-150">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-3.5 gap-x-6 text-xs">
+                @for (cf of app.customFields; track cf.key) {
+                  <div>
+                    <span class="text-slate-500 block text-[11px] mb-0.5">{{ cf.label }}</span>
+                    <span class="font-medium text-slate-900 text-xs">
+                      {{ formatFieldValue(cf.value) }}
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </section>
+      }
+
+      <!-- Documents -->
       <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="docs-heading">
         <div
           (click)="toggleSection(4)"
@@ -246,7 +295,9 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
           (keydown.space)="$event.preventDefault(); toggleSection(4)"
         >
           <div class="flex items-center gap-3">
-            <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
+            <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
+              {{ app.customFields && app.customFields.length > 0 ? '5' : '4' }}
+            </span>
             <h2 id="docs-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
               Documents
             </h2>
@@ -313,12 +364,14 @@ export class ScrutinyReviewSectionsComponent {
   readonly isOrgOpen = signal<boolean>(false);
   readonly isSignatoryOpen = signal<boolean>(false);
   readonly isBankOpen = signal<boolean>(false);
+  readonly isCustomFieldsOpen = signal<boolean>(false);
   readonly isDocsOpen = signal<boolean>(false);
 
   readonly allOpen = computed(() =>
     this.isOrgOpen() &&
     this.isSignatoryOpen() &&
     (this.applicant()?.bankDetails ? this.isBankOpen() : true) &&
+    (this.applicant()?.customFields?.length ? this.isCustomFieldsOpen() : true) &&
     this.isDocsOpen()
   );
 
@@ -328,6 +381,7 @@ export class ScrutinyReviewSectionsComponent {
       case 2: this.isSignatoryOpen.update(v => !v); break;
       case 3: this.isBankOpen.update(v => !v); break;
       case 4: this.isDocsOpen.update(v => !v); break;
+      case 5: this.isCustomFieldsOpen.update(v => !v); break;
     }
   }
 
@@ -336,7 +390,15 @@ export class ScrutinyReviewSectionsComponent {
     this.isOrgOpen.set(next);
     this.isSignatoryOpen.set(next);
     this.isBankOpen.set(next);
+    this.isCustomFieldsOpen.set(next);
     this.isDocsOpen.set(next);
+  }
+
+  formatFieldValue(val: any): string {
+    if (val === true) return 'Yes / Linkage Attached';
+    if (val === false) return 'No / Not Available';
+    if (val === null || val === undefined || val === '') return '—';
+    return String(val);
   }
 
   protected readonly documentColumns: TableColumn<DossierDocument>[] = [

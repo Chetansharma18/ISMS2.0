@@ -54,6 +54,8 @@ export const MOCK_CONFIG: MockConfigSettings = {
     USER_ROLES: true,
     REMARK_MASTERS: true,
     GRADING_MASTERS: true,
+    DOC_MASTERS: true,
+    ANNEXURE_MASTERS: true,
     TWO_STEP_VERIFICATION: true
   }
 };

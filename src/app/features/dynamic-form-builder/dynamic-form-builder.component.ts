@@ -14,7 +14,17 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ButtonComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
+import {
+  ButtonComponent,
+  DropdownComponent,
+  IconComponent,
+  InputDirective,
+  PageShellComponent,
+  SwitchComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption
+} from '../../shared';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { TableComponent } from '../../shared/components/table/table.component';
 import { TableColumn } from '../../shared/components/table/table.types';
@@ -72,10 +82,12 @@ interface FormBuilderFormData {
     TableComponent,
     ActionModalComponent,
     ButtonComponent,
+    DropdownComponent,
     IconComponent,
     InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -702,6 +714,21 @@ interface FormBuilderFormData {
           </button>
         </app-page-header>
 
+        <!-- Unified Master Filter Bar (Dropdown filters - NO BUTTONS) -->
+        <app-master-filter-bar
+          [(searchQuery)]="searchQuery"
+          searchPlaceholder="Search by form name, step title, or field label..."
+          [(status)]="statusFilter"
+          [showStatusFilter]="true"
+          [statusOptions]="statusFilterOptions()"
+          [filters]="formFilters()"
+          [(filterValues)]="formFilterValues"
+          [totalCount]="forms().length"
+          [filteredCount]="filteredForms().length"
+          itemUnit="forms"
+          (resetFilters)="resetFilters()"
+        />
+
         <!-- Template: Form Type Column (Title + Step Form / Direct Form without background) -->
         <ng-template #formTypeTemplate let-item>
           <div class="flex flex-col gap-1 py-1">
@@ -842,10 +869,10 @@ interface FormBuilderFormData {
                     <div class="w-6 sm:w-12 h-0.5 bg-slate-200 ml-1"></div>
                   </div>
 
-                  <!-- Step 4: Complete Preview -->
+                  <!-- Step 4: Preview -->
                   <div class="flex items-center gap-2 shrink-0 opacity-60">
                     <span class="w-5 h-5 rounded-full bg-slate-100 border border-slate-300 text-slate-400 flex items-center justify-center text-[11px] font-bold">4</span>
-                    <span class="font-medium text-slate-400 text-xs">4. Complete Preview</span>
+                    <span class="font-medium text-slate-400 text-xs">4. Preview</span>
                     <div class="w-6 sm:w-12 h-0.5 bg-slate-200 ml-1"></div>
                   </div>
 
@@ -1381,7 +1408,7 @@ interface FormBuilderFormData {
                     </button>
 
                     <button appButton type="button" (click)="submitApplyEoi()">
-                      <span>Proceed to Complete Preview</span>
+                      <span>Proceed to Preview</span>
                       <span>&rarr;</span>
                     </button>
                   </div>
@@ -1562,7 +1589,7 @@ interface FormBuilderFormData {
               </h2>
 
               <!-- Modal Form Body -->
-              <div class="mt-4 font-sans text-[13px] max-h-[75vh] overflow-y-auto pr-1">
+              <div class="mt-4 font-sans text-[13px]">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5">
                   <!-- Col 1: SSO ID* -->
                   <div>
@@ -2447,12 +2474,13 @@ interface FormBuilderFormData {
                         <input appInput size="sm" type="text" [(ngModel)]="previewFormValues[field.id]" placeholder="10 / 13 / 2026" class="w-full" />
                       }
                       @if (field.type === 'dropdown') {
-                        <select appInput size="sm" [(ngModel)]="previewFormValues[field.id]" class="w-full">
-                          <option value="" disabled>{{ getDropdownPlaceholder(field) }}</option>
-                          @for (opt of getOptionsArray(field); track opt) {
-                            <option [value]="opt">{{ opt }}</option>
-                          }
-                        </select>
+                        <app-dropdown
+                          size="sm"
+                          [options]="getOptionsArray(field)"
+                          [(value)]="previewFormValues[field.id]"
+                          [placeholder]="getDropdownPlaceholder(field)"
+                          class="w-full"
+                        />
                       }
                       @if (field.type === 'textarea') {
                         <textarea appInput rows="3" [(ngModel)]="previewFormValues[field.id]" [placeholder]="getFieldPlaceholder(field)" class="w-full"></textarea>
@@ -2714,9 +2742,42 @@ export class DynamicFormBuilderComponent {
     });
   }
 
+  readonly statusFilter = signal<string>('ALL');
+  readonly formFilterValues = signal<Record<string, string>>({});
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
+
+  readonly formFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'type',
+      label: 'Form Type',
+      placeholder: 'All Form Types',
+      options: ['Step Form', 'Direct Form']
+    }
+  ]);
+
   readonly filteredForms = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const list = this.forms();
+    const st = this.statusFilter();
+    const type = this.formFilterValues()['type'];
+    let list = this.forms();
+
+    if (st !== 'ALL') {
+      list = list.filter(f => (f.status || 'Active') === st);
+    }
+
+    if (type) {
+      if (type === 'Step Form') {
+        list = list.filter(f => f.isStepForm);
+      } else if (type === 'Direct Form') {
+        list = list.filter(f => !f.isStepForm);
+      }
+    }
+
     if (!q) return list;
 
     return list.filter(form => {
@@ -2729,6 +2790,12 @@ export class DynamicFormBuilderComponent {
       return matchName || matchDirect || matchStep;
     });
   });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.formFilterValues.set({});
+  }
 
   // --- Step Management ---
 
@@ -3873,7 +3940,7 @@ export class DynamicFormBuilderComponent {
 
   submitApplyEoi(): void {
     const org = this.previewFormValues['eoi-otr-1'] || 'Company';
-    this.notification.success(`EOI Application for ${org} submitted to Complete Preview!`);
+    this.notification.success(`EOI Application for ${org} submitted to Preview!`);
     this.closePreviewModal();
   }
 

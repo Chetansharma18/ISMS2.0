@@ -22,7 +22,9 @@ import {
   PageShellComponent,
   TableComponent,
   TableColumn,
-  ActionModalComponent
+  ActionModalComponent,
+  DropdownComponent,
+  DropdownOption
 } from '../../../shared';
 import { FilterTabsComponent } from '../../../shared';
 
@@ -41,7 +43,8 @@ import { FilterTabsComponent } from '../../../shared';
     PageHeaderComponent,
     PageShellComponent,
     TableComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    DropdownComponent
   ],
   template: `
     <app-page-shell>
@@ -58,62 +61,48 @@ import { FilterTabsComponent } from '../../../shared';
         <!-- Status Filter Badges / Pills Toolbar -->
         <div class="flex items-center justify-between gap-3 pt-1">
           <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
-
-          <div class="text-xs text-slate-500 font-medium hidden sm:block">
-            Showing {{ filteredBatches().length }} {{ filteredBatches().length === 1 ? 'batch' : 'batches' }}
-          </div>
         </div>
 
         <!-- Admin Advanced Filter Bar (Center, Scheme, District) -->
-        <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+        <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
           
           <!-- Filter: Center Name -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[200px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedCenter()"
-              (ngModelChange)="selectedCenter.set($event)"
-              class="max-w-[200px]"
-            >
-              <option value="ALL">All Centers ({{ centerList().length }})</option>
-              @for (c of centerList(); track c) {
-                <option [value]="c">{{ c }}</option>
-              }
-            </select>
+              class="flex-1 min-w-[180px] max-w-[240px]"
+              [options]="centerDropdownOptions()"
+              [value]="selectedCenter()"
+              (valueChange)="selectedCenter.set($event)"
+              placeholder="Select Center"
+            />
           </div>
 
           <!-- Filter: Scheme -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[180px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedScheme()"
-              (ngModelChange)="selectedScheme.set($event)"
-            >
-              <option value="ALL">All Schemes</option>
-              @for (sch of schemeList(); track sch) {
-                <option [value]="sch">{{ sch }}</option>
-              }
-            </select>
+              class="flex-1 min-w-[160px]"
+              [options]="schemeDropdownOptions()"
+              [value]="selectedScheme()"
+              (valueChange)="selectedScheme.set($event)"
+              placeholder="Select Scheme"
+            />
           </div>
 
           <!-- Filter: District -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[180px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedDistrict()"
-              (ngModelChange)="selectedDistrict.set($event)"
-            >
-              <option value="ALL">All Districts</option>
-              @for (dst of districtList(); track dst) {
-                <option [value]="dst">{{ dst }}</option>
-              }
-            </select>
+              class="flex-1 min-w-[160px]"
+              [options]="districtDropdownOptions()"
+              [value]="selectedDistrict()"
+              (valueChange)="selectedDistrict.set($event)"
+              placeholder="Select District"
+            />
           </div>
 
           <!-- Reset filters -->
@@ -368,18 +357,33 @@ export class BatchApprovalsComponent {
 
   readonly centerList = computed(() => {
     const list = this.batchService.batches();
-    return Array.from(new Set(list.map(b => b.sdcName).filter(Boolean)));
+    return Array.from(new Set(list.map(b => b.sdcName).filter((c): c is string => !!c)));
   });
 
   readonly schemeList = computed(() => {
     const list = this.batchService.batches();
-    return Array.from(new Set(list.map(b => b.scheme).filter(Boolean)));
+    return Array.from(new Set(list.map(b => b.scheme).filter((s): s is string => !!s)));
   });
 
   readonly districtList = computed(() => {
     const list = this.batchService.batches();
-    return Array.from(new Set(list.map(b => b.sdcDistrict).filter(Boolean)));
+    return Array.from(new Set(list.map(b => b.sdcDistrict).filter((d): d is string => !!d)));
   });
+
+  readonly centerDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Centers', value: 'ALL' },
+    ...this.centerList().map(c => ({ label: c, value: c }))
+  ]);
+
+  readonly schemeDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Schemes', value: 'ALL' },
+    ...this.schemeList().map(sch => ({ label: sch, value: sch }))
+  ]);
+
+  readonly districtDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Districts', value: 'ALL' },
+    ...this.districtList().map(dst => ({ label: dst, value: dst }))
+  ]);
 
   isApproved(b: BatchRecord): boolean {
     return isBatchApproved(b);

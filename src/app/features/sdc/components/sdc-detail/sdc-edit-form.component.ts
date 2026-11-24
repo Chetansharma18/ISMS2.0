@@ -3,14 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { SDC_SECTOR_OPTIONS } from '../../models/sdc.model';
 import { RAJASTHAN_LOCATION_DATA } from '../../config/sdc-form.config';
 import { SdcPhotoEditorComponent } from './sdc-photo-editor.component';
-import { ButtonComponent, IconComponent, InputDirective } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective } from '../../../../shared';
 
 /** Inline edit form for an SDC. Edits the parent-owned edit model in place via ngModel. */
 // Default change detection: the parent edits the edit model in place (e.g. district change resets dependent fields).
 @Component({
   selector: 'app-sdc-edit-form',
   standalone: true,
-  imports: [FormsModule, SdcPhotoEditorComponent, ButtonComponent, IconComponent, InputDirective],
+  imports: [FormsModule, SdcPhotoEditorComponent, ButtonComponent, IconComponent, InputDirective, DropdownComponent],
   host: { class: 'block' },
   template: `
     <div class="border border-slate-200 rounded-xl p-5 sm:p-6 bg-white shadow-2xs space-y-4 animate-in fade-in duration-150">
@@ -41,15 +41,12 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
           <label class="block font-semibold text-slate-700 mb-1">
             Sector <span class="text-rose-500">*</span>
           </label>
-          <select
-            appInput
-            [(ngModel)]="editModel.sector"
+          <app-dropdown
+            [options]="sectors"
+            [(value)]="editModel.sector"
+            placeholder="Select Sector"
             class="w-full"
-          >
-            @for (sec of sectors; track sec) {
-              <option [value]="sec">{{ sec }}</option>
-            }
-          </select>
+          />
         </div>
 
         <!-- Row 2: State (1) + District (1) + Assembly Constituency (1) + Parliament Constituency (1) -->
@@ -68,46 +65,37 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
           <label class="block font-semibold text-slate-700 mb-1">
             District <span class="text-rose-500">*</span>
           </label>
-          <select
-            appInput
-            [ngModel]="editModel.district"
-            (ngModelChange)="districtChange.emit($event)"
+          <app-dropdown
+            [options]="districts"
+            [value]="editModel.district"
+            (valueChange)="districtChange.emit($event)"
+            placeholder="Select District"
             class="w-full"
-          >
-            @for (d of districts; track d) {
-              <option [value]="d">{{ d }}</option>
-            }
-          </select>
+          />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-700 mb-1">
             Assembly Constituency <span class="text-rose-500">*</span>
           </label>
-          <select
-            appInput
-            [(ngModel)]="editModel.assemblyConstituency"
+          <app-dropdown
+            [options]="assemblyConstituencies()"
+            [(value)]="editModel.assemblyConstituency"
+            placeholder="Select Assembly Constituency"
             class="w-full"
-          >
-            @for (a of assemblyConstituencies(); track a) {
-              <option [value]="a">{{ a }}</option>
-            }
-          </select>
+          />
         </div>
 
         <div>
           <label class="block font-semibold text-slate-700 mb-1">
             Parliament Constituency <span class="text-rose-500">*</span>
           </label>
-          <select
-            appInput
-            [(ngModel)]="editModel.parliamentConstituency"
+          <app-dropdown
+            [options]="parliamentConstituencies()"
+            [(value)]="editModel.parliamentConstituency"
+            placeholder="Select Parliament Constituency"
             class="w-full"
-          >
-            @for (p of parliamentConstituencies(); track p) {
-              <option [value]="p">{{ p }}</option>
-            }
-          </select>
+          />
         </div>
 
         <!-- Row 3: Division (1) + Block (1) + Proposed Start Date (1) + SDC Capacity (1) -->
@@ -126,15 +114,12 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
           <label class="block font-semibold text-slate-700 mb-1">
             Block <span class="text-rose-500">*</span>
           </label>
-          <select
-            appInput
-            [(ngModel)]="editModel.block"
+          <app-dropdown
+            [options]="blocks()"
+            [(value)]="editModel.block"
+            placeholder="Select Block"
             class="w-full"
-          >
-            @for (b of blocks(); track b) {
-              <option [value]="b">{{ b }}</option>
-            }
-          </select>
+          />
         </div>
 
         <div>
@@ -227,15 +212,12 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
 
         <div class="sm:col-span-2">
           <label class="block font-semibold text-slate-700 mb-1">Hostel Category</label>
-          <select
-            appInput
-            [(ngModel)]="editModel.hostelCategory"
+          <app-dropdown
+            [options]="hostelCategories"
+            [(value)]="editModel.hostelCategory"
+            placeholder="Select Hostel Category"
             class="w-full"
-          >
-            @for (cat of hostelCategories; track cat) {
-              <option [value]="cat">{{ cat }}</option>
-            }
-          </select>
+          />
         </div>
 
         <!-- Row 6: Latitude (1) + Longitude (1) + Remarks (2) -->

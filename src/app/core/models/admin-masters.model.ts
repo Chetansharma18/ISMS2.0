@@ -99,8 +99,20 @@ export interface SchemeCategoryMasterItem {
 export interface DocMasterItem {
   id: string;
   sNo?: number;
-  schemeName: string;
-  documents: string;
+  docName: string;
+  schemes: string[];
+  documents?: string;
+  schemeName?: string;
+  status: 'Active' | 'Inactive';
+}
+
+export interface AnnexureMasterItem {
+  id: string;
+  sNo?: number;
+  annexureName: string;
+  schemes: string[];
+  annexures?: string;
+  schemeName?: string;
   status: 'Active' | 'Inactive';
 }
 

@@ -59,28 +59,81 @@ export function isBeforeClosingDate(closingDateStr?: string, now: Date = new Dat
 }
 
 export function canEditTender(tender: SubmittedTender, now: Date = new Date()): boolean {
-  return isBeforeClosingDate(tender.closingDate, now) && (tender.editCount || 0) < (tender.maxEdits || 3);
+  return (
+    tender.submittedStatus === 'Submitted' &&
+    isBeforeClosingDate(tender.closingDate, now) &&
+    (tender.editCount || 0) < (tender.maxEdits || 3)
+  );
 }
 
 export function remainingEdits(tender: SubmittedTender): number {
   return Math.max(0, (tender.maxEdits || 3) - (tender.editCount || 0));
 }
 
-/** Case-insensitive search across the columns shown in the status table. */
-export function filterTenders(tenders: SubmittedTender[], rawQuery: string): SubmittedTender[] {
-  const query = rawQuery.trim().toLowerCase();
-  if (!query) return tenders;
+/** Filter criteria for searching and refining the EOI applications table. */
+export interface TenderFilterCriteria {
+  searchQuery?: string;
+  status?: string;
+  schemeName?: string;
+  schemeCategory?: string;
+}
 
-  return tenders.filter(t =>
-    t.appRef.toLowerCase().includes(query) ||
-    t.schemeTitle.toLowerCase().includes(query) ||
-    (t.schemeCategory && t.schemeCategory.toLowerCase().includes(query)) ||
-    t.department.toLowerCase().includes(query) ||
-    t.submittedStatus.toLowerCase().includes(query) ||
-    t.eoiStatus.toLowerCase().includes(query) ||
-    (t.rejectionReason && t.rejectionReason.toLowerCase().includes(query)) ||
-    t.transactionRef.toLowerCase().includes(query)
-  );
+/** Case-insensitive search & filtering across the columns shown in the status table. */
+export function filterTenders(
+  tenders: SubmittedTender[],
+  rawQueryOrCriteria: string | TenderFilterCriteria
+): SubmittedTender[] {
+  let criteria: TenderFilterCriteria;
+  if (typeof rawQueryOrCriteria === 'string') {
+    criteria = { searchQuery: rawQueryOrCriteria };
+  } else {
+    criteria = rawQueryOrCriteria || {};
+  }
+
+  const query = (criteria.searchQuery || '').trim().toLowerCase();
+  const status = (criteria.status || 'ALL').trim();
+  const schemeName = (criteria.schemeName || '').trim();
+  const schemeCategory = (criteria.schemeCategory || '').trim();
+
+  let result = tenders;
+
+  // 1. Full-text search
+  if (query) {
+    result = result.filter(t =>
+      t.appRef.toLowerCase().includes(query) ||
+      t.schemeTitle.toLowerCase().includes(query) ||
+      (t.schemeCategory && t.schemeCategory.toLowerCase().includes(query)) ||
+      t.department.toLowerCase().includes(query) ||
+      t.submittedStatus.toLowerCase().includes(query) ||
+      t.eoiStatus.toLowerCase().includes(query) ||
+      (t.rejectionReason && t.rejectionReason.toLowerCase().includes(query)) ||
+      t.transactionRef.toLowerCase().includes(query)
+    );
+  }
+
+  // 2. Status filter
+  if (status && status !== 'ALL') {
+    result = result.filter(t => t.submittedStatus.toLowerCase() === status.toLowerCase());
+  }
+
+  // 3. Scheme Name filter
+  if (schemeName && schemeName !== 'ALL') {
+    result = result.filter(t =>
+      t.schemeTitle === schemeName ||
+      t.schemeName === schemeName ||
+      t.schemeTitle.toLowerCase() === schemeName.toLowerCase() ||
+      (t.schemeName && t.schemeName.toLowerCase() === schemeName.toLowerCase())
+    );
+  }
+
+  // 4. Scheme Category filter
+  if (schemeCategory && schemeCategory !== 'ALL') {
+    result = result.filter(t =>
+      (t.schemeCategory || '').toLowerCase() === schemeCategory.toLowerCase()
+    );
+  }
+
+  return result;
 }
 
 export function documentCategoryLabel(category: SubmittedTenderDoc['category']): string {

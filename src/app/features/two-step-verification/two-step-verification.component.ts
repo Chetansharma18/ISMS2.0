@@ -16,7 +16,17 @@ import { PageHeaderComponent } from '../../shared/components/page-header/page-he
 import { TableComponent } from '../../shared/components/table/table.component';
 import { TableColumn } from '../../shared/components/table/table.types';
 import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
-import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent } from '../../shared';
+import {
+  ButtonComponent,
+  DropdownComponent,
+  IconComponent,
+  InputDirective,
+  PageShellComponent,
+  SwitchComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  StatusFilterOption
+} from '../../shared';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
 import { AuthMethodType, TwoStepVerificationItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
 
@@ -42,9 +52,9 @@ interface TwoStepFormData {
     ButtonComponent,
     DropdownComponent,
     IconComponent,
-    InputDirective,
     PageShellComponent,
-    SwitchComponent
+    SwitchComponent,
+    MasterFilterBarComponent
   ],
   template: `
     <app-page-shell>
@@ -53,9 +63,6 @@ interface TwoStepFormData {
       <app-page-header
         title="Two Step Verification"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Two Step Verification' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by role type or auth type..."
-        [(searchQuery)]="searchQuery"
       >
         <!-- Add New Button -->
         <button
@@ -69,6 +76,21 @@ interface TwoStepFormData {
           <span>Add new</span>
         </button>
       </app-page-header>
+
+      <!-- Unified Master Filter & Search Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search by role type or auth type..."
+        [(status)]="statusFilter"
+        [showStatusFilter]="true"
+        [statusOptions]="statusFilterOptions()"
+        [filters]="filters()"
+        [(filterValues)]="filterValues"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        itemUnit="configurations"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Table -->
       <app-table
@@ -125,8 +147,8 @@ interface TwoStepFormData {
             type="button"
             [disabled]="item.status === 'Inactive'"
             (click)="openViewModal(item)"
-            [title]="item.status === 'Inactive' ? 'Cannot view inactive configuration' : 'View Details'"
-            [attr.aria-label]="item.status === 'Inactive' ? 'Cannot view inactive configuration' : 'View Details'"
+            [title]="item.status === 'Inactive' ? 'Actions are disabled for inactive users' : 'View Details'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Actions are disabled for inactive users' : 'View Details'"
           >
             <app-icon name="eye" size="sm" />
           </button>
@@ -192,18 +214,13 @@ interface TwoStepFormData {
             <label class="block text-slate-700 font-semibold text-xs mb-1.5">
               Role *
             </label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="formData.roleType"
-              class="w-full"
+              [options]="availableRoles()"
+              [(value)]="formData.roleType"
+              placeholder="Select Role"
               [invalid]="submitted() && !formData.roleType"
-            >
-              <option value="" disabled selected>Select Role</option>
-              @for (role of availableRoles(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
+            />
             @if (submitted() && !formData.roleType) {
               <p class="text-[11px] text-red-500 mt-1 font-medium">Role is required</p>
             }
@@ -256,47 +273,42 @@ interface TwoStepFormData {
         </div>
       </app-action-modal>
 
-      <!-- ====================================================================
-           VIEW MODAL
-           ==================================================================== -->
+      <!-- VIEW MODAL -->
       <app-action-modal
         [isOpen]="showViewModal()"
         [showCloseButton]="true"
         [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        accentBarClass="bg-primary"
-        title="Two Step Verification Details"
         primaryLabel=""
-        secondaryLabel=""
-        maxWidthClass="max-w-[460px]"
+        secondaryLabel="Close"
+        maxWidthClass="max-w-[480px]"
         (secondaryAction)="closeViewModal()"
         (close)="closeViewModal()"
       >
-        @if (selectedViewItem(); as item) {
-          <div class="mt-3 font-sans text-xs space-y-4 divide-y divide-slate-100">
-            <div class="flex items-center justify-between pt-1">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role Type</span>
-              <span class="text-sm font-bold text-slate-800">{{ item.roleType }}</span>
-            </div>
+        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          Two Step Verification Details
+        </h2>
 
-            <div class="pt-3">
-              <span class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Authentication Methods</span>
-              <div class="flex flex-wrap gap-2">
-                @for (type of item.authTypes; track type) {
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+        @if (selectedViewItem(); as viewItem) {
+          <div class="mt-4 font-sans text-xs space-y-4">
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Role</span>
+              <span class="font-semibold text-slate-800 text-sm">{{ viewItem.roleType }}</span>
+            </div>
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Authentication Types</span>
+              <div class="flex flex-wrap gap-1.5 mt-1">
+                @for (type of viewItem.authTypes; track type) {
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
                     {{ type }}
                   </span>
                 }
               </div>
             </div>
-
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border"
-                [ngClass]="selectedViewItem()?.status === 'Inactive' ? 'bg-slate-100 text-slate-700 border-slate-300' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
-              >
-                {{ selectedViewItem()?.status === 'Inactive' ? 'Inactive' : 'Active' }}
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Status</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'">
+                {{ viewItem.status }}
               </span>
             </div>
           </div>
@@ -321,12 +333,29 @@ export class TwoStepVerificationComponent implements OnInit {
   searchQuery = signal<string>('');
 
   showModal = signal<boolean>(false);
+  showViewModal = signal<boolean>(false);
+  selectedViewItem = signal<TwoStepVerificationItem | null>(null);
   editingId = signal<string | null>(null);
   submitted = signal<boolean>(false);
   isAuthDropdownOpen = signal<boolean>(false);
 
-  showViewModal = signal<boolean>(false);
-  selectedViewItem = signal<TwoStepVerificationItem | null>(null);
+  readonly statusFilter = signal<string>('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly filters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'roleType',
+      label: 'Role',
+      options: () => this.availableRoles(),
+      placeholder: 'All Roles'
+    }
+  ]);
+
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
 
   formData: TwoStepFormData = {
     roleType: '',
@@ -353,14 +382,31 @@ export class TwoStepVerificationComponent implements OnInit {
 
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const all = this.items();
-    if (!q) return all;
+    const st = this.statusFilter();
+    const role = this.filterValues()['roleType'];
+    let list = this.items();
 
-    return all.filter(it =>
+    if (st !== 'ALL') {
+      list = list.filter(it => (it.status || 'Active') === st);
+    }
+
+    if (role) {
+      list = list.filter(it => it.roleType.toLowerCase() === role.toLowerCase());
+    }
+
+    if (!q) return list;
+
+    return list.filter(it =>
       it.roleType.toLowerCase().includes(q) ||
       it.authTypes.some(a => a.toLowerCase().includes(q))
     );
   });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+  }
 
   ngOnInit(): void {
     this.twoStepRepo = this.dataEngine.for<TwoStepVerificationItem>('TWO_STEP_VERIFICATION', { idKey: 'id' });
@@ -527,7 +573,9 @@ export class TwoStepVerificationComponent implements OnInit {
   }
 
   openViewModal(item: TwoStepVerificationItem): void {
-    if (item.status === 'Inactive') return;
+    if (item.status === 'Inactive') {
+      return;
+    }
     this.selectedViewItem.set(item);
     this.showViewModal.set(true);
   }

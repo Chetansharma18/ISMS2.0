@@ -10,8 +10,7 @@ export type { SchemeCategoryMasterItem };
 
 const COLUMNS: TableColumn<SchemeCategoryMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-  { key: 'categoryName', label: 'Category Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
-  { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' }
+  { key: 'categoryName', label: 'Category Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' }
 ];
 
 const CONFIG: MasterCrudConfig<SchemeCategoryMasterItem> = {

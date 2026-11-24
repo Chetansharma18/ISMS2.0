@@ -263,6 +263,53 @@ export function parseEoiDuration(duration?: string): { value: string; unit: EoiD
   return { value: match[1], unit: 'Years' };
 }
 
+/**
+ * Filters master records (Doc Master or Annexure Master) by scheme and extracts their names.
+ * Supports both multi-scheme array (`item.schemes`) and legacy single-scheme string (`item.schemeName`).
+ */
+export function parseMasterEntriesByScheme<T extends { schemeName?: string; schemes?: string[]; status?: string }>(
+  items: T[],
+  schemeName: string,
+  fieldExtractor: (item: T) => string | undefined
+): string[] {
+  if (!schemeName) return [];
+  const target = schemeName.trim().toLowerCase();
+  const results: string[] = [];
+
+  for (const item of items) {
+    if (item.status === 'Inactive') continue;
+
+    if (Array.isArray(item.schemes) && item.schemes.length > 0) {
+      const matches = item.schemes.some(s => {
+        const lower = s.trim().toLowerCase();
+        return (
+          lower === 'all' ||
+          lower === 'all schemes' ||
+          lower === target ||
+          lower.includes(target) ||
+          target.includes(lower)
+        );
+      });
+      if (matches) {
+        const name = fieldExtractor(item);
+        if (name) {
+          name.split(',').map(s => s.trim()).filter(Boolean).forEach(entry => results.push(entry));
+        }
+      }
+    } else {
+      const s = (item.schemeName || '').trim().toLowerCase();
+      if (s === 'all' || s === 'all schemes' || s === target || s.includes(target) || target.includes(s)) {
+        const raw = fieldExtractor(item);
+        if (raw) {
+          raw.split(',').map(x => x.trim()).filter(Boolean).forEach(entry => results.push(entry));
+        }
+      }
+    }
+  }
+
+  return Array.from(new Set(results));
+}
+
 /** Blank form model for "Configure New EOI". */
 export function createEmptyEoiForm(): EoiFormData {
   return {
@@ -279,6 +326,7 @@ export function createEmptyEoiForm(): EoiFormData {
     processFee: '',
     attachments: [],
     documents: [],
+    annexures: [],
     documentFiles: {}
   };
 }
@@ -311,6 +359,7 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
       file: new File([], doc.name)
     })),
     documents: scheme.requiredDocs ? [...scheme.requiredDocs] : [],
+    annexures: scheme.annexures ? [...scheme.annexures] : [],
     documentFiles: {}
   };
 }
@@ -469,21 +518,23 @@ export function validateFee(
   return '';
 }
 
-export function validateDocuments(
-  documents: string[] = []
+function validateDistinctList(
+  items: string[] = [],
+  emptyError: string,
+  duplicateError: string
 ): { isValid: boolean; errors: Record<number, string> } {
   const errors: Record<number, string> = {};
   const seen = new Set<string>();
 
-  documents.forEach((doc, idx) => {
-    const trimmed = (doc ?? '').trim();
+  items.forEach((item, idx) => {
+    const trimmed = (item ?? '').trim();
     if (!trimmed) {
-      errors[idx] = 'Please select a document type.';
+      errors[idx] = emptyError;
       return;
     }
     const lower = trimmed.toLowerCase();
     if (seen.has(lower)) {
-      errors[idx] = 'This document type has already been added.';
+      errors[idx] = duplicateError;
     } else {
       seen.add(lower);
     }
@@ -493,6 +544,26 @@ export function validateDocuments(
     isValid: Object.keys(errors).length === 0,
     errors
   };
+}
+
+export function validateDocuments(
+  documents: string[] = []
+): { isValid: boolean; errors: Record<number, string> } {
+  return validateDistinctList(
+    documents,
+    'Please select a document type.',
+    'This document type has already been added.'
+  );
+}
+
+export function validateAnnexures(
+  annexures: string[] = []
+): { isValid: boolean; errors: Record<number, string> } {
+  return validateDistinctList(
+    annexures,
+    'Please select an annexure format.',
+    'This annexure has already been added.'
+  );
 }
 
 export interface EoiValidationOptions {
@@ -512,6 +583,7 @@ export interface EoiValidationResult {
   isValid: boolean;
   errors: Record<string, string>;
   docErrors: Record<number, string>;
+  annexureErrors: Record<number, string>;
 }
 
 export function validateEoiFormComplete(
@@ -529,7 +601,8 @@ export function validateEoiFormComplete(
     return {
       isValid: Object.keys(errors).length === 0,
       errors,
-      docErrors: {}
+      docErrors: {},
+      annexureErrors: {}
     };
   }
 
@@ -624,12 +697,16 @@ export function validateEoiFormComplete(
   // 11. Documents
   const docResult = validateDocuments(d.documents || []);
 
-  const isValid = Object.keys(errors).length === 0 && docResult.isValid;
+  // 12. Annexures
+  const annexureResult = validateAnnexures(d.annexures || []);
+
+  const isValid = Object.keys(errors).length === 0 && docResult.isValid && annexureResult.isValid;
 
   return {
     isValid,
     errors,
-    docErrors: docResult.errors
+    docErrors: docResult.errors,
+    annexureErrors: annexureResult.errors
   };
 }
 
@@ -705,11 +782,13 @@ export function buildSchemeFromForm(
     isFeeExempted: d.isFeeExempted,
     attachedDocs: attachedDocsList,
     requiredDocs: d.documents ? d.documents.filter(Boolean) : existingScheme?.requiredDocs || [],
-    createdAt: existingScheme ? existingScheme.createdAt : now,
+    annexures: d.annexures ? d.annexures.filter(Boolean) : existingScheme?.annexures || [],
+    createdAt: existingScheme ? (existingScheme.createdAt ?? now) : now,
     updatedAt: now,
     publishedAt: status === 'Open' ? (existingScheme?.publishedAt || now) : undefined,
     isActive: existingScheme ? existingScheme.isActive : true,
-    isFrozen: existingScheme ? existingScheme.isFrozen : false
+    isFrozen: existingScheme ? existingScheme.isFrozen : false,
+    isNew: existingScheme ? (existingScheme.isNew ?? false) : true
   };
 }
 

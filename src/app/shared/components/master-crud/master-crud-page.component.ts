@@ -230,29 +230,24 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                     }
                   }
                   @case ('select') {
-                    <select
-                      appInput
-                      [(ngModel)]="formData[field.key]"
+                    <app-dropdown
+                      [options]="resolveOptions(field)"
+                      [(value)]="formData[field.key]"
+                      [placeholder]="field.placeholder || ('Select ' + field.label)"
                       [invalid]="fieldInvalid(field)"
-                      class="w-full transition-none"
-                      style="transition: none !important;"
-                    >
-                      <option value="" disabled selected>Select {{ field.label }}</option>
-                      @for (opt of resolveOptions(field); track opt) {
-                        <option [value]="opt">{{ opt }}</option>
-                      }
-                    </select>
+                    />
                   }
                   @case ('multiselect') {
                     <app-dropdown
                       multiple
-                      overlay
                       [options]="resolveOptions(field)"
                       [values]="valuesOf(field)"
-                      [placeholder]="'Select ' + field.label"
+                      [placeholder]="field.placeholder || ('Select ' + field.label)"
                       [summary]="getMultiselectLabel(field)"
                       [invalid]="fieldInvalid(field)"
+                      [selectAllLabel]="field.key === 'schemes' ? 'All Schemes' : 'Select All'"
                       (optionToggled)="toggleMultiselectOption(field, $event)"
+                      (selectAllToggled)="toggleAllMultiselect(field)"
                     />
                   }
                   @case ('number') {
@@ -268,16 +263,12 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                   }
                   @case ('permissions') {
                     <div class="flex items-center gap-2">
-                      <select
-                        appInput
-                        [(ngModel)]="pendingPermission"
+                      <app-dropdown
                         class="flex-1"
-                      >
-                        <option value="" disabled selected>Select permission to add...</option>
-                        @for (opt of unselectedPermissions(field); track opt) {
-                          <option [value]="opt">{{ opt }}</option>
-                        }
-                      </select>
+                        [options]="unselectedPermissions(field)"
+                        [(value)]="pendingPermission"
+                        placeholder="Select permission to add..."
+                      />
                       <button
                         appButton
                         iconOnly
@@ -438,9 +429,9 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   });
 
   readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
-    { value: 'ALL', label: 'All', count: this.items().length },
-    { value: 'Active', label: 'Active', count: this.activeCount() },
-    { value: 'Inactive', label: 'Inactive', count: this.inactiveCount() }
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
   ]);
 
   readonly isFilterActive = computed(() => {
@@ -486,7 +477,17 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     const activeFilters = Object.entries(fv).filter(([_, val]) => !!val);
     if (activeFilters.length > 0) {
       list = list.filter((item: any) => {
-        return activeFilters.every(([key, val]) => String(item[key] ?? '') === val);
+        return activeFilters.every(([key, val]) => {
+          const itemVal = item[key];
+          if (Array.isArray(itemVal)) {
+            return itemVal.some((v: any) => String(v).trim().toLowerCase() === val.trim().toLowerCase());
+          }
+          if (typeof itemVal === 'string' && itemVal.includes(',')) {
+            const parts = itemVal.split(',').map((s: string) => s.trim().toLowerCase());
+            return parts.includes(val.trim().toLowerCase());
+          }
+          return String(itemVal ?? '').trim().toLowerCase() === val.trim().toLowerCase();
+        });
       });
     }
 
@@ -651,10 +652,27 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.syncMultiselectValues(field);
   }
 
+  toggleAllMultiselect(field: MasterFieldConfig): void {
+    const current: string[] = Array.isArray(this.formData[field.key])
+      ? [...this.formData[field.key]]
+      : [];
+    const allApplicable = this.resolveOptions(field).filter(
+      (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
+    );
+    const allSelected = allApplicable.length > 0 && allApplicable.every((o) => current.includes(o));
+    if (allSelected) {
+      this.formData[field.key] = current.filter((o) => !allApplicable.includes(o));
+    } else {
+      const naSelected = current.filter((o) => o.toLowerCase() === 'na');
+      this.formData[field.key] = [...allApplicable, ...naSelected];
+    }
+    this.syncMultiselectValues(field);
+  }
+
   getMultiselectLabel(field: MasterFieldConfig): string {
     const selected: string[] = this.formData[field.key] || [];
     if (!selected || selected.length === 0) {
-      return `Select ${field.label}`;
+      return field.placeholder || `Select ${field.label}`;
     }
     const allApplicable = this.resolveOptions(field).filter(
       (o) => o !== 'ALL' && o.toLowerCase() !== 'na'
@@ -664,7 +682,8 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
     if (hasAllApplicable) {
       const hasNa = selected.some((o) => o.toLowerCase() === 'na');
-      return hasNa ? 'ALL, na' : 'ALL';
+      const allLabel = field.key === 'schemes' ? 'All Schemes' : 'ALL';
+      return hasNa ? `${allLabel}, na` : allLabel;
     }
     return selected.join(', ');
   }

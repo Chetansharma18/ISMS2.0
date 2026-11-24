@@ -20,6 +20,7 @@ import { TenderDocCardComponent, TenderDocReplaceRequest, TenderDocViewRequest }
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Short Name</span><span class="font-medium text-slate-900">{{ app().orgDetails.shortName || app().orgDetails.fullName || '-' }}</span></div>
         <div class="sm:col-span-2"><span class="text-slate-500 block text-[11px] mb-0.5">Full Name of Organisation</span><span class="font-medium text-slate-900">{{ app().orgDetails.fullName || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Nature of Entity</span><span class="font-medium text-slate-900">{{ app().orgDetails.natureOfEntity || '-' }}</span></div>
+        <div><span class="text-slate-500 block text-[11px] mb-0.5">Preferred Sector</span><span class="font-medium text-slate-900">{{ app().orgDetails.preferredSector || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Registration Number (CIN)</span><span class="tabular-nums text-slate-900 font-medium">{{ app().orgDetails.registrationNumber || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">Date of Registration</span><span class="font-medium text-slate-900">{{ app().orgDetails.dateOfRegistration || '-' }}</span></div>
         <div><span class="text-slate-500 block text-[11px] mb-0.5">State / UT of Registration</span><span class="font-medium text-slate-900">{{ app().orgDetails.stateOfLegalReg || '-' }}</span></div>

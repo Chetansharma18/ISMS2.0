@@ -44,6 +44,8 @@ export function formatFileSize(bytes: number): string {
 /** Filters documents by tab / category; the 'all' tab returns the list unchanged. */
 export function filterDocsByCategory(docs: EoiDocumentItem[], tab: EoiDocumentTab): EoiDocumentItem[] {
   if (tab === 'all') return docs;
+  if (tab === 'mandatory') return docs.filter(d => d.category === 'mandatory' || (d.category === 'supporting' && d.isMandatory));
+  if (tab === 'remaining') return docs.filter(d => d.category === 'remaining' || (d.category === 'supporting' && !d.isMandatory));
   return docs.filter(d => d.category === tab);
 }
 

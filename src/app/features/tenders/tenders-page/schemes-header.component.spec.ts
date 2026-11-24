@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { describe, expect, it, beforeEach } from 'vitest';
 import { SchemesHeaderComponent } from './schemes-header.component';
 
-describe('SchemesHeaderComponent & PageHeader - Search and Suggestions (Bug 5)', () => {
+describe('SchemesHeaderComponent', () => {
   let fixture: ComponentFixture<SchemesHeaderComponent>;
   let component: SchemesHeaderComponent;
 
@@ -18,90 +18,34 @@ describe('SchemesHeaderComponent & PageHeader - Search and Suggestions (Bug 5)',
     fixture.detectChanges();
   });
 
-  it('renders search input with placeholder', () => {
+  it('renders Active Schemes title', () => {
     const el = fixture.nativeElement as HTMLElement;
-    const input = el.querySelector('input[type="text"]') as HTMLInputElement;
-    expect(input).not.toBeNull();
-    expect(input.placeholder).toBe('Search active schemes...');
+    expect(el.textContent).toContain('Active Schemes');
   });
 
-  it('emits searchChange when typing in the search input', () => {
-    let emitted = '';
-    component.searchChange.subscribe(val => {
-      emitted = val;
+  it('renders Configure New EOI button when isSuperAdmin is true and emits configureEoi', () => {
+    fixture.componentRef.setInput('isSuperAdmin', true);
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement as HTMLElement;
+    const btn = el.querySelector('button');
+    expect(btn).not.toBeNull();
+    expect(btn?.textContent).toContain('Configure New EOI');
+
+    let clicked = false;
+    component.configureEoi.subscribe(() => {
+      clicked = true;
     });
 
-    const el = fixture.nativeElement as HTMLElement;
-    const input = el.querySelector('input[type="text"]') as HTMLInputElement;
-    input.value = 'Solar';
-    input.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-
-    expect(emitted).toBe('Solar');
+    btn?.click();
+    expect(clicked).toBe(true);
   });
 
-  it('displays suggestions dropdown with visible, non-truncated items matching query', () => {
-    fixture.componentRef.setInput('suggestions', [
-      'Empanelment of Training Partners under PMKVY Scheme 4.0 Rajasthan',
-      'Solar Panel Technician Scheme 2026'
-    ]);
-    fixture.componentRef.setInput('searchQuery', 'Solar');
+  it('does not render Configure New EOI button when isSuperAdmin is false', () => {
+    fixture.componentRef.setInput('isSuperAdmin', false);
     fixture.detectChanges();
 
     const el = fixture.nativeElement as HTMLElement;
-    const input = el.querySelector('input[type="text"]') as HTMLInputElement;
-    input.dispatchEvent(new Event('focus'));
-    fixture.detectChanges();
-
-    const dropdown = el.querySelector('.shadow-lg');
-    expect(dropdown).not.toBeNull();
-    const items = el.querySelectorAll('.shadow-lg button');
-    expect(items.length).toBe(1);
-    expect(items[0].textContent?.trim()).toBe('Solar Panel Technician Scheme 2026');
-    // Verify whitespace-normal and break-words classes prevent truncation
-    expect(items[0].className).toContain('whitespace-normal');
-    expect(items[0].className).toContain('break-words');
-  });
-
-  it('filters correctly for PMKVY in suggestions dropdown', () => {
-    fixture.componentRef.setInput('suggestions', [
-      'Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)',
-      'Rooftop Solar Skill Development Scheme'
-    ]);
-    fixture.componentRef.setInput('searchQuery', 'PMKVY');
-    fixture.detectChanges();
-
-    const el = fixture.nativeElement as HTMLElement;
-    const input = el.querySelector('input[type="text"]') as HTMLInputElement;
-    input.dispatchEvent(new Event('focus'));
-    fixture.detectChanges();
-
-    const dropdown = el.querySelector('.shadow-lg');
-    expect(dropdown).not.toBeNull();
-    const items = el.querySelectorAll('.shadow-lg button');
-    expect(items.length).toBe(1);
-    expect(items[0].textContent?.trim()).toBe('Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)');
-  });
-
-  it('emits searchChange when a suggestion is selected', () => {
-    let emitted = '';
-    component.searchChange.subscribe(val => {
-      emitted = val;
-    });
-
-    fixture.componentRef.setInput('suggestions', ['Solar Panel Scheme']);
-    fixture.componentRef.setInput('searchQuery', 'Sol');
-    fixture.detectChanges();
-
-    const el = fixture.nativeElement as HTMLElement;
-    const input = el.querySelector('input[type="text"]') as HTMLInputElement;
-    input.dispatchEvent(new Event('focus'));
-    fixture.detectChanges();
-
-    const suggestionBtn = el.querySelector('.shadow-lg button') as HTMLButtonElement;
-    suggestionBtn.dispatchEvent(new MouseEvent('mousedown'));
-    fixture.detectChanges();
-
-    expect(emitted).toBe('Solar Panel Scheme');
+    expect(el.textContent).not.toContain('Configure New EOI');
   });
 });

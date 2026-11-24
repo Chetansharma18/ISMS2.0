@@ -21,6 +21,7 @@ interface PressRelease {
       title="Press Releases & Official Statements"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
       size="lg"
+      [scrollBody]="true"
       (close)="close.emit()"
     >
         <div class="space-y-6">

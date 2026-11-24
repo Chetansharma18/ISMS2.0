@@ -35,13 +35,11 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
     ActionModalComponent
   ],
   host: {
-    class: 'block w-full relative z-50'
+    class: 'block w-full sticky top-0 z-50'
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#EADCE2] box-border relative z-50 select-none"
-      [class.sticky]="isSticky"
-      [class.top-0]="isSticky"
+      class="w-full bg-white border-b border-[#EADCE2] box-border sticky top-0 z-50 select-none shadow-2xs"
       role="banner"
     >
       <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">

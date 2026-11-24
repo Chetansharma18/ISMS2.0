@@ -29,6 +29,7 @@ export interface SchemeTender {
   isFeeExempted?: boolean;
   attachedDocs?: EoiDocumentItem[];
   requiredDocs?: string[];
+  annexures?: string[];
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;
@@ -38,6 +39,7 @@ export interface SchemeTender {
   scheduledDate?: string;
   isActive?: boolean;
   isFrozen?: boolean;
+  isNew?: boolean;
 }
 
 /** A required-information / supporting-document entry for an EOI. */
@@ -89,6 +91,7 @@ export interface EoiFormData {
   processFee: string;
   attachments: EoiAttachment[];
   documents: string[];
+  annexures: string[];
   documentFiles?: Record<number, EoiDocumentUpload>;
   status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
   isFeeExempted?: boolean;

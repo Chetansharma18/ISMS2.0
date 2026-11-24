@@ -42,8 +42,8 @@ import { ConnectivityService } from './core/services/connectivity.service';
       <!-- Main Portal Header (Always visible across all pages except standalone pages) -->
       @if (showHeader()) {
         <app-header
-          [isSticky]="false"
-          class="shrink-0 relative z-50"
+          [isSticky]="true"
+          class="shrink-0 sticky top-0 z-50"
           (loginClicked)="onLoginClick()"
           (toggleMobileMenu)="toggleMobileSidebar()"
         ></app-header>

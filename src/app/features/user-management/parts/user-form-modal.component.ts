@@ -32,7 +32,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
         {{ editing() ? 'Edit User' : 'Add New User' }}
       </h2>
 
-      <div class="mt-4 font-sans text-[13px] max-h-[75vh] overflow-y-auto pr-1">
+      <div class="mt-4 font-sans text-[13px]">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5">
 
           <!-- ROW 1 (Col 1: SSO ID*, Col 2: Role Type*) -->
@@ -54,20 +54,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
 
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.roleType"
+              [options]="activeRoleOptions()"
+              [(value)]="f.roleType"
+              placeholder="Select Role Type"
               [invalid]="isSubmitted && !f.roleType"
-              class="w-full"
-            >
-              <option value="" disabled selected>Select Role Type</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role" [disabled]="isRoleDisabled(role)">
-                  {{ role }}{{ isRoleDisabled(role) ? ' (Disabled)' : '' }}
-                </option>
-              }
-            </select>
+            />
             @if (isSubmitted && !f.roleType) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
             }
@@ -173,17 +166,12 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <!-- ROW 5 (Col 1: Designation, Col 2: Scheme Name) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">Designation</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.designation"
-              class="w-full"
-            >
-              <option value="" disabled>Select Designation</option>
-              @for (desig of activeDesignationOptions(); track desig) {
-                <option [value]="desig">{{ desig }}</option>
-              }
-            </select>
+              [options]="activeDesignationOptions()"
+              [(value)]="f.designation"
+              placeholder="Select Designation"
+            />
           </div>
 
           <div>
@@ -205,34 +193,24 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <!-- ROW 6 (Col 1: District, Col 2: Block Name) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">District</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.district"
-              (ngModelChange)="onDistrictChange($event)"
-              class="w-full"
-            >
-              <option value="All Districts">All Districts</option>
-              @for (district of activeDistrictOptions(); track district) {
-                <option [value]="district">{{ district }}</option>
-              }
-            </select>
+              [options]="activeDistrictOptions()"
+              [value]="f.district || 'All Districts'"
+              (valueChange)="f.district = $event; onDistrictChange($event)"
+              placeholder="All Districts"
+            />
           </div>
 
           <div>
             <label class="block text-slate-700 font-medium mb-1">Block Name</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.blockName"
-              class="w-full transition-none"
-              style="transition: none !important;"
-            >
-              <option value="All Blocks">All Blocks</option>
-              @for (block of activeBlockOptions(); track block) {
-                <option [value]="block">{{ block }}</option>
-              }
-            </select>
+              [options]="activeBlockOptions()"
+              [value]="f.blockName || 'All Blocks'"
+              (valueChange)="f.blockName = $event"
+              placeholder="All Blocks"
+            />
           </div>
 
         </div>

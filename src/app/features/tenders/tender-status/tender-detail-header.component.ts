@@ -31,15 +31,15 @@ import { canEditTender, remainingEdits } from './tender-status.util';
             <button appButton size="sm" type="button" (click)="save.emit()">
               <span>Save Changes</span>
             </button>
-          } @else {
-            @if (canEdit(tender())) {
-              <span class="text-xs text-slate-500 font-medium whitespace-nowrap self-center">
-                ({{ remainingEdits(tender()) }} {{ remainingEdits(tender()) === 1 ? 'edit' : 'edits' }} remaining)
-              </span>
-              <button appButton size="sm" type="button" (click)="edit.emit()">
-                <span>Edit Application</span>
-              </button>
-            } @else if (tender().editCount >= 3) {
+          } @else if (canEdit(tender())) {
+            <span class="text-xs text-slate-500 font-medium whitespace-nowrap self-center">
+              ({{ remainingEdits(tender()) }} {{ remainingEdits(tender()) === 1 ? 'edit' : 'edits' }} remaining)
+            </span>
+            <button appButton size="sm" type="button" (click)="edit.emit()">
+              <span>Edit Application</span>
+            </button>
+          } @else if (tender().submittedStatus === 'Submitted') {
+            @if (tender().editCount >= (tender().maxEdits || 3)) {
               <span class="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold select-none">
                 All 3 edits used
               </span>

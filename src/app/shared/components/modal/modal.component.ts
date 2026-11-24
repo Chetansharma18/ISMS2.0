@@ -44,7 +44,10 @@ let nextId = 0;
       (click)="onBackdrop($event)"
     >
       <div
-        class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
+        class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
+        [class.overflow-visible]="!scrollBody()"
+        [class.overflow-hidden]="scrollBody()"
+        [class.max-h-[90vh]]="scrollBody()"
         style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
         [class]="widthClass()"
         role="dialog"
@@ -80,7 +83,7 @@ let nextId = 0;
         }
 
         <!-- Body -->
-        <div class="px-4 sm:px-7 py-4 flex-1 min-h-0" [class.overflow-auto]="scrollBody()">
+        <div class="px-4 sm:px-7 py-4" [class.flex-1]="scrollBody()" [class.min-h-0]="scrollBody()" [class.overflow-auto]="scrollBody()" [class.overflow-visible]="!scrollBody()">
           <ng-content />
         </div>
 
@@ -100,8 +103,8 @@ export class ModalComponent {
   readonly widthOverride = input('');
   readonly showClose = input(true);
   readonly closeOnBackdrop = input(true);
-  /** Turn off when the body manages its own scrolling. */
-  readonly scrollBody = input(true);
+  /** Turn off when the body manages its own scrolling or contains overlay dropdowns. */
+  readonly scrollBody = input(false);
 
   readonly close = output<void>();
 

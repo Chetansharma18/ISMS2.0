@@ -148,7 +148,11 @@ export class ShortfallBridgeService {
               status: 'Rejected' as const,
               rejectionReason: remarks
             } : undefined;
-            return this.tenderRepo.update(tender.id, { appeal: updatedAppeal }).pipe(map(() => true));
+            return this.tenderRepo.update(tender.id, {
+              submittedStatus: 'Rejected',
+              rejectionReason: remarks,
+              appeal: updatedAppeal
+            }).pipe(map(() => true));
           })
         );
       })

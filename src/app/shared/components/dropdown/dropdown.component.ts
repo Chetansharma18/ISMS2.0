@@ -59,7 +59,7 @@ let nextDropdownId = 0;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'block relative',
-    '[class.z-40]': 'isOpen()',
+    '[class.z-50]': 'isOpen()',
     '(keydown)': 'onKeydown($event)',
     '(keyup)': 'onKeyup($event)',
     '(document:click)': 'onOutside($event)',
@@ -113,7 +113,7 @@ let nextDropdownId = 0;
 
     @if (isOpen()) {
       <div
-        class="bg-white border border-slate-300 rounded-lg overflow-hidden"
+        class="bg-white border border-theme rounded-[4px] overflow-hidden"
         [class.mt-1]="!overlay() || resolvedDirection() === 'down'"
         [class.mb-1]="overlay() && resolvedDirection() === 'up'"
         [class.shadow-xs]="!overlay()"
@@ -123,16 +123,16 @@ let nextDropdownId = 0;
         [class.top-full]="overlay() && resolvedDirection() === 'down'"
         [class.bottom-full]="overlay() && resolvedDirection() === 'up'"
         [class.z-50]="overlay()"
-        [class.shadow-xl]="overlay()"
+        [class.shadow-[0_8px_24px_rgba(31,41,51,0.12)]]="overlay()"
       >
         @if (searchable()) {
-          <div class="p-2 border-b border-slate-100 bg-slate-50/80">
+          <div class="p-2 border-b border-theme bg-surface-muted">
             <input
               #search
               appInput
               size="sm"
               type="text"
-              class="w-full"
+              class="w-full h-[32px] px-2.5 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
               autocomplete="off"
               [value]="query()"
               [placeholder]="searchPlaceholder()"
@@ -147,7 +147,7 @@ let nextDropdownId = 0;
         <ul
           [id]="listId"
           role="listbox"
-          class="m-0 p-1 list-none max-h-56 overflow-y-auto text-xs"
+          class="m-0 py-1 list-none max-h-56 overflow-y-auto divide-y divide-border/40 text-[13px]"
           [attr.aria-multiselectable]="multiple() ? 'true' : null"
           [attr.aria-label]="ariaLabel() || null"
         >
@@ -159,35 +159,38 @@ let nextDropdownId = 0;
               [attr.aria-disabled]="row.disabled ? 'true' : null"
               (mousedown)="$event.preventDefault()"
               (click)="activate($index)"
-              class="flex items-center gap-2.5 px-2.5 py-2 rounded leading-snug select-none"
+              class="flex items-center justify-between gap-2.5 px-3 py-2 leading-snug select-none transition-colors"
               [class.cursor-pointer]="!row.disabled"
               [class.cursor-not-allowed]="row.disabled"
               [class.opacity-50]="row.disabled"
-              [class.hover:bg-slate-50]="!row.disabled"
-              [class.bg-slate-100]="$index === activeIndex()"
-              [class.bg-slate-50]="row.kind === 'all' && $index !== activeIndex()"
-              [class.font-semibold]="row.kind === 'all' || (!multiple() && isRowSelected(row))"
+              [class.hover:bg-surface-muted]="!row.disabled && !isRowSelected(row)"
+              [class.bg-[#FAF5F7]]="isRowSelected(row)"
+              [class.text-[#7C0E44]]="isRowSelected(row)"
+              [class.font-semibold]="isRowSelected(row) || row.kind === 'all'"
+              [class.bg-surface-muted]="$index === activeIndex() && !isRowSelected(row)"
               [class.text-navy]="row.kind === 'other'"
-              [class.text-slate-800]="row.kind !== 'other'"
+              [class.text-slate-800]="row.kind !== 'other' && !isRowSelected(row)"
               [class.border-t]="row.kind === 'other'"
               [class.border-slate-100]="row.kind === 'other'"
             >
-              @if (multiple()) {
-                <input
-                  type="checkbox"
-                  tabindex="-1"
-                  aria-hidden="true"
-                  class="w-4 h-4 rounded text-primary border-slate-300 accent-primary shrink-0 pointer-events-none"
-                  [checked]="isRowSelected(row)"
-                  [disabled]="row.disabled"
-                />
-              }
-              <span class="flex-1 min-w-0">{{ rowLabel(row) }}</span>
-              @if (row.kind === 'all') {
-                <span class="text-[11px] text-slate-500 font-normal shrink-0">({{ selectedEnabledCount() }}/{{ enabledItems().length }})</span>
-              }
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                @if (multiple()) {
+                  <input
+                    type="checkbox"
+                    tabindex="-1"
+                    aria-hidden="true"
+                    class="w-4 h-4 rounded text-primary border-slate-300 accent-primary shrink-0 pointer-events-none"
+                    [checked]="isRowSelected(row)"
+                    [disabled]="row.disabled"
+                  />
+                }
+                <span class="truncate">{{ rowLabel(row) }}</span>
+                @if (row.kind === 'all') {
+                  <span class="text-[11px] text-slate-500 font-normal shrink-0">({{ selectedEnabledCount() }}/{{ enabledItems().length }})</span>
+                }
+              </div>
               @if (!multiple() && isRowSelected(row)) {
-                <app-icon name="check" size="sm" [stroke]="2.5" class="text-navy" />
+                <span class="text-primary font-bold text-xs shrink-0">✓</span>
               }
             </li>
           }
@@ -244,8 +247,8 @@ export class DropdownComponent {
   readonly summary = input('');
   /** Multi mode shows the joined labels up to this many options, then "n selected". 0 always shows the count. */
   readonly maxLabels = input(2);
-  /** Float the list over the content below instead of pushing it down. */
-  readonly overlay = input(false, { transform: booleanAttribute });
+  /** Float the list over the content below instead of pushing it down. Defaults to true. */
+  readonly overlay = input(true, { transform: booleanAttribute });
   /** Multi mode: footer with the selected count and a Done button. */
   readonly footer = input(false, { transform: booleanAttribute });
   /** Opening direction: 'down' (default), 'up' (drop-up), or 'auto' (detects available space in viewport). */
@@ -256,13 +259,14 @@ export class DropdownComponent {
 
   protected readonly resolvedDirection = computed(() => {
     const d = this.direction();
+    this.isOpen();
     if (d !== 'auto') return d;
     if (typeof window === 'undefined') return 'down';
     const el = this.host.nativeElement;
     const rect = el.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
-    return spaceBelow < 280 && spaceAbove > spaceBelow ? 'up' : 'down';
+    return spaceBelow < 300 && spaceAbove > spaceBelow ? 'up' : 'down';
   });
 
   /** The "Other" row was clicked. */
@@ -505,7 +509,15 @@ export class DropdownComponent {
   private scrollActiveIntoView(): void {
     const index = this.activeIndex();
     if (index < 0) return;
-    const row = this.host.nativeElement.querySelector(`[id="${this.rowId(index)}"]`);
-    row?.scrollIntoView?.({ block: 'nearest' });
+    const list = this.host.nativeElement.querySelector(`ul#${this.listId}`) as HTMLElement | null;
+    const row = this.host.nativeElement.querySelector(`[id="${this.rowId(index)}"]`) as HTMLElement | null;
+    if (!list || !row) return;
+    const listRect = list.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+    if (rowRect.top < listRect.top) {
+      list.scrollTop -= (listRect.top - rowRect.top);
+    } else if (rowRect.bottom > listRect.bottom) {
+      list.scrollTop += (rowRect.bottom - listRect.bottom);
+    }
   }
 }

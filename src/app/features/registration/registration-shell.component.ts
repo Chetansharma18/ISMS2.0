@@ -67,7 +67,11 @@ export interface StepMeta {
             } @else if (activeStep() === 3) {
               Please provide the required details to complete the registration process.
             } @else {
-              Review all the details before submitting your registration.
+              @if (isExistingUser()) {
+                Review all your details.
+              } @else {
+                Review all the details before submitting your registration.
+              }
             }
           </p>
         </div>
@@ -75,7 +79,7 @@ export interface StepMeta {
         <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
         <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5 overflow-x-auto no-scrollbar">
           <div class="flex items-center justify-between w-full min-w-135 sm:min-w-0">
-            @for (step of steps; track step.number; let last = $last) {
+            @for (step of steps(); track step.number; let last = $last) {
               <!-- Step Item Button -->
               <button
                 appButton
@@ -191,7 +195,7 @@ export interface StepMeta {
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
                 <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
-                  Review &amp; Submit
+                  {{ isExistingUser() ? 'Preview' : 'Review & Submit' }}
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
                   Step 4 of the application
@@ -253,7 +257,7 @@ export interface StepMeta {
                   <span>Download PDF</span>
                 </button>
 
-                @if (isAlreadySubmitted()) {
+                @if (isExistingUser()) {
                   <button appButton size="lg" type="button" (click)="backToProfile()">
                     <span>Back to Profile</span>
                   </button>
@@ -358,6 +362,17 @@ export class RegistrationShellComponent implements OnInit, OnDestroy {
     return data.status === 'Submitted' || this.submittedRegId() !== null;
   });
 
+  readonly isExistingUser = computed(() => {
+    return this.authService.currentUser()?.role === 'existing_user' || this.isAlreadySubmitted();
+  });
+
+  readonly steps = computed<StepMeta[]>(() => [
+    { number: 1, label: 'Organisation Details' },
+    { number: 2, label: 'Authorized Person' },
+    { number: 3, label: 'Organisation Bank Details' },
+    { number: 4, label: this.isExistingUser() ? 'Preview' : 'Preview & Submit' }
+  ]);
+
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
@@ -378,13 +393,6 @@ export class RegistrationShellComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.validationService.resetSubmittedSteps();
   }
-
-  readonly steps: StepMeta[] = [
-    { number: 1, label: 'Organisation Details' },
-    { number: 2, label: 'Authorized Person' },
-    { number: 3, label: 'Organisation Bank Details' },
-    { number: 4, label: 'Preview & Submit' }
-  ];
 
   isStepCompleted(stepNumber: number): boolean {
     const data = this.otrFormService.formData();

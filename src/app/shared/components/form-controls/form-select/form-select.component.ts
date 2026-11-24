@@ -95,7 +95,11 @@ export interface SelectItem {
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
       @if (isOpen()) {
         <div
-          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-[4px] border border-theme shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
+          class="absolute left-0 right-0 z-50 bg-white rounded-[4px] border border-theme shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
+          [class.top-full]="openDirection() === 'down'"
+          [class.mt-1]="openDirection() === 'down'"
+          [class.bottom-full]="openDirection() === 'up'"
+          [class.mb-1]="openDirection() === 'up'"
           role="listbox"
         >
           <!-- Search input for large lists -->
@@ -244,6 +248,7 @@ export class FormSelectComponent {
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
   @Input() clearable: boolean = false;
+  @Input() direction: 'down' | 'up' | 'auto' = 'auto';
   @Input() hint?: string;
   @Input() error?: string;
   @Input() disableLabelClick: boolean = false;
@@ -253,6 +258,7 @@ export class FormSelectComponent {
   @Output() blur = new EventEmitter<FocusEvent | void>();
 
   isOpen = signal<boolean>(false);
+  readonly openDirection = signal<'up' | 'down'>('down');
   searchQuery = signal<string>('');
 
   constructor(private elementRef: ElementRef) { }
@@ -309,7 +315,9 @@ export class FormSelectComponent {
       const willOpen = !this.isOpen();
       this.isOpen.set(willOpen);
       this.searchQuery.set('');
-      if (!willOpen) {
+      if (willOpen) {
+        this.updateDirection();
+      } else {
         this.blur.emit();
       }
     }
@@ -325,6 +333,29 @@ export class FormSelectComponent {
   onBlur(event: FocusEvent): void {
     if (!this.isOpen()) {
       this.blur.emit(event);
+    }
+  }
+
+  updateDirection(): void {
+    if (this.direction !== 'auto') {
+      this.openDirection.set(this.direction);
+      return;
+    }
+    if (typeof window === 'undefined') {
+      this.openDirection.set('down');
+      return;
+    }
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    this.openDirection.set(spaceBelow < 300 && spaceAbove > spaceBelow ? 'up' : 'down');
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onWindowChange(): void {
+    if (this.isOpen()) {
+      this.updateDirection();
     }
   }
 

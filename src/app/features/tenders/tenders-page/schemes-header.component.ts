@@ -16,9 +16,9 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
     <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
     <app-page-header
       title="Active Schemes"
-      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Configuration' }, { label: 'Active Schemes' }]"
       [searchable]="true"
-      searchPlaceholder="Search active schemes..."
+      searchPlaceholder="Search by scheme name, ref no, category..."
       [(searchQuery)]="searchQuery"
       [suggestions]="suggestions()"
       (search)="searchChange.emit($event)"

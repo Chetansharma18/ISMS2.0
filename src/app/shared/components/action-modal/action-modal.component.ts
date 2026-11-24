@@ -25,7 +25,10 @@ import { IconComponent } from '../icon/icon.component';
         (click)="onBackdropClick($event)"
       >
         <div
-          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
+          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
+          [class.overflow-visible]="!scrollable"
+          [class.overflow-hidden]="scrollable"
+          [class.max-h-[90vh]]="scrollable"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"
@@ -35,7 +38,7 @@ import { IconComponent } from '../icon/icon.component';
         >
           <!-- Top Accent Bar -->
           @if (showAccentBar) {
-            <div class="h-1 w-full shrink-0" [ngClass]="accentBarClass"></div>
+            <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
           }
 
           <!-- Close Button -->
@@ -52,7 +55,13 @@ import { IconComponent } from '../icon/icon.component';
           }
 
           <!-- Modal Body -->
-          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 overflow-y-auto flex-1 flex flex-col min-h-0">
+          <div
+            class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
+            [class.overflow-y-auto]="scrollable"
+            [class.overflow-visible]="!scrollable"
+            [class.flex-1]="scrollable"
+            [class.min-h-0]="scrollable"
+          >
 
             <!-- Badge Pill -->
             @if (badge) {
@@ -140,6 +149,8 @@ export class ActionModalComponent {
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;
   @Input() reverseButtons = false;
+  /** When true, forces the modal body to scroll internally instead of natural height with overlay dropdowns */
+  @Input() scrollable = false;
   /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
   @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
 

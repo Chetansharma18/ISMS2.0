@@ -179,6 +179,17 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/empanelment-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/empanelment-orders/empanelment-orders.component').then(
+        (m) => m.EmpanelmentOrdersPageComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-orders',
+    redirectTo: 'admin/empanelment-order'
+  },
+  {
     path: 'admin/sanction-orders',
     loadComponent: () =>
       import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
@@ -370,6 +381,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/doc-master.component').then(
         (m) => m.DocMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/annexure',
+    loadComponent: () =>
+      import('./features/admin-master/annexure-master.component').then(
+        (m) => m.AnnexureMasterComponent
       )
   },
   {

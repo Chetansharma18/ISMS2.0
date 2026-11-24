@@ -2,13 +2,18 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
+import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
+import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
+import { GenerateEmpanelmentOrderModalComponent } from '../../components/generate-empanelment-order-modal/generate-empanelment-order-modal.component';
+import { OrderViewerModalComponent } from '../../components/order-viewer-modal/order-viewer-modal.component';
+import { downloadEvaluationExcelFile } from '../../utils/eoi-evaluation-excel.util';
 import { formatDate } from '../../../../shared/utils';
 import {
   ButtonComponent,
-  FilterTab,
-  FilterTabsComponent,
   IconComponent,
   ListPageComponent,
   TableColumn
@@ -18,7 +23,15 @@ import {
   selector: 'app-applicant-submissions',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ListPageComponent, ButtonComponent, FilterTabsComponent, IconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ListPageComponent,
+    ButtonComponent,
+    IconComponent,
+    GenerateEmpanelmentOrderModalComponent,
+    OrderViewerModalComponent
+  ],
   template: `
     <app-list-page
       title="Applicant Submissions"
@@ -33,59 +46,53 @@ import {
       [data]="filteredResponses()"
       [pagination]="true"
       [pageSize]="10"
-      emptyMessage="No submissions found matching the selected filter."
+      emptyMessage="No submissions found."
       [customTemplates]="{
         anonymousLabel: applicantTemplate,
         status: statusTemplate,
         action: actionTemplate
       }"
     >
-        <!-- Simple Neutral Filter Toolbar & Review Progress -->
+        <!-- Action Toolbar: Back, Excel Download, Generate Order, Total Count -->
         <div beforeTable class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-2.5 sm:p-3 flex flex-wrap items-center justify-between gap-3">
-          <!-- Left: Back Button & Filter Tabs -->
+          <!-- Left: Back Button, Excel Download Button, Generate Empanelment Order -->
           <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-            <!-- Back Button matching existing screens -->
             <button appButton variant="outline" size="sm" class="shrink-0" (click)="goBack()" title="Back to EOI Responses">
               <app-icon name="chevron-left" size="sm" />
               <span>Back</span>
             </button>
 
-            <!-- Simple Filter Tabs (the selected one is filled) -->
-            <app-filter-tabs [options]="filterTabs()" [value]="selectedFilter()" (valueChange)="setFilter($event)" />
-        </div>
+            <!-- Excel Download Button -->
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              class="shrink-0"
+              (click)="downloadOfflineEvaluationExcel()"
+              [disabled]="isDownloadingExcel()"
+              title="Download Evaluation Excel with Dropdowns for Status and Grading"
+            >
+              <app-icon name="download" size="sm" />
+              <span>{{ isDownloadingExcel() ? 'Generating Excel...' : 'Download Evaluation Excel' }}</span>
+            </button>
 
-          <!-- Review status, and the sanction order once every application is decided -->
-          <div class="flex items-center gap-4 flex-wrap">
-            <div class="text-right">
-              <div class="text-xs font-semibold text-slate-800 flex items-center gap-1.5 justify-end">
-                <span class="text-slate-500 font-normal">Review Status:</span>
-                @if (allReviewed()) {
-                  <span class="font-bold text-slate-800">Reviewed</span>
-                } @else {
-                  <span class="font-bold text-slate-800">{{ countReviewed() }} / {{ totalSubmissionsCount() }} Processed</span>
-                }
-              </div>
-              <div class="text-[11px] text-slate-500 font-normal">
-                @if (allReviewed()) {
-                  All {{ totalSubmissionsCount() }} applications
-                } @else {
-                  {{ reviewPercentage() }}% Completed
-                }
-              </div>
-            </div>
+            <!-- Generate Empanelment Order Button -->
+            <button
+              appButton
+              size="sm"
+              class="shrink-0"
+              (click)="showGenerateOrderModal.set(true)"
+              title="Upload evaluated Excel to generate Empanelment and Rejection Orders"
+            >
+              <app-icon name="clipboard-check" size="sm" />
+              <span>Generate Empanelment Order</span>
+            </button>
+          </div>
 
-            @if (allReviewed()) {
-              <button appButton class="shrink-0" (click)="openSanctionOrder()" title="Prepare the sanction order for this scheme">
-                <span>Release Sanction Order</span>
-              </button>
-            } @else {
-              <div class="w-20 sm:w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                <div
-                  class="h-full bg-slate-700 rounded-full transition-all duration-300"
-                  [style.width.%]="reviewPercentage()"
-                ></div>
-              </div>
-            }
+          <!-- Total Submissions Count -->
+          <div class="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <span class="text-slate-500 font-normal">Total Submissions:</span>
+            <span class="font-bold text-slate-800">{{ totalSubmissionsCount() }}</span>
           </div>
         </div>
 
@@ -98,10 +105,13 @@ import {
           </div>
         </ng-template>
 
-        <!-- Clean, Proper, Non-Colorful Status -->
+        <!-- Status column displaying Pending, Approved, or Rejected -->
         <ng-template #statusTemplate let-item>
-          <span class="inline-block px-2.5 py-1 rounded-md text-xs font-medium text-slate-700 bg-slate-100 border border-slate-200">
-            {{ (item.appeal && item.appeal.status === 'Pending') || item.status === 'REVERTED' ? 'Appeal Request' : item.status === 'UNDER_SCRUTINY' ? 'Under Review' : item.status === 'APPROVED' ? 'Approved' : 'Rejected' }}
+          <span
+            class="inline-block px-2.5 py-1 rounded-md text-xs font-medium border"
+            [class]="item.status === 'APPROVED' ? 'text-emerald-800 bg-emerald-50 border-emerald-200' : (item.status === 'REJECTED' ? 'text-rose-800 bg-rose-50 border-rose-200' : 'text-amber-800 bg-amber-50 border-amber-200')"
+          >
+            {{ item.statusDisplay || (item.status === 'APPROVED' ? 'Approved' : (item.status === 'REJECTED' ? 'Rejected' : 'Pending')) }}
           </span>
         </ng-template>
 
@@ -120,20 +130,49 @@ import {
         </ng-template>
 
     </app-list-page>
+
+    <!-- Modal for Generating Empanelment & Rejection Orders via Excel upload & Multi-Party E-Sign -->
+    @if (showGenerateOrderModal()) {
+      <app-generate-empanelment-order-modal
+        [schemeId]="schemeId()"
+        [schemeName]="currentSchemeName()"
+        [eoiRefNo]="currentEoiRefNo()"
+        [currentApplicants]="responses()"
+        (close)="showGenerateOrderModal.set(false)"
+        (orderGenerated)="onOrderGenerated($event)"
+        (viewEmpanelmentOrder)="onViewEmpanelmentOrder($event)"
+        (viewRejectionOrder)="onViewRejectionOrder($event)"
+      />
+    }
+
+    <!-- Modal for Official Order Viewer with RajKaj Seal & Download -->
+    @if (showOrderViewerModal()) {
+      <app-order-viewer-modal
+        [order]="selectedViewOrder()"
+        [orderType]="selectedViewOrderType()"
+        (close)="showOrderViewerModal.set(false)"
+      />
+    }
   `
 })
 export class ApplicantSubmissionsComponent {
   private eoiStateService = inject(EoiStateService);
+  private dataEngine = inject(DataEngineService, { optional: true });
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
   responses = signal<ApplicantResponse[]>([]);
-  selectedFilter = signal<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'>('ALL');
   searchQuery = signal<string>('');
   schemeId = signal<string>('');
+  isDownloadingExcel = signal<boolean>(false);
   isDownloadingAll = signal<boolean>(false);
   downloadType = signal<'zip' | 'pdf'>('zip');
+
+  showGenerateOrderModal = signal<boolean>(false);
+  showOrderViewerModal = signal<boolean>(false);
+  selectedViewOrder = signal<EmpanelmentOrder | null>(null);
+  selectedViewOrderType = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -153,12 +192,14 @@ export class ApplicantSubmissionsComponent {
 
   loadResponses(sId: string): void {
     this.eoiStateService.getResponses(sId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
-      this.responses.set(data);
+      // Ensure all initial submissions on this page show 'Pending' as requested
+      const pendingSubmissions = (data || []).map(r => ({
+        ...r,
+        status: 'UNDER_SCRUTINY' as const,
+        statusDisplay: 'Pending'
+      }));
+      this.responses.set(pendingSubmissions);
     });
-  }
-
-  setFilter(filter: 'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'): void {
-    this.selectedFilter.set(filter);
   }
 
   goBack(): void {
@@ -167,42 +208,19 @@ export class ApplicantSubmissionsComponent {
 
   totalSubmissionsCount = computed(() => this.responses().length);
 
-  readonly filterTabs = computed<FilterTab<'ALL' | 'UNDER_SCRUTINY' | 'APPROVED' | 'REJECTED' | 'REVERTED'>[]>(() => [
-    { id: 'ALL', label: 'All Applications', count: this.totalSubmissionsCount() },
-    { id: 'UNDER_SCRUTINY', label: 'Under Review', count: this.countPending() },
-    { id: 'APPROVED', label: 'Approved', count: this.countApproved() },
-    { id: 'REJECTED', label: 'Rejected', count: this.countRejected() },
-    { id: 'REVERTED', label: 'Appeal Request', count: this.countAppealRequests() }
-  ]);
-
-  countPending = computed(() => this.responses().filter(r => r.status === 'UNDER_SCRUTINY').length);
-  countApproved = computed(() => this.responses().filter(r => r.status === 'APPROVED').length);
-  countRejected = computed(() => this.responses().filter(r => r.status === 'REJECTED' && (!r.appeal || r.appeal.status !== 'Pending')).length);
-  countAppealRequests = computed(() => this.responses().filter(r => r.status === 'REVERTED' || (!!r.appeal && r.appeal.status === 'Pending')).length);
-  countReviewed = computed(() => this.responses().filter(r => r.status === 'APPROVED' || r.status === 'REJECTED' || r.status === 'REVERTED').length);
-
-  reviewPercentage = computed(() => {
-    const total = this.totalSubmissionsCount();
-    if (!total) return 0;
-    return Math.round((this.countReviewed() / total) * 100);
+  currentSchemeName = computed(() => {
+    const list = this.responses();
+    return list[0]?.schemeName || 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)';
   });
 
-  allReviewed = computed(() => this.responses().length > 0 && this.responses().every(r => r.status === 'APPROVED' || r.status === 'REJECTED'));
-
-  /** Opens the draft sanction order for this scheme. */
-  openSanctionOrder(): void {
-    this.router.navigate(['/admin/eoi-sanction-editor', this.schemeId()]);
-  }
+  currentEoiRefNo = computed(() => {
+    const list = this.responses();
+    return list[0]?.eoiRefNo || this.schemeId() || 'RSLDC/EOI/2026/MMKVY-01';
+  });
 
   filteredResponses = computed(() => {
-    const filter = this.selectedFilter();
     const query = this.searchQuery().trim().toLowerCase();
-    let list = this.responses();
-    if (filter === 'REVERTED') {
-      list = list.filter(r => r.status === 'REVERTED' || (!!r.appeal && r.appeal.status === 'Pending'));
-    } else if (filter !== 'ALL') {
-      list = list.filter(r => r.status === filter);
-    }
+    const list = this.responses();
     if (!query) return list;
     return list.filter(r =>
       (r.anonymousLabel && r.anonymousLabel.toLowerCase().includes(query)) ||
@@ -210,6 +228,95 @@ export class ApplicantSubmissionsComponent {
       (r.actualLegalName && r.actualLegalName.toLowerCase().includes(query))
     );
   });
+
+  onOrderGenerated(order: EmpanelmentOrder): void {
+    const acceptedMap = new Set(order.empanelledAgencies.map(a => a.applicationId));
+    const rejectedMap = new Set(order.rejectedAgencies.map(a => a.applicationId));
+
+    this.responses.update(list =>
+      list.map(r => {
+        if (acceptedMap.has(r.regNumber) || acceptedMap.has(r.id)) {
+          return { ...r, status: 'APPROVED' as const, statusDisplay: 'Approved' };
+        }
+        if (rejectedMap.has(r.regNumber) || rejectedMap.has(r.id)) {
+          return { ...r, status: 'REJECTED' as const, statusDisplay: 'Rejected' };
+        }
+        return r;
+      })
+    );
+  }
+
+  onViewEmpanelmentOrder(order: EmpanelmentOrder): void {
+    this.selectedViewOrder.set(order);
+    this.selectedViewOrderType.set('EMPANELMENT');
+    this.showGenerateOrderModal.set(false);
+    this.showOrderViewerModal.set(true);
+  }
+
+  onViewRejectionOrder(order: EmpanelmentOrder): void {
+    this.selectedViewOrder.set(order);
+    this.selectedViewOrderType.set('REJECTION');
+    this.showGenerateOrderModal.set(false);
+    this.showOrderViewerModal.set(true);
+  }
+
+  /**
+   * Downloads evaluation excel file containing all submitted companies for this scheme
+   * with in-cell dropdown data validations for Status ("Approved,Reject") and
+   * Grading (from Super Admin Grading Master), plus a Reason / Remarks column.
+   */
+  async downloadOfflineEvaluationExcel(): Promise<void> {
+    const list = this.filteredResponses();
+    if (!list || list.length === 0) return;
+
+    this.isDownloadingExcel.set(true);
+    try {
+      let gradeOptions = ['A+', 'A', 'B', 'C', 'D'];
+      if (this.dataEngine) {
+        try {
+          const masters = await firstValueFrom(
+            this.dataEngine.for<GradingMasterItem>('GRADING_MASTERS', { idKey: 'id' }).getAll()
+          );
+          const activeGrades = (masters || [])
+            .filter(g => g.status !== 'Inactive')
+            .map(g => g.grade?.trim())
+            .filter((g): g is string => !!g);
+          const unique = Array.from(new Set(activeGrades));
+          if (unique.length > 0) {
+            gradeOptions = unique;
+          }
+        } catch (e) {
+          console.warn('Could not load grades from data engine, using defaults', e);
+        }
+      }
+
+      const schemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
+      const eoiRefNo = list[0]?.eoiRefNo || this.schemeId() || 'EOI-2026';
+      const cleanCode = (this.schemeId() || 'EOI').replace(/[^a-zA-Z0-9_-]/g, '_');
+
+      const rows = list.map((app, idx) => ({
+        sNo: idx + 1,
+        refNo: app.regNumber || app.id,
+        companyName: app.anonymousLabel || app.actualLegalName,
+        status: '',
+        grade: '',
+        reason: ''
+      }));
+
+      await downloadEvaluationExcelFile({
+        fileName: `RSLDC_Evaluation_${cleanCode}.xlsx`,
+        schemeTitle,
+        eoiRefNo,
+        rows,
+        gradeOptions,
+        statusOptions: ['Approved', 'Reject']
+      });
+    } catch (err) {
+      console.error('Error generating Excel file:', err);
+    } finally {
+      this.isDownloadingExcel.set(false);
+    }
+  }
 
   /**
    * Renders a single official applicant IPA or review outcome document on a given PDF instance page
@@ -255,8 +362,8 @@ export class ApplicantSubmissionsComponent {
     const docTitle = isApproved
       ? 'IN-PRINCIPLE APPROVAL (IPA) LETTER'
       : isRejected
-      ? 'APPLICATION REVIEW & SCRUTINY OUTCOME'
-      : 'APPLICATION SUBMISSION DOSSIER SUMMARY';
+        ? 'APPLICATION REVIEW & SCRUTINY OUTCOME'
+        : 'APPLICATION SUBMISSION DOSSIER SUMMARY';
 
     pdf.setTextColor(11, 53, 88);
     pdf.setFont('helvetica', 'bold');
@@ -320,8 +427,8 @@ export class ApplicantSubmissionsComponent {
       isApproved
         ? 'Subject: In-Principle Approval (IPA) for Allocation of Physical Training Targets FY 2026-27'
         : isRejected
-        ? 'Subject: Intimation of Application Scrutiny & Evaluation Outcome'
-        : 'Subject: Acknowledgment & Dossier Summary for EOI Application',
+          ? 'Subject: Intimation of Application Scrutiny & Evaluation Outcome'
+          : 'Subject: Acknowledgment & Dossier Summary for EOI Application',
       18,
       y + 5.5
     );
@@ -463,9 +570,7 @@ export class ApplicantSubmissionsComponent {
       const { default: JSZip } = await import('jszip');
       const zip = new JSZip();
       const currentSchemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
-      const currentFilter = this.selectedFilter();
-      const filterTag = currentFilter === 'APPROVED' ? 'Approved_IPA' : currentFilter === 'REJECTED' ? 'Rejected_Outcome' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All_Applications';
-      const folderName = `RSLDC_${filterTag}_${this.schemeId() || 'EOI'}`;
+      const folderName = `RSLDC_Submissions_${this.schemeId() || 'EOI'}`;
       const folder = zip.folder(folderName) || zip;
       const today = formatDate(new Date());
 
@@ -507,7 +612,6 @@ export class ApplicantSubmissionsComponent {
     try {
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const currentSchemeTitle = list[0]?.schemeName || 'RSLDC Skill Development Scheme';
-      const currentFilter = this.selectedFilter();
       const today = formatDate(new Date());
 
       list.forEach((app, idx) => {
@@ -517,8 +621,7 @@ export class ApplicantSubmissionsComponent {
         this.renderApplicantPdfPage(pdf, app, currentSchemeTitle, today, idx + 1, list.length);
       });
 
-      const filterTag = currentFilter === 'APPROVED' ? 'Approved_IPA' : currentFilter === 'REJECTED' ? 'Rejected' : currentFilter === 'UNDER_SCRUTINY' ? 'Under_Scrutiny' : 'All';
-      const fileName = `RSLDC_${filterTag}_Applications_${this.schemeId() || 'EOI'}.pdf`;
+      const fileName = `RSLDC_Submissions_${this.schemeId() || 'EOI'}.pdf`;
       pdf.save(fileName);
     } catch (err) {
       console.error('Error generating PDF:', err);

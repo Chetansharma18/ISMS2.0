@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AspirantDocumentItem } from '../../config/aspirant-form.config';
-import { ButtonComponent, IconComponent, InputDirective, ModalComponent } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, ModalComponent } from '../../../../shared';
 import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-document.util';
 
 /** Modal: upload and attach a new document. Emits the filled form on save. */
@@ -9,28 +9,19 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
   selector: 'app-aspirant-add-document-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent, DropdownComponent],
   template: `
     <app-modal title="Upload &amp; Attach Document" size="sm" (close)="close.emit()">
   <div class="space-y-4 text-xs">
     <div>
       <label class="block text-slate-700 font-semibold mb-1">Document Category / Type *</label>
-      <select
-        appInput
-        [(ngModel)]="newDocForm.docType"
+      <app-dropdown
+        [options]="docTypeOptions"
+        [value]="newDocForm.docType || ''"
+        (valueChange)="newDocForm.docType = $event"
+        placeholder="Select Document Type"
         class="w-full"
-      >
-        <option value="Educational Qualification Certificate">Educational Qualification Certificate</option>
-        <option value="Bank Passbook / Cancelled Cheque">Bank Passbook / Cancelled Cheque</option>
-        <option value="Aadhaar Card">Aadhaar Card Copy</option>
-        <option value="Domicile Certificate">Domicile / Bonafide Certificate</option>
-        <option value="Caste Certificate">Caste / Category Certificate (SC/ST/OBC)</option>
-        <option value="Income Certificate">Income Certificate</option>
-        <option value="BPL Ration Card">BPL Ration Card</option>
-        <option value="Disability Certificate">Disability / PwD Certificate</option>
-        <option value="Experience Certificate">Experience Certificate</option>
-        <option value="Other Supporting Document">Other Supporting Document</option>
-      </select>
+      />
     </div>
 
     <div>
@@ -84,6 +75,19 @@ import { formatFileSize, stripFileExtension, todayIsoDate } from './aspirant-doc
 export class AspirantAddDocumentModalComponent {
   readonly save = output<Partial<AspirantDocumentItem>>();
   readonly close = output<void>();
+
+  readonly docTypeOptions = [
+    'Educational Qualification Certificate',
+    'Bank Passbook / Cancelled Cheque',
+    'Aadhaar Card Copy',
+    'Domicile / Bonafide Certificate',
+    'Caste / Category Certificate (SC/ST/OBC)',
+    'Income Certificate',
+    'BPL Ration Card',
+    'Disability / PwD Certificate',
+    'Experience Certificate',
+    'Other Supporting Document'
+  ];
 
   newDocForm: Partial<AspirantDocumentItem> = {
     id: 'doc-' + Date.now(),

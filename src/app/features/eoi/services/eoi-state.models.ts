@@ -76,6 +76,9 @@ export interface ApplicantResponse {
   emdStatus: 'PAID' | 'REFUNDED';
   processingFee: number;
   processingFeeStatus: 'PAID';
+  evaluationStatus?: 'Approved' | 'Rejected' | 'Pending';
+  evaluationGrade?: string;
+  evaluationRemarks?: string;
   
   // OTR Organisation Profile
   organisation: {

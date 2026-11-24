@@ -34,6 +34,7 @@ export const ASPIRANT_NAV: NavItem[] = [
 
 export const DEPT_ADMIN_NAV: NavItem[] = [
   { key: 'dept-eoi-view', label: 'EOI Responses', link: '/admin/eoi-view', icon: 'document', bold: true },
+  { key: 'dept-empanelment-order', label: 'Empanelment Order', link: '/admin/empanelment-order', icon: 'clipboard-check', bold: true },
   { key: 'dept-sanction-orders', label: 'Sanction Order', link: '/admin/sanction-orders', icon: 'document', bold: true },
   { key: 'dept-ipa', label: 'In-Principal Approval (IPA)', link: '/admin/ipa', icon: 'shield-check', bold: true },
   { key: 'dept-mou', label: 'MoU Management', link: '/admin/mou', icon: 'document', bold: true },

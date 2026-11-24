@@ -155,6 +155,20 @@ import {
                 <span>Uploaded: <strong>{{ uploadedFileName() }}</strong> ({{ allRows().length }} rows evaluated)</span>
               </div>
             }
+
+            @if (uploadErrors().length > 0) {
+              <div class="mt-4 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs text-left max-w-lg mx-auto">
+                <div class="font-semibold flex items-center gap-1.5 mb-1.5 text-rose-800">
+                  <app-icon name="alert-triangle" size="xs" />
+                  <span>Spreadsheet Validation Errors:</span>
+                </div>
+                <ul class="list-disc pl-5 space-y-1">
+                  @for (err of uploadErrors(); track err) {
+                    <li>{{ err }}</li>
+                  }
+                </ul>
+              </div>
+            }
           </div>
 
           <!-- Evaluation Summary Metrics -->
@@ -817,6 +831,7 @@ export class GenerateEmpanelmentOrderModalComponent {
 
   currentStep = signal<1 | 2 | 3 | 4>(1);
   uploadedFileName = signal<string>('');
+  uploadErrors = signal<string[]>([]);
   allRows = signal<ParsedEvaluationRow[]>([]);
   activePreviewTab = signal<'ACCEPTED' | 'REJECTED'>('ACCEPTED');
   activeOrderTab = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
@@ -902,7 +917,18 @@ export class GenerateEmpanelmentOrderModalComponent {
 
     const file = inputEl.files[0];
     try {
+      this.uploadErrors.set([]);
       const parsed = await parseEvaluationSpreadsheet(file);
+
+      if (!parsed.isValid && parsed.errors && parsed.errors.length > 0) {
+        this.uploadErrors.set(parsed.errors);
+        this.uploadedFileName.set('');
+        this.allRows.set([]);
+        this.empanelledAgencies.set([]);
+        this.rejectedAgencies.set([]);
+        return;
+      }
+
       this.uploadedFileName.set(file.name);
       this.allRows.set(parsed.all);
 
@@ -927,8 +953,11 @@ export class GenerateEmpanelmentOrderModalComponent {
           reason: row.reason || 'Mandatory eligibility criteria not met'
         }))
       );
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error parsing spreadsheet:', err);
+      this.uploadErrors.set([err.message || 'Failed to parse spreadsheet file. Please verify file format.']);
+      this.uploadedFileName.set('');
+      this.allRows.set([]);
     }
   }
 

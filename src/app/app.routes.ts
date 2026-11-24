@@ -179,6 +179,17 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/empanelment-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/empanelment-orders/empanelment-orders.component').then(
+        (m) => m.EmpanelmentOrdersPageComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-orders',
+    redirectTo: 'admin/empanelment-order'
+  },
+  {
     path: 'admin/sanction-orders',
     loadComponent: () =>
       import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(

@@ -7,6 +7,7 @@ import { StorageService } from '../../core/services/storage.service';
 import { EOI_WIZARD_STEP_COUNT, EoiDraft, EoiDraftService } from '../../core/services/eoi-draft.service';
 import { PermissionService } from '../../core/permissions/permission.service';
 import { SchemeService } from './services/scheme.service';
+import { SchemeRequirementsService } from '../../core/services/scheme-requirements.service';
 import {
   TableComponent,
   ActionModalComponent,
@@ -451,6 +452,7 @@ export class TendersPageComponent {
   searchQuery = signal<string>('');
 
   private readonly draftService = inject(EoiDraftService);
+  private readonly schemeReqService = inject(SchemeRequirementsService);
   protected readonly draftStepCount = EOI_WIZARD_STEP_COUNT;
 
   /** Unfinished applications for schemes that are still listed. Admins do not apply, so they never see any. */
@@ -970,16 +972,25 @@ export class TendersPageComponent {
       }
     }
 
-    // 2. Auto-fill required documents from Doc Master
-    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const docs = parseMasterEntriesByScheme(masterList, schemeName, (d) => d.docName || d.documents);
-    this.newEoiData.documents = [...docs];
+    // 2. Auto-fill required documents from Scheme Requirements / Doc Master
+    const reqs = this.schemeReqService.getRequirementsForScheme(schemeName);
+    if (reqs.documents.length > 0) {
+      this.newEoiData.documents = reqs.documents.map((d) => d.masterItemName);
+    } else {
+      const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+      const docs = parseMasterEntriesByScheme(masterList, schemeName, (d) => d.docName || d.documents);
+      this.newEoiData.documents = [...docs];
+    }
     this.newEoiData.documentFiles = {};
 
-    // 3. Auto-fill annexures from Annexure Master
-    const annexList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
-    const annexures = parseMasterEntriesByScheme(annexList, schemeName, (a) => a.annexureName || a.annexures);
-    this.newEoiData.annexures = [...annexures];
+    // 3. Auto-fill annexures from Scheme Requirements / Annexure Master
+    if (reqs.annexures.length > 0) {
+      this.newEoiData.annexures = reqs.annexures.map((a) => a.masterItemName);
+    } else {
+      const annexList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+      const annexures = parseMasterEntriesByScheme(annexList, schemeName, (a) => a.annexureName || a.annexures);
+      this.newEoiData.annexures = [...annexures];
+    }
 
     this.eoiFormVersion.update((v) => v + 1);
     this.autoSaveDraft();
@@ -1321,6 +1332,9 @@ export class TendersPageComponent {
     const targetRef = this.editingSchemeRefNo();
     const existingScheme = targetRef ? this.schemes().find(s => s.refNo === targetRef) : null;
     const newScheme = buildSchemeFromForm(this.newEoiData, existingScheme);
+
+    // Freeze immutable EOI requirement snapshot to protect published tenders against master edits
+    this.schemeReqService.createEoiSnapshot(newScheme.refNo, newScheme.schemeName);
 
     this.isSubmitting.set(true);
     if (targetRef) {

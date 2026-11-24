@@ -19,6 +19,7 @@ import { ApplicantResponse, DossierDocument, EoiStateService } from '../../servi
 import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
 import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
+import { SchemeRequirementsService } from '../../../../core/services/scheme-requirements.service';
 import {
   countUploaded,
   emdPaymentModeLabel,
@@ -49,6 +50,7 @@ export class SchemeFormState {
   private otrFormService = inject(OtrFormService);
   private receipts = inject(SchemeFormReceiptsService);
   private docViewer = inject(DocumentViewerService);
+  private schemeReqService = inject(SchemeRequirementsService);
 
   private draftStore = inject(EoiDraftService);
   private draftRestored = false;
@@ -74,21 +76,53 @@ export class SchemeFormState {
     'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
   );
 
-  readonly wizardSteps: StepperStep[] = [
-    { label: 'Registration Profile' },
-    { label: 'Upload Documents' },
-    { label: 'Preview' },
-    { label: 'Processing Fee' },
-    { label: 'EMD Payment' },
-    { label: 'Submission Receipt' }
-  ];
+  readonly schemeCustomFields = signal<any[]>([]);
 
-  /** Step 4 (Processing Fee) is done once the fee is paid; Step 5 is done once submitted; the final step is done once reached. */
+  readonly hasCustomFields = computed(() => this.schemeCustomFields().length > 0);
+
+  readonly customFieldAnswers = signal<Record<string, any>>({});
+
+  updateCustomAnswer(fieldKey: string, value: any): void {
+    this.customFieldAnswers.update(curr => ({ ...curr, [fieldKey]: value }));
+  }
+
+  // Dynamic Step Indices
+  readonly stepIndexProfile = 1;
+  readonly stepIndexCustomFields = computed(() => this.hasCustomFields() ? 2 : -1);
+  readonly stepIndexDocuments = computed(() => this.hasCustomFields() ? 3 : 2);
+  readonly stepIndexPreview = computed(() => this.hasCustomFields() ? 4 : 3);
+  readonly stepIndexProcFee = computed(() => this.hasCustomFields() ? 5 : 4);
+  readonly stepIndexEmd = computed(() => this.hasCustomFields() ? 6 : 5);
+  readonly stepIndexReceipts = computed(() => this.hasCustomFields() ? 7 : 6);
+
+  readonly wizardSteps = computed<StepperStep[]>(() => {
+    if (this.hasCustomFields()) {
+      return [
+        { label: 'Registration Profile' },
+        { label: 'Scheme Proposal Details' },
+        { label: 'Upload Documents' },
+        { label: 'Complete Preview' },
+        { label: 'Processing Fee' },
+        { label: 'EMD Payment' },
+        { label: 'Submission Receipt' }
+      ];
+    }
+    return [
+      { label: 'Registration Profile' },
+      { label: 'Upload Documents' },
+      { label: 'Complete Preview' },
+      { label: 'Processing Fee' },
+      { label: 'EMD Payment' },
+      { label: 'Submission Receipt' }
+    ];
+  });
+
+  /** Dynamic completion indicators matching whether custom fields step is active */
   readonly completedWizardSteps = computed(() => {
     const done: number[] = [];
-    if (this.procFeePaid()) done.push(4);
-    if (this.submitted()) done.push(5);
-    if (this.currentStep() === this.wizardSteps.length) done.push(this.wizardSteps.length);
+    if (this.procFeePaid()) done.push(this.stepIndexProcFee());
+    if (this.submitted()) done.push(this.stepIndexEmd());
+    if (this.currentStep() === this.wizardSteps().length) done.push(this.wizardSteps().length);
     return done;
   });
 
@@ -278,11 +312,11 @@ export class SchemeFormState {
           : doc;
       })
     );
-    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps.length - 1));
+    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps().length - 1));
   }
 
   goToStep(step: number): void {
-    if (step < 1 || step > this.wizardSteps.length) return;
+    if (step < 1 || step > this.wizardSteps().length) return;
     this.currentStep.set(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -304,10 +338,10 @@ export class SchemeFormState {
       this.procFeePaid.set(true);
       this.procFeeDate.set(formatDateTime(new Date()));
       this.showProcFeeSuccessModal.set(true);
-      // The success screen carries the applicant on to Step 5 (EMD Payment) by itself.
+      // The success screen carries the applicant on to EMD Payment by itself.
       setTimeout(() => {
         this.showProcFeeSuccessModal.set(false);
-        this.goToStep(5);
+        this.goToStep(this.stepIndexEmd());
       }, PROC_FEE_SUCCESS_REDIRECT_MS);
     }, 600);
   }
@@ -471,7 +505,7 @@ export class SchemeFormState {
 
   closeSuccessModalAndGoToStep6(): void {
     this.showEmdSuccessModal.set(false);
-    this.goToStep(6);
+    this.goToStep(this.stepIndexReceipts());
   }
 
   downloadAllReceipts(): void {
@@ -579,14 +613,14 @@ export class SchemeFormState {
       dossierDocs.length > 0
         ? dossierDocs
         : submittedDocs.map(doc => ({
-            id: `doc-${doc.id}`,
-            title: doc.name,
-            fileSize: doc.fileSize,
-            category:
-              doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
-            verified: true,
-            comment: doc.comment
-          }));
+          id: `doc-${doc.id}`,
+          title: doc.name,
+          fileSize: doc.fileSize,
+          category:
+            doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+          verified: true,
+          comment: doc.comment
+        }));
 
     const refLower = (this.schemeRefNo() || '').toLowerCase();
     const nameLower = (this.schemeName() || '').toLowerCase();
@@ -656,7 +690,12 @@ export class SchemeFormState {
       financialYears: this.editableStep1.financialYears || [],
       placementTrackRecord: [],
       annualActionPlan: [],
-      uploadedDocuments
+      uploadedDocuments,
+      customFields: this.schemeCustomFields().map((f: any) => ({
+        key: f.fieldKey,
+        label: f.label,
+        value: this.customFieldAnswers()[f.fieldKey] ?? 'N/A'
+      }))
     };
 
     this.eoiStateService.submitApplicantResponse(deptResponse);

@@ -33,7 +33,8 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
         </div>
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-          <div class="sm:col-span-2">
+          <!-- Row 1: Basic Organisation Details -->
+          <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation Name</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.fullName || '-' }}</span>
           </div>
@@ -42,7 +43,17 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.natureOfEntity || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No.</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.preferredSector || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.nsdcPartner || '-' }}</span>
+          </div>
+
+          <!-- Row 2: Registrations & Status -->
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.registrationNumber || '-' }}</span>
           </div>
           <div>
@@ -50,79 +61,59 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.dateOfRegistration || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State / UT of Registration</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.stateOfLegalReg || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.companyPan || '-' }}</span>
           </div>
+
+          <!-- Row 3: GST & MSME Status -->
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GST Registered</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.gstRegistered || '-' }}</span>
           </div>
-
-          @if (state.editableStep1.gstRegistered === 'Yes' && state.editableStep1.gstin) {
+          @if (state.editableStep1.gstRegistered === 'Yes') {
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">GSTIN</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.gstin }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums uppercase">{{ state.editableStep1.gstin || '-' }}</span>
             </div>
           }
-
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MSME Registered</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MSME / Udyam Registered</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.msmeRegistered || '-' }}</span>
           </div>
-
-          @if (state.editableStep1.msmeRegistered === 'Yes' && state.editableStep1.udyamNumber) {
+          @if (state.editableStep1.msmeRegistered === 'Yes') {
             <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Udyam Registration No.</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.udyamNumber }}</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums uppercase">{{ state.editableStep1.udyamNumber || '-' }}</span>
             </div>
           }
 
-          @if (state.editableStep1.preferredSector) {
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Preferred Sector</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.preferredSector }}</span>
-            </div>
-          }
-
-          @if (state.editableStep1.nsdcPartner) {
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">NSDC Partner</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.nsdcPartner }}</span>
-            </div>
-          }
-
+          <!-- Row 4: Contact Information -->
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact No.</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Contact Number</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.contactNo || '-' }}</span>
           </div>
-
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation Email ID</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ state.editableStep1.emailId || '-' }}</span>
           </div>
+          <div class="sm:col-span-2">
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Website</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ state.editableStep1.website || '-' }}</span>
+          </div>
 
-          @if (state.editableStep1.website) {
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Website</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ state.editableStep1.website }}</span>
-            </div>
-          }
-
+          <!-- Row 5: Addresses -->
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registered Address</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.registeredAddressText }}</span>
           </div>
-
-          @if (!state.editableStep1.sameAsRegistered && state.editableStep1.officeAddress) {
-            <div class="sm:col-span-2">
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.officeAddressText }}</span>
-            </div>
-          }
+          <div class="sm:col-span-2">
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.officeAddressText }}</span>
+          </div>
 
           <!-- Uploaded registration documents -->
           @if (state.editableStep1.registrationCertDoc?.status === 'uploaded' || state.editableStep1.panCardDoc?.status === 'uploaded' || state.editableStep1.gstCertDoc?.status === 'uploaded' || state.editableStep1.msmeCertDoc?.status === 'uploaded') {
@@ -195,78 +186,72 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
         <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
             <span class="w-5 h-5 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
-            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Signatory</h2>
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Authorized Person Details</h2>
           </div>
         </div>
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Name</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.name || '-' }}</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Full Name</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ authPersonFullName }}</span>
           </div>
           <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Designation</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.designation || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Birth</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.dob || '-' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">PAN</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.pan || '-' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile No.</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Mobile Number</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.mobileNo || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Email Address</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all">{{ state.editableStep3.emailId || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Aadhaar No.</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep3.aadhaarNo || '-' }}</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.state || '-' }}</span>
           </div>
-          @if (state.editableStep3.state) {
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">State</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.state }}</span>
-            </div>
-          }
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Identity Document Type</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep3.identityDocType || (state.editableStep3.aadhaarNo ? 'Aadhaar Card' : state.editableStep3.pan ? 'PAN Card' : '-') }}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Document Number</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ authPersonDocNumber }}</span>
+          </div>
           <div class="sm:col-span-2">
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Address</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.residenceAddressText }}</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Residential Address</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.residenceAddressText || state.editableStep3.residenceAddress || '-' }}</span>
           </div>
 
           <!-- Uploaded signatory documents -->
-          @if (state.editableStep3.authorizationLetterDoc?.status === 'uploaded' || state.editableStep3.idProofDoc?.status === 'uploaded') {
+          @if (state.editableStep3.idProofDoc?.status === 'uploaded' || state.editableStep3.authorizationLetterDoc?.status === 'uploaded') {
             <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-100 space-y-1.5">
-              @if (state.editableStep3.authorizationLetterDoc; as doc) {
-                @if (doc.status === 'uploaded') {
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
-                      <div class="min-w-0">
-                        <span class="text-slate-500 text-[11.5px]">Authorization Letter: </span>
-                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
-                      </div>
-                    </div>
-                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Authorization Letter', doc.fileSize)" title="View Authorization Letter" aria-label="View Authorization Letter"><app-icon name="eye" size="sm" /></button>
-                  </div>
-                }
-              }
               @if (state.editableStep3.idProofDoc; as doc) {
                 @if (doc.status === 'uploaded') {
                   <div class="flex items-center justify-between gap-3">
                     <div class="flex items-center gap-2 min-w-0">
                       <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
                       <div class="min-w-0">
-                        <span class="text-slate-500 text-[11.5px]">Identity Proof: </span>
+                        <span class="text-slate-500 text-[11.5px]">Identity Document: </span>
                         <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
                       </div>
                     </div>
-                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Signatory Identity Proof', doc.fileSize)" title="View Signatory Identity Proof" aria-label="View Signatory Identity Proof"><app-icon name="eye" size="sm" /></button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Identity Document', doc.fileSize)" title="View Identity Document" aria-label="View Identity Document"><app-icon name="eye" size="sm" /></button>
+                  </div>
+                }
+              }
+              @if (state.editableStep3.authorizationLetterDoc; as doc) {
+                @if (doc.status === 'uploaded') {
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
+                      <div class="min-w-0">
+                        <span class="text-slate-500 text-[11.5px]">Authorization Letter / Board Resolution: </span>
+                        <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
+                      </div>
+                    </div>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="state.viewDoc(doc.fileName, 'Authorization Letter', doc.fileSize)" title="View Authorization Letter" aria-label="View Authorization Letter"><app-icon name="eye" size="sm" /></button>
                   </div>
                 }
               }
@@ -288,24 +273,28 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 
         <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Bank</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Name of the Bank</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep4.bankName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Branch Name</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep4.branchName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Holder</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Holder Name</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep4.accountHolderName || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account No.</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Account Number</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.accountNo || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.ifscCode || '-' }}</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">IFSC Code</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums uppercase">{{ state.editableStep4.ifscCode || '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">MICR Code</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep4.micrCode || '-' }}</span>
           </div>
 
           @if (state.editableStep4.cancelledChequeDoc; as doc) {
@@ -315,7 +304,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
                   <div class="flex items-center gap-2 min-w-0">
                     <app-icon name="pdf-badge" solid size="auto" class="w-4 h-4 text-[#E5252A] select-none shrink-0" />
                     <div class="min-w-0">
-                      <span class="text-slate-500 text-[11.5px]">Cancelled Cheque / Passbook: </span>
+                      <span class="text-slate-500 text-[11.5px]">Cancelled Cheque / Bank Passbook: </span>
                       <span class="font-medium text-slate-900 text-[12.5px] break-all">{{ doc.fileName }}</span>
                     </div>
                   </div>
@@ -346,20 +335,33 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
           </button>
         </div>
 
-        <div class="p-4 sm:p-5">
+        <div class="p-4 sm:p-5 space-y-6">
           @if (isEditingDocs()) {
-            <div class="mb-3.5 p-3 bg-[#F8EDF1] border border-[#EADCE2] rounded-lg text-xs text-[#7C0E44] flex items-center justify-between gap-3">
+            <div class="p-3 bg-[#F8EDF1] border border-[#EADCE2] rounded-lg text-xs text-[#7C0E44] flex items-center justify-between gap-3">
               <span>Replace mode active: click <strong>Replace</strong> against any document to upload a replacement file.</span>
               <button appButton variant="primary" size="sm" (click)="toggleDocEdit()">Done</button>
             </div>
           }
 
-          <app-table
-            [columns]="documentColumns"
-            [data]="state.eoiDocuments()"
-            [customTemplates]="{ name: nameTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
-          >
-          </app-table>
+          <!-- Subsection 4.1: Supporting Documents -->
+          <div class="space-y-2.5">
+            <app-table
+              [columns]="documentColumns"
+              [data]="state.supportingDocs()"
+              [customTemplates]="{ name: nameTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
+            >
+            </app-table>
+          </div>
+
+          <!-- Subsection 4.2: Annexures -->
+          <div class="space-y-2.5">
+            <app-table
+              [columns]="annexureColumns"
+              [data]="state.annexureDocs()"
+              [customTemplates]="{ name: nameTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
+            >
+            </app-table>
+          </div>
         </div>
 
         <ng-template #nameTemplate let-doc>
@@ -464,9 +466,31 @@ export class Step4CompletePreviewComponent {
   protected readonly accept = DOC_ACCEPT;
   protected readonly errors = signal<Record<number, string>>({});
 
+  get authPersonFullName(): string {
+    const s = this.state.editableStep3;
+    if (s.name?.trim()) return s.name.trim();
+    const parts = [s.firstName?.trim(), s.lastName?.trim()].filter(Boolean);
+    return parts.length ? parts.join(' ') : '-';
+  }
+
+  get authPersonDocNumber(): string {
+    const s = this.state.editableStep3;
+    return s.identityDocNumber || s.aadhaarNo || s.pan || s.voterIdNo || s.bhamashahNo || s.passportNo || '-';
+  }
+
   protected readonly documentColumns: TableColumn<EoiDocumentItem>[] = [
-    { key: 'id', label: '#', align: 'center', width: 'w-10' },
-    { key: 'name', label: 'Document Name', type: 'custom' },
+    { key: '$index', label: '#', align: 'center', width: 'w-10' },
+    { key: 'name', label: 'Supporting Document', type: 'custom' },
+    { key: 'fileName', label: 'File Name', cellClass: 'break-all' },
+    { key: 'fileSize', label: 'Size', cellClass: 'whitespace-nowrap' },
+    { key: 'comment', label: 'Comment', type: 'custom' },
+    { key: 'status', label: 'Status', type: 'custom' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center' }
+  ];
+
+  protected readonly annexureColumns: TableColumn<EoiDocumentItem>[] = [
+    { key: '$index', label: '#', align: 'center', width: 'w-10' },
+    { key: 'name', label: 'Annexure Name', type: 'custom' },
     { key: 'fileName', label: 'File Name', cellClass: 'break-all' },
     { key: 'fileSize', label: 'Size', cellClass: 'whitespace-nowrap' },
     { key: 'comment', label: 'Comment', type: 'custom' },

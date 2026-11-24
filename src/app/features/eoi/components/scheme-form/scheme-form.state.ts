@@ -173,10 +173,13 @@ export class SchemeFormState {
   eoiDocuments = signal<EoiDocumentItem[]>(createInitialEoiDocuments());
 
   readonly mandatoryDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'mandatory'));
-  readonly annexureDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'annexure'));
+  readonly supportingDocs = computed(() => this.eoiDocuments().filter(d => d.category !== 'annexure'));
+  readonly annexureDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'annexure'));
   readonly remainingDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'remaining'));
 
   readonly mandatoryAttachedCount = computed(() => countUploaded(this.mandatoryDocs()));
+  readonly attachedSupportingDocsCount = computed(() => countUploaded(this.supportingDocs()));
+  readonly attachedAnnexureDocsCount = computed(() => countUploaded(this.annexureDocs()));
   readonly annexureAttachedCount = computed(() => countUploaded(this.annexureDocs()));
   readonly remainingAttachedCount = computed(() => countUploaded(this.remainingDocs()));
 

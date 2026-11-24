@@ -13,33 +13,12 @@ import { documentCategoryLabel } from './tender-status.util';
   template: `
     <div class="space-y-6">
 
-      <!-- 1. ANNEXURES TABLE -->
-      @if (annexureDocs().length > 0) {
-        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
-          <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">4.1</span>
-              <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Annexures</h2>
-            </div>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
-              {{ annexureDocs().length }} Files
-            </span>
-          </div>
-
-          <app-table
-            [columns]="annexureColumns"
-            [data]="annexureDocs()"
-            [customTemplates]="{ fileName: fileNameTemplate, comment: commentTemplate, action: actionTemplate }"
-          />
-        </div>
-      }
-
-      <!-- 2. SUPPORTING DOCUMENTS TABLE -->
+      <!-- 1. SUPPORTING DOCUMENTS TABLE -->
       @if (supportingDocs().length > 0) {
         <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
           <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
             <div class="flex items-center gap-3">
-              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">4.2</span>
+              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">4.1</span>
               <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Supporting Documents</h2>
             </div>
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
@@ -50,6 +29,27 @@ import { documentCategoryLabel } from './tender-status.util';
           <app-table
             [columns]="supportingColumns"
             [data]="supportingDocs()"
+            [customTemplates]="{ fileName: fileNameTemplate, comment: commentTemplate, action: actionTemplate }"
+          />
+        </div>
+      }
+
+      <!-- 2. ANNEXURES TABLE -->
+      @if (annexureDocs().length > 0) {
+        <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-6 space-y-4">
+          <div class="pb-3.5 border-b border-slate-100 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-xs shadow-2xs shrink-0">4.2</span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 m-0">Annexures</h2>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+              {{ annexureDocs().length }} Files
+            </span>
+          </div>
+
+          <app-table
+            [columns]="annexureColumns"
+            [data]="annexureDocs()"
             [customTemplates]="{ fileName: fileNameTemplate, comment: commentTemplate, action: actionTemplate }"
           />
         </div>

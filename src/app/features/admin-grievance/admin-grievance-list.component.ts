@@ -116,10 +116,6 @@ export type { AdminGrievance };
             </button>
           }
         </div>
-
-        <div class="text-[11px] text-slate-500 font-medium whitespace-nowrap">
-          Showing <span class="font-bold text-slate-800">{{ filteredGrievances().length }}</span> of {{ grievances().length }} grievances
-        </div>
       </div>
     </app-list-page>
 
@@ -325,8 +321,8 @@ export class AdminGrievanceListComponent {
   readonly statusOptions = ['Open', 'In progress', 'Resolved', 'closed'] as const;
 
   readonly schemeDropdownOptions = computed(() => [
-    { value: 'ALL', label: `All Schemes (${this.grievances().length})` },
-    ...this.schemeOptions().map(s => ({ value: s, label: `${s} (${this.getSchemeCount(s)})` }))
+    { value: 'ALL', label: 'All Schemes' },
+    ...this.schemeOptions().map(s => ({ value: s, label: s }))
   ]);
 
   readonly issueTypeDropdownOptions = [

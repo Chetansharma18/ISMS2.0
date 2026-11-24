@@ -2689,16 +2689,11 @@ export class DynamicFormBuilderComponent {
   readonly statusFilter = signal<string>('ALL');
   readonly formFilterValues = signal<Record<string, string>>({});
 
-  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
-    const all = this.forms();
-    const active = all.filter(f => f.status !== 'Inactive').length;
-    const inactive = all.filter(f => f.status === 'Inactive').length;
-    return [
-      { value: 'ALL', label: 'All', count: all.length },
-      { value: 'Active', label: 'Active', count: active },
-      { value: 'Inactive', label: 'Inactive', count: inactive }
-    ];
-  });
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
 
   readonly formFilters = computed<MasterFilterConfig[]>(() => [
     {

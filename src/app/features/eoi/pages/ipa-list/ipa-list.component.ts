@@ -4,7 +4,13 @@ import { Router } from '@angular/router';
 import { ApplicantResponse, EoiStateService, Scheme } from '../../services/eoi-state.service';
 import { categoryLabel } from '../sanction-order-list/sanction-order-list.component';
 import { formatDateTime } from '../../../../shared/utils';
-import { ButtonComponent, ListPageComponent, TableColumn } from '../../../../shared';
+import {
+  ButtonComponent,
+  ListPageComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  TableColumn
+} from '../../../../shared';
 
 /** One scheme with a released sanction order. */
 interface IpaSchemeRow {
@@ -22,19 +28,29 @@ interface IpaSchemeRow {
   selector: 'app-ipa-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ListPageComponent, ButtonComponent],
+  imports: [ListPageComponent, ButtonComponent, MasterFilterBarComponent],
   template: `
     <app-list-page
       title="In-Principal Approval (IPA)"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'In-Principal Approval (IPA)' }]"
-      searchPlaceholder="Search Scheme, Ref No., Category..."
-      [(searchQuery)]="searchQuery"
+      [searchable]="false"
       [columns]="schemeColumns"
       [data]="rows()"
       itemUnit="schemes"
       emptyMessage="No sanction order has been released yet."
       [customTemplates]="{ schemeTitle: schemeTitleTemplate, action: actionTemplate }"
-    />
+    >
+      <!-- Filter Bar with Search, Scheme Name & Category -->
+      <app-master-filter-bar
+        beforeTable
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search Scheme, Ref No., Category..."
+        [showStatusFilter]="false"
+        [filters]="schemeFilters()"
+        [(filterValues)]="filterValues"
+        (resetFilters)="resetFilters()"
+      />
+    </app-list-page>
 
     <ng-template #schemeTitleTemplate let-row>
       <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
@@ -53,21 +69,83 @@ export class IpaListComponent {
   private schemes = signal<Scheme[]>([]);
   private responses = signal<ApplicantResponse[]>([]);
   searchQuery = signal('');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly allSchemeRows = computed<IpaSchemeRow[]>(() => {
+    const responses = this.responses();
+    return this.schemes()
+      .map(scheme => this.toRow(scheme, responses))
+      .filter((row): row is IpaSchemeRow => row !== null);
+  });
+
+  readonly schemeTitleOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSchemeRows()) {
+      if (r.schemeTitle) set.add(r.schemeTitle);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly categoryOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allSchemeRows()) {
+      if (r.category && r.category !== '-') set.add(r.category);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly schemeFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'schemeTitle',
+      label: 'Scheme Name',
+      options: () => this.schemeTitleOptions(),
+      placeholder: 'All Scheme Names'
+    },
+    {
+      key: 'category',
+      label: 'Category',
+      options: () => this.categoryOptions(),
+      placeholder: 'All Categories'
+    }
+  ]);
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.filterValues.set({});
+  }
 
   readonly rows = computed<IpaSchemeRow[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    const responses = this.responses();
+    const fv = this.filterValues();
+    const selectedScheme = (fv['schemeTitle'] || '').trim();
+    const selectedCategory = (fv['category'] || '').trim();
 
-    return this.schemes()
-      .map(scheme => this.toRow(scheme, responses))
-      .filter((row): row is IpaSchemeRow => row !== null)
-      .filter(
-        row =>
-          !query ||
+    return this.allSchemeRows().filter(row => {
+      // 1. Text search
+      if (query) {
+        const matchesQuery =
           row.schemeTitle.toLowerCase().includes(query) ||
           row.refNo.toLowerCase().includes(query) ||
-          row.category.toLowerCase().includes(query)
-      );
+          row.category.toLowerCase().includes(query);
+        if (!matchesQuery) return false;
+      }
+
+      // 2. Scheme Name filter
+      if (selectedScheme && selectedScheme !== 'ALL') {
+        if (row.schemeTitle !== selectedScheme && !row.schemeTitle.toLowerCase().includes(selectedScheme.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Category filter
+      if (selectedCategory && selectedCategory !== 'ALL') {
+        if (row.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   });
 
   readonly schemeColumns: TableColumn<IpaSchemeRow>[] = [

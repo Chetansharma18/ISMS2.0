@@ -339,12 +339,12 @@ export class AspirantListComponent {
   readonly schemeOptions = computed(() => Array.from(new Set(this.aspirantService.aspirants().map(a => a.scheme).filter((s): s is string => !!s))));
 
   readonly centerDropdownOptions = computed<DropdownOption[]>(() => [
-    { label: `All Centers (${this.sdcOptions().length})`, value: 'ALL' },
+    { label: 'All Centers', value: 'ALL' },
     ...this.sdcOptions().map(s => ({ label: s.name, value: s.code }))
   ]);
 
   readonly batchDropdownOptions = computed<DropdownOption[]>(() => [
-    { label: `All Batches (${this.batchOptions().length})`, value: 'ALL' },
+    { label: 'All Batches', value: 'ALL' },
     ...this.batchOptions().map(b => ({ label: `${b.code} - ${b.course}`, value: b.code }))
   ]);
 

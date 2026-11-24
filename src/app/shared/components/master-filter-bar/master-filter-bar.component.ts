@@ -110,17 +110,6 @@ export interface StatusFilterOption {
           </button>
         }
       </div>
-
-      <!-- Count Summary Badge -->
-      @if (showCount()) {
-        <div class="text-[12.5px] font-medium text-slate-500 whitespace-nowrap lg:ml-auto shrink-0 self-center">
-          Showing <strong class="text-slate-800 font-bold tabular-nums">{{ filteredCount() }}</strong>
-          @if (totalCount() > 0) {
-            of <span class="tabular-nums font-semibold text-slate-600">{{ totalCount() }}</span>
-          }
-          {{ itemUnit() }}
-        </div>
-      }
     </div>
   `
 })
@@ -149,7 +138,7 @@ export class MasterFilterBarComponent {
   readonly statusDropdownOptions = computed<DropdownOption[]>(() => {
     return this.resolvedStatusOptions().map(opt => ({
       value: opt.value,
-      label: opt.count !== undefined ? `${opt.label === 'All' ? 'All Status' : opt.label} (${opt.count})` : (opt.label === 'All' ? 'All Status' : opt.label)
+      label: opt.label === 'All' ? 'All Status' : opt.label
     }));
   });
 
@@ -159,7 +148,7 @@ export class MasterFilterBarComponent {
   readonly totalCount = input<number>(0);
   readonly filteredCount = input<number>(0);
   readonly itemUnit = input<string>('entries');
-  readonly showCount = input<boolean>(true);
+  readonly showCount = input<boolean>(false);
 
   readonly resetFilters = output<void>();
 

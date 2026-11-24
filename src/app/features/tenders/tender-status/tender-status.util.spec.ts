@@ -120,6 +120,20 @@ describe('filterTenders', () => {
     expect(filterTenders(list, 'rejected').map(t => t.id)).toEqual(['2']);
   });
 
+  it('filters by status, schemeName, and schemeCategory with criteria object', () => {
+    const multiList = [
+      makeTender({ id: '1', schemeTitle: 'Scheme A', schemeCategory: 'RAJVIK', submittedStatus: 'Submitted' }),
+      makeTender({ id: '2', schemeTitle: 'Scheme B', schemeCategory: 'SAMARTH', submittedStatus: 'Approved' }),
+      makeTender({ id: '3', schemeTitle: 'Scheme A', schemeCategory: 'RAJVIK', submittedStatus: 'Rejected' })
+    ];
+
+    expect(filterTenders(multiList, { status: 'Approved' }).map(t => t.id)).toEqual(['2']);
+    expect(filterTenders(multiList, { schemeName: 'Scheme A' }).map(t => t.id)).toEqual(['1', '3']);
+    expect(filterTenders(multiList, { schemeCategory: 'SAMARTH' }).map(t => t.id)).toEqual(['2']);
+    expect(filterTenders(multiList, { schemeName: 'Scheme A', status: 'Rejected' }).map(t => t.id)).toEqual(['3']);
+    expect(filterTenders(multiList, { status: 'ALL', schemeName: 'ALL', schemeCategory: 'ALL' })).toBe(multiList);
+  });
+
   it('returns an empty list when nothing matches', () => {
     expect(filterTenders(list, 'zzz')).toEqual([]);
   });

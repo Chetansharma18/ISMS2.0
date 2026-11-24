@@ -67,10 +67,6 @@ import { FilterTabsComponent } from '../../../shared';
           
           <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
 
-          <div class="text-xs text-slate-500 font-medium hidden sm:block">
-            Showing {{ filteredSdcs().length }} {{ filteredSdcs().length === 1 ? 'center' : 'centers' }}
-          </div>
-
         </div>
 
         <!-- Admin Advanced Filter Bar (TP filter, Scheme filter, District filter, and Search) -->
@@ -358,7 +354,7 @@ export class SdcListComponent {
   });
 
   readonly tpDropdownOptions = computed(() => [
-    { value: 'ALL', label: `All Training Partners (${this.tpList().length})` },
+    { value: 'ALL', label: 'All Training Partners' },
     ...this.tpList().map(tp => ({ value: tp, label: tp }))
   ]);
 

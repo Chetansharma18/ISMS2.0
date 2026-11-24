@@ -76,6 +76,8 @@ interface TenderDetailTabItem {
         <app-tender-list
           [tenders]="tenders()"
           [(searchQuery)]="searchQuery"
+          [(statusFilter)]="statusFilter"
+          [(filterValues)]="filterValues"
           (open)="openApplicationPage($event.tender, $event.tab)"
           (respond)="openShortfallFromList($event)"
           (appeal)="openAppealFromList($event)"
@@ -259,6 +261,8 @@ export class TenderStatusComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly searchQuery = signal('');
+  readonly statusFilter = signal('ALL');
+  readonly filterValues = signal<Record<string, string>>({});
 
   // Selected tender state for full page view
   selectedTender = signal<SubmittedTender | null>(null);

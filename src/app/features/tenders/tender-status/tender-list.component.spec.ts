@@ -43,4 +43,28 @@ describe('TenderListComponent', () => {
       'Action'
     ]);
   });
+
+  it('provides status options, scheme name and category filters and resets them', () => {
+    const component = createComponent();
+
+    // Verify status options
+    const statusOpts = component.statusFilterOptions();
+    expect(statusOpts.map(s => s.value)).toEqual(['ALL', 'Submitted', 'Under Review', 'Approved', 'Rejected']);
+
+    // Verify filters config
+    const filters = component.tenderFilters();
+    expect(filters.map(f => f.key)).toEqual(['schemeName', 'schemeCategory']);
+    expect(filters.map(f => f.label)).toEqual(['Scheme Name', 'Scheme Category']);
+
+    // Test reset
+    component.searchQuery.set('test');
+    component.statusFilter.set('Approved');
+    component.filterValues.set({ schemeName: 'MMKVY', schemeCategory: 'RAJVIK' });
+
+    component.resetFilters();
+
+    expect(component.searchQuery()).toBe('');
+    expect(component.statusFilter()).toBe('ALL');
+    expect(component.filterValues()).toEqual({});
+  });
 });

@@ -423,9 +423,9 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   });
 
   readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
-    { value: 'ALL', label: 'All', count: this.items().length },
-    { value: 'Active', label: 'Active', count: this.activeCount() },
-    { value: 'Inactive', label: 'Inactive', count: this.inactiveCount() }
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
   ]);
 
   readonly isFilterActive = computed(() => {

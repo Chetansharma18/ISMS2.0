@@ -61,10 +61,6 @@ import { FilterTabsComponent } from '../../../shared';
         <!-- Status Filter Badges / Pills Toolbar -->
         <div class="flex items-center justify-between gap-3 pt-1">
           <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
-
-          <div class="text-xs text-slate-500 font-medium hidden sm:block">
-            Showing {{ filteredBatches().length }} {{ filteredBatches().length === 1 ? 'batch' : 'batches' }}
-          </div>
         </div>
 
         <!-- Admin Advanced Filter Bar (Center, Scheme, District) -->
@@ -375,7 +371,7 @@ export class BatchApprovalsComponent {
   });
 
   readonly centerDropdownOptions = computed<DropdownOption[]>(() => [
-    { label: `All Centers (${this.centerList().length})`, value: 'ALL' },
+    { label: 'All Centers', value: 'ALL' },
     ...this.centerList().map(c => ({ label: c, value: c }))
   ]);
 

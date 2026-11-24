@@ -157,10 +157,6 @@ import { StorageService } from '../../../core/services/storage.service';
               Clear All
             </button>
           </div>
-
-          <div class="text-[11px] text-slate-500 font-medium">
-            Showing <strong class="font-semibold text-slate-800">{{ filteredBatches().length }}</strong> of {{ portalService.calendarItems().length }} training batches
-          </div>
         </div>
       }
 

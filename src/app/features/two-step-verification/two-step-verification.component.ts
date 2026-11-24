@@ -289,16 +289,11 @@ export class TwoStepVerificationComponent implements OnInit {
     }
   ]);
 
-  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
-    const all = this.items();
-    const activeCount = all.filter(it => it.status !== 'Inactive').length;
-    const inactiveCount = all.filter(it => it.status === 'Inactive').length;
-    return [
-      { value: 'ALL', label: 'All', count: all.length },
-      { value: 'Active', label: 'Active', count: activeCount },
-      { value: 'Inactive', label: 'Inactive', count: inactiveCount }
-    ];
-  });
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
+  ]);
 
   formData: TwoStepFormData = {
     roleType: '',

@@ -150,31 +150,32 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../../shar
                   <button
                     appButton
                     variant="ghost"
+                    size="sm"
                     iconOnly
                     type="button"
                     (click)="refreshCaptcha()"
+                    aria-label="Refresh Captcha Code"
                     title="Refresh Captcha"
-                    aria-label="Refresh Captcha"
                   >
-                    <app-icon name="refresh" size="lg" [stroke]="2" />
+                    <app-icon name="refresh" size="sm" />
                   </button>
                 </div>
               </div>
 
-              <!-- Role Selector Toolbar (Positioned below Security Verification) -->
-              <div class="pt-3 border-t border-slate-200">
-                <span class="block text-xs sm:text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+              <!-- Test Persona Switcher (For Development & Demonstration) -->
+              <div class="pt-2">
+                <span class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
                   Select Test Persona Role:
                 </span>
                 <div class="grid grid-cols-2 gap-2">
                   @for (r of availableRoles; track r.role) {
                     <button
                       appButton
+                      [variant]="selectedRole() === r.role ? 'primary' : 'outline'"
                       size="sm"
                       type="button"
-                      [variant]="selectedRole() === r.role ? 'primary' : 'outline'"
                       (click)="selectRole(r.role)"
-                      class="justify-between"
+                      class="justify-between text-xs"
                     >
                       <span class="truncate">{{ r.label }}</span>
                       @if (selectedRole() === r.role) {

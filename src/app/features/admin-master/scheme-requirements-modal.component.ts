@@ -588,7 +588,14 @@ export class SchemeRequirementsModalComponent {
   removeDocMapping(doc: SchemeRequirementMapping): void {
     this.schemeReqService.removeMapping(doc.id);
     const s = this.scheme();
-    if (s) this.loadSchemeRequirements(s);
+    if (s) {
+      const foundDoc = this.availableDocsLibrary().find(d => d.id === doc.masterItemId || d.docName === doc.masterItemName);
+      if (foundDoc && foundDoc.schemes?.some(sch => sch.trim().toLowerCase() === s.schemeName.trim().toLowerCase())) {
+        const updatedSchemes = foundDoc.schemes.filter(sch => sch.trim().toLowerCase() !== s.schemeName.trim().toLowerCase());
+        this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' }).update(foundDoc.id, { schemes: updatedSchemes }).subscribe();
+      }
+      this.loadSchemeRequirements(s);
+    }
   }
 
   addDocumentToScheme(): void {
@@ -633,7 +640,14 @@ export class SchemeRequirementsModalComponent {
   removeAnnexMapping(annex: SchemeRequirementMapping): void {
     this.schemeReqService.removeMapping(annex.id);
     const s = this.scheme();
-    if (s) this.loadSchemeRequirements(s);
+    if (s) {
+      const foundAnnex = this.availableAnnexuresLibrary().find(a => a.id === annex.masterItemId || a.annexureName === annex.masterItemName);
+      if (foundAnnex && foundAnnex.schemes?.some(sch => sch.trim().toLowerCase() === s.schemeName.trim().toLowerCase())) {
+        const updatedSchemes = foundAnnex.schemes.filter(sch => sch.trim().toLowerCase() !== s.schemeName.trim().toLowerCase());
+        this.dataEngine.for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' }).update(foundAnnex.id, { schemes: updatedSchemes }).subscribe();
+      }
+      this.loadSchemeRequirements(s);
+    }
   }
 
   addAnnexureToScheme(): void {

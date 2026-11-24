@@ -304,6 +304,7 @@ export class SchemeFormState {
 
   /** Dynamically loads requirements (custom proposal fields, documents, and annexures) for the selected scheme. */
   private loadSchemeRequirements(schName: string): void {
+    this.schemeReqService.syncWithMasters();
     const reqs = this.schemeReqService.getRequirementsForScheme(schName);
     if (reqs.customFields && reqs.customFields.length > 0) {
       this.schemeCustomFields.set(reqs.customFields);

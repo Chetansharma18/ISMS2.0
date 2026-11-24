@@ -108,34 +108,70 @@ export class SchemeRequirementsService {
     }
 
     let modified = false;
+    const updated: SchemeRequirementMapping[] = [];
 
-    // 1. Update existing mappings' masterItemName and status to match master
-    const updated = currentMappings.map(m => {
+    // 1. Filter out deleted or unlinked mappings, and update renamed/status-changed items
+    for (const m of currentMappings) {
       if (m.requirementType === 'DOCUMENT') {
-        const found = docMap.get(m.masterItemId) || docMap.get(m.masterItemName.trim().toLowerCase());
-        if (found && (m.masterItemName !== found.docName || m.masterItemId !== found.id || m.status !== found.status)) {
-          modified = true;
-          return {
-            ...m,
-            masterItemId: found.id,
-            masterItemName: found.docName,
-            status: found.status || 'Active'
-          };
+        if (docs.length > 0) {
+          const found = docMap.get(m.masterItemId) || docMap.get(m.masterItemName.trim().toLowerCase());
+          if (!found) {
+            // Master document was deleted
+            modified = true;
+            continue;
+          }
+          const isAssigned = (found.schemes || []).some(
+            sch => sch.trim().toLowerCase() === m.schemeName.trim().toLowerCase()
+          );
+          if (!isAssigned) {
+            // Scheme was unlinked from this document in Doc Master
+            modified = true;
+            continue;
+          }
+          if (m.masterItemName !== found.docName || m.masterItemId !== found.id || m.status !== found.status) {
+            modified = true;
+            updated.push({
+              ...m,
+              masterItemId: found.id,
+              masterItemName: found.docName,
+              status: found.status || 'Active'
+            });
+            continue;
+          }
         }
+        updated.push(m);
       } else if (m.requirementType === 'ANNEXURE') {
-        const found = annexMap.get(m.masterItemId) || annexMap.get(m.masterItemName.trim().toLowerCase());
-        if (found && (m.masterItemName !== found.annexureName || m.masterItemId !== found.id || m.status !== found.status)) {
-          modified = true;
-          return {
-            ...m,
-            masterItemId: found.id,
-            masterItemName: found.annexureName,
-            status: found.status || 'Active'
-          };
+        if (annexes.length > 0) {
+          const found = annexMap.get(m.masterItemId) || annexMap.get(m.masterItemName.trim().toLowerCase());
+          if (!found) {
+            // Master annexure was deleted
+            modified = true;
+            continue;
+          }
+          const isAssigned = (found.schemes || []).some(
+            sch => sch.trim().toLowerCase() === m.schemeName.trim().toLowerCase()
+          );
+          if (!isAssigned) {
+            // Scheme was unlinked from this annexure in Annexure Master
+            modified = true;
+            continue;
+          }
+          if (m.masterItemName !== found.annexureName || m.masterItemId !== found.id || m.status !== found.status) {
+            modified = true;
+            updated.push({
+              ...m,
+              masterItemId: found.id,
+              masterItemName: found.annexureName,
+              status: found.status || 'Active'
+            });
+            continue;
+          }
         }
+        updated.push(m);
+      } else {
+        updated.push(m);
       }
-      return m;
-    });
+    }
 
     // 2. Ensure every doc's assigned schemes have a mapping
     for (const d of docs) {

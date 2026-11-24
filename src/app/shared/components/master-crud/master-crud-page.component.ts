@@ -28,6 +28,7 @@ import { SwitchComponent } from '../switch/switch.component';
 import { PageShellComponent } from '../../templates/page-shell/page-shell.component';
 import { MasterFilterBarComponent, StatusFilterOption } from '../master-filter-bar/master-filter-bar.component';
 import { DataEngineService, ResourceRepository } from '../../../core/services/data-engine.service';
+import { SchemeRequirementsService } from '../../../core/services/scheme-requirements.service';
 import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
 
 /**
@@ -538,6 +539,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   private dataEngine = inject(DataEngineService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private schemeReqService = inject(SchemeRequirementsService, { optional: true });
   private repo!: ResourceRepository<T>;
 
   searchQuery = signal<string>('');
@@ -859,6 +861,16 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.showModal.set(false);
   }
 
+  private syncRequirementsIfApplicable(): void {
+    if (this.config.dataKey === 'DOC_MASTERS' || this.config.dataKey === 'ANNEXURE_MASTERS') {
+      try {
+        this.schemeReqService?.syncWithMasters();
+      } catch {
+        // Safe fallback in test contexts
+      }
+    }
+  }
+
   submit(): void {
     this.submitted.set(true);
     const hasInvalid = this.config.fields.some(f => this.fieldInvalid(f));
@@ -871,11 +883,13 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
       this.repo.update(editId, payload).subscribe((updated: T) => {
         this.items.update(current => current.map(it => (it.id === editId ? updated : it)));
         this.showModal.set(false);
+        this.syncRequirementsIfApplicable();
       });
     } else {
       this.repo.create(payload).subscribe((created: T) => {
         this.items.update(current => [created, ...current]);
         this.showModal.set(false);
+        this.syncRequirementsIfApplicable();
       });
     }
   }
@@ -889,6 +903,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.repo.delete(item.id).subscribe((success: boolean) => {
       if (success) {
         this.items.update(current => current.filter(it => it.id !== item.id));
+        this.syncRequirementsIfApplicable();
       }
     });
   }
@@ -950,6 +965,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
     this.repo.update(item.id, { status: newStatus } as any).subscribe((updated: T) => {
       this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
+      this.syncRequirementsIfApplicable();
     });
   }
 

@@ -1,34 +1,25 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AspirantDocumentItem } from '../../config/aspirant-form.config';
-import { ButtonComponent, InputDirective, ModalComponent } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, InputDirective, ModalComponent } from '../../../../shared';
 
 /** Modal: edit a document's type and title (edits the supplied copy in place). */
 @Component({
   selector: 'app-aspirant-edit-document-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, InputDirective, ModalComponent],
+  imports: [FormsModule, ButtonComponent, InputDirective, ModalComponent, DropdownComponent],
   template: `
     <app-modal title="Edit Document Details" size="sm" (close)="close.emit()">
   <div class="space-y-4 text-xs">
     <div>
       <label class="block text-slate-700 font-semibold mb-1">Document Type</label>
-      <select
-        appInput
-        [(ngModel)]="doc().docType"
+      <app-dropdown
+        [options]="docTypeOptions"
+        [(value)]="doc().docType"
+        placeholder="Select Document Type"
         class="w-full"
-      >
-        <option value="Educational Qualification Certificate">Educational Qualification Certificate</option>
-        <option value="Bank Passbook / Cancelled Cheque">Bank Passbook / Cancelled Cheque</option>
-        <option value="Aadhaar Card">Aadhaar Card Copy</option>
-        <option value="Domicile Certificate">Domicile / Bonafide Certificate</option>
-        <option value="Caste Certificate">Caste / Category Certificate</option>
-        <option value="Income Certificate">Income Certificate</option>
-        <option value="BPL Ration Card">BPL Ration Card</option>
-        <option value="Disability Certificate">Disability / PwD Certificate</option>
-        <option value="Other Document">Other Document</option>
-      </select>
+      />
     </div>
 
     <div>
@@ -64,4 +55,16 @@ export class AspirantEditDocumentModalComponent {
   readonly doc = input.required<AspirantDocumentItem>();
   readonly save = output<AspirantDocumentItem>();
   readonly close = output<void>();
+
+  readonly docTypeOptions = [
+    'Educational Qualification Certificate',
+    'Bank Passbook / Cancelled Cheque',
+    'Aadhaar Card Copy',
+    'Domicile / Bonafide Certificate',
+    'Caste / Category Certificate',
+    'Income Certificate',
+    'BPL Ration Card',
+    'Disability / PwD Certificate',
+    'Other Document'
+  ];
 }

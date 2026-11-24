@@ -86,7 +86,7 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
         </button>
 
         <button appButton size="lg" (click)="state.goToStep(3)">
-          Proceed to Complete Preview &rarr;
+          Proceed to Preview &rarr;
         </button>
       </div>
 

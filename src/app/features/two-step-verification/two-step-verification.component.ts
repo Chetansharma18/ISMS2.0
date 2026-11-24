@@ -52,7 +52,6 @@ interface TwoStepFormData {
     ButtonComponent,
     DropdownComponent,
     IconComponent,
-    InputDirective,
     PageShellComponent,
     SwitchComponent,
     MasterFilterBarComponent
@@ -197,18 +196,13 @@ interface TwoStepFormData {
             <label class="block text-slate-700 font-semibold text-xs mb-1.5">
               Role *
             </label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="formData.roleType"
-              class="w-full"
+              [options]="availableRoles()"
+              [(value)]="formData.roleType"
+              placeholder="Select Role"
               [invalid]="submitted() && !formData.roleType"
-            >
-              <option value="" disabled selected>Select Role</option>
-              @for (role of availableRoles(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
+            />
             @if (submitted() && !formData.roleType) {
               <p class="text-[11px] text-red-500 mt-1 font-medium">Role is required</p>
             }

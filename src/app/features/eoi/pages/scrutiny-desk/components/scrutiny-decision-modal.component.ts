@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
-import { ButtonComponent, InputDirective, ModalComponent } from '../../../../../shared';
+import { ButtonComponent, InputDirective, ModalComponent, DropdownComponent } from '../../../../../shared';
 import { OTHER_OPTION, OptionDropdownComponent } from './option-dropdown.component';
 
 export type DecisionMode = 'remark' | 'reject' | 'approve';
@@ -60,7 +60,7 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
 @Component({
   selector: 'app-scrutiny-decision-modal',
   standalone: true,
-  imports: [ButtonComponent, InputDirective, ModalComponent, OptionDropdownComponent],
+  imports: [ButtonComponent, InputDirective, ModalComponent, OptionDropdownComponent, DropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-modal [title]="content().title" [subtitle]="applicantLabel()" size="sm" (close)="close.emit()">
@@ -71,17 +71,13 @@ const CONTENT: Record<DecisionMode, { title: string; label: string; required: bo
               <label class="block text-xs font-semibold text-slate-800" for="decision-grade">
                 Grade <span class="text-rose-600">*</span>
               </label>
-              <select
-                appInput
-                id="decision-grade"
-                (change)="grade.set($any($event.target).value)"
-                class="w-full cursor-pointer"
-              >
-                <option value="" [selected]="!grade()">Select grade</option>
-                @for (g of uniqueGrades(); track g.grade) {
-                  <option [value]="g.grade" [selected]="g.grade === grade()">{{ g.grade }}</option>
-                }
-              </select>
+              <app-dropdown
+                inputId="decision-grade"
+                [options]="uniqueGradeValues()"
+                [value]="grade()"
+                (valueChange)="grade.set($event)"
+                placeholder="Select grade"
+              />
             </div>
           }
 
@@ -142,6 +138,8 @@ export class ScrutinyDecisionModalComponent {
     }
     return result;
   });
+
+  readonly uniqueGradeValues = computed(() => this.uniqueGrades().map(g => g.grade));
 
   readonly confirmed = output<DecisionSubmission>();
   readonly close = output<void>();

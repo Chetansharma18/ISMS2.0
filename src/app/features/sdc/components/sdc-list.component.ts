@@ -18,6 +18,7 @@ import {
   IconComponent,
   InputDirective,
   PageShellComponent,
+  DropdownComponent,
   TableColumn
 } from '../../../shared';
 import { FilterTabsComponent } from '../../../shared';
@@ -34,8 +35,8 @@ import { FilterTabsComponent } from '../../../shared';
     TableComponent,
     ButtonComponent,
     IconComponent,
-    InputDirective,
     PageShellComponent,
+    DropdownComponent,
     CenterHeadAssignModalComponent
   ],
   template: `
@@ -74,55 +75,45 @@ import { FilterTabsComponent } from '../../../shared';
 
         <!-- Admin Advanced Filter Bar (TP filter, Scheme filter, District filter, and Search) -->
         @if (isAdmin()) {
-          <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+          <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
             
             <!-- Filter: TP Name -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[200px] max-w-[280px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">TP Name:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedTp()"
-                (ngModelChange)="selectedTp.set($event)"
-                class="max-w-50"
-              >
-                <option value="ALL">All Training Partners ({{ tpList().length }})</option>
-                @for (tp of tpList(); track tp) {
-                  <option [value]="tp">{{ tp }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="tpDropdownOptions()"
+                [value]="selectedTp()"
+                (valueChange)="selectedTp.set($event)"
+                placeholder="All Training Partners"
+              />
             </div>
 
             <!-- Filter: Scheme -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[170px] max-w-[260px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedScheme()"
-                (ngModelChange)="selectedScheme.set($event)"
-              >
-                <option value="ALL">All Schemes</option>
-                @for (sch of schemeList(); track sch) {
-                  <option [value]="sch">{{ sch }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="schemeDropdownOptions()"
+                [value]="selectedScheme()"
+                (valueChange)="selectedScheme.set($event)"
+                placeholder="All Schemes"
+              />
             </div>
 
             <!-- Filter: District -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[150px] max-w-[220px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedDistrict()"
-                (ngModelChange)="selectedDistrict.set($event)"
-              >
-                <option value="ALL">All Districts</option>
-                @for (dst of districtList(); track dst) {
-                  <option [value]="dst">{{ dst }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="districtDropdownOptions()"
+                [value]="selectedDistrict()"
+                (valueChange)="selectedDistrict.set($event)"
+                placeholder="All Districts"
+              />
             </div>
 
             <!-- Reset filters -->
@@ -366,15 +357,30 @@ export class SdcListComponent {
     return Array.from(new Set(list.map(s => s.tpName).filter(Boolean)));
   });
 
+  readonly tpDropdownOptions = computed(() => [
+    { value: 'ALL', label: `All Training Partners (${this.tpList().length})` },
+    ...this.tpList().map(tp => ({ value: tp, label: tp }))
+  ]);
+
   readonly schemeList = computed(() => {
     const list = this.sdcService.sdcs();
     return Array.from(new Set(list.map(s => s.scheme).filter(Boolean)));
   });
 
+  readonly schemeDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Schemes' },
+    ...this.schemeList().map(s => ({ value: s, label: s }))
+  ]);
+
   readonly districtList = computed(() => {
     const list = this.sdcService.sdcs();
     return Array.from(new Set(list.map(s => s.district).filter(Boolean)));
   });
+
+  readonly districtDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Districts' },
+    ...this.districtList().map(d => ({ value: d, label: d }))
+  ]);
 
   readonly hasActiveFilters = computed(() => {
     return (

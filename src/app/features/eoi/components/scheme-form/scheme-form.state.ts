@@ -77,7 +77,7 @@ export class SchemeFormState {
   readonly wizardSteps: StepperStep[] = [
     { label: 'Registration Profile' },
     { label: 'Upload Documents' },
-    { label: 'Complete Preview' },
+    { label: 'Preview' },
     { label: 'Processing Fee' },
     { label: 'EMD Payment' },
     { label: 'Submission Receipt' }

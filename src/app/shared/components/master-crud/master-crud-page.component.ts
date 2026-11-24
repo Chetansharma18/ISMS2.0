@@ -204,7 +204,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
         </h2>
 
-        <div class="mt-4 font-sans text-[13px] space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        <div class="mt-4 font-sans text-[13px] space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             @for (field of config.fields; track field.key) {
               <div [ngClass]="colSpanClass(field)">
@@ -224,22 +224,16 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                     ></textarea>
                   }
                   @case ('select') {
-                    <select
-                      appInput
-                      [(ngModel)]="formData[field.key]"
+                    <app-dropdown
+                      [options]="resolveOptions(field)"
+                      [(value)]="formData[field.key]"
+                      [placeholder]="field.placeholder || ('Select ' + field.label)"
                       [invalid]="fieldInvalid(field)"
-                      class="w-full"
-                    >
-                      <option value="" disabled selected>Select {{ field.label }}</option>
-                      @for (opt of resolveOptions(field); track opt) {
-                        <option [value]="opt">{{ opt }}</option>
-                      }
-                    </select>
+                    />
                   }
                   @case ('multiselect') {
                     <app-dropdown
                       multiple
-                      direction="down"
                       [options]="resolveOptions(field)"
                       [values]="valuesOf(field)"
                       [placeholder]="field.placeholder || ('Select ' + field.label)"
@@ -263,16 +257,12 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                   }
                   @case ('permissions') {
                     <div class="flex items-center gap-2">
-                      <select
-                        appInput
-                        [(ngModel)]="pendingPermission"
+                      <app-dropdown
                         class="flex-1"
-                      >
-                        <option value="" disabled selected>Select permission to add...</option>
-                        @for (opt of unselectedPermissions(field); track opt) {
-                          <option [value]="opt">{{ opt }}</option>
-                        }
-                      </select>
+                        [options]="unselectedPermissions(field)"
+                        [(value)]="pendingPermission"
+                        placeholder="Select permission to add..."
+                      />
                       <button
                         appButton
                         iconOnly

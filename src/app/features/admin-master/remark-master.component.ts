@@ -11,8 +11,7 @@ export type { RemarkMasterItem };
 const COLUMNS: TableColumn<RemarkMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
   { key: 'remarkType', label: 'Remark Type', cellClass: 'whitespace-nowrap font-semibold text-slate-800', width: 'w-52' },
-  { key: 'description', label: 'Description', cellClass: 'text-slate-700' },
-  { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'w-28' }
+  { key: 'description', label: 'Description', cellClass: 'text-slate-700' }
 ];
 
 const CONFIG: MasterCrudConfig<RemarkMasterItem> = {

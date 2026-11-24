@@ -516,13 +516,6 @@ export class UserManagementComponent {
       cellClass: 'whitespace-nowrap text-slate-700'
     },
     {
-      key: 'schemeStatus',
-      label: 'Scheme Status',
-      align: 'center',
-      type: 'custom',
-      width: 'w-32'
-    },
-    {
       key: 'action',
       label: 'Actions',
       align: 'center',

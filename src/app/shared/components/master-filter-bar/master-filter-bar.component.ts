@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { IconComponent } from '../icon/icon.component';
 import { InputDirective } from '../form-controls/input/input.directive';
+import { DropdownComponent, DropdownOption } from '../dropdown/dropdown.component';
 import { MasterFilterConfig } from '../master-crud/master-crud.types';
 
 export interface StatusFilterOption {
@@ -23,10 +24,10 @@ export interface StatusFilterOption {
   selector: 'app-master-filter-bar',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, DropdownComponent],
   template: `
     <div
-      class="mb-4 bg-white p-3 sm:p-4 rounded-[10px] border border-[#EADCE2] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs font-sans"
+      class="mb-4 bg-white p-3 sm:p-4 rounded-[10px] border border-[#EADCE2] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs font-sans relative z-20"
     >
       <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
         <!-- Search Input with Search Icon & Clear Button -->
@@ -62,40 +63,31 @@ export interface StatusFilterOption {
           </div>
         }
 
-        <!-- Status Filter Dropdown (Simple select dropdown - NO BUTTONS) -->
+        <!-- Status Filter Dropdown (Unified Design) -->
         @if (showStatusFilter()) {
-          <div class="inline-flex items-center gap-1.5 shrink-0">
-            <select
-              appInput
+          <div class="inline-flex items-center gap-1.5 shrink-0 min-w-[150px] max-w-[240px]">
+            <app-dropdown
+              class="w-full"
               [size]="inputSize()"
-              [ngModel]="status()"
-              (ngModelChange)="status.set($event)"
-              class="text-[13px] font-medium min-w-[150px] max-w-[240px]"
-            >
-              @for (opt of resolvedStatusOptions(); track opt.value) {
-                <option [value]="opt.value">
-                  {{ opt.label === 'All' ? 'All Status' : opt.label }}@if (opt.count !== undefined) { ({{ opt.count }}) }
-                </option>
-              }
-            </select>
+              [options]="statusDropdownOptions()"
+              [value]="status()"
+              (valueChange)="status.set($event)"
+              placeholder="All Status"
+            />
           </div>
         }
 
         <!-- Dynamic Master Filters (e.g. Sector, Scheme, Category, Role dropdowns) -->
         @for (filter of filters(); track filter.key) {
-          <div class="inline-flex items-center gap-1.5 shrink-0">
-            <select
-              appInput
+          <div class="inline-flex items-center gap-1.5 shrink-0 min-w-[170px] max-w-[300px]">
+            <app-dropdown
+              class="w-full"
               [size]="inputSize()"
-              [ngModel]="filterValues()[filter.key] || ''"
-              (ngModelChange)="setFilterValue(filter.key, $event)"
-              class="text-[13px] font-medium min-w-[170px] max-w-[300px]"
-            >
-              <option value="">{{ filter.placeholder || 'All ' + filter.label }}</option>
-              @for (opt of resolveFilterOptions(filter); track opt) {
-                <option [value]="opt">{{ opt }}</option>
-              }
-            </select>
+              [options]="resolveDropdownFilterOptions(filter)"
+              [value]="filterValues()[filter.key] || ''"
+              (valueChange)="setFilterValue(filter.key, $event)"
+              [placeholder]="filter.placeholder || 'All ' + filter.label"
+            />
           </div>
         }
 
@@ -154,6 +146,13 @@ export class MasterFilterBarComponent {
     ];
   });
 
+  readonly statusDropdownOptions = computed<DropdownOption[]>(() => {
+    return this.resolvedStatusOptions().map(opt => ({
+      value: opt.value,
+      label: opt.count !== undefined ? `${opt.label === 'All' ? 'All Status' : opt.label} (${opt.count})` : (opt.label === 'All' ? 'All Status' : opt.label)
+    }));
+  });
+
   readonly filters = input<MasterFilterConfig[]>([]);
   readonly filterValues = model<Record<string, string>>({});
 
@@ -174,6 +173,15 @@ export class MasterFilterBarComponent {
   resolveFilterOptions(filter: MasterFilterConfig): string[] {
     if (!filter.options) return [];
     return typeof filter.options === 'function' ? filter.options() : filter.options;
+  }
+
+  resolveDropdownFilterOptions(filter: MasterFilterConfig): DropdownOption[] {
+    const raw = this.resolveFilterOptions(filter);
+    const options: DropdownOption[] = [{ value: '', label: filter.placeholder || 'All ' + filter.label }];
+    for (const opt of raw) {
+      options.push({ value: opt, label: opt });
+    }
+    return options;
   }
 
   setFilterValue(key: string, val: string): void {

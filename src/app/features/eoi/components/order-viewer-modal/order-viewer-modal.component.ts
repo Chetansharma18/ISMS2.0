@@ -80,7 +80,7 @@ import {
                   appButton
                   [variant]="viewMode() === 'single' && activePageNumber() === p.pageNumber ? 'primary' : 'ghost'"
                   size="sm"
-                  class="w-7 justify-center px-0 text-xs font-semibold"
+                  iconOnly
                   (click)="selectPage(p.pageNumber)"
                 >
                   {{ p.pageNumber }}
@@ -106,7 +106,7 @@ import {
                   appButton
                   [variant]="viewMode() === 'single' && activePageNumber() === p.pageNumber ? 'primary' : 'ghost'"
                   size="sm"
-                  class="w-7 justify-center px-0 text-xs font-semibold"
+                  iconOnly
                   (click)="selectPage(p.pageNumber)"
                 >
                   {{ p.pageNumber }}
@@ -739,7 +739,7 @@ import {
                   <p class="text-xs text-slate-600">{{ cur.designation }} • {{ cur.role }}</p>
                 </div>
                 <div class="text-right text-xs text-slate-600">
-                  <p class="font-mono text-[11px]">{{ cur.mobile }}</p>
+                  <p class="tabular-nums text-[11px]">{{ cur.mobile }}</p>
                   <p class="text-[11px] text-slate-500">{{ cur.email }}</p>
                 </div>
               </div>
@@ -764,7 +764,7 @@ import {
                   <input
                     appInput
                     size="sm"
-                    class="w-48 text-center text-base font-bold tracking-widest font-mono"
+                    class="w-48 text-center text-base font-bold tracking-widest tabular-nums"
                     maxlength="6"
                     placeholder="------"
                     [(ngModel)]="currentOtp"

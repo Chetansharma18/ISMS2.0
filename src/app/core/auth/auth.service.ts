@@ -160,7 +160,8 @@ export class AuthService {
   }
 
   triggerSsoRedirect(): void {
-    this.isRedirecting.set(true);
+    this.isRedirecting.set(false);
+    this.router.navigate(['/sso-login']);
   }
 
   closeSsoRedirect(): void {
@@ -169,11 +170,7 @@ export class AuthService {
 
   proceedToSsoLogin(): void {
     this.isRedirecting.set(false);
-    if (PORTAL_CONFIG.ssoUrl) {
-      window.location.href = PORTAL_CONFIG.ssoUrl;
-    } else {
-      this.router.navigate(['/sso-login']);
-    }
+    this.router.navigate(['/sso-login']);
   }
 
   login(persona: UserPersona, redirectUrl: string | null = '/registration'): void {

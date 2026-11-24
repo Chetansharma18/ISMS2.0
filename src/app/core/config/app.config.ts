@@ -17,5 +17,5 @@ export const PORTAL_CONFIG: PortalConfig = {
   supportEmail: 'support-isms@rajasthan.gov.in',
   helplineNumber: '0141-2792600',
   sessionTimeoutMinutes: 30,
-  ssoUrl: 'https://sso.rajasthan.gov.in'
+  ssoUrl: ''
 };

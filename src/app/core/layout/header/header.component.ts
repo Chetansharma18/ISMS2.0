@@ -272,7 +272,7 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
               <!-- User Icon -->
               <app-icon name="user" />
 
-              <span>Login with SSO</span>
+              <span>Login</span>
 
               <!-- Right Arrow Icon -->
               <app-icon name="forward" />

@@ -6,7 +6,6 @@ import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
-import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
@@ -22,7 +21,6 @@ import { ConnectivityService } from './core/services/connectivity.service';
     RouterOutlet,
     HeaderComponent,
     SidebarComponent,
-    SsoRedirectModalComponent,
     ToastOutletComponent,
     ButtonComponent,
     IconComponent,
@@ -33,11 +31,6 @@ import { ConnectivityService } from './core/services/connectivity.service';
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FFFFFF;">
       <!-- Global toast notifications (NotificationService) -->
       <app-toast-outlet></app-toast-outlet>
-
-      <!-- Theme-Based Blurred SSO Redirection Popup -->
-      @if (authService.isRedirecting()) {
-        <app-sso-redirect-modal></app-sso-redirect-modal>
-      }
 
       <!-- Main Portal Header (Always visible across all pages except standalone pages) -->
       @if (showHeader()) {
@@ -177,7 +170,7 @@ export class AppComponent {
   }
 
   onLoginClick(): void {
-    this.authService.triggerSsoRedirect();
+    this.router.navigate(['/sso-login']);
   }
 
   toggleMobileSidebar(): void {

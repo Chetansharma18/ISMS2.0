@@ -28,4 +28,38 @@ describe('ScrutinyDecisionModalComponent', () => {
     const unique = comp.uniqueGrades();
     expect(unique.map(g => g.grade)).toEqual(['A+', 'A', 'B']);
   });
+
+  it('calculates word count accurately and validates 250 word limit in remark mode', () => {
+    const comp = runInInjectionContext(injector, () => {
+      const c = new ScrutinyDecisionModalComponent();
+      (c as any).mode = signal('remark');
+      (c as any).initialRemark = signal('');
+      return c;
+    });
+
+    expect(comp.getWordCount('')).toBe(0);
+    expect(comp.getWordCount('   ')).toBe(0);
+    expect(comp.getWordCount('All documents verified successfully.')).toBe(4);
+
+    // Empty remark is invalid
+    (comp as any).custom.set('');
+    expect((comp as any).isValid()).toBe(false);
+
+    // Normal remark under 250 words is valid
+    (comp as any).custom.set('Proposal is satisfactory.');
+    expect((comp as any).wordCount()).toBe(3);
+    expect((comp as any).isValid()).toBe(true);
+
+    // Over 250 words is invalid
+    const words251 = Array(251).fill('word').join(' ');
+    (comp as any).custom.set(words251);
+    expect((comp as any).wordCount()).toBe(251);
+    expect((comp as any).isValid()).toBe(false);
+
+    // Exactly 250 words is valid
+    const words250 = Array(250).fill('word').join(' ');
+    (comp as any).custom.set(words250);
+    expect((comp as any).wordCount()).toBe(250);
+    expect((comp as any).isValid()).toBe(true);
+  });
 });

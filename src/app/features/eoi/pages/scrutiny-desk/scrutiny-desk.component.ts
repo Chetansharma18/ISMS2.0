@@ -49,8 +49,8 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"
-        (reject)="openRejectModal()"
-        (approve)="openApproveModal()"
+        [isRemarked]="isRemarked()"
+        (remark)="openRemarksModal()"
       />
 
       @if (applicant(); as app) {
@@ -105,6 +105,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
       <app-scrutiny-decision-modal
         mode="remark"
         [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [initialRemark]="currentRemark()"
         (confirmed)="confirmAddRemark($event)"
         (close)="closeModals()"
       />
@@ -162,6 +163,21 @@ export class ScrutinyDeskComponent {
   Math = Math;
 
   applicant = signal<ApplicantResponse | undefined>(undefined);
+  hasRemarkedLocally = signal<boolean>(false);
+
+  readonly currentRemark = computed(() => {
+    const app = this.applicant();
+    if (!app?.activityLog) return '';
+    const remarkLog = [...app.activityLog].reverse().find(act => act.action === 'REMARK_ADDED');
+    return remarkLog?.description || '';
+  });
+
+  readonly isRemarked = computed(() => {
+    if (this.hasRemarkedLocally()) return true;
+    const app = this.applicant();
+    if (!app) return false;
+    return app.activityLog?.some(act => act.action === 'REMARK_ADDED') ?? false;
+  });
 
   // Modal Dialog States
   showApproveModal = signal<boolean>(false);
@@ -282,6 +298,7 @@ export class ScrutinyDeskComponent {
   }
 
   loadApplicant(appId: string): void {
+    this.hasRemarkedLocally.set(false);
     this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       if (data) {
         this.shortfallBridge.syncFromTenderIfNeeded(data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(synced => {
@@ -630,6 +647,8 @@ export class ScrutinyDeskComponent {
     const remark = submission.remark.trim();
     if (!app || !remark) return;
 
+    this.hasRemarkedLocally.set(true);
+
     const now = new Date();
     const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -651,7 +670,7 @@ export class ScrutinyDeskComponent {
       status: app.status,
       technicalScore: app.scrutinyDetails?.technicalScore || 0,
       grade: app.scrutinyDetails?.grade,
-      remarks: app.scrutinyDetails?.remarks ?? remark,
+      remarks: remark,
       shortfall: app.scrutinyDetails?.shortfall,
       activityLog: [...this.getActivityLog(), newActivity],
       scrutinyOfficer: app.scrutinyDetails?.scrutinyOfficer ?? this.reviewerName()

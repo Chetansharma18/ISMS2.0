@@ -48,8 +48,26 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 
         <!-- Review actions -->
         <div class="flex items-center gap-2 flex-wrap">
-          <button appButton variant="danger" size="sm" (click)="reject.emit()" title="Reject application">Reject</button>
-          <button appButton size="sm" (click)="approve.emit()" title="Approve application">Approve</button>
+          @if (isRemarked()) {
+            <span
+              (click)="remark.emit()"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
+              title="Remark recorded. Click to view or update remark."
+            >
+              <app-icon name="check" size="sm" />
+              <span>Remarked</span>
+            </span>
+          } @else {
+            <button
+              appButton
+              variant="primary"
+              size="sm"
+              (click)="remark.emit()"
+              title="Add Remark"
+            >
+              Remark
+            </button>
+          }
         </div>
       </div>
 
@@ -83,8 +101,8 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 })
 export class ScrutinyToolbarComponent {
   readonly applicant = input<ApplicantResponse | undefined>();
-  readonly reject = output<void>();
-  readonly approve = output<void>();
+  readonly isRemarked = input<boolean>(false);
+  readonly remark = output<void>();
 
   protected statusLabel(): string {
     const app = this.applicant();

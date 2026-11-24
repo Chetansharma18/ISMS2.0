@@ -9,14 +9,42 @@ export interface EvaluationExcelRow {
   reason?: string;
 }
 
+export interface EvaluationExcelGradeOption {
+  grade: string;
+  range?: string;
+  minimum?: number;
+  maximum?: number;
+}
+
 export interface EvaluationExcelOptions {
   fileName: string;
   schemeTitle: string;
   eoiRefNo: string;
   rows: EvaluationExcelRow[];
-  gradeOptions: string[];
+  gradeOptions: (string | EvaluationExcelGradeOption)[];
   statusOptions?: string[];
 }
+
+export const DEFAULT_GRADE_RANGES: Record<string, string> = {
+  'A+': '85 - 100',
+  'A': '70 - 84',
+  'B': '55 - 69',
+  'C': '40 - 54',
+  'D': '0 - 39'
+};
+
+/**
+ * Formats a grade and its score range with grade left-aligned and range right-aligned.
+ */
+export function formatGradeWithRange(grade: string, range?: string, totalWidth = 24): string {
+  const g = grade.trim();
+  const r = (range || DEFAULT_GRADE_RANGES[g] || '').trim();
+  if (!r) return g;
+  const spaces = Math.max(2, totalWidth - g.length - r.length);
+  return `${g}${' '.repeat(spaces)}${r}`;
+}
+
+export const GRADE_DROPDOWN_PROMPT = 'Select Grade';
 
 function escapeXml(unsafe: unknown): string {
   if (unsafe === null || unsafe === undefined) return '';
@@ -40,7 +68,30 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
   const zip = new JSZipModule();
 
   const statuses = options.statusOptions?.length ? options.statusOptions : ['Approved', 'Reject'];
-  const grades = options.gradeOptions?.length ? options.gradeOptions : ['A+', 'A', 'B', 'C', 'D'];
+
+  const rawGrades = options.gradeOptions?.length
+    ? options.gradeOptions
+    : [
+        { grade: 'A+', range: '85 - 100' },
+        { grade: 'A', range: '70 - 84' },
+        { grade: 'B', range: '55 - 69' },
+        { grade: 'C', range: '40 - 54' },
+        { grade: 'D', range: '0 - 39' }
+      ];
+
+  const gradeItems: { grade: string; range: string; formatted: string }[] = rawGrades.map(opt => {
+    if (typeof opt === 'string') {
+      const g = opt.trim();
+      const r = DEFAULT_GRADE_RANGES[g] || '';
+      return { grade: g, range: r, formatted: formatGradeWithRange(g, r) };
+    }
+    const g = opt.grade.trim();
+    const r = (opt.range || (opt.minimum !== undefined && opt.maximum !== undefined ? `${opt.minimum} - ${opt.maximum}` : '') || DEFAULT_GRADE_RANGES[g] || '').trim();
+    return { grade: g, range: r, formatted: formatGradeWithRange(g, r) };
+  });
+
+  const promptOption = GRADE_DROPDOWN_PROMPT;
+  const validationGrades = [promptOption, ...gradeItems.map(g => g.formatted)];
 
   const totalRows = Math.max(options.rows.length + 1, 100);
 
@@ -84,10 +135,11 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
   // 5. xl/styles.xml
   const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <fonts count="3">
+  <fonts count="4">
     <font><sz val="10.5"/><name val="Segoe UI"/></font>
     <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Segoe UI"/></font>
     <font><b/><sz val="10.5"/><color rgb="FF0B3558"/><name val="Segoe UI"/></font>
+    <font><sz val="10.5"/><color rgb="FF475569"/><name val="Segoe UI"/></font>
   </fonts>
   <fills count="4">
     <fill><patternFill patternType="none"/></fill>
@@ -107,18 +159,22 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
   <cellStyleXfs count="1">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="0"/>
   </cellStyleXfs>
-  <cellXfs count="4">
+  <cellXfs count="5">
     <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/>
-    <!-- Header Style (Navy background, White Bold text) -->
+    <!-- 1: Header Style (Navy background, White Bold text) -->
     <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
       <alignment horizontal="center" vertical="center" wrapText="1"/>
     </xf>
-    <!-- Normal Left-aligned Data Cell with border -->
+    <!-- 2: Normal Left-aligned Data Cell with border -->
     <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">
       <alignment vertical="center"/>
     </xf>
-    <!-- Center-aligned Data Cell with border -->
+    <!-- 3: Center-aligned Data Cell with border -->
     <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">
+      <alignment horizontal="center" vertical="center"/>
+    </xf>
+    <!-- 4: Dropdown In-cell Interactive Style (Light slate fill, centered, thin border) -->
+    <xf numFmtId="0" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">
       <alignment horizontal="center" vertical="center"/>
     </xf>
   </cellXfs>
@@ -140,15 +196,22 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
     const refNo = escapeXml(row.refNo);
     const companyName = escapeXml(row.companyName);
     const statusVal = escapeXml(row.status || '');
-    const gradeVal = escapeXml(row.grade || '');
     const reasonVal = escapeXml(row.reason || '');
+
+    let gradeVal = promptOption;
+    let gradeStyle = '4';
+    if (row.grade) {
+      const match = gradeItems.find(g => g.grade.toLowerCase() === row.grade!.trim().toLowerCase());
+      gradeVal = match ? match.formatted : row.grade;
+      gradeStyle = '3';
+    }
 
     sheetDataXml += `    <row r="${rowNum}" ht="22" customHeight="1">
       <c r="A${rowNum}" s="3"><v>${sNo}</v></c>
       <c r="B${rowNum}" s="3" t="inlineStr"><is><t>${refNo}</t></is></c>
       <c r="C${rowNum}" s="2" t="inlineStr"><is><t>${companyName}</t></is></c>
       <c r="D${rowNum}" s="3" t="inlineStr"><is><t>${statusVal}</t></is></c>
-      <c r="E${rowNum}" s="3" t="inlineStr"><is><t>${gradeVal}</t></is></c>
+      <c r="E${rowNum}" s="${gradeStyle}" t="inlineStr"><is><t>${escapeXml(gradeVal)}</t></is></c>
       <c r="F${rowNum}" s="2" t="inlineStr"><is><t>${reasonVal}</t></is></c>
     </row>\n`;
   });
@@ -166,7 +229,7 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
     <col min="2" max="2" width="28" customWidth="1"/>
     <col min="3" max="3" width="38" customWidth="1"/>
     <col min="4" max="4" width="24" customWidth="1"/>
-    <col min="5" max="5" width="20" customWidth="1"/>
+    <col min="5" max="5" width="26" customWidth="1"/>
     <col min="6" max="6" width="45" customWidth="1"/>
   </cols>
   <sheetData>
@@ -175,14 +238,14 @@ ${sheetDataXml}  </sheetData>
     <dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" errorTitle="Invalid Status" error="Please select either Approved or Reject from the dropdown." promptTitle="Status Decision" prompt="Select Approved or Reject" sqref="D2:D${totalRows}">
       <formula1>ValidationData!$A$1:$A$${statuses.length}</formula1>
     </dataValidation>
-    <dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" errorTitle="Invalid Grade" error="Please select a valid Grade from the dropdown list." promptTitle="Empanelment Grade" prompt="Select Grade as per evaluation" sqref="E2:E${totalRows}">
-      <formula1>ValidationData!$B$1:$B$${grades.length}</formula1>
+    <dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" errorTitle="Invalid Grade" error="Please select a valid Grade from the dropdown list." promptTitle="Empanelment Grade" prompt="Select Grade &amp; Range from dropdown" sqref="E2:E${totalRows}">
+      <formula1>ValidationData!$B$1:$B$${validationGrades.length}</formula1>
     </dataValidation>
   </dataValidations>
 </worksheet>`;
 
   // 7. xl/worksheets/sheet2.xml (Validation sheet for reliable dropdowns)
-  const maxValidationRows = Math.max(statuses.length, grades.length);
+  const maxValidationRows = Math.max(statuses.length, validationGrades.length);
   let sheet2RowsXml = '';
   for (let r = 0; r < maxValidationRows; r++) {
     const rNum = r + 1;
@@ -190,8 +253,8 @@ ${sheetDataXml}  </sheetData>
     if (r < statuses.length) {
       cells += `<c r="A${rNum}" t="inlineStr"><is><t>${escapeXml(statuses[r])}</t></is></c>`;
     }
-    if (r < grades.length) {
-      cells += `<c r="B${rNum}" t="inlineStr"><is><t>${escapeXml(grades[r])}</t></is></c>`;
+    if (r < validationGrades.length) {
+      cells += `<c r="B${rNum}" t="inlineStr"><is><t>${escapeXml(validationGrades[r])}</t></is></c>`;
     }
     sheet2RowsXml += `    <row r="${rNum}">${cells}</row>\n`;
   }
@@ -338,12 +401,17 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
         status.toLowerCase().includes('eligib') ||
         status.toLowerCase() === 'yes';
 
+      let cleanGrade = '';
+      if (grade && !grade.toLowerCase().includes('select') && !grade.startsWith('--')) {
+        cleanGrade = grade.split(/\s{2,}|[\(\[]/)[0].trim();
+      }
+
       parsedRows.push({
         sNo,
         refNo: refNo || `APP-2026-${String(sNo).padStart(3, '0')}`,
         companyName: companyName || `Agency ${sNo}`,
         status: isApproved ? 'Approved' : 'Reject',
-        grade: grade || (isApproved ? 'A' : '-'),
+        grade: cleanGrade || (isApproved ? 'A' : '-'),
         reason: reason || (isApproved ? 'Qualified as per technical norms' : 'Criteria not fulfilled'),
         isApproved
       });
@@ -378,12 +446,17 @@ function parseCsvText(text: string, fileName: string): ParsedEvaluationResult {
         status.toLowerCase().includes('eligib') ||
         status.toLowerCase() === 'yes';
 
+      let cleanGrade = '';
+      if (cleanMatches[4] && !cleanMatches[4].toLowerCase().includes('select') && !cleanMatches[4].startsWith('--')) {
+        cleanGrade = cleanMatches[4].split(/\s{2,}|[\(\[]/)[0].trim();
+      }
+
       parsedRows.push({
         sNo,
         refNo: refNo || `APP-2026-${String(sNo).padStart(3, '0')}`,
         companyName: companyName || `Agency ${sNo}`,
         status: isApproved ? 'Approved' : 'Reject',
-        grade: grade || (isApproved ? 'A' : '-'),
+        grade: cleanGrade || (isApproved ? 'A' : '-'),
         reason: reason || (isApproved ? 'Qualified as per criteria' : 'Criteria not fulfilled'),
         isApproved
       });

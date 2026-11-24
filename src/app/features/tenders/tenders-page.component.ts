@@ -41,8 +41,11 @@ import {
   isEoiFormValid,
   isSchemeClosed,
   parseMasterEntriesByScheme,
-  validateEoiFormComplete
+  validateEoiFormComplete,
+  validatePublishDetailsStep,
+  validateUploadingDetailsStep
 } from './tenders-page/tenders-page.util';
+import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
 import { ConfigureEoiFormComponent } from './tenders-page/configure-eoi-form.component';
 import { CommitteeAssignmentModalComponent } from './tenders-page/committee-assignment-modal.component';
 import { OtrPromptModalComponent } from './tenders-page/otr-prompt-modal.component';
@@ -64,7 +67,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
     ActionModalComponent,
     ButtonComponent,
     IconComponent,
-    PageHeaderComponent,
+    StepperComponent,
     SchemeDetailViewComponent,
     ConfigureEoiFormComponent,
     CommitteeAssignmentModalComponent,
@@ -82,31 +85,65 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
            VIEW 1: CONFIGURE / EDIT EOI SCREEN (Full Page View)
            ==================================================================== -->
       @if (showConfigureScreen()) {
-        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
-          <app-page-header
-            [title]="editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI'"
-            [breadcrumbs]="[
-              { label: 'Home', url: '/' },
-              { label: 'Active Schemes', url: '/admin/eoi-configuration' },
-              { label: editingSchemeRefNo() ? 'Edit EOI' : 'Configure New EOI' }
-            ]"
-            [showBack]="true"
-            (back)="closeConfigureScreen()"
-            backTitle="Back to Active Schemes"
-          >
-          </app-page-header>
+        <div class="p-4 sm:p-6 lg:p-7 font-sans" style="background-color: #ffffff;">
 
-          <!-- Main Form Card Container - Styled exactly like Registration Form Box -->
-          <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
+          <!-- 1. Header with Back button and Page Title (Matching scheme-form pattern) -->
+          <div class="mb-3.5 space-y-2">
+            <div>
+              <button
+                appButton
+                variant="outline"
+                size="sm"
+                type="button"
+                (click)="closeConfigureScreen()"
+              >
+                <app-icon name="back" />
+                <span>Back</span>
+              </button>
+            </div>
+
+            <div>
+              <h1 class="text-2xl sm:text-[26px] font-bold text-[#7C0E44] tracking-tight m-0">
+                {{ editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI' }}
+              </h1>
+            </div>
+
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
+              {{ editingSchemeRefNo() ? 'Update the scheme parameters, required documents, and custom fields below.' : 'Complete the two steps below to configure and publish an Expression of Interest application.' }}
+            </p>
+          </div>
+
+          <!-- 2. Step progress card (Wizard Stepper - Full width border with centered steps) -->
+          <div class="mb-3.5 w-full">
+            <app-stepper
+              variant="wizard"
+              ariaLabel="EOI Configuration Steps"
+              [steps]="eoiWizardSteps"
+              [currentStep]="eoiCurrentStep()"
+              [completedSteps]="completedEoiSteps()"
+              (stepClick)="goToEoiStep($event)"
+            ></app-stepper>
+          </div>
+
+          <!-- 3. Main Form Card Container - Styled with clean borders and compact spacing -->
+          <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-6 space-y-5">
 
             <!-- Card Header Strip -->
-            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
+            <div class="pb-4 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
                 <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  {{ editingSchemeRefNo() ? 'Edit Expression of Interest' : 'Expression of Interest Details' }}
+                  @if (eoiCurrentStep() === 1) {
+                    {{ editingSchemeRefNo() ? 'Edit Expression of Interest' : 'Expression of Interest Details' }}
+                  } @else {
+                    Uploading Details
+                  }
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
-                  {{ editingSchemeRefNo() ? 'Update scheme parameters and required documents' : 'Enter the required scheme parameters and EOI details' }}
+                  @if (eoiCurrentStep() === 1) {
+                    {{ editingSchemeRefNo() ? 'Update scheme parameters and EOI details' : 'Enter the required scheme parameters and EOI details' }}
+                  } @else {
+                    Configure required supporting documents and annexures for proposal upload
+                  }
                 </p>
               </div>
               <div class="flex items-center gap-3 shrink-0">
@@ -115,14 +152,17 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
                     Ref: {{ editingSchemeRefNo() }}
                   </span>
                 }
-                <span class="text-xs text-slate-500 font-medium">
-                  Required fields marked <span class="text-[#DC2626] font-bold">*</span>
-                </span>
+                @if (eoiCurrentStep() === 1) {
+                  <span class="text-xs text-slate-500 font-medium">
+                    Required fields marked <span class="text-[#DC2626] font-bold">*</span>
+                  </span>
+                }
               </div>
             </div>
 
             <!-- Form Content Component -->
             <app-configure-eoi-form
+              [activeStep]="eoiCurrentStep()"
               [data]="newEoiData"
               [submitted]="newEoiSubmitted()"
               [fileError]="fileError()"
@@ -148,31 +188,46 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             ></app-configure-eoi-form>
 
             <!-- Card Footer / Actions -->
-            <div class="pt-4 border-t border-[#E8EEF5] flex items-center justify-between gap-3">
-              <button
-                appButton
-                variant="outline"
-                size="md"
-                type="button"
-                [disabled]="isSubmitting()"
-                (click)="closeConfigureScreen()"
-              >
-                <app-icon name="chevron-left" />
-                <span>Cancel</span>
-              </button>
-              <div class="flex items-center gap-2">
-                <button
-                  appButton
-                  variant="primary"
-                  size="md"
-                  type="button"
-                  [disabled]="isSubmitting()"
-                  (click)="submitNewEoi()"
-                >
-                  <span>{{ editingSchemeRefNo() ? 'Update EOI' : 'Submit EOI' }}</span>
-                  <app-icon name="chevron-right" />
-                </button>
-              </div>
+            <div class="pt-5 border-t border-[#E8EEF5]">
+              @if (eoiCurrentStep() === 1) {
+                <div class="flex items-center justify-end w-full">
+                  <button
+                    appButton
+                    variant="primary"
+                    size="md"
+                    type="button"
+                    (click)="nextEoiStep()"
+                  >
+                    <span>Next: Uploading Details</span>
+                    <app-icon name="chevron-right" />
+                  </button>
+                </div>
+              } @else {
+                <div class="flex items-center justify-between w-full gap-3">
+                  <button
+                    appButton
+                    variant="outline"
+                    size="md"
+                    type="button"
+                    [disabled]="isSubmitting()"
+                    (click)="prevEoiStep()"
+                  >
+                    <app-icon name="chevron-left" />
+                    <span>Back to Publish Details</span>
+                  </button>
+                  <button
+                    appButton
+                    variant="primary"
+                    size="md"
+                    type="button"
+                    [disabled]="isSubmitting()"
+                    (click)="submitNewEoi()"
+                  >
+                    <span>{{ editingSchemeRefNo() ? 'Update EOI' : 'Submit EOI' }}</span>
+                    <app-icon name="chevron-right" />
+                  </button>
+                </div>
+              }
             </div>
 
           </div>
@@ -391,6 +446,21 @@ export class TendersPageComponent {
   readonly showConfirmSubmitEoiModal = signal<boolean>(false);
   readonly showCommitteeModal = signal<boolean>(false);
   readonly selectedSchemeForCommittee = signal<SchemeTender | null>(null);
+
+  /** Stepper configuration for Configure / Edit EOI form wizard. */
+  readonly eoiWizardSteps: StepperStep[] = [
+    { label: 'Publish Details' },
+    { label: 'Uploading Details' }
+  ];
+  readonly eoiCurrentStep = signal<number>(1);
+
+  readonly completedEoiSteps = computed<number[]>(() => {
+    const res: number[] = [];
+    if (this.eoiCurrentStep() >= 2) {
+      res.push(1);
+    }
+    return res;
+  });
 
   private dataEngine = inject(DataEngineService);
 
@@ -1020,6 +1090,7 @@ export class TendersPageComponent {
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
+    this.eoiCurrentStep.set(1);
 
     const savedDraft = this.storage.getItem<EoiFormData>(TendersPageComponent.EOI_DRAFT_STORAGE_KEY);
     if (savedDraft) {
@@ -1048,11 +1119,29 @@ export class TendersPageComponent {
     this.openConfigureScreen();
   }
 
+  nextEoiStep(): void {
+    this.eoiCurrentStep.set(2);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  prevEoiStep(): void {
+    this.eoiCurrentStep.set(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  goToEoiStep(step: number): void {
+    if (step >= 1 && step <= 2) {
+      this.eoiCurrentStep.set(step);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
   editScheme(scheme: SchemeTender, updateUrl = true): void {
     this.loadMasterOptions();
     this.editingSchemeRefNo.set(scheme.refNo);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
+    this.eoiCurrentStep.set(1);
     this.newEoiData = eoiFormFromScheme(scheme);
     this.eoiFormVersion.update((v) => v + 1);
     this.selectedScheme.set(null);
@@ -1068,6 +1157,7 @@ export class TendersPageComponent {
     this.editingSchemeRefNo.set(null);
     this.newEoiSubmitted.set(false);
     this.fileError.set('');
+    this.eoiCurrentStep.set(1);
     const action = this.route.snapshot.queryParams['action'];
     if (action === 'create' || action === 'edit') {
       this.router.navigate([], { relativeTo: this.route, queryParams: {} });
@@ -1254,40 +1344,6 @@ export class TendersPageComponent {
 
   submitNewEoi(): void {
     this.newEoiSubmitted.set(true);
-
-    const validation = validateEoiFormComplete(this.newEoiData, {
-      existingRefNos: this.existingRefNos(),
-      currentRefNo: this.editingSchemeRefNo(),
-      activeSchemeNames: this.schemeNameOptions(),
-      activeEoiCategories: [...this.eoiCategoryOptions()],
-      schemeMasterItems: this.schemeMasterItems()
-    });
-
-    if (!validation.isValid) {
-      const firstInvalidKey = Object.keys(validation.errors)[0];
-      if (firstInvalidKey) {
-        const fieldMap: Record<string, string> = {
-          refNo: 'eoiRefNoInput',
-          scheme: 'eoiSchemeSelect',
-          schemeCategory: 'eoiSchemeCategorySelect',
-          eoiCategory: 'eoiCategorySelect',
-          publishedDate: 'eoiPublishedDateInput',
-          submissionDate: 'eoiSubmissionDateInput',
-          eoiDurationValue: 'eoiDurationInput',
-          description: 'eoiDescriptionInput',
-          emdFee: 'eoiEmdFeeInput',
-          processFee: 'eoiProcessFeeInput'
-        };
-        const elId = fieldMap[firstInvalidKey];
-        if (elId) {
-          const el = document.getElementById(elId);
-          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el?.focus();
-        }
-      }
-      return;
-    }
-
     this.showConfirmSubmitEoiModal.set(true);
   }
 

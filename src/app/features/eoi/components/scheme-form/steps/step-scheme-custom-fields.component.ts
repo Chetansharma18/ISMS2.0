@@ -118,7 +118,7 @@ import { SchemeCustomField } from '../../../../../core/models/scheme-requirement
 
       <!-- Footer Action Buttons -->
       <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(1)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexProfile)">
           &larr; Back to Registration Profile
         </button>
 
@@ -149,8 +149,8 @@ export class StepSchemeCustomFieldsComponent {
 
     this.errors.set(newErrors);
     if (Object.keys(newErrors).length === 0) {
-      // Proceed to Step 3 (Upload Documents)
-      this.state.goToStep(3);
+      // Proceed to Step (Upload Documents)
+      this.state.goToStep(this.state.stepIndexDocuments());
     }
   }
 }

@@ -66,12 +66,12 @@ import { SchemeFormState } from '../scheme-form.state';
 
       <!-- Action bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(3)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexPreview())">
           &larr; Back to Preview
         </button>
 
         @if (state.procFeePaid()) {
-          <button appButton size="lg" (click)="state.goToStep(5)">
+          <button appButton size="lg" (click)="state.goToStep(state.stepIndexEmd())">
             Proceed to EMD Payment &rarr;
           </button>
         } @else {

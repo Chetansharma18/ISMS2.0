@@ -34,8 +34,8 @@ function makeTender(overrides: Partial<SubmittedTender> = {}): SubmittedTender {
 }
 
 describe('TenderAppealSectionComponent', () => {
-  it('correctly identifies rejected state vs non-rejected state', () => {
-    // 1. Submitted tender: not rejected, canAppeal is false
+  it('correctly identifies appeal state and supports appeal in both rejected and approved cases within 7 days', () => {
+    // 1. Submitted tender: not eligible for appeal, canAppeal is false
     const submittedTender = makeTender({ submittedStatus: 'Submitted' });
     const tenderSignal = signal(submittedTender);
 
@@ -48,31 +48,67 @@ describe('TenderAppealSectionComponent', () => {
     expect((comp as any).isRejected()).toBe(false);
     expect((comp as any).canAppeal(submittedTender)).toBe(false);
 
-    // 2. Rejected tender without appeal: isRejected is true, canAppeal is true
+    // 2. Rejected tender within 7-day window: eligible for appeal, canAppeal is true
     const rejectedTender = makeTender({
       submittedStatus: 'Rejected',
+      decisionDate: '22-Nov-2026',
+      appealDeadline: '29-Nov-2026',
       rejectionReason: 'Technical qualification criteria not met.'
     });
     tenderSignal.set(rejectedTender);
     expect((comp as any).isRejected()).toBe(true);
     expect((comp as any).canAppeal(rejectedTender)).toBe(true);
+    expect((comp as any).appealDueDate()).toBe('29-Nov-2026');
 
-    // 3. Rejected tender with appeal and documents
+    // 3. Approved tender within 7-day window: eligible for appeal, canAppeal is true
+    const approvedTender = makeTender({
+      submittedStatus: 'Approved',
+      decisionDate: '21-Nov-2026',
+      appealDeadline: '28-Nov-2026',
+      scrutinyRemarks: 'Proposal approved by scrutiny committee.'
+    });
+    tenderSignal.set(approvedTender);
+    expect((comp as any).isRejected()).toBe(true);
+    expect((comp as any).canAppeal(approvedTender)).toBe(true);
+    expect((comp as any).appealDueDate()).toBe('28-Nov-2026');
+
+    // 4. Tender with expired 7-day window: canAppeal is false (button disappears after 7 days)
+    const expiredTender = makeTender({
+      submittedStatus: 'Approved',
+      decisionDate: '10-Nov-2026',
+      appealDeadline: '17-Nov-2026'
+    });
+    tenderSignal.set(expiredTender);
+    expect((comp as any).isRejected()).toBe(true);
+    expect((comp as any).canAppeal(expiredTender)).toBe(false);
+
+    // 5. Rejected tender with appeal already submitted: canAppeal is false (single appeal constraint)
     const appealedTender = makeTender({
       submittedStatus: 'Rejected',
       rejectionReason: 'Missing CA UDIN.',
       appeal: {
         submittedOn: '10-Oct-2026',
-        reply: 'UDIN certificate is attached.',
-        files: [{ fileName: 'udin.pdf', fileSize: '1 MB' }],
+        reply: 'UDIN certificate is verified.',
         status: 'Accepted',
-        deptRemarks: 'Appeal approved after reviewing UDIN certificate.',
-        responseDeadline: '19-Oct-2026'
+        deptRemarks: 'Appeal approved after reviewing UDIN.'
       }
     });
     tenderSignal.set(appealedTender);
     expect((comp as any).isRejected()).toBe(true);
     expect((comp as any).canAppeal(appealedTender)).toBe(false);
-    expect((comp as any).appealDueDate()).toBe('19-Oct-2026');
+
+    // 6. Approved tender with appeal already submitted: canAppeal is false
+    const approvedAppealedTender = makeTender({
+      submittedStatus: 'Approved',
+      scrutinyRemarks: 'Proposal approved.',
+      appeal: {
+        submittedOn: '11-Oct-2026',
+        reply: 'Requesting target revision from 100 to 200.',
+        status: 'Pending'
+      }
+    });
+    tenderSignal.set(approvedAppealedTender);
+    expect((comp as any).isRejected()).toBe(true);
+    expect((comp as any).canAppeal(approvedAppealedTender)).toBe(false);
   });
 });

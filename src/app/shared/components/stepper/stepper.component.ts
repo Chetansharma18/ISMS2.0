@@ -30,7 +30,10 @@ export interface StepperStep {
       >
         <ol
           class="list-none m-0 p-0 flex items-center justify-between w-full"
-          [ngClass]="hideLabelsOnMobile ? '' : 'min-w-135 sm:min-w-0'"
+          [ngClass]="[
+            hideLabelsOnMobile ? '' : 'min-w-135 sm:min-w-0',
+            steps.length <= 2 ? 'max-w-xl mx-auto' : ''
+          ]"
         >
           @for (step of steps; track step.label; let i = $index; let last = $last) {
             <li class="contents">

@@ -28,7 +28,9 @@ import {
   validateEoiRefNo,
   validateFee,
   validatePublishedDate,
+  validatePublishDetailsStep,
   validateSubmissionDate,
+  validateUploadingDetailsStep,
   validateUploadFile
 } from './tenders-page.util';
 import { EoiFormData, SchemeTender } from '../tenders.models';
@@ -362,6 +364,22 @@ describe('tenders-page.util', () => {
         { sNo: 3, name: 'Registration Certificate (reg_cert.png)', size: '1.2 MB' }
       ]);
     });
+
+    it('supports multiple attached documents in attachments array', () => {
+      const formWithMultiAtt: EoiFormData = {
+        ...form,
+        attachments: [
+          { id: '1', title: 'RFP Guideline', fileName: 'rfp.pdf', size: '2.4 MB', file: {} as File },
+          { id: '2', title: 'Notification Letter', fileName: 'letter.docx', size: '512 KB', file: {} as File },
+          { id: '3', title: 'Schedule of Rates', fileName: 'sor.xlsx', size: '1.1 MB', file: {} as File }
+        ]
+      };
+      const result = buildSchemeFromForm(formWithMultiAtt, null, 123);
+      expect(result.attachedDocs).toHaveLength(3);
+      expect(result.attachedDocs![0]).toEqual({ sNo: 1, name: 'RFP Guideline', size: '2.4 MB' });
+      expect(result.attachedDocs![1]).toEqual({ sNo: 2, name: 'Notification Letter', size: '512 KB' });
+      expect(result.attachedDocs![2]).toEqual({ sNo: 3, name: 'Schedule of Rates', size: '1.1 MB' });
+    });
   });
 
   describe('buildCorrigendumDoc', () => {
@@ -645,6 +663,46 @@ describe('tenders-page.util', () => {
 
       // Empty scheme returns empty array
       expect(parseMasterEntriesByScheme(mockDocs, '', (d) => d.docName)).toEqual([]);
+    });
+
+    // 22. Scheme Category dependency on Scheme
+    it('Scenario 22: requires scheme to be selected and validates scheme-category correlation', () => {
+      const emptySchemeForm = { ...validEoi(), scheme: '', schemeCategory: 'Rajvik' };
+      const res = validateEoiFormComplete(emptySchemeForm, standardOptions);
+      expect(res.errors['scheme']).toBe('Please select a valid scheme.');
+    });
+
+    // 23. Two-Step Form Division: validatePublishDetailsStep & validateUploadingDetailsStep
+    it('Scenario 23: validates Step 1 Publish Details independently from Step 2 Uploading Details', () => {
+      // Step 1 valid, documents empty (allowed during Step 1)
+      const step1OnlyForm = { ...validEoi(), documents: [], annexures: [] };
+      const step1Result = validatePublishDetailsStep(step1OnlyForm, standardOptions);
+      expect(step1Result.isValid).toBe(true);
+      expect(Object.keys(step1Result.errors).length).toBe(0);
+
+      // Step 1 with missing required field (e.g. refNo, scheme, fees)
+      const invalidStep1Form = { ...step1OnlyForm, refNo: '', scheme: '' };
+      const failedStep1 = validatePublishDetailsStep(invalidStep1Form, standardOptions);
+      expect(failedStep1.isValid).toBe(false);
+      expect(failedStep1.errors['refNo']).toBeDefined();
+      expect(failedStep1.errors['scheme']).toBeDefined();
+
+      // Step 2 Uploading Details: validates documents and annexures
+      const validStep2 = validateUploadingDetailsStep({
+        ...validEoi(),
+        documents: ['Doc A', 'Doc B'],
+        annexures: ['Ann 1']
+      });
+      expect(validStep2.isValid).toBe(true);
+
+      // Step 2 with duplicates
+      const duplicateDocsStep2 = validateUploadingDetailsStep({
+        ...validEoi(),
+        documents: ['Doc A', 'Doc A'],
+        annexures: []
+      });
+      expect(duplicateDocsStep2.isValid).toBe(false);
+      expect(duplicateDocsStep2.docErrors[1]).toContain('already been added');
     });
   });
 });

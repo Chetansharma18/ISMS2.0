@@ -262,6 +262,13 @@ export class SchemeFormState {
       if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
       if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
       if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
+      const schName = params['schemeName'] || params['title'] || this.schemeName();
+      if (schName) {
+        const fields = this.schemeReqService.getCustomFieldsForScheme(schName);
+        if (fields && fields.length > 0) {
+          this.schemeCustomFields.set(fields);
+        }
+      }
       if (params['refNo'] && !this.draftRestored) {
         this.draftRestored = true;
         this.restoreDraft(params['refNo']);
@@ -276,7 +283,7 @@ export class SchemeFormState {
       const docs = this.eoiDocuments();
       const refNo = this.schemeRefNo();
       const procFeeDate = this.procFeeDate();
-      if (this.submitted() || step >= this.wizardSteps.length) return;
+      if (this.submitted() || step >= this.wizardSteps().length) return;
       this.draftStore.save({
         refNo,
         schemeName: this.schemeName(),
@@ -365,7 +372,7 @@ export class SchemeFormState {
   saveAndProceedToDocuments(): void {
     this.saveStep2Changes();
     this.isEditingStep2.set(false);
-    this.goToStep(2);
+    this.goToStep(this.hasCustomFields() ? this.stepIndexCustomFields() : this.stepIndexDocuments());
   }
 
   saveAndProceedToStep3(): void {

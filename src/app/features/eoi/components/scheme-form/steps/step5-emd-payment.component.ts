@@ -66,7 +66,7 @@ import { SchemeFormState } from '../scheme-form.state';
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(4)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexProcFee())">
           &larr; Back to Processing Fee
         </button>
 

@@ -561,6 +561,10 @@ app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
     box-shadow var(--transition-fast);
 }
 
+select.form-control {
+  transition: none;
+}
+
 .form-control:focus {
   border-color: #AA5E7A;
   box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2);

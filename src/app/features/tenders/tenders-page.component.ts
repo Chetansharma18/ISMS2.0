@@ -355,10 +355,10 @@ export class TendersPageComponent {
   private promptDismissed = false;
 
   readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
-  readonly docMasterItems = signal<DocMasterItem[]>([]);
-  readonly schemeMasterNames = signal<string[]>([]);
-  readonly schemeCategoryNames = signal<string[]>([]);
-  readonly eoiCategoryNames = signal<string[]>([]);
+  readonly docMasterItems = signal<DocMasterItem[]>(INITIAL_DOC_ITEMS);
+  readonly schemeMasterNames = signal<string[]>(['MMKVY', 'Rajvik', 'PMMY', 'Vishwakarma Yuva Udyami Protsahan Yojana']);
+  readonly schemeCategoryNames = signal<string[]>(['Rajvik', 'MMKVY', 'Special Initiatives', 'ALL']);
+  readonly eoiCategoryNames = signal<string[]>(['General', 'Special', 'Empanelment']);
 
   /** Scheme names available in the "Configure New EOI" scheme dropdown (sourced from Scheme Master). */
   readonly schemeNameOptions = computed(() => {
@@ -998,8 +998,9 @@ export class TendersPageComponent {
     });
 
     if (!validation.isValid) {
-      const firstInvalidKey = Object.keys(validation.errors)[0];
-      if (firstInvalidKey) {
+      if (Object.keys(validation.errors).length > 0) {
+        this.fileError.set('Please fill in all mandatory fields marked with * before publishing.');
+        const firstInvalidKey = Object.keys(validation.errors)[0];
         const fieldMap: Record<string, string> = {
           refNo: 'eoiRefNoInput',
           scheme: 'eoiSchemeSelect',
@@ -1018,10 +1019,17 @@ export class TendersPageComponent {
           el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el?.focus();
         }
+      } else if (Object.keys(validation.docErrors).length > 0) {
+        this.fileError.set('Please select a valid document for each required document row.');
+        const docEl = document.querySelector('app-dropdown, .border-dashed');
+        docEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        this.fileError.set('Please complete all mandatory EOI requirements before submitting.');
       }
       return;
     }
 
+    this.fileError.set('');
     this.showConfirmSubmitEoiModal.set(true);
   }
 

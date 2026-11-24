@@ -50,10 +50,19 @@ import { filterAdmins } from './tenders-page.util';
                 {{ s.refNo }}
               </span>
             </div>
-            <p class="text-[11px] text-slate-600 m-0 line-clamp-1">
+            <p
+              class="text-[11px] text-slate-600 m-0 line-clamp-1 hover:line-clamp-none transition-all cursor-default"
+              [title]="s.eoiDescription"
+            >
               {{ s.eoiDescription }}
             </p>
           </div>
+
+          @if (errorMessage()) {
+            <div class="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 font-medium">
+              {{ errorMessage() }}
+            </div>
+          }
 
           <!-- 1. APPROVER DROPDOWN (SINGLE SELECT + SEARCHABLE) -->
           <div class="relative approver-dropdown-container">
@@ -73,6 +82,8 @@ import { filterAdmins } from './tenders-page.util';
                 type="button"
                 (click)="toggleApproverDropdown($event)"
                 class="justify-between text-left"
+                [class.border-red-400]="submitted() && !selectedApprover()"
+              >
               >
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   @if (selectedApprover()) {
@@ -126,7 +137,7 @@ import { filterAdmins } from './tenders-page.util';
                         placeholder="Search approver by name..."
                         [ngModel]="approverSearchQuery()"
                         (ngModelChange)="approverSearchQuery.set($event)"
-                        class="w-full pl-9 pr-8"
+                        class="w-full pl-9 pr-8 focus:outline-none focus:ring-0"
                       />
                       <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
                       @if (approverSearchQuery()) {
@@ -186,6 +197,9 @@ import { filterAdmins } from './tenders-page.util';
                 </div>
               }
             </div>
+            @if (submitted() && !selectedApprover()) {
+              <p class="text-[11px] text-red-500 font-medium mt-1 m-0">Approver is required.</p>
+            }
           </div>
 
           <!-- 2. MEMBERS DROPDOWN (MULTI SELECT + SEARCHABLE) -->
@@ -206,6 +220,7 @@ import { filterAdmins } from './tenders-page.util';
                 type="button"
                 (click)="toggleMemberDropdown($event)"
                 class="justify-between text-left"
+                [class.border-red-400]="submitted() && selectedAdminIds().length === 0"
               >
                 <div class="flex items-center gap-2 min-w-0 pr-2">
                   @if (selectedAdminIds().length === 0) {
@@ -241,7 +256,7 @@ import { filterAdmins } from './tenders-page.util';
                         placeholder="Search members by name..."
                         [ngModel]="memberSearchQuery()"
                         (ngModelChange)="memberSearchQuery.set($event)"
-                        class="w-full pl-9 pr-8"
+                        class="w-full pl-9 pr-8 focus:outline-none focus:ring-0"
                       />
                       <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
                       @if (memberSearchQuery()) {
@@ -294,6 +309,9 @@ import { filterAdmins } from './tenders-page.util';
                 </div>
               }
             </div>
+            @if (submitted() && selectedAdminIds().length === 0) {
+              <p class="text-[11px] text-red-500 font-medium mt-1 m-0">At least one committee member is required.</p>
+            }
           </div>
 
           <!-- 3. ASSIGNED MEMBERS SUMMARY -->
@@ -389,6 +407,15 @@ export class CommitteeAssignmentModalComponent {
     this.scheme()?.committeeMembers ? [...this.scheme()!.committeeMembers!] : []
   );
 
+  readonly submitted = linkedSignal<boolean>(() => {
+    this.scheme();
+    return false;
+  });
+  readonly errorMessage = linkedSignal<string>(() => {
+    this.scheme();
+    return '';
+  });
+
   readonly isApproverDropdownOpen = linkedSignal<boolean>(() => {
     // Closes whenever the scheme changes
     this.scheme();
@@ -445,6 +472,7 @@ export class CommitteeAssignmentModalComponent {
 
   selectApprover(name: string): void {
     this.selectedApprover.set(name);
+    this.errorMessage.set('');
     this.isApproverDropdownOpen.set(false);
     this.approverSearchQuery.set('');
   }
@@ -459,6 +487,7 @@ export class CommitteeAssignmentModalComponent {
   }
 
   toggleMemberSelection(name: string): void {
+    this.errorMessage.set('');
     this.selectedAdminIds.update((current) => {
       if (current.includes(name)) {
         return current.filter((n) => n !== name);
@@ -473,8 +502,22 @@ export class CommitteeAssignmentModalComponent {
   }
 
   onSave(): void {
+    this.submitted.set(true);
+    if (!this.selectedApprover() && this.selectedAdminIds().length === 0) {
+      this.errorMessage.set('Please select an Approver and at least one Committee Member.');
+      return;
+    }
+    if (!this.selectedApprover()) {
+      this.errorMessage.set('Please select an Approver.');
+      return;
+    }
+    if (this.selectedAdminIds().length === 0) {
+      this.errorMessage.set('Please select at least one Committee Member.');
+      return;
+    }
+    this.errorMessage.set('');
     this.save.emit({
-      approver: this.selectedApprover() || undefined,
+      approver: this.selectedApprover(),
       members: this.selectedAdminIds()
     });
   }

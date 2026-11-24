@@ -14,6 +14,9 @@ export interface BreadcrumbItem {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, FormsModule, IconComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   styles: [`
     :host {
       display: block;

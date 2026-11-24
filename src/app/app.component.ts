@@ -96,7 +96,7 @@ import { ConnectivityService } from './core/services/connectivity.service';
       } @else {
         <main 
           class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
-          [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
+          [style.background-color]="isLandingRoute() && !authService.currentUser() ? '#070e18' : '#FFFFFF'"
         >
           <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>

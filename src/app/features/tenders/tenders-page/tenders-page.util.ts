@@ -357,6 +357,11 @@ export function validatePublishedDate(
   if (!isScheduled && pubIso > todayStr) {
     return 'EOI Publication Date cannot be a future date.';
   }
+  const currentYear = parseInt(todayStr.split('-')[0], 10);
+  const pubYear = parseInt(pubIso.split('-')[0], 10);
+  if (pubYear < currentYear) {
+    return 'EOI Publication Date cannot be from a past year.';
+  }
   return '';
 }
 

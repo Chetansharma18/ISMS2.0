@@ -8,7 +8,10 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, PageHeaderComponent, ButtonComponent, IconComponent],
-  host: { class: 'block' },
+  host: {
+    class: 'block',
+    '[attr.title]': 'null'
+  },
   template: `
     <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
     <app-page-header
@@ -23,7 +26,15 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
       (suggestionSelect)="searchChange.emit($event)"
     >
       @if (isSuperAdmin()) {
-        <button appButton size="sm" type="button" (click)="configureEoi.emit()" class="shrink-0">
+        <button
+          appButton
+          size="sm"
+          type="button"
+          (click)="configureEoi.emit()"
+          title="Configure New EOI"
+          aria-label="Configure New EOI"
+          class="shrink-0"
+        >
           <app-icon name="plus" size="sm" />
           <span>Configure New EOI</span>
         </button>

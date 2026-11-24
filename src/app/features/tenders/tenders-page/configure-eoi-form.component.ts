@@ -26,10 +26,17 @@ import {
   host: { class: 'block' },
   template: `
     <div class="w-full space-y-6 font-sans text-[13px]">
+      @if (fileError() || (submitted() && !validation().isValid)) {
+        <div class="p-3.5 rounded-lg border border-red-200 bg-red-50 text-red-700 text-xs font-medium flex items-center gap-2">
+          <app-icon name="warning-triangle" size="sm" class="shrink-0 text-red-600" />
+          <span>{{ fileError() || 'Please fill in all mandatory fields marked with * before publishing.' }}</span>
+        </div>
+      }
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
 
         <!-- Row 1, Col 1: EOI Reference No. * -->
-        <div>
+        <div class="relative pt-0.5">
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiRefNoInput">
             EOI Reference No. <span class="text-[#DC2626] font-bold">*</span>
           </label>
@@ -43,7 +50,7 @@ import {
             (blur)="onRefNoBlur()"
             (ngModelChange)="onFieldChange('refNo')"
             [invalid]="hasError('refNo')"
-            class="w-full"
+            class="w-full focus:ring-1 focus:ring-inset"
           />
           @if (hasError('refNo')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('refNo') }}</p>
@@ -133,6 +140,7 @@ import {
             id="eoiPublishedDateInput"
             appInput
             type="date"
+            [min]="minPublishedDate"
             [max]="todayKolkata"
             [(ngModel)]="data().publishedDate"
             (blur)="onBlur('publishedDate')"
@@ -236,6 +244,8 @@ import {
             placeholder="e.g. ₹50,000"
             [(ngModel)]="data().emdFee"
             (blur)="onFeeBlur('emdFee')"
+            (input)="onFeeInput('emdFee', $event)"
+            (keydown)="filterFeeKey($event)"
             (ngModelChange)="onFieldChange('emdFee')"
             [invalid]="hasError('emdFee')"
             class="w-full"
@@ -258,6 +268,8 @@ import {
             placeholder="e.g. ₹10,000"
             [(ngModel)]="data().processFee"
             (blur)="onFeeBlur('processFee')"
+            (input)="onFeeInput('processFee', $event)"
+            (keydown)="filterFeeKey($event)"
             (ngModelChange)="onFieldChange('processFee')"
             [invalid]="hasError('processFee')"
             class="w-full"
@@ -355,6 +367,9 @@ export class ConfigureEoiFormComponent {
 
   /** Current Indian Standard Time (Asia/Kolkata) date for date boundary constraints. */
   readonly todayKolkata = getTodayKolkataDate();
+
+  /** First day of current year to prevent selecting dates in past years. */
+  readonly minPublishedDate = `${new Date().getFullYear()}-01-01`;
 
   /** Parent-owned form model, edited in place via ngModel. */
   readonly data = input.required<EoiFormData>();
@@ -494,14 +509,37 @@ export class ConfigureEoiFormComponent {
   }
 
   onBlur(field: string): void {
-    this.notifyMutation(field);
+    this.touchedFields.update(t => ({ ...t, [field]: true }));
   }
 
   onRefNoBlur(): void {
     if (this.data()?.refNo) {
       this.data().refNo = this.data().refNo.trim();
     }
-    this.notifyMutation('refNo');
+    this.touchedFields.update(t => ({ ...t, refNo: true }));
+    this.formVersion.update(v => v + 1);
+    this.formChange.emit();
+  }
+
+  filterFeeKey(event: KeyboardEvent): void {
+    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Enter', 'Home', 'End'];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^[0-9,.\u20B9]$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onFeeInput(field: 'emdFee' | 'processFee', event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input) {
+      const sanitized = input.value.replace(/[^0-9,.\u20B9]/g, '');
+      if (sanitized !== input.value) {
+        input.value = sanitized;
+        this.data()[field] = sanitized;
+      }
+    }
   }
 
   onFeeBlur(field: 'emdFee' | 'processFee'): void {
@@ -512,7 +550,9 @@ export class ConfigureEoiFormComponent {
         this.data()[field] = formatInr(num);
       }
     }
-    this.notifyMutation(field);
+    this.touchedFields.update(t => ({ ...t, [field]: true }));
+    this.formVersion.update(v => v + 1);
+    this.formChange.emit();
   }
 
   onFieldChange(field: string): void {

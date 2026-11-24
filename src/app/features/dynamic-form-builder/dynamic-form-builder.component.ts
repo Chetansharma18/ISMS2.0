@@ -665,7 +665,7 @@ interface FormBuilderFormData {
           title="Dynamic Form Builder"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
           [searchable]="true"
-          searchPlaceholder="Search by form name, step title, or field label..."
+          searchPlaceholder="Search by form name, step, or field..."
           [(searchQuery)]="searchQuery"
         >
           <button

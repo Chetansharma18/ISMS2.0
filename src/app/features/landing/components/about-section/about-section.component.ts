@@ -160,7 +160,7 @@ export interface AboutStatCard {
               <img 
                 [src]="card.bgImage" 
                 alt="" 
-                class="absolute inset-0 w-full h-full object-cover object-right pointer-events-none select-none opacity-85 z-0" 
+                class="absolute inset-0 w-full h-full object-cover object-right pointer-events-none select-none opacity-95 z-0" 
                 aria-hidden="true"
               />
 
@@ -180,7 +180,7 @@ export interface AboutStatCard {
                 <span class="text-[13px] sm:text-[13.5px] font-bold leading-none tracking-tight mb-1" [ngClass]="card.textColorClass">
                   {{ card.label }}
                 </span>
-                <span class="text-[26px] sm:text-[28px] lg:text-[30px] font-black leading-tight tracking-tight tabular-nums" [ngClass]="card.textColorClass">
+                <span class="text-[26px] sm:text-[28px] lg:text-[30px] font-black leading-tight tracking-tight tabular-nums text-[#920129]">
                   {{ card.count }}
                 </span>
               </div>
@@ -221,47 +221,47 @@ export class AboutSectionComponent implements AfterViewInit, OnDestroy {
       icon: 'layers',
       bgImage: '/card-bg-schemes.png',
       waveSrc: '/stat-wave-pink.png',
-      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F5E1EB] hover:border-[#D73389]/40 shadow-xs hover:shadow-md',
-      iconBoxClass: 'bg-[#FFF5F8] border border-[#F8D5E3]',
-      iconColorClass: 'text-[#9F1239]',
-      dividerClass: 'bg-[#F3D5E2]',
-      textColorClass: 'text-[#9F1239]'
+      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F3D5E2] hover:border-[#D73389] shadow-xs hover:shadow-md transition-all duration-300',
+      iconBoxClass: 'bg-[#FDF2F7] border border-[#F8D5E3]',
+      iconColorClass: 'text-[#D73389]',
+      dividerClass: 'bg-[#F0CBD8]',
+      textColorClass: 'text-[#D73389]'
     },
     {
       label: 'Courses',
       count: '425',
       icon: 'graduation-cap',
       bgImage: '/card-bg-courses.png',
-      waveSrc: '/stat-wave-blue.png',
-      cardClass: 'bg-white hover:bg-[#FBFDFF] border border-[#E0E7FF] hover:border-[#224599]/40 shadow-xs hover:shadow-md',
-      iconBoxClass: 'bg-[#F0F7FF] border border-[#BFDBFE]',
-      iconColorClass: 'text-[#224599]',
-      dividerClass: 'bg-[#BFDBFE]',
-      textColorClass: 'text-[#224599]'
+      waveSrc: '/stat-wave-pink.png',
+      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F3D5E2] hover:border-[#D73389] shadow-xs hover:shadow-md transition-all duration-300',
+      iconBoxClass: 'bg-[#FDF2F7] border border-[#F8D5E3]',
+      iconColorClass: 'text-[#D73389]',
+      dividerClass: 'bg-[#F0CBD8]',
+      textColorClass: 'text-[#D73389]'
     },
     {
       label: 'Training Partners',
       count: '1,280',
       icon: 'school',
       bgImage: '/card-bg-training-partners.png',
-      waveSrc: '/stat-wave-green.png',
-      cardClass: 'bg-white hover:bg-[#FBFFFD] border border-[#DCFCE7] hover:border-[#05831F]/40 shadow-xs hover:shadow-md',
-      iconBoxClass: 'bg-[#F0FDF4] border border-[#BBF7D0]',
-      iconColorClass: 'text-[#05831F]',
-      dividerClass: 'bg-[#BBF7D0]',
-      textColorClass: 'text-[#05831F]'
+      waveSrc: '/stat-wave-pink.png',
+      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F3D5E2] hover:border-[#D73389] shadow-xs hover:shadow-md transition-all duration-300',
+      iconBoxClass: 'bg-[#FDF2F7] border border-[#F8D5E3]',
+      iconColorClass: 'text-[#D73389]',
+      dividerClass: 'bg-[#F0CBD8]',
+      textColorClass: 'text-[#D73389]'
     },
     {
       label: 'Users',
       count: '25,640',
       icon: 'users',
       bgImage: '/card-bg-users.png',
-      waveSrc: '/stat-wave-purple.png',
-      cardClass: 'bg-white hover:bg-[#FDFBFF] border border-[#EDE9FE] hover:border-[#6B21A8]/40 shadow-xs hover:shadow-md',
-      iconBoxClass: 'bg-[#FAF5FF] border border-[#DDD6FE]',
-      iconColorClass: 'text-[#6B21A8]',
-      dividerClass: 'bg-[#DDD6FE]',
-      textColorClass: 'text-[#6B21A8]'
+      waveSrc: '/stat-wave-pink.png',
+      cardClass: 'bg-white hover:bg-[#FFFDFE] border border-[#F3D5E2] hover:border-[#D73389] shadow-xs hover:shadow-md transition-all duration-300',
+      iconBoxClass: 'bg-[#FDF2F7] border border-[#F8D5E3]',
+      iconColorClass: 'text-[#D73389]',
+      dividerClass: 'bg-[#F0CBD8]',
+      textColorClass: 'text-[#D73389]'
     }
   ];
 

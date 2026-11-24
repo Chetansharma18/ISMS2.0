@@ -146,7 +146,11 @@ export class ShortfallBridgeService {
               status: 'Rejected' as const,
               rejectionReason: remarks
             } : undefined;
-            return this.tenderRepo.update(tender.id, { appeal: updatedAppeal }).pipe(map(() => true));
+            return this.tenderRepo.update(tender.id, {
+              submittedStatus: 'Rejected',
+              rejectionReason: remarks,
+              appeal: updatedAppeal
+            }).pipe(map(() => true));
           })
         );
       })
@@ -179,11 +183,11 @@ export class ShortfallBridgeService {
           id: `ACT-${Date.now()}`,
           timestamp: response.respondedOn,
           action: 'RESUBMITTED',
-          title: 'Applicant Responded to Appeal Response / Shortfall',
+          title: 'Applicant Responded to Department Appeal Request',
           actor: `${application?.authorizedSignatory?.name || 'Applicant'} (Authorized Signatory)`,
           actorRole: 'Applicant / TP',
           description:
-            `Response to the shortfall request raised on ${notice.raisedOn} submitted with ${uploaded.length} document(s).` +
+            `Response to the department appeal request raised on ${notice.raisedOn} submitted with ${uploaded.length} document(s).` +
             (response.remarks ? ` Remarks: "${response.remarks}"` : ''),
           badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
           meta: { documents: uploaded, officeOrderRef: notice.officeOrderRef, remarks: response.remarks }
@@ -193,7 +197,7 @@ export class ShortfallBridgeService {
           id: `DOC-RESUB-${Date.now()}-${i}`,
           title: u.requiredDoc,
           fileSize: u.fileSize || '1.5 MB',
-          category: 'Appeal / Shortfall Uploaded Document',
+          category: 'Appeal Uploaded Document',
           verified: true
         }));
 
@@ -295,7 +299,7 @@ export class ShortfallBridgeService {
             id: `DOC-RESUB-${Date.now()}-${i}`,
             title: u.requiredDoc,
             fileSize: u.fileSize || '1.5 MB',
-            category: 'Appeal / Shortfall Uploaded Document',
+            category: 'Appeal Uploaded Document',
             verified: true
           }));
 

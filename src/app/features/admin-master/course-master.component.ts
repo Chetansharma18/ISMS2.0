@@ -14,29 +14,35 @@ const SECTOR_OPTIONS = [...SKILL_SECTOR_NAMES];
 const COMMON_NORMS_OPTIONS = ['I', 'II', 'III'];
 
 const COLUMNS: TableColumn<CourseMasterItem>[] = [
-  { key: 'sNo', label: 'Sr.No.', type: 'number', align: 'center', width: 'w-14 min-w-[55px]' },
-  { key: 'sector', label: 'Sector', cellClass: 'whitespace-nowrap font-medium text-slate-800 min-w-[140px]' },
-  { key: 'jobRoleName', label: 'QP/Job Role Name', cellClass: 'font-semibold text-slate-800 min-w-[180px]' },
-  { key: 'jobRoleCode', label: 'QP/Job Role Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700 min-w-[120px]' },
-  { key: 'version', label: 'Version', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[70px]' },
-  { key: 'nsqfLevel', label: 'NSQF Level', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[85px]' },
-  { key: 'commonNormsCategory', label: 'Common Norms Category', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[120px]' },
-  { key: 'theoryDurationHours', label: 'Theory Duration (In hours)', align: 'center', type: 'number', cellClass: 'whitespace-nowrap min-w-[110px]' },
-  { key: 'practicalOjtDurationHours', label: 'Practical + Mandatory OJT Duration (In hours)', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[160px]' },
-  { key: 'itSoftSkillTrainingHours', label: 'IT & Soft Skill Training', align: 'center', type: 'number', cellClass: 'whitespace-nowrap min-w-[110px]' },
-  { key: 'totalQpHours', label: 'Total QP Hours', align: 'center', type: 'number', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[100px]' },
-  { key: 'courseValidUpToDate', label: 'Course Valid Up to Date', align: 'center', cellClass: 'whitespace-nowrap text-slate-700 min-w-[130px]' },
+  { key: 'sNo', label: 'Sr.No.', type: 'number', align: 'center', width: 'w-14' },
+  { key: 'jobRoleName', label: 'Course / Job Role Name', cellClass: 'font-semibold text-slate-800' },
+  { key: 'jobRoleCode', label: 'QP Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-600', width: 'w-32' },
+  { key: 'sector', label: 'Sector', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
+  { key: 'nsqfLevel', label: 'NSQF Level', align: 'center', cellClass: 'whitespace-nowrap text-slate-700', width: 'w-24' },
   {
-    key: 'remark',
-    label: 'Remark',
-    cellClass: (value: string) => {
-      const base = 'min-w-[140px] text-xs font-medium whitespace-nowrap';
-      if (value === 'Expired') return `${base} text-rose-600`;
-      if (value === 'New Version' || value === 'New Course') return `${base} text-emerald-600`;
-      if (value === 'Not Valid') return `${base} text-slate-600`;
-      return `${base} text-amber-800`;
-    }
+    key: 'totalQpHours',
+    label: 'Total Hours',
+    align: 'center',
+    type: 'number',
+    cellClass: 'whitespace-nowrap font-semibold text-slate-800',
+    width: 'w-28',
+    format: (val: number) => (val ? `${val} hrs` : '-')
   }
+];
+
+const VIEW_COLUMNS: TableColumn<CourseMasterItem>[] = [
+  { key: 'sector', label: 'Sector' },
+  { key: 'jobRoleName', label: 'QP/Job Role Name' },
+  { key: 'jobRoleCode', label: 'QP/Job Role Code' },
+  { key: 'version', label: 'Version' },
+  { key: 'nsqfLevel', label: 'NSQF Level' },
+  { key: 'commonNormsCategory', label: 'Common Norms Category' },
+  { key: 'theoryDurationHours', label: 'Theory Duration (In hours)' },
+  { key: 'practicalOjtDurationHours', label: 'Practical + Mandatory OJT Duration (In hours)' },
+  { key: 'itSoftSkillTrainingHours', label: 'IT & Soft Skill Training' },
+  { key: 'totalQpHours', label: 'Total QP Hours' },
+  { key: 'courseValidUpToDate', label: 'Course Valid Up to Date' },
+  { key: 'remark', label: 'Remark' }
 ];
 
 const CONFIG: MasterCrudConfig<CourseMasterItem> = {
@@ -47,8 +53,18 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
   searchFields: ['sector', 'jobRoleName', 'jobRoleCode'],
   itemUnit: 'courses',
   columns: COLUMNS,
+  viewColumns: VIEW_COLUMNS,
   hasStatus: true,
   modalWidthClass: 'max-w-[720px]',
+  viewModalWidthClass: 'max-w-[640px]',
+  filters: [
+    {
+      key: 'sector',
+      label: 'Sector',
+      placeholder: 'All Sectors',
+      options: SECTOR_OPTIONS
+    }
+  ],
   fields: [
     { key: 'sector', label: 'Sector', type: 'select', required: true, options: SECTOR_OPTIONS, colSpan: 2 },
     { key: 'jobRoleName', label: 'QP/Job Role Name', type: 'text', required: true, maxLength: 120, placeholder: 'Enter job role name', colSpan: 1 },

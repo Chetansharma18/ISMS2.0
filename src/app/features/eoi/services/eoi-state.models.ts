@@ -140,6 +140,9 @@ export interface ApplicantResponse {
   // Uploaded Checklist Documents (Screenshot 3)
   uploadedDocuments: DossierDocument[];
 
+  /** Custom scheme-specific proposal answers */
+  customFields?: { key: string; label: string; value: any }[];
+
   /** Earlier schemes this organisation was empanelled under, with the results achieved against target. */
   pastEngagements?: PastEngagement[];
 

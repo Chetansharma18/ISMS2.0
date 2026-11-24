@@ -8,6 +8,7 @@ describe('RemarkMasterComponent', () => {
     expect(comp.config.title).toBe('Remark Master');
     expect(comp.config.entityLabel).toBe('Remarks');
     expect(comp.config.dataKey).toBe('REMARK_MASTERS');
+    expect(comp.config.hideViewAction).toBe(true);
 
     const columnKeys = comp.config.columns.map((c) => c.key);
     expect(columnKeys).toContain('sNo');

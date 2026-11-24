@@ -177,8 +177,6 @@ import type { ActivePreviewDocument } from '../scrutiny-desk.util';
               <app-icon name="download" size="sm" />
               <span>Download PDF</span>
             </button>
-
-            <button appButton variant="outline" (click)="close.emit()">Close</button>
           </ng-container>
       </app-modal>
     }

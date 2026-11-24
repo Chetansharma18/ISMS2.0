@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, DocTableDirective, IconComponent, InputDirective } from '../../../../../shared';
+import { ButtonComponent, DocTableDirective, DropdownComponent, IconComponent, InputDirective } from '../../../../../shared';
 import type { SanctionTableRow } from '../eoi-sanction-editor.model';
 
 /**
@@ -10,7 +10,7 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
 @Component({
   selector: 'app-sanction-targets-table',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, DocTableDirective, IconComponent, InputDirective],
+  imports: [FormsModule, ButtonComponent, DocTableDirective, IconComponent, InputDirective, DropdownComponent],
   host: { class: 'block' },
   template: `
     <div class="my-5 font-serif">
@@ -55,36 +55,24 @@ import type { SanctionTableRow } from '../eoi-sanction-editor.model';
                   ></textarea>
                 </td>
                 <td class="border border-slate-900 p-1.5">
-                  <select
-                    appInput
-                    variant="plain"
-                    aria-label="Sanction district"
-                    [(ngModel)]="row.district"
-                    class="w-full cursor-pointer"
-                  >
-                    @if (row.district && !districts().includes(row.district)) {
-                      <option [value]="row.district">{{ row.district }}</option>
-                    }
-                    @for (dist of districts(); track dist) {
-                      <option [value]="dist">{{ dist }}</option>
-                    }
-                  </select>
+                  <app-dropdown
+                    size="sm"
+                    ariaLabel="Sanction district"
+                    [options]="districtOptions(row)"
+                    [(value)]="row.district"
+                    placeholder="Select District"
+                    class="w-full font-sans"
+                  />
                 </td>
                 <td class="border border-slate-900 p-1.5">
-                  <select
-                    appInput
-                    variant="plain"
-                    aria-label="Sanction sector"
-                    [(ngModel)]="row.sector"
-                    class="w-full cursor-pointer"
-                  >
-                    @if (row.sector && !sectors().includes(row.sector)) {
-                      <option [value]="row.sector">{{ row.sector }}</option>
-                    }
-                    @for (sec of sectors(); track sec) {
-                      <option [value]="sec">{{ sec }}</option>
-                    }
-                  </select>
+                  <app-dropdown
+                    size="sm"
+                    ariaLabel="Sanction sector"
+                    [options]="sectorOptions(row)"
+                    [(value)]="row.sector"
+                    placeholder="Select Sector"
+                    class="w-full font-sans"
+                  />
                 </td>
                 <td class="border border-slate-900 p-1.5 text-center">
                   <input
@@ -140,4 +128,20 @@ export class SanctionTargetsTableComponent {
   readonly sectors = input<readonly string[]>([]);
   readonly addRow = output<void>();
   readonly removeRow = output<number>();
+
+  districtOptions(row: SanctionTableRow): string[] {
+    const list = this.districts() as string[];
+    if (row.district && !list.includes(row.district)) {
+      return [row.district, ...list];
+    }
+    return list;
+  }
+
+  sectorOptions(row: SanctionTableRow): string[] {
+    const list = this.sectors() as string[];
+    if (row.sector && !list.includes(row.sector)) {
+      return [row.sector, ...list];
+    }
+    return list;
+  }
 }

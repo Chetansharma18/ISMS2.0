@@ -66,17 +66,32 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           <span class="text-slate-500 text-[11px] ml-1">EOIs</span>
         </ng-template>
 
-        <!-- Custom Action Template: Changed button text to 'View' with guaranteed white text -->
+        <!-- Custom Action Template: Icon-only with tooltips -->
         <ng-template #actionTemplate let-scheme>
           @if (scheme.status === 'Closed') {
-            <a appButton size="sm" [routerLink]="['/admin/responses', scheme.id]">
-              <span>View</span>
+            <a
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              [routerLink]="['/admin/responses', scheme.id]"
+              title="View Submissions"
+              aria-label="View Submissions"
+            >
+              <app-icon name="eye" size="sm" />
             </a>
           } @else {
             <div class="relative group inline-block">
-              <button appButton variant="outline" size="sm" disabled title="Submissions unlock upon Date of closing">
-                <app-icon name="lock" size="xs" [stroke]="2" class="text-slate-400" />
-                <span>View</span>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                disabled
+                title="Submissions unlock upon Date of closing"
+                aria-label="Submissions unlock upon Date of closing"
+              >
+                <app-icon name="lock" size="sm" [stroke]="2" class="text-slate-400" />
               </button>
               <!-- Tooltip positioned right-aligned so it never causes horizontal scrollbar on hover -->
               <div class="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-slate-800 text-white text-[10.5px] rounded px-2.5 py-1 whitespace-nowrap z-30 shadow-md font-normal pointer-events-none">

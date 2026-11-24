@@ -7,6 +7,7 @@ import {
   NSDC_PARTNER_TYPES,
   STATES_MASTER
 } from '../../../../../registration/models/otr-form.model';
+import { SKILL_SECTOR_NAMES } from '../../../../../../core/config/sector.config';
 import { FormInputComponent } from '../../../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../../../shared/components/form-controls/form-textarea/form-textarea.component';
@@ -73,6 +74,33 @@ const NO_DISTRICTS: string[] = [];
                 [options]="natureOfEntitiesList"
                 placeholder="Select nature of entity"
                 [required]="true"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-select>
+            </div>
+
+            <!-- Preferred Sector -->
+            <div>
+              <app-form-select
+                label="Preferred Sector"
+                [value]="state.editableStep1.preferredSector"
+                (valueChange)="state.editableStep1.preferredSector = $event"
+                [options]="sectorOptions"
+                placeholder="Select preferred sector(s)"
+                [multiple]="true"
+                [required]="true"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-select>
+            </div>
+
+            <!-- NSDC Partner -->
+            <div>
+              <app-form-select
+                label="NSDC Partner"
+                [value]="state.editableStep1.nsdcPartner"
+                (valueChange)="state.editableStep1.nsdcPartner = $event"
+                [options]="nsdcPartnersList"
+                placeholder="Select status"
+                [required]="false"
                 [disabled]="!state.isEditingStep2()"
               ></app-form-select>
             </div>
@@ -266,11 +294,11 @@ const NO_DISTRICTS: string[] = [];
             <!-- Organisation Contact No. -->
             <div>
               <app-form-input
-                label="Organisation Contact No."
+                label="Contact Number"
                 type="tel"
                 [value]="state.editableStep1.contactNo"
                 (valueChange)="state.editableStep1.contactNo = $event"
-                placeholder="Enter contact number"
+                placeholder="10-digit mobile number"
                 [required]="true"
                 [maxLength]="15"
                 [disabled]="!state.isEditingStep2()"
@@ -284,34 +312,21 @@ const NO_DISTRICTS: string[] = [];
                 type="email"
                 [value]="state.editableStep1.emailId"
                 (valueChange)="state.editableStep1.emailId = $event"
-                placeholder="Enter email address"
+                placeholder="Enter official email"
                 [required]="true"
                 [disabled]="!state.isEditingStep2()"
               ></app-form-input>
             </div>
 
             <!-- Website -->
-            <div>
+            <div class="col-span-1 md:col-span-2">
               <app-form-input
-                label="Website"
+                label="Website (Optional)"
                 [value]="state.editableStep1.website"
                 (valueChange)="state.editableStep1.website = $event"
-                placeholder="Enter website (https://www.example.com)"
+                placeholder="https://www.example.com"
                 [disabled]="!state.isEditingStep2()"
               ></app-form-input>
-            </div>
-
-            <!-- NSDC Partner -->
-            <div>
-              <app-form-select
-                label="NSDC Partner"
-                [value]="state.editableStep1.nsdcPartner"
-                (valueChange)="state.editableStep1.nsdcPartner = $event"
-                [options]="nsdcPartnersList"
-                placeholder="Select partner type"
-                [required]="false"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-select>
             </div>
           </div>
         </div>
@@ -588,6 +603,7 @@ export class Step2OrganisationComponent {
   protected readonly natureOfEntitiesList = NATURE_OF_ENTITIES;
   protected readonly statesList = STATES_MASTER;
   protected readonly nsdcPartnersList = NSDC_PARTNER_TYPES;
+  protected readonly sectorOptions: string[] = [...SKILL_SECTOR_NAMES];
   protected readonly yesNo: string[] = ['Yes', 'No'];
 
   protected districtsFor(stateName: string): string[] {

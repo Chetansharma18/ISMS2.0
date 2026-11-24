@@ -195,66 +195,69 @@ import { FilterTabsComponent } from '../../../shared';
 
         <!-- Template: Actions -->
         <ng-template #actionsTemplate let-b>
-          <div class="flex items-center justify-center gap-3 py-2 px-1 whitespace-nowrap">
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 py-1 whitespace-nowrap">
             <!-- View Button -->
             <button
               appButton
-              variant="outline"
+              variant="ghost"
               size="sm"
-              class="w-24 shrink-0"
+              iconOnly
               type="button"
               (click)="viewDetails(b)"
               title="View Batch Details"
+              aria-label="View Batch Details"
             >
               <app-icon name="eye" size="sm" />
-              <span>View</span>
             </button>
+
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
             <!-- Register Button: once the batch is approved, until registration closes before the start date or it is full -->
             <button
               appButton
-              variant="primary"
+              variant="ghost"
               size="sm"
-              class="w-28 shrink-0"
+              iconOnly
               type="button"
               [disabled]="!canRegister(b)"
               (click)="selectAndMap(b)"
               [title]="canRegister(b) ? 'Register Aspirant' : registerBlockedReason(b)"
+              aria-label="Register Aspirant"
             >
               <app-icon name="plus" size="sm" />
-              <span>Register</span>
             </button>
 
-            <!-- Upload Study Material once the batch is approved. One fixed slot so the buttons stay in line. -->
-            <div class="w-52 shrink-0">
-              @if (canUpload(b)) {
-                <button
-                  appButton
-                  variant="outline"
-                  size="sm"
-                  block
-                  type="button"
-                  (click)="materialBatchId.set(b.id)"
-                  title="Upload E-Campus study material for this batch"
-                >
-                  <app-icon name="upload" size="sm" />
-                  <span>Upload Study Material</span>
-                </button>
-              }
-            </div>
+            <!-- Upload Study Material once the batch is approved. -->
+            @if (canUpload(b)) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                (click)="materialBatchId.set(b.id)"
+                title="Upload E-Campus study material for this batch"
+                aria-label="Upload Study Material"
+              >
+                <app-icon name="upload" size="sm" />
+              </button>
+            }
 
             <!-- Withdraw Batch: visible when batch is approved -->
             @if (isApproved(b)) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               <button
                 appButton
-                variant="danger"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="openWithdrawModal(b)"
                 title="Withdraw Request"
+                aria-label="Withdraw Request"
               >
-                <app-icon name="ban" size="sm" />
-                <span>Withdraw Request</span>
+                <app-icon name="ban" size="sm" class="text-rose-600" />
               </button>
             }
           </div>
@@ -284,12 +287,12 @@ import { FilterTabsComponent } from '../../../shared';
       [isOpen]="!!batchToWithdraw()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-rose-600"
       title="Withdraw Request"
       primaryLabel="Submit Withdraw Request"
       primaryVariant="danger"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[460px]"
       (primaryAction)="confirmWithdraw()"
       (secondaryAction)="cancelWithdraw()"
@@ -358,7 +361,7 @@ export class BatchListComponent {
     { key: 'time', label: 'Time', type: 'custom', width: 'min-w-[160px]' },
     { key: 'status', label: 'Status', type: 'custom', width: 'min-w-[150px]' },
     { key: 'attender', label: 'Attender User', type: 'custom', width: 'min-w-[190px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[590px]' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-36 min-w-[130px]' }
   ];
 
   /** The approved batch whose Attender User is being assigned. */

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { OtrFormService } from '../../services/otr-form.service';
@@ -103,6 +103,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
               label="First Name"
               [value]="firstName()"
               (valueChange)="onFirstNameChange($event)"
+              (blur)="markTouched('firstName')"
               placeholder="Enter first name"
               [required]="true"
               [maxLength]="50"
@@ -157,8 +158,10 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
             <app-form-input
               label="Mobile Number"
               type="tel"
+              [numericOnly]="true"
               [value]="data().mobileNo"
               (valueChange)="update('mobileNo', $event)"
+              (blur)="markTouched('mobileNo')"
               placeholder="10-digit mobile number"
               [required]="true"
               [maxLength]="10"
@@ -173,6 +176,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
               type="email"
               [value]="data().emailId"
               (valueChange)="update('emailId', $event)"
+              (blur)="markTouched('emailId')"
               placeholder="Enter email address"
               [required]="true"
               [error]="getFieldError('emailId')"
@@ -242,6 +246,7 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
               [type]="currentDocConfig().type"
               [value]="currentDocNumber()"
               (valueChange)="onDocNumberChange($event)"
+              (blur)="markTouched('identityDocNumber')"
               [placeholder]="currentDocConfig().placeholder"
               [required]="true"
               [uppercase]="currentDocConfig().uppercase"
@@ -333,9 +338,14 @@ const DEFAULT_DOC_CONFIG: DocConfig = {
       border-color: #B5CBE0 !important;
     }
 
-    :host ::ng-deep app-form-input > div > div.relative:focus-within {
+    :host ::ng-deep app-form-input > div > div.relative:not(.border-rose-600):focus-within {
       border-color: #477DAF !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
     }
 
     :host ::ng-deep app-form-input input {
@@ -417,6 +427,16 @@ export class Step3AuthPersonComponent {
 
   readonly data = computed(() => this.otrFormService.step3());
   readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(2));
+  readonly touchedFields = signal<Set<string>>(new Set<string>());
+
+  markTouched(field: string): void {
+    this.touchedFields.update(set => {
+      if (set.has(field)) return set;
+      const next = new Set(set);
+      next.add(field);
+      return next;
+    });
+  }
 
   readonly firstName = computed(() => {
     const d = this.data();
@@ -537,31 +557,40 @@ export class Step3AuthPersonComponent {
   }
 
   getFieldError(field: string): string | undefined {
-    if (!this.isSubmitted()) return undefined;
+    const isSubmitted = this.isSubmitted();
+    const isTouched = this.touchedFields().has(field);
     const d = this.data();
-    switch (field) {
-      case 'firstName':
-      case 'name':
-        if (!this.firstName()?.trim() && !d.name?.trim()) return 'Authorized Person First Name is required';
-        return undefined;
-      case 'lastName':
-        return undefined;
-      case 'mobileNo':
-        if (!d.mobileNo?.trim()) return 'Mobile Number is required';
-        if (!REGEX.INDIAN_MOBILE.test(d.mobileNo)) return 'Invalid 10-digit Mobile Number';
-        return undefined;
-      case 'emailId':
-        if (!d.emailId?.trim()) return 'Email Address is required';
-        if (!REGEX.EMAIL.test(d.emailId)) return 'Invalid Email Address format';
-        return undefined;
-      case 'identityDocType':
-        if (!this.selectedDocType()) return 'Identity Document Type is required';
-        return undefined;
-      case 'identityDocNumber': {
-        const type = this.selectedDocType();
-        const num = this.currentDocNumber().trim();
-        if (!type) return 'Identity Document Type is required';
-        if (!num) return `${this.currentDocConfig().label} is required`;
+
+    if (field === 'firstName' || field === 'name') {
+      if ((isSubmitted || isTouched) && !this.firstName()?.trim() && !d.name?.trim()) {
+        return 'Authorized Person First Name is required';
+      }
+      return undefined;
+    }
+
+    if (field === 'mobileNo') {
+      if ((isSubmitted || isTouched) && !d.mobileNo?.trim()) return 'Mobile Number is required';
+      if (d.mobileNo?.trim() && !REGEX.INDIAN_MOBILE.test(d.mobileNo)) return 'Invalid 10-digit Mobile Number';
+      return undefined;
+    }
+
+    if (field === 'emailId') {
+      if ((isSubmitted || isTouched) && !d.emailId?.trim()) return 'Email Address is required';
+      if (d.emailId?.trim() && !REGEX.EMAIL.test(d.emailId)) return 'Invalid Email Address format';
+      return undefined;
+    }
+
+    if (field === 'identityDocType') {
+      if ((isSubmitted || isTouched) && !this.selectedDocType()) return 'Identity Document Type is required';
+      return undefined;
+    }
+
+    if (field === 'identityDocNumber') {
+      const type = this.selectedDocType();
+      const num = this.currentDocNumber().trim();
+      if ((isSubmitted || isTouched) && !type) return 'Identity Document Type is required';
+      if ((isSubmitted || isTouched) && !num) return `${this.currentDocConfig().label} is required`;
+      if (num && type) {
         switch (type) {
           case 'Aadhaar Card':
             if (!REGEX.AADHAAR.test(num)) return 'Invalid 12-digit Aadhaar Number';
@@ -579,8 +608,13 @@ export class Step3AuthPersonComponent {
             if (!REGEX.PASSPORT.test(num.toUpperCase())) return 'Invalid Passport Number format';
             break;
         }
-        return undefined;
       }
+      return undefined;
+    }
+
+    if (!isSubmitted) return undefined;
+
+    switch (field) {
       case 'idProofDoc':
         if (!d.idProofDoc || d.idProofDoc.status !== 'uploaded') {
           return 'Identity Document upload is required';

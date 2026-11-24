@@ -108,9 +108,17 @@ interface ParticipantRow {
       <span class="whitespace-nowrap font-normal text-[13px] tabular-nums" [class]="low(r.percent) ? 'text-red-600' : 'text-emerald-700'">{{ r.percent }}%</span>
     </ng-template>
     <ng-template #sessionActionTpl let-r>
-      <button appButton variant="outline" size="sm" type="button" class="w-24" (click)="openSession(r.date)" title="See who was present on this day">
+      <button
+        appButton
+        variant="ghost"
+        size="sm"
+        iconOnly
+        type="button"
+        (click)="openSession(r.date)"
+        title="See who was present on this day"
+        aria-label="View Session"
+      >
         <app-icon name="eye" size="sm" />
-        <span>View</span>
       </button>
     </ng-template>
     <ng-template #aspirantTpl let-r>
@@ -144,7 +152,6 @@ interface ParticipantRow {
             <app-icon name="download" size="sm" />
             <span>Export CSV</span>
           </button>
-          <button appButton variant="outline" type="button" (click)="openDate.set(null)">Close</button>
         </ng-container>
       </app-modal>
     }

@@ -30,11 +30,11 @@ import { filterAdmins } from './tenders-page.util';
       [isOpen]="isOpen()"
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
-      [showAccentBar]="true"
+      [showAccentBar]="false"
       accentBarClass="bg-primary"
       title="Create Committee"
       primaryLabel="Save Committee"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[560px]"
       (primaryAction)="onSave()"
       (secondaryAction)="close.emit()"
@@ -56,7 +56,7 @@ import { filterAdmins } from './tenders-page.util';
           </div>
 
           <!-- 1. APPROVER DROPDOWN (SINGLE SELECT + SEARCHABLE) -->
-          <div class="relative approver-dropdown-container">
+          <div class="relative approver-dropdown-container" [class.z-30]="isApproverDropdownOpen()">
             <div class="flex items-center justify-between mb-1">
               <label class="block text-slate-700 font-semibold text-xs">
                 Approver *
@@ -114,7 +114,7 @@ import { filterAdmins } from './tenders-page.util';
               @if (isApproverDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col font-sans"
+                  class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-theme rounded-lg shadow-[0_8px_24px_rgba(31,41,51,0.12)] flex flex-col font-sans z-50 animate-in fade-in duration-150"
                 >
                   <!-- Search Bar -->
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
@@ -149,33 +149,39 @@ import { filterAdmins } from './tenders-page.util';
                   <!-- Admins List (Single Selection) -->
                   <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
                     @for (adm of filteredApproverAdmins(); track adm.id) {
-                      <button
-                        appButton
-                        [variant]="selectedApprover() === adm.name ? 'secondary' : 'ghost'"
-                        block
-                        type="button"
+                      <div
+                        role="button"
+                        tabindex="0"
                         (click)="selectApprover(adm.name)"
-                        class="justify-between text-left"
+                        (keydown.enter)="selectApprover(adm.name)"
+                        (keydown.space)="selectApprover(adm.name); $event.preventDefault()"
+                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-xs select-none"
+                        [ngClass]="selectedApprover() === adm.name ? 'bg-[#FAF5F7] text-[#7C0E44]' : 'hover:bg-slate-50 text-slate-800'"
                       >
-                        <div class="flex items-center gap-2.5 min-w-0 text-xs">
-                          <!-- Radio Indicator -->
-                          <div
-                            class="w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors"
-                            [ngClass]="selectedApprover() === adm.name ? 'border-[#7C0E44] bg-[#7C0E44]' : 'border-slate-300 bg-white'"
-                          >
-                            @if (selectedApprover() === adm.name) {
-                              <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
-                            }
-                          </div>
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <!-- Square Box Tick Indicator -->
+                          <input
+                            type="checkbox"
+                            [checked]="selectedApprover() === adm.name"
+                            tabindex="-1"
+                            class="w-4 h-4 rounded text-[#7C0E44] focus:ring-[#AA5E7A] border-slate-300 cursor-pointer accent-[#7C0E44] pointer-events-none"
+                          />
                           <div class="flex flex-col min-w-0">
-                            <span class="font-semibold text-slate-800 truncate">{{ adm.name }}</span>
-                            <span class="text-[10px] text-slate-400 tabular-nums">{{ adm.ssoId }}</span>
+                            <span class="font-semibold truncate" [class.text-[#7C0E44]]="selectedApprover() === adm.name" [class.text-slate-800]="selectedApprover() !== adm.name">
+                              {{ adm.name }}
+                            </span>
+                            <span class="text-[10px] tabular-nums" [class.text-[#AA5E7A]]="selectedApprover() === adm.name" [class.text-slate-400]="selectedApprover() !== adm.name">
+                              {{ adm.ssoId }}
+                            </span>
                           </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 shrink-0 ml-2">
+                        <span
+                          class="px-2 py-0.5 rounded text-[10px] font-medium shrink-0 ml-2 border"
+                          [ngClass]="selectedApprover() === adm.name ? 'bg-[#F2DACE] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-700 border-slate-200'"
+                        >
                           {{ adm.role }}
                         </span>
-                      </button>
+                      </div>
                     }
                     @if (filteredApproverAdmins().length === 0) {
                       <div class="p-4 text-center text-xs text-slate-400 italic">
@@ -189,7 +195,7 @@ import { filterAdmins } from './tenders-page.util';
           </div>
 
           <!-- 2. MEMBERS DROPDOWN (MULTI SELECT + SEARCHABLE) -->
-          <div class="relative member-dropdown-container">
+          <div class="relative member-dropdown-container" [class.z-20]="isMemberDropdownOpen()">
             <div class="flex items-center justify-between mb-1">
               <label class="block text-slate-700 font-semibold text-xs">
                 Members *
@@ -229,7 +235,7 @@ import { filterAdmins } from './tenders-page.util';
               @if (isMemberDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 flex flex-col font-sans"
+                  class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-theme rounded-lg shadow-[0_8px_24px_rgba(31,41,51,0.12)] flex flex-col font-sans z-50 animate-in fade-in duration-150"
                 >
                   <!-- Search Bar -->
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
@@ -265,8 +271,8 @@ import { filterAdmins } from './tenders-page.util';
                   <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
                     @for (adm of filteredMemberAdmins(); track adm.id) {
                       <label
-                        class="flex items-center justify-between px-2.5 py-2 rounded-md hover:bg-[#F8EDF1] cursor-pointer transition-colors text-xs select-none"
-                        [ngClass]="{'bg-[#F8EDF1]': isMemberSelected(adm.name)}"
+                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-xs select-none"
+                        [ngClass]="isMemberSelected(adm.name) ? 'bg-[#FAF5F7] text-[#7C0E44]' : 'hover:bg-slate-50 text-slate-800'"
                       >
                         <div class="flex items-center gap-2.5 min-w-0">
                           <input
@@ -276,11 +282,18 @@ import { filterAdmins } from './tenders-page.util';
                             class="w-4 h-4 rounded text-[#7C0E44] focus:ring-[#AA5E7A] border-slate-300 cursor-pointer accent-[#7C0E44]"
                           />
                           <div class="flex flex-col min-w-0">
-                            <span class="font-semibold text-slate-800 truncate">{{ adm.name }}</span>
-                            <span class="text-[10px] text-slate-400 tabular-nums">{{ adm.ssoId }}</span>
+                            <span class="font-semibold truncate" [class.text-[#7C0E44]]="isMemberSelected(adm.name)" [class.text-slate-800]="!isMemberSelected(adm.name)">
+                              {{ adm.name }}
+                            </span>
+                            <span class="text-[10px] tabular-nums" [class.text-[#AA5E7A]]="isMemberSelected(adm.name)" [class.text-slate-400]="!isMemberSelected(adm.name)">
+                              {{ adm.ssoId }}
+                            </span>
                           </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 shrink-0 ml-2">
+                        <span
+                          class="px-2 py-0.5 rounded text-[10px] font-medium shrink-0 ml-2 border"
+                          [ngClass]="isMemberSelected(adm.name) ? 'bg-[#F2DACE] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-700 border-slate-200'"
+                        >
                           {{ adm.role }}
                         </span>
                       </label>

@@ -21,7 +21,7 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
       [reverseButtons]="true"
       [showAccentBar]="false"
       primaryLabel="Submit"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       maxWidthClass="max-w-[500px]"
       (primaryAction)="submitAttachment()"
       (secondaryAction)="close.emit()"
@@ -33,13 +33,28 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
       <div class="mt-4 font-sans text-[13px] space-y-4">
         <div>
           <label class="block text-slate-700 font-medium mb-1">File Title<span class="text-red-600">*</span></label>
-          <input appInput type="text" maxlength="100" [(ngModel)]="attachmentFormData.title" [invalid]="attachmentSubmitted() && !attachmentFormData.title" class="w-full" />
+          <input
+            appInput
+            type="text"
+            maxlength="100"
+            [(ngModel)]="attachmentFormData.title"
+            [invalid]="attachmentSubmitted() && !attachmentFormData.title.trim()"
+            class="w-full"
+          />
+          @if (attachmentSubmitted() && !attachmentFormData.title.trim()) {
+            <div class="text-xs text-red-500 mt-1">File Title is required.</div>
+          }
         </div>
         <div>
           <label class="block text-slate-700 font-medium mb-1">Upload Document<span class="text-red-600">*</span></label>
-          <input type="file" accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx" (change)="onAttachmentFileSelected($event)" class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-navy cursor-pointer" />
+          <input
+            type="file"
+            accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx"
+            (change)="onAttachmentFileSelected($event)"
+            class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-navy cursor-pointer"
+          />
           @if (attachmentSubmitted() && !attachmentFormData.file) {
-            <div class="text-xs text-red-500 mt-1">Required</div>
+            <div class="text-xs text-red-500 mt-1">Attachment file is required.</div>
           }
         </div>
         @if (attachmentFileError()) {
@@ -99,10 +114,11 @@ export class AttachmentUploadModalComponent {
 
   submitAttachment(): void {
     this.attachmentSubmitted.set(true);
-    if (!this.attachmentFormData.title || !this.attachmentFormData.file) {
+    const title = this.attachmentFormData.title?.trim() || '';
+    if (!title || !this.attachmentFormData.file) {
       return; // Invalid
     }
 
-    this.attachmentAdded.emit(createAttachment(this.attachmentFormData.title, this.attachmentFormData.file));
+    this.attachmentAdded.emit(createAttachment(title, this.attachmentFormData.file));
   }
 }

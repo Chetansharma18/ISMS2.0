@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
 
 export const routes: Routes = [
   {
@@ -88,6 +89,37 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'privacy-policy',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'terms-and-conditions',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'help-support',
+    loadComponent: () =>
+      import('./features/help-support/help-support.component').then(
+        (m) => m.HelpSupportComponent
+      )
+  },
+  {
     path: 'history',
     redirectTo: 'payment-history',
     pathMatch: 'full'
@@ -145,6 +177,17 @@ export const routes: Routes = [
       import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(
         (m) => m.DepartmentEoiViewComponent
       )
+  },
+  {
+    path: 'admin/empanelment-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/empanelment-orders/empanelment-orders.component').then(
+        (m) => m.EmpanelmentOrdersPageComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-orders',
+    redirectTo: 'admin/empanelment-order'
   },
   {
     path: 'admin/sanction-orders',
@@ -338,6 +381,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/admin-master/doc-master.component').then(
         (m) => m.DocMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/annexure',
+    loadComponent: () =>
+      import('./features/admin-master/annexure-master.component').then(
+        (m) => m.AnnexureMasterComponent
       )
   },
   {

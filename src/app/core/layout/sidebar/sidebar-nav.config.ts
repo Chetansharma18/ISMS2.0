@@ -11,6 +11,8 @@ export interface NavItem {
   stroke?: number;
   /** Label in medium weight. */
   bold?: boolean;
+  /** Whether this link points to an external URL (opens in a new tab). */
+  external?: boolean;
 }
 
 /** A link inside a collapsible section. */
@@ -35,6 +37,7 @@ export const ASPIRANT_NAV: NavItem[] = [
 
 export const DEPT_ADMIN_NAV: NavItem[] = [
   { key: 'dept-eoi-view', label: 'EOI Responses', link: '/admin/eoi-view', icon: 'document', bold: true },
+  { key: 'dept-empanelment-order', label: 'Empanelment Order', link: '/admin/empanelment-order', icon: 'clipboard-check', bold: true },
   { key: 'dept-sanction-orders', label: 'Sanction Order', link: '/admin/sanction-orders', icon: 'document', bold: true },
   { key: 'dept-ipa', label: 'In-Principal Approval (IPA)', link: '/admin/ipa', icon: 'shield-check', bold: true },
   { key: 'dept-mou', label: 'MoU Management', link: '/admin/mou', icon: 'document', bold: true },
@@ -90,6 +93,7 @@ export const MASTER_NAV: NavSubItem[] = [
   { label: 'District & Block Master', link: '/admin/master/district-block' },
   { label: 'Designation', link: '/admin/master/designation' },
   { label: 'Doc Master', link: '/admin/master/doc' },
+  { label: 'Annexure Master', link: '/admin/master/annexure' },
   { label: 'Remark Master', link: '/admin/master/remark' },
   { label: 'Grading Master', link: '/admin/master/grading' }
 ];
@@ -100,6 +104,31 @@ export const USER_MANAGEMENT_NAV: NavSubItem[] = [
   { label: 'Role Management', link: '/admin/master/user-role' },
   { label: 'Permission Management', link: '/admin/master/permission' }
 ];
+
+export const EXTERNAL_LEGAL_URL = 'https://livelihoods.rajasthan.gov.in/rsldc/#/home/dptHome';
+
+export const TERMS_AND_CONDITIONS_NAV: NavItem = {
+  key: 'terms-and-conditions',
+  label: 'Terms & Conditions',
+  link: EXTERNAL_LEGAL_URL,
+  icon: 'document',
+  external: true
+};
+
+export const HELP_SUPPORT_NAV: NavItem = {
+  key: 'help-support',
+  label: 'Help & Support',
+  link: '/help-support',
+  icon: 'info-circle'
+};
+
+export const PRIVACY_POLICY_NAV: NavItem = {
+  key: 'privacy-policy',
+  label: 'Privacy Policy',
+  link: EXTERNAL_LEGAL_URL,
+  icon: 'shield-check',
+  external: true
+};
 
 /** Icons of the two collapsible sections. */
 export const MASTER_ICON: IconName = 'list';

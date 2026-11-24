@@ -355,5 +355,49 @@ describe('OtrValidationService - Step 1 Sub-sections', () => {
       expect(errors.some(e => e.includes('Authorization Letter'))).toBe(true);
     });
   });
+
+  describe('Bug 12: Submitted Steps Reset', () => {
+    it('clears submittedSteps when resetSubmittedSteps is called', () => {
+      service.markStepSubmitted(1);
+      service.markStepSubmitted(2);
+      expect(service.submittedSteps().size).toBe(2);
+
+      service.resetSubmittedSteps();
+      expect(service.submittedSteps().size).toBe(0);
+    });
+  });
+
+  describe('Officer In-Charge Validation (Bugs 9-11)', () => {
+    it('validates Officer In-Charge list using validateOfficerInCharge', () => {
+      const emptyErrors = service.validateOfficerInCharge([]);
+      expect(emptyErrors.some(e => e.includes('Officer In-Charge record is strictly required'))).toBe(true);
+
+      const invalidOic = [{
+        id: '1',
+        name: '',
+        designation: '',
+        mobileNo: '123',
+        emailId: 'bad',
+        pan: 'BAD',
+        aadhaarNo: '123',
+        bhamashahNo: '',
+        voterIdNo: '',
+        passportNo: '',
+        appointmentLetterDoc: null,
+        idProofDoc: null
+      }];
+      const errs = service.validateOfficerInCharge(invalidOic);
+      expect(errs.length).toBeGreaterThan(0);
+    });
+
+    it('returns combined validation for all sections in validateAll', () => {
+      const initial = createInitialOtrFormData();
+      const all = service.validateAll(initial);
+      expect(all.step1).toBeDefined();
+      expect(all.step2).toBeDefined();
+      expect(all.step3).toBeDefined();
+      expect(all.step4).toBeDefined();
+    });
+  });
 });
 

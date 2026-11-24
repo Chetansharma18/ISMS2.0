@@ -1,5 +1,5 @@
 // ui-guard-allow: page-frame - the registration wizard has its own stepper layout
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild, OnInit, OnDestroy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -35,7 +35,7 @@ export interface StepMeta {
     IconComponent
   ],
   template: `
-    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#7C0E44] selection:text-white font-sans" >
 
       <!-- ====================================================================
            Main Content Area
@@ -54,7 +54,7 @@ export interface StepMeta {
 
           <!-- Title and Subtitle Row -->
           <div>
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
+            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
               Organization Registration
             </h1>
           </div>
@@ -67,7 +67,11 @@ export interface StepMeta {
             } @else if (activeStep() === 3) {
               Please provide the required details to complete the registration process.
             } @else {
-              Review all the details before submitting your registration.
+              @if (isExistingUser()) {
+                Review all your details.
+              } @else {
+                Review all the details before submitting your registration.
+              }
             }
           </p>
         </div>
@@ -75,7 +79,7 @@ export interface StepMeta {
         <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
         <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5 overflow-x-auto no-scrollbar">
           <div class="flex items-center justify-between w-full min-w-135 sm:min-w-0">
-            @for (step of steps; track step.number; let last = $last) {
+            @for (step of steps(); track step.number; let last = $last) {
               <!-- Step Item Button -->
               <button
                 appButton
@@ -104,7 +108,7 @@ export interface StepMeta {
                 <span
                   class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
                   [class.font-extrabold]="activeStep() === step.number"
-                  [class.text-navy]="activeStep() === step.number"
+                  [class.text-[#7C0E44]]="activeStep() === step.number"
                   [class.text-slate-800]="isStepCompleted(step.number) && activeStep() !== step.number"
                   [class.font-semibold]="activeStep() !== step.number"
                   [class.text-slate-600]="!isStepCompleted(step.number) && activeStep() !== step.number"
@@ -117,7 +121,7 @@ export interface StepMeta {
               @if (!last) {
                 <div
                   class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
-                  [class.bg-navy]="isStepCompleted(step.number)"
+                  [class.bg-[#7C0E44]]="isStepCompleted(step.number)"
                   [class.bg-slate-200]="!isStepCompleted(step.number)"
                 ></div>
               }
@@ -133,7 +137,7 @@ export interface StepMeta {
             <!-- Step 1 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Organisation Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -152,7 +156,7 @@ export interface StepMeta {
             <!-- Step 2 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Authorized Person Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -171,7 +175,7 @@ export interface StepMeta {
             <!-- Step 3 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
                   Organisation Bank Details
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
@@ -190,8 +194,8 @@ export interface StepMeta {
             <!-- Step 4 Card Header -->
             <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
               <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  Review &amp; Submit
+                <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">
+                  {{ isExistingUser() ? 'Preview' : 'Review & Submit' }}
                 </h2>
                 <p class="text-xs text-slate-500 m-0 mt-0.5">
                   Step 4 of the application
@@ -253,12 +257,12 @@ export interface StepMeta {
                   <span>Download PDF</span>
                 </button>
 
-                @if (isAlreadySubmitted()) {
+                @if (isExistingUser()) {
                   <button appButton size="lg" type="button" (click)="backToProfile()">
                     <span>Back to Profile</span>
                   </button>
                 } @else {
-                  <button appButton size="lg" type="button" (click)="submitApplication()">
+                  <button appButton size="lg" type="button" [disabled]="!canSubmit()" (click)="submitApplication()">
                     <span>Register</span>
                   </button>
                 }
@@ -340,7 +344,7 @@ export interface StepMeta {
     </div>
   `
 })
-export class RegistrationShellComponent {
+export class RegistrationShellComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
@@ -358,21 +362,37 @@ export class RegistrationShellComponent {
     return data.status === 'Submitted' || this.submittedRegId() !== null;
   });
 
+  readonly isExistingUser = computed(() => {
+    return this.authService.currentUser()?.role === 'existing_user' || this.isAlreadySubmitted();
+  });
+
+  readonly steps = computed<StepMeta[]>(() => [
+    { number: 1, label: 'Organisation Details' },
+    { number: 2, label: 'Authorized Person' },
+    { number: 3, label: 'Organisation Bank Details' },
+    { number: 4, label: this.isExistingUser() ? 'Preview' : 'Preview & Submit' }
+  ]);
+
   constructor() {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const step = parseInt(params['step'], 10);
       if (step >= 1 && step <= 4) {
-        this.activeStep.set(step);
+        if (step === 1) {
+          this.activeStep.set(1);
+        } else {
+          this.goToStep(step);
+        }
       }
     });
   }
 
-  readonly steps: StepMeta[] = [
-    { number: 1, label: 'Organisation Details' },
-    { number: 2, label: 'Authorized Person' },
-    { number: 3, label: 'Organisation Bank Details' },
-    { number: 4, label: 'Preview & Submit' }
-  ];
+  ngOnInit(): void {
+    this.validationService.resetSubmittedSteps();
+  }
+
+  ngOnDestroy(): void {
+    this.validationService.resetSubmittedSteps();
+  }
 
   isStepCompleted(stepNumber: number): boolean {
     const data = this.otrFormService.formData();
@@ -402,18 +422,53 @@ export class RegistrationShellComponent {
 
   goToStep(stepNumber: number): void {
     if (stepNumber < 1 || stepNumber > 4) return;
+    const current = this.activeStep();
+
+    // Allow backward navigation at any time
+    if (stepNumber <= current) {
+      this.activeStep.set(stepNumber);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // Forward navigation: validate all preceding steps
+    const data = this.otrFormService.formData();
+    for (let s = 1; s < stepNumber; s++) {
+      if (!this.validationService.isStepValid(s, data)) {
+        this.validationService.markStepSubmitted(s);
+        const stepName = s === 1 ? 'Organisation Details' : s === 2 ? 'Authorized Person Details' : 'Bank Details';
+        this.validationService.showToast(`Please complete mandatory fields in ${stepName} before proceeding.`, 'error', s);
+        return;
+      }
+    }
+
     this.activeStep.set(stepNumber);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   nextStep(): void {
     const current = this.activeStep();
+    const data = this.otrFormService.formData();
 
     if (current === 1) {
       this.validationService.markStepSubmitted(1);
-      const errors = this.validationService.validateStep1(this.otrFormService.step1());
+      const errors = this.validationService.validateStep1(data.step1);
       if (errors.length > 0) {
         this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Details', 'error', 1);
+        return;
+      }
+    } else if (current === 2) {
+      this.validationService.markStepSubmitted(2);
+      const errors = this.validationService.validateStep3(data.step3);
+      if (errors.length > 0) {
+        this.validationService.showToast('Please fill all mandatory fields marked with * in Authorized Person Details', 'error', 2);
+        return;
+      }
+    } else if (current === 3) {
+      this.validationService.markStepSubmitted(3);
+      const errors = this.validationService.validateStep4(data.step4);
+      if (errors.length > 0) {
+        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Bank Details', 'error', 3);
         return;
       }
     }
@@ -444,8 +499,9 @@ export class RegistrationShellComponent {
       this.validationService.markStepSubmitted(s);
       const errors = this.validationService.getStepErrors(s, data);
       if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', s);
-        this.goToStep(s);
+        this.validationService.showToast(errors[0] || 'Please fill all mandatory fields marked with *', 'error', s);
+        this.activeStep.set(s);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
@@ -480,18 +536,26 @@ export class RegistrationShellComponent {
   }
 
   goBack(): void {
+    this.validationService.resetSubmittedSteps();
     if (this.activeStep() > 1) {
       this.previousStep();
     } else {
-      this.router.navigate(['/profile']);
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      if (returnUrl) {
+        void this.router.navigateByUrl(returnUrl);
+      } else {
+        void this.router.navigate(['/profile']);
+      }
     }
   }
 
   backToProfile(): void {
+    this.validationService.resetSubmittedSteps();
     this.router.navigate(['/profile']);
   }
 
   navigateToExistingUserProfile(): void {
+    this.validationService.resetSubmittedSteps();
     const data = this.otrFormService.formData();
     const orgName = data.step1.fullName?.trim() || data.step1.shortName?.trim() || 'Approved Citizen (TP)';
 
@@ -512,6 +576,7 @@ export class RegistrationShellComponent {
   }
 
   navigateToHome(): void {
+    this.validationService.resetSubmittedSteps();
     this.submittedRegId.set(null);
     this.router.navigate(['/']);
   }

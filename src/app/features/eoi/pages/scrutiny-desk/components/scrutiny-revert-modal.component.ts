@@ -119,16 +119,13 @@ const COMMENT_PRESETS = [
             <label class="block text-xs font-semibold text-slate-800" for="revert-days">
               Response Time <span class="text-rose-600">*</span>
             </label>
-            <select
-              appInput
-              id="revert-days"
-              (change)="dueDays.set(+$any($event.target).value)"
-              class="w-full cursor-pointer"
-            >
-              @for (days of dayOptions; track days) {
-                <option [value]="days" [selected]="days === dueDays()">{{ days }} days</option>
-              }
-            </select>
+            <app-dropdown
+              inputId="revert-days"
+              [options]="dayDropdownOptions"
+              [value]="dueDays().toString()"
+              (valueChange)="dueDays.set(+$event)"
+              placeholder="Select response time"
+            />
           </div>
 
           <!-- Comment -->
@@ -158,7 +155,6 @@ const COMMENT_PRESETS = [
         </div>
 
         <ng-container modalFooter>
-          <button appButton variant="outline" (click)="close.emit()">Cancel</button>
           <button appButton (click)="submit()" [disabled]="!isValid()">{{ submitLabel() }}</button>
         </ng-container>
     </app-modal>
@@ -175,12 +171,16 @@ export class ScrutinyRevertModalComponent {
   readonly confirmed = output<RevertSubmission>();
   readonly close = output<void>();
 
-  readonly modalTitle = computed(() => (this.isAppeal() ? 'Accept Appeal' : 'Raise Shortfall'));
-  readonly submitLabel = computed(() => (this.isAppeal() ? 'Accept' : 'Raise Shortfall'));
-  readonly docLabel = computed(() => (this.isAppeal() ? 'Appeal Documents' : 'Shortfall Documents'));
+  readonly modalTitle = computed(() => (this.isAppeal() ? 'Accept Appeal' : 'Request Appeal Clarification'));
+  readonly submitLabel = computed(() => (this.isAppeal() ? 'Accept' : 'Send Clarification Request'));
+  readonly docLabel = computed(() => (this.isAppeal() ? 'Appeal Documents' : 'Requested Documents'));
 
   protected readonly other = OTHER;
   protected readonly dayOptions = RESPONSE_DAY_OPTIONS;
+  protected readonly dayDropdownOptions = RESPONSE_DAY_OPTIONS.map(days => ({
+    value: days.toString(),
+    label: `${days} days`
+  }));
   protected readonly commentPresets = COMMENT_PRESETS;
 
   protected readonly documents = signal<string[]>([]);

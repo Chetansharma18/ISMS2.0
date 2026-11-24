@@ -23,6 +23,7 @@ const CONFIG: MasterCrudConfig<EoiCategoryItem> = {
   itemUnit: 'categories',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[500px]',
   fields: [
     { key: 'categoryTitle', label: 'EOI Category Title', type: 'text', required: true, maxLength: 100, placeholder: 'Enter category title', colSpan: 3 },

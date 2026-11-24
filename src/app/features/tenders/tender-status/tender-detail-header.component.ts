@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { NgClass } from '@angular/common';
 import { ButtonComponent, IconComponent } from '../../../shared';
 import { SubmittedTender } from '../../../core/models/tender.model';
-import { canEditTender } from './tender-status.util';
+import { canEditTender, remainingEdits } from './tender-status.util';
 
 /** Top of the application detail page: back button, title, actions and the application summary. */
 @Component({
@@ -31,17 +31,15 @@ import { canEditTender } from './tender-status.util';
             <button appButton size="sm" type="button" (click)="save.emit()">
               <span>Save Changes</span>
             </button>
-          } @else {
-            <button appButton variant="outline" size="sm" type="button" (click)="print.emit()" title="Print Application">
-              <app-icon name="print-simple" [stroke]="2" class="text-slate-600" />
-              <span>Print</span>
+          } @else if (canEdit(tender())) {
+            <span class="text-xs text-slate-500 font-medium whitespace-nowrap self-center">
+              ({{ remainingEdits(tender()) }} {{ remainingEdits(tender()) === 1 ? 'edit' : 'edits' }} remaining)
+            </span>
+            <button appButton size="sm" type="button" (click)="edit.emit()">
+              <span>Edit Application</span>
             </button>
-
-            @if (canEdit(tender())) {
-              <button appButton size="sm" type="button" (click)="edit.emit()">
-                <span>Edit Application</span>
-              </button>
-            } @else if (tender().editCount >= 3) {
+          } @else if (tender().submittedStatus === 'Submitted') {
+            @if (tender().editCount >= (tender().maxEdits || 3)) {
               <span class="inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold select-none">
                 All 3 edits used
               </span>
@@ -108,7 +106,7 @@ export class TenderDetailHeaderComponent {
   readonly edit = output<void>();
   readonly save = output<void>();
   readonly cancel = output<void>();
-  readonly print = output<void>();
 
   protected readonly canEdit = canEditTender;
+  protected readonly remainingEdits = remainingEdits;
 }

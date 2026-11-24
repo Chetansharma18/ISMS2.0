@@ -82,7 +82,6 @@ const CHECKS: { key: 'physicalExistenceVerified' | 'signboardVerified' | 'classr
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" type="button" (click)="close.emit()">Cancel</button>
         <button appButton type="button" (click)="submit()">Submit Inspection</button>
       </ng-container>
     </app-modal>

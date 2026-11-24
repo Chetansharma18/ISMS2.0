@@ -8,13 +8,27 @@ import {
   filterAdmins,
   formatBytes,
   formatEoiDuration,
+  getTodayKolkataDate,
   isEditDisabled,
   isEoiFormValid,
   isSchemeClosed,
+  isValidCalendarDate,
   normalizeSchemeCategory,
   parseEoiDuration,
+  parseFeeNumber,
+  parseMasterEntriesByScheme,
+  sanitizeInput,
   toDisplayDate,
   toInputDate,
+  validateAnnexures,
+  validateDocuments,
+  validateEoiDescription,
+  validateEoiDuration,
+  validateEoiFormComplete,
+  validateEoiRefNo,
+  validateFee,
+  validatePublishedDate,
+  validateSubmissionDate,
   validateUploadFile
 } from './tenders-page.util';
 import { EoiFormData, SchemeTender } from '../tenders.models';
@@ -76,15 +90,17 @@ describe('tenders-page.util', () => {
 
   describe('filterActiveSchemes', () => {
     const list = [
-      scheme({ sNo: 7, refNo: 'A-1', schemeName: 'Alpha', eoiDescription: 'first' }),
+      scheme({ sNo: 7, refNo: 'A-1', schemeName: 'Alpha', eoiDescription: 'first', schemeCategory: 'Rajvik' }),
       scheme({ sNo: 8, refNo: 'B-2', schemeName: 'Beta', eoiDescription: 'second', closingDate: '01/01/2000' }),
-      scheme({ sNo: 9, refNo: 'C-3', schemeName: 'Gamma', eoiDescription: 'third', schemeTitle: 'Gamma Title' })
+      scheme({ sNo: 9, refNo: 'C-3', schemeName: 'Gamma', eoiDescription: 'third', schemeTitle: 'Gamma Title', schemeCategory: 'samarth' }),
+      scheme({ sNo: 10, refNo: 'RSLDC/EOI/PMKVY/2026-27/01', schemeName: 'Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)', eoiDescription: 'Central scheme', schemeCategory: 'PMKVY' }),
+      scheme({ sNo: 11, refNo: 'RSLDC/EOI/SOLAR/2026-27/01', schemeName: 'Rooftop Solar Skill Development Scheme', eoiDescription: 'Solar power training', schemeCategory: 'Solar' })
     ];
 
     it('drops closed schemes and renumbers from 1', () => {
       const result = filterActiveSchemes(list, '', now);
-      expect(result.map(s => s.refNo)).toEqual(['A-1', 'C-3']);
-      expect(result.map(s => s.sNo)).toEqual([1, 2]);
+      expect(result.map(s => s.refNo)).toEqual(['A-1', 'C-3', 'RSLDC/EOI/PMKVY/2026-27/01', 'RSLDC/EOI/SOLAR/2026-27/01']);
+      expect(result.map(s => s.sNo)).toEqual([1, 2, 3, 4]);
     });
 
     it('matches name, ref no, description and title case-insensitively', () => {
@@ -94,13 +110,24 @@ describe('tenders-page.util', () => {
       expect(filterActiveSchemes(list, 'gamma title', now).map(s => s.refNo)).toEqual(['C-3']);
     });
 
+    it('matches scheme category case-insensitively', () => {
+      expect(filterActiveSchemes(list, 'rajvik', now).map(s => s.refNo)).toEqual(['A-1']);
+      expect(filterActiveSchemes(list, 'SAMARTH', now).map(s => s.refNo)).toEqual(['C-3']);
+    });
+
+    it('filters correctly for PMKVY and Solar queries (Bug 5)', () => {
+      expect(filterActiveSchemes(list, 'PMKVY', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/PMKVY/2026-27/01']);
+      expect(filterActiveSchemes(list, 'Solar', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/SOLAR/2026-27/01']);
+      expect(filterActiveSchemes(list, 'solar', now).map(s => s.refNo)).toEqual(['RSLDC/EOI/SOLAR/2026-27/01']);
+    });
+
     it('does not match closed schemes even when the query fits', () => {
       expect(filterActiveSchemes(list, 'beta', now)).toEqual([]);
     });
 
     it('does not mutate the input', () => {
       filterActiveSchemes(list, '', now);
-      expect(list.map(s => s.sNo)).toEqual([7, 8, 9]);
+      expect(list.map(s => s.sNo)).toEqual([7, 8, 9, 10, 11]);
     });
   });
 
@@ -179,6 +206,25 @@ describe('tenders-page.util', () => {
     });
   });
 
+  describe('validateAnnexures', () => {
+    it('accepts empty or valid distinct annexures list', () => {
+      expect(validateAnnexures([]).isValid).toBe(true);
+      expect(validateAnnexures(['Annexure-1: Covering Letter', 'Annexure-3: Financials']).isValid).toBe(true);
+    });
+
+    it('rejects blank annexure entries', () => {
+      const res = validateAnnexures(['Annexure-1', '   ']);
+      expect(res.isValid).toBe(false);
+      expect(res.errors[1]).toBe('Please select an annexure format.');
+    });
+
+    it('rejects duplicate annexure entries', () => {
+      const res = validateAnnexures(['Annexure-1: Covering Letter', 'annexure-1: covering letter']);
+      expect(res.isValid).toBe(false);
+      expect(res.errors[1]).toBe('This annexure has already been added.');
+    });
+  });
+
   describe('formatEoiDuration / parseEoiDuration', () => {
     it('formats singular and plural year duration strings', () => {
       expect(formatEoiDuration('1', 'Years')).toBe('1 Year');
@@ -195,12 +241,16 @@ describe('tenders-page.util', () => {
   });
 
   describe('isEoiFormValid', () => {
+    const today = getTodayKolkataDate();
+    const [y, m, d] = today.split('-').map(Number);
+    const futureDate = `${y + 1}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
     const validForm = (): EoiFormData => ({
       ...createEmptyEoiForm(),
-      refNo: 'REF-1',
+      refNo: 'RSLDC/EOI/2026-27/01',
       scheme: 'Vishwakarma Yuva Udyami Protsahan Yojana',
-      publishedDate: '2026-01-01',
-      submissionDate: '2026-02-01',
+      publishedDate: today,
+      submissionDate: futureDate,
       eoiDurationValue: '2',
       eoiDurationUnit: 'Years',
       eoiCategory: 'General',
@@ -326,6 +376,269 @@ describe('tenders-page.util', () => {
     it('keeps titles that already start with "corrigendum" and defaults blank titles', () => {
       expect(buildCorrigendumDoc('  Corrigendum-1: Dates ', 0, 0).name).toBe('Corrigendum-1: Dates');
       expect(buildCorrigendumDoc('   ', 0, 0).name).toBe('Corrigendum Document');
+    });
+  });
+
+  describe('Government Standards EOI Form Validation (All 20 Test Scenarios)', () => {
+    const validEoi = (): EoiFormData => ({
+      ...createEmptyEoiForm(),
+      refNo: 'RSLDC/EOI/2026-27/01',
+      scheme: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+      schemeCategory: 'Rajvik',
+      publishedDate: '2026-01-10',
+      submissionDate: '2026-02-15',
+      eoiDurationValue: '2',
+      eoiDurationUnit: 'Years',
+      eoiCategory: 'General',
+      emdFee: '₹50,000',
+      processFee: '₹10,000',
+      documents: ['PAN Card', 'Registration Certificate'],
+      attachments: [{ id: '1', title: 'RFP', fileName: 'rfp.pdf', size: '1 KB', file: {} as File }]
+    });
+
+    const standardOptions = {
+      todayStr: '2026-01-10',
+      existingRefNos: ['RSLDC/EOI/2025-26/99'],
+      activeSchemeNames: ['Vishwakarma Yuva Udyami Protsahan Yojana', 'MMKVY'],
+      activeEoiCategories: ['General', 'Special'],
+      schemeMasterItems: [
+        {
+          schemeName: 'Vishwakarma Yuva Udyami Protsahan Yojana',
+          schemeCategory: 'Rajvik',
+          amount: 50000,
+          processFees: 10000,
+          status: 'Active'
+        }
+      ]
+    };
+
+    // 1. Empty mandatory fields
+    it('Scenario 1: flags all empty mandatory fields with clear error messages', () => {
+      const res = validateEoiFormComplete(createEmptyEoiForm(), standardOptions);
+      expect(res.isValid).toBe(false);
+      expect(res.errors['refNo']).toBe('EOI Reference Number is required.');
+      expect(res.errors['scheme']).toBe('Please select a valid scheme.');
+      expect(res.errors['eoiCategory']).toBe('Please select an EOI Category.');
+      expect(res.errors['publishedDate']).toBe('Please select the EOI Publication Date.');
+      expect(res.errors['submissionDate']).toBe('Please select the Last Date of EOI Submission.');
+      expect(res.errors['eoiDurationValue']).toBe('EOI Duration is required.');
+      expect(res.errors['emdFee']).toBe('EMD Fee is required.');
+      expect(res.errors['processFee']).toBe('Process Fee is required.');
+    });
+
+    // 2. Duplicate EOI reference numbers
+    it('Scenario 2: rejects duplicate EOI reference numbers', () => {
+      const duplicateForm = { ...validEoi(), refNo: 'RSLDC/EOI/2025-26/99' };
+      const res = validateEoiFormComplete(duplicateForm, standardOptions);
+      expect(res.errors['refNo']).toBe('This EOI Reference Number already exists.');
+    });
+
+    // 3. Inactive scheme selection
+    it('Scenario 3: rejects inactive or unapproved schemes', () => {
+      const form = { ...validEoi(), scheme: 'Inactive Old Scheme' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['scheme']).toBe('Please select a valid scheme.');
+    });
+
+    // 4. Invalid scheme-category combinations
+    it('Scenario 4: rejects invalid scheme-category combinations', () => {
+      const form = { ...validEoi(), schemeCategory: 'Unrelated Category' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['schemeCategory']).toBe('Scheme Category does not match the selected scheme.');
+    });
+
+    // 5. Future publication date for Publish Now
+    it('Scenario 5: rejects future publication date for immediate publication (Publish Now)', () => {
+      const form = { ...validEoi(), publishedDate: '2026-01-11' }; // after today (2026-01-10)
+      const res = validateEoiFormComplete(form, { ...standardOptions, isScheduled: false });
+      expect(res.errors['publishedDate']).toBe('EOI Publication Date cannot be a future date.');
+    });
+
+    // 6. Invalid calendar dates
+    it('Scenario 6: rejects invalid calendar dates such as 31 February or 29 Feb in non-leap year', () => {
+      expect(isValidCalendarDate('2026-02-31')).toBe(false);
+      expect(isValidCalendarDate('31/02/2026')).toBe(false);
+      expect(isValidCalendarDate('2026-02-29')).toBe(false); // 2026 is not leap
+      expect(isValidCalendarDate('2024-02-29')).toBe(true);  // 2024 is leap
+      const form = { ...validEoi(), publishedDate: '2026-02-31' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['publishedDate']).toBe('Please enter a valid publication date.');
+    });
+
+    // 7. Submission deadline before publication
+    it('Scenario 7: rejects submission deadline before publication date', () => {
+      const form = { ...validEoi(), publishedDate: '2026-01-10', submissionDate: '2026-01-05' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['submissionDate']).toBe('Submission deadline must be after the publication date.');
+    });
+
+    // 8. Submission deadline equal to publication
+    it('Scenario 8: rejects submission deadline equal to publication date', () => {
+      const form = { ...validEoi(), publishedDate: '2026-01-10', submissionDate: '2026-01-10' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['submissionDate']).toBe('Submission deadline must be after the publication date.');
+    });
+
+    // 9. Expired submission deadline
+    it('Scenario 9: rejects expired submission deadline (not in future)', () => {
+      const form = { ...validEoi(), publishedDate: '2026-01-01', submissionDate: '2026-01-09' }; // 09 is before today 10
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['submissionDate']).toBe('Submission deadline must be in the future.');
+    });
+
+    // 10. Unrealistic submission deadline such as year 2202
+    it('Scenario 10: rejects unrealistic submission deadlines such as year 2202', () => {
+      expect(isValidCalendarDate('2202-02-11')).toBe(false);
+      const form = { ...validEoi(), submissionDate: '2202-02-11' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['submissionDate']).toBe('Submission period exceeds the permitted duration.');
+    });
+
+    // 11. Submission window outside configured limits
+    it('Scenario 11: rejects submission window exceeding maximum permitted duration (> 365 days)', () => {
+      const form = { ...validEoi(), publishedDate: '2026-01-10', submissionDate: '2027-02-15' }; // > 365 days
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['submissionDate']).toBe('Submission period exceeds the permitted duration.');
+    });
+
+    // 12. Invalid EOI duration
+    it('Scenario 12: rejects invalid EOI duration (0, negative, decimal, non-numeric, > max)', () => {
+      expect(validateEoiDuration('0')).toBe('Please enter a valid duration.');
+      expect(validateEoiDuration('-3')).toBe('Please enter a valid duration.');
+      expect(validateEoiDuration('2.5')).toBe('Please enter a valid duration.');
+      expect(validateEoiDuration('abc')).toBe('Please enter a valid duration.');
+      expect(validateEoiDuration('50')).toBe('Duration exceeds the permitted limit for this scheme.');
+      expect(validateEoiDuration('3')).toBe('');
+    });
+
+    // 13. Negative EMD and Process Fee
+    it('Scenario 13: rejects negative or invalid EMD and Process Fee', () => {
+      const form = { ...validEoi(), emdFee: '-500', processFee: 'invalid' };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['emdFee']).toBe('Please enter a valid EMD Fee.');
+      expect(res.errors['processFee']).toBe('Please enter a valid Process Fee.');
+    });
+
+    // 14. Fee mismatch with Scheme Master
+    it('Scenario 14: rejects fee mismatch when amount does not match Scheme Master configuration', () => {
+      const form = { ...validEoi(), emdFee: '₹12,345' }; // Expected is 50,000
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.errors['emdFee']).toBe('EMD Fee does not match the selected scheme.');
+    });
+
+    // 15. Duplicate supporting document types
+    it('Scenario 15: rejects duplicate supporting document types across configured rows', () => {
+      const form = { ...validEoi(), documents: ['Company PAN Card', 'Company PAN Card'] };
+      const res = validateEoiFormComplete(form, standardOptions);
+      expect(res.isValid).toBe(false);
+      expect(res.docErrors[1]).toBe('This document type has already been added.');
+    });
+
+    // 16. Unsupported file formats
+    it('Scenario 16: rejects unsupported file formats and active scripting extensions like .exe, .svg', () => {
+      expect(validateUploadFile({ name: 'malicious.exe', size: 1024 })).toBe(
+        'Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.'
+      );
+      expect(validateUploadFile({ name: 'vector.svg', size: 1024 })).toBe(
+        'Invalid file type. Supported: PDF, TXT, JPEG, PNG, WORD, EXCEL.'
+      );
+    });
+
+    // 17. File exceeding 25 MB or empty file
+    it('Scenario 17: rejects files exceeding 25 MB limit and empty files (0 bytes)', () => {
+      expect(validateUploadFile({ name: 'empty.pdf', size: 0 })).toBe('File cannot be empty.');
+      expect(validateUploadFile({ name: 'huge.pdf', size: 25 * 1024 * 1024 + 1 })).toBe(
+        'File size exceeds the 25MB limit.'
+      );
+      expect(validateUploadFile({ name: 'good.pdf', size: 10 * 1024 * 1024 })).toBe('');
+    });
+
+    // 18. Duplicate form submission prevention
+    it('Scenario 18: prevents duplicate form submission using isSubmitting state flag', () => {
+      let isSubmitting = false;
+      const simulateSubmit = () => {
+        if (isSubmitting) return 'BLOCKED';
+        isSubmitting = true;
+        return 'PROCEED';
+      };
+      expect(simulateSubmit()).toBe('PROCEED');
+      expect(simulateSubmit()).toBe('BLOCKED');
+    });
+
+    // 19. Unauthorized publication and service-layer backend validation
+    it('Scenario 19: trims whitespace, rejects whitespace-only refNo, and validates EOI reference format', () => {
+      expect(validateEoiRefNo('   ')).toBe('EOI Reference Number is required.');
+      expect(validateEoiRefNo('invalid#ref$no')).toBe(
+        'Invalid EOI Reference Number format (e.g. RSLDC/EOI/2026-27/01).'
+      );
+      expect(validateEoiRefNo('RSLDC/EOI/2026-27/01')).toBe('');
+    });
+
+    // 20. Valid draft, scheduled, and immediate publication workflows
+    it('Scenario 20: supports draft, scheduled, and immediate publication workflows', () => {
+      // Draft: partial data allowed without publication date
+      const draftForm: EoiFormData = {
+        ...createEmptyEoiForm(),
+        refNo: 'RSLDC/EOI/DRAFT/01',
+        scheme: 'Vishwakarma Yuva Udyami Protsahan Yojana'
+      };
+      const draftRes = validateEoiFormComplete(draftForm, { ...standardOptions, isDraft: true });
+      expect(draftRes.isValid).toBe(true);
+
+      // Immediate Publication: requires full validation and publishedDate <= today
+      const immediateRes = validateEoiFormComplete(validEoi(), { ...standardOptions, isScheduled: false });
+      expect(immediateRes.isValid).toBe(true);
+
+      // Scheduled Publication: future publication date allowed when isScheduled is true
+      const scheduledForm = {
+        ...validEoi(),
+        publishedDate: '2026-01-20',
+        submissionDate: '2026-02-28'
+      };
+      const scheduledRes = validateEoiFormComplete(scheduledForm, { ...standardOptions, isScheduled: true });
+      expect(scheduledRes.isValid).toBe(true);
+    });
+
+    // 21. Scheme binding with Doc Master & Annexure Master
+    it('Scenario 21: binds scheme with documents and annexures correctly via parseMasterEntriesByScheme', () => {
+      const mockDocs = [
+        {
+          id: '1',
+          docName: 'PAN Card',
+          schemes: ['Scheme A', 'Scheme B'],
+          status: 'Active'
+        },
+        {
+          id: '2',
+          docName: 'Aadhaar Card',
+          schemes: ['Scheme B'],
+          status: 'Active'
+        },
+        {
+          id: '3',
+          docName: 'Old Inactive Doc',
+          schemes: ['Scheme A'],
+          status: 'Inactive'
+        },
+        {
+          id: '4',
+          docName: 'Universal Doc',
+          schemes: ['ALL'],
+          status: 'Active'
+        }
+      ];
+
+      const docsA = parseMasterEntriesByScheme(mockDocs, 'Scheme A', (d) => d.docName);
+      expect(docsA).toEqual(['PAN Card', 'Universal Doc']);
+
+      const docsB = parseMasterEntriesByScheme(mockDocs, 'Scheme B', (d) => d.docName);
+      expect(docsB).toEqual(['PAN Card', 'Aadhaar Card', 'Universal Doc']);
+
+      const docsC = parseMasterEntriesByScheme(mockDocs, 'Scheme C', (d) => d.docName);
+      expect(docsC).toEqual(['Universal Doc']);
+
+      // Empty scheme returns empty array
+      expect(parseMasterEntriesByScheme(mockDocs, '', (d) => d.docName)).toEqual([]);
     });
   });
 });

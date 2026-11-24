@@ -16,6 +16,8 @@ import {
   DropdownComponent,
   IconComponent,
   InputDirective,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
   PageHeaderComponent,
   PageShellComponent,
   SwitchComponent,
@@ -73,33 +75,16 @@ interface EditPermissionForm {
   selector: 'app-permission-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent],
+  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, PageShellComponent, SwitchComponent, MasterFilterBarComponent],
   template: `
     <app-page-shell>
       
       <!-- Page Header -->
       <app-page-header
         title="Permission Management"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Permission Management' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by role type or model..."
-        [(searchQuery)]="searchQuery"
+        subtitle="Configure page-level access permissions (View, Edit, Delete) for system roles"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Permission Management' }]"
       >
-        <!-- Role Filter Dropdown -->
-        <select
-          appInput
-          size="sm"
-          aria-label="Filter by role"
-          [ngModel]="selectedRoleFilter()"
-          (ngModelChange)="selectedRoleFilter.set($event)"
-          class="w-auto whitespace-nowrap shrink-0"
-        >
-          <option value="all">All Roles</option>
-          @for (role of activeRoleOptions(); track role) {
-            <option [value]="role">{{ role }}</option>
-          }
-        </select>
-
         <!-- Add Permission Button -->
         <button
           appButton
@@ -112,6 +97,19 @@ interface EditPermissionForm {
           <span>Add Permission</span>
         </button>
       </app-page-header>
+
+      <!-- Unified Master Filter Bar -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search by role type or model..."
+        [showStatusFilter]="false"
+        [filters]="filterConfigs()"
+        [(filterValues)]="filterValues"
+        [totalCount]="items().length"
+        [filteredCount]="filteredItems().length"
+        itemUnit="permissions"
+        (resetFilters)="resetFilters()"
+      />
 
       <!-- Permissions Table -->
       <app-table
@@ -181,53 +179,36 @@ interface EditPermissionForm {
         </div>
       </ng-template>
 
-      <!-- Action Column Template: View, Edit, Status Toggle -->
+      <!-- Action Column Template: Edit, Status Toggle -->
       <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            title="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-            <span>View</span>
-          </button>
-
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
-
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
           <!-- Edit Button -->
           <button
             appButton
             variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="$event.stopPropagation(); openEditModal(item)"
             title="Edit"
+            aria-label="Edit"
           >
             <app-icon name="edit" size="sm" />
-            <span>Edit</span>
           </button>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
           <!-- Active / Inactive Toggle -->
-          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
+          <div
+            class="inline-flex items-center"
+            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+            (click)="$event.stopPropagation()"
+          >
             <app-switch
               [checked]="item.status !== 'Inactive'"
-              label="Toggle Active Status"
+              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
               (toggled)="toggleStatus(item)"
             />
-            <span
-              class="text-[12px] font-semibold select-none cursor-pointer"
-              [ngClass]="item.status === 'Inactive' ? 'text-slate-500' : 'text-emerald-700'"
-              (click)="toggleStatus(item)"
-            >
-              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-            </span>
           </div>
         </div>
       </ng-template>
@@ -240,7 +221,7 @@ interface EditPermissionForm {
         [reverseButtons]="true"
         [showAccentBar]="false"
         primaryLabel="Save Permissions"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         maxWidthClass="max-w-[580px]"
         (primaryAction)="submitAdd()"
         (secondaryAction)="closeAddModal()"
@@ -254,17 +235,13 @@ interface EditPermissionForm {
           <!-- 1. Role Type -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-            <select
-              appInput
-              [(ngModel)]="addForm.roleType"
-              class="w-full"
+            <app-dropdown
+              [options]="activeRoleOptions()"
+              [(value)]="addForm.roleType"
+              placeholder="Select Role Type"
               [invalid]="submitted() && !addForm.roleType"
-            >
-              <option value="" disabled selected>Select Role Type</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
+              class="w-full"
+            />
             @if (submitted() && !addForm.roleType) {
               <div class="text-xs text-red-500 mt-1 font-medium">Role Type is required</div>
             }
@@ -364,7 +341,7 @@ interface EditPermissionForm {
         [reverseButtons]="true"
         [showAccentBar]="false"
         primaryLabel="Save Changes"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         maxWidthClass="max-w-[500px]"
         (primaryAction)="submitEdit()"
         (secondaryAction)="closeEditModal()"
@@ -379,29 +356,23 @@ interface EditPermissionForm {
             <!-- Role Type -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Role Type</label>
-              <select
-                appInput
-                [(ngModel)]="ef.roleType"
+              <app-dropdown
+                [options]="activeRoleOptions()"
+                [(value)]="ef.roleType"
+                placeholder="Select Role Type"
                 class="w-full"
-              >
-                @for (role of activeRoleOptions(); track role) {
-                  <option [value]="role">{{ role }}</option>
-                }
-              </select>
+              />
             </div>
 
             <!-- Model (Page) -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Model (Page)</label>
-              <select
-                appInput
-                [(ngModel)]="ef.moduleName"
+              <app-dropdown
+                [options]="availableModels"
+                [(value)]="ef.moduleName"
+                placeholder="Select Model (Page)"
                 class="w-full"
-              >
-                @for (m of availableModels; track m) {
-                  <option [value]="m">{{ m }}</option>
-                }
-              </select>
+              />
             </div>
 
             <!-- Permissions Checkboxes -->
@@ -440,79 +411,12 @@ interface EditPermissionForm {
             <!-- Status Toggle -->
             <div>
               <label class="block text-slate-700 font-medium mb-1">Status</label>
-              <select
-                appInput
-                [(ngModel)]="ef.status"
+              <app-dropdown
+                [options]="['Active', 'Inactive']"
+                [(value)]="ef.status"
+                placeholder="Select Status"
                 class="w-full"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-        }
-      </app-action-modal>
-
-      <!-- Modal: View Permission Details -->
-      <app-action-modal
-        [isOpen]="showViewModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        primaryLabel=""
-        secondaryLabel="Close"
-        maxWidthClass="max-w-[480px]"
-        (secondaryAction)="closeViewModal()"
-        (close)="closeViewModal()"
-      >
-        <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Permission Details
-        </h2>
-
-        @if (selectedViewItem(); as viewItem) {
-          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100">
-            <div class="pt-2.5 flex flex-col gap-1 first:pt-0">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role Type</span>
-              <span class="text-sm font-semibold text-slate-800">{{ viewItem.roleType }}</span>
-            </div>
-
-            <div class="pt-2.5 flex flex-col gap-1">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Model (Page)</span>
-              <span class="text-sm font-medium text-slate-800">{{ viewItem.moduleName }}</span>
-            </div>
-
-            <div class="pt-2.5 flex flex-col gap-1.5">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Permissions</span>
-              <div class="flex items-center gap-2.5 pt-0.5">
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canView ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  View
-                </span>
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canEdit ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  Edit
-                </span>
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canDelete ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  Delete
-                </span>
-              </div>
-            </div>
-
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
-                [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
-              >
-                {{ viewItem.status === 'Inactive' ? 'Inactive' : 'Active' }}
-              </span>
+              />
             </div>
           </div>
         }
@@ -533,12 +437,11 @@ export class PermissionMasterComponent {
 
   searchQuery = signal<string>('');
   selectedRoleFilter = signal<string>('all');
+  filterValues = signal<Record<string, string>>({});
 
   showAddModal = signal<boolean>(false);
   showEditModal = signal<boolean>(false);
-  showViewModal = signal<boolean>(false);
 
-  selectedViewItem = signal<PermissionMasterItem | null>(null);
   submitted = signal<boolean>(false);
 
   isModelDropdownOpen = signal<boolean>(false);
@@ -561,7 +464,7 @@ export class PermissionMasterComponent {
     { key: 'roleType', label: 'Role Type', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[160px]' },
     { key: 'moduleName', label: 'Model', cellClass: 'whitespace-nowrap font-medium text-slate-700 min-w-[220px]' },
     { key: 'permissions', label: 'Permissions', type: 'custom', cellClass: 'min-w-[260px]' },
-    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'min-w-[210px]' }
+    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'w-28 min-w-[105px]' }
   ];
 
   constructor() {
@@ -593,6 +496,15 @@ export class PermissionMasterComponent {
       : ['Super Admin', 'Department Officer', 'Scrutiny Officer', 'Training Partner'];
   });
 
+  readonly filterConfigs = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'roleType',
+      label: 'Role',
+      options: () => this.activeRoleOptions(),
+      placeholder: 'All Roles'
+    }
+  ]);
+
   readonly filteredAvailableModels = computed(() => {
     const q = this.modelSearchText().toLowerCase().trim();
     if (!q) return this.availableModels;
@@ -601,10 +513,10 @@ export class PermissionMasterComponent {
 
   readonly filteredItems = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
-    const roleFilter = this.selectedRoleFilter();
+    const roleFilter = this.filterValues()['roleType'] || this.selectedRoleFilter();
     let result = this.items();
 
-    if (roleFilter !== 'all') {
+    if (roleFilter && roleFilter !== 'all') {
       result = result.filter(item => item.roleType === roleFilter);
     }
 
@@ -617,6 +529,12 @@ export class PermissionMasterComponent {
 
     return result;
   });
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.filterValues.set({});
+    this.selectedRoleFilter.set('all');
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
@@ -819,15 +737,5 @@ export class PermissionMasterComponent {
       this.items.update(list => list.map(i => (i.id === saved.id ? saved : i)));
       this.closeEditModal();
     });
-  }
-
-  openViewModal(item: PermissionMasterItem): void {
-    this.selectedViewItem.set(item);
-    this.showViewModal.set(true);
-  }
-
-  closeViewModal(): void {
-    this.showViewModal.set(false);
-    this.selectedViewItem.set(null);
   }
 }

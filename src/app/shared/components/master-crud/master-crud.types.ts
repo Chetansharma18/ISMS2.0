@@ -20,6 +20,13 @@ export interface MasterFieldConfig<T = any> {
   colSpan?: 1 | 2 | 3;
 }
 
+export interface MasterFilterConfig {
+  key: string;
+  label: string;
+  options: string[] | (() => string[]);
+  placeholder?: string;
+}
+
 export interface MasterCrudConfig<T extends { id: string; status?: string } = any> {
   /** DataEngineService resource key, e.g. 'SECTORS', 'DESIGNATIONS' */
   dataKey: string;
@@ -27,6 +34,10 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   entityLabel: string;
   /** Page title shown in the header, e.g. "Sector Master" */
   title: string;
+  /** Optional subtitle shown in the header */
+  subtitle?: string;
+  /** Optional custom breadcrumbs shown in the header */
+  breadcrumbs?: { label: string; url?: string }[];
   /** Placeholder for the search box */
   searchPlaceholder: string;
   /** Raw item fields to match against when searching */
@@ -47,6 +58,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   fields: MasterFieldConfig<T>[];
   /** Max-width tailwind class for the add/edit modal */
   modalWidthClass?: string;
+  /** Max-width tailwind class for the view details modal */
+  viewModalWidthClass?: string;
   /** Builds the blank form data object used when opening the "Add" modal */
   createDefaults: () => Record<string, any>;
   /** Transforms submitted form data into the final entity payload sent to the API/mock store.
@@ -55,4 +68,12 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   buildPayload: (formData: any) => Partial<T>;
   /** Optional custom confirmation text for delete */
   deleteConfirmText?: (item: T) => string;
+  /** Whether to hide the View action button in the table action column */
+  hideViewAction?: boolean;
+  /** Explicit column definitions for the View Details modal (defaults to config.columns) */
+  viewColumns?: TableColumn<T>[];
+  /** Dynamic top filter dropdowns (e.g. Sector, Category, Department) */
+  filters?: MasterFilterConfig[];
+  /** Whether to hide the default quick Status filter [All, Active, Inactive] (defaults to false if hasStatus=true) */
+  hideStatusFilter?: boolean;
 }

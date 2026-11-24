@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../shared';
 
@@ -14,6 +14,13 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
     <app-page-header
       title="Active Schemes"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
+      [searchable]="true"
+      searchPlaceholder="Search active schemes..."
+      [(searchQuery)]="searchQuery"
+      [suggestions]="suggestions()"
+      (search)="searchChange.emit($event)"
+      (clear)="searchChange.emit('')"
+      (suggestionSelect)="searchChange.emit($event)"
     >
       @if (isSuperAdmin()) {
         <button appButton size="sm" type="button" (click)="configureEoi.emit()" class="shrink-0">
@@ -25,8 +32,9 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
   `
 })
 export class SchemesHeaderComponent {
-  readonly searchQuery = input('');
+  readonly searchQuery = model<string>('');
   readonly isSuperAdmin = input(false);
+  readonly suggestions = input<string[]>([]);
 
   readonly searchChange = output<string>();
   readonly configureEoi = output<void>();

@@ -10,6 +10,7 @@ import { InputDirective } from '../form-controls/input/input.directive';
 import { ModalComponent } from '../modal/modal.component';
 import { TableComponent } from '../table/table.component';
 import { TableColumn } from '../table/table.types';
+import { DropdownComponent, DropdownOption } from '../dropdown/dropdown.component';
 
 /** One line of the financial turnover grid; the last line is the computed 3-year average. */
 interface TurnoverRow {
@@ -24,7 +25,7 @@ interface TurnoverRow {
   selector: 'app-profile-preview-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, ModalComponent, TableComponent],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, ModalComponent, TableComponent, DropdownComponent],
   template: `
     @if (isOpen) {
       <app-modal
@@ -193,19 +194,14 @@ interface TurnoverRow {
                   <p class="text-[11px] text-slate-600 mb-2">
                     Choose which registered Officer In-Charge will serve as the primary operational contact for this scheme proposal.
                   </p>
-                  <select
-                    appInput
+                  <app-dropdown
                     size="sm"
-                    [ngModel]="selectedOicId()"
-                    (ngModelChange)="selectedOicId.set($event)"
+                    [options]="oicDropdownOptions()"
+                    [value]="selectedOicId()"
+                    (valueChange)="selectedOicId.set($event)"
                     class="w-full sm:w-auto min-w-[280px]"
-                  >
-                    @for (oic of step2(); track oic.id) {
-                      <option [value]="oic.id">
-                        {{ oic.name }} ({{ oic.designation || 'OIC' }}) - {{ oic.mobileNo }}
-                      </option>
-                    }
-                  </select>
+                    placeholder="Select Designated OIC"
+                  />
                 </div>
 
                 <!-- OIC Cards list -->
@@ -287,16 +283,6 @@ interface TurnoverRow {
               <div class="flex items-center gap-2.5 justify-end">
                 <button
                   appButton
-                  variant="outline"
-                  type="button"
-                  (click)="onClose()"
-                  class="flex-1 sm:flex-none"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  appButton
                   type="button"
                   (click)="onProceed()"
                   class="flex-1 sm:flex-none"
@@ -325,6 +311,13 @@ export class ProfilePreviewModalComponent implements OnInit {
   readonly step4 = computed(() => this.otrFormService.step4());
 
   selectedOicId = signal<string>('');
+
+  readonly oicDropdownOptions = computed<DropdownOption[]>(() =>
+    this.step2().map(oic => ({
+      value: oic.id,
+      label: `${oic.name} (${oic.designation || 'OIC'}) - ${oic.mobileNo}`
+    }))
+  );
 
   readonly avgTotalTurnover = computed(() => {
     const rows = this.step1().financialYears;

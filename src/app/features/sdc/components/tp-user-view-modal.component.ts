@@ -14,7 +14,7 @@ import { TpAssignment, TpUserRow } from '../utils/tp-users.util';
   selector: 'app-tp-user-view-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonComponent, FormInputComponent, FormSectionComponent, ModalComponent, TableComponent],
+  imports: [FormInputComponent, FormSectionComponent, ModalComponent, TableComponent],
   template: `
     @let u = user();
     <app-modal title="User Details" [subtitle]="u.role + ' • ' + u.ssoId" size="lg" (close)="closed.emit()">
@@ -57,10 +57,6 @@ import { TpAssignment, TpUserRow } from '../utils/tp-users.util';
           <app-table [columns]="columns" [data]="u.assignments" emptyMessage="Not assigned to anything." />
         </app-form-section>
       </div>
-
-      <ng-container modalFooter>
-        <button appButton variant="outline" type="button" (click)="closed.emit()">Close</button>
-      </ng-container>
     </app-modal>
   `
 })

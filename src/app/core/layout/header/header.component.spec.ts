@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { Component } from '@angular/core';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { HeaderComponent } from './header.component';
 import { AuthService } from '../../auth/auth.service';
 
@@ -19,7 +19,8 @@ describe('HeaderComponent', () => {
         provideRouter([
           { path: '', component: DummyComponent },
           { path: 'sso-login', component: DummyComponent },
-          { path: 'tenders', component: DummyComponent }
+          { path: 'tenders', component: DummyComponent },
+          { path: 'profile', component: DummyComponent }
         ])
       ]
     }).compileComponents();

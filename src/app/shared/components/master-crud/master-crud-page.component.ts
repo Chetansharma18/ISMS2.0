@@ -237,82 +237,6 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
         >
         </app-table>
 
-        <!-- Tag-list cell template (reused for any array-valued column, e.g. permissions) -->
-        <ng-template #tagsTemplate let-item let-column="column">
-          <div class="flex flex-wrap gap-1.5 py-1">
-            @for (tag of item[column.key]; track tag) {
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-normal bg-sky-50 text-brand border border-sky-200">
-                {{ tag }}
-              </span>
-            }
-          </div>
-        </ng-template>
-
-        <!-- Status badge cell template -->
-        <ng-template #statusTemplate let-item>
-          <span
-            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
-            [ngClass]="item.status === 'Inactive'
-              ? 'bg-slate-100 text-slate-600 border-slate-300'
-              : 'bg-emerald-50 text-emerald-700 border-emerald-300'"
-          >
-            <span class="w-1.5 h-1.5 rounded-full" [ngClass]="item.status === 'Inactive' ? 'bg-slate-400' : 'bg-emerald-500'"></span>
-            {{ item.status || 'Active' }}
-          </span>
-        </ng-template>
-
-        <!-- Action cell template: View + Edit + Active/Inactive toggle -->
-        <ng-template #actionTemplate let-item>
-          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
-            @if (!config.hideViewAction) {
-              <!-- View Button -->
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="$event.stopPropagation(); openViewModal(item)"
-                title="View Details"
-                aria-label="View Details"
-              >
-                <app-icon name="eye" size="sm" />
-              </button>
-
-              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
-            }
-
-            <!-- Edit Button -->
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              iconOnly
-              type="button"
-              (click)="$event.stopPropagation(); openEditModal(item)"
-              title="Edit"
-              aria-label="Edit"
-            >
-              <app-icon name="edit" size="sm" />
-            </button>
-
-            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
-
-            <!-- Active / Inactive Toggle -->
-            <div
-              class="inline-flex items-center"
-              [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
-              (click)="$event.stopPropagation()"
-            >
-              <app-switch
-                [checked]="item.status !== 'Inactive'"
-                [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
-                (toggled)="toggleStatus(item)"
-              />
-            </div>
-          </div>
-        </ng-template>
-
         @if (config.displayMode !== 'screen') {
           <!-- Add / Edit Modal -->
           <app-action-modal
@@ -401,6 +325,83 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           </app-action-modal>
         }
       }
+
+      <!-- Reusable templates at root level of page-shell so @ViewChild(..., { static: true }) always resolves -->
+      <!-- Tag-list cell template (reused for any array-valued column, e.g. permissions) -->
+      <ng-template #tagsTemplate let-item let-column="column">
+        <div class="flex flex-wrap gap-1.5 py-1">
+          @for (tag of item[column.key]; track tag) {
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-normal bg-sky-50 text-brand border border-sky-200">
+              {{ tag }}
+            </span>
+          }
+        </div>
+      </ng-template>
+
+      <!-- Status badge cell template -->
+      <ng-template #statusTemplate let-item>
+        <span
+          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
+          [ngClass]="item.status === 'Inactive'
+            ? 'bg-slate-100 text-slate-600 border-slate-300'
+            : 'bg-emerald-50 text-emerald-700 border-emerald-300'"
+        >
+          <span class="w-1.5 h-1.5 rounded-full" [ngClass]="item.status === 'Inactive' ? 'bg-slate-400' : 'bg-emerald-500'"></span>
+          {{ item.status || 'Active' }}
+        </span>
+      </ng-template>
+
+      <!-- Action cell template: View + Edit + Active/Inactive toggle -->
+      <ng-template #actionTemplate let-item>
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+          @if (!config.hideViewAction) {
+            <!-- View Button -->
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); openViewModal(item)"
+              title="View Details"
+              aria-label="View Details"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
+
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+          }
+
+          <!-- Edit Button -->
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="$event.stopPropagation(); openEditModal(item)"
+            title="Edit"
+            aria-label="Edit"
+          >
+            <app-icon name="edit" size="sm" />
+          </button>
+
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+          <!-- Active / Inactive Toggle -->
+          <div
+            class="inline-flex items-center"
+            [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+            (click)="$event.stopPropagation()"
+          >
+            <app-switch
+              [checked]="item.status !== 'Inactive'"
+              [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+              (toggled)="toggleStatus(item)"
+            />
+          </div>
+        </div>
+      </ng-template>
 
       <!-- Shared Form Fields Template -->
       <ng-template #formFieldsTemplate>
@@ -532,6 +533,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   @ViewChild('tagsTemplate', { static: true }) tagsTemplate!: TemplateRef<unknown>;
   @ViewChild('statusTemplate', { static: true }) statusTemplate!: TemplateRef<unknown>;
   @ViewChild('actionTemplate', { static: true }) actionTemplate!: TemplateRef<unknown>;
+  @ViewChild('formFieldsTemplate', { static: true }) formFieldsTemplate!: TemplateRef<unknown>;
 
   private dataEngine = inject(DataEngineService);
   private cdr = inject(ChangeDetectorRef);
@@ -638,6 +640,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   ngOnInit(): void {
     this.repo = this.dataEngine.for<T>(this.config.dataKey, { idKey: 'id' });
     this.buildColumns();
+    this.rebuildTemplates();
     this.load();
   }
 
@@ -663,7 +666,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
 
   private buildColumns(): void {
     const cols = [...this.config.columns];
-    const actionWidth = this.config.hideViewAction ? 'w-28 min-w-[105px]' : 'w-36 min-w-[130px]';
+    const actionWidth = this.config.actionColumnWidth || (this.config.hideViewAction ? 'w-36 min-w-[145px]' : 'w-44 min-w-[175px]');
     cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: actionWidth });
     this.tableColumns.set(cols);
   }

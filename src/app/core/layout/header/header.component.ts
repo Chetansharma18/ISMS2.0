@@ -19,6 +19,7 @@ import { ClickOutsideDirective } from '../../../shared/directives/click-outside.
 import { HeaderNotificationComponent } from './header-notification.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
 
 @Component({
   selector: 'app-header',
@@ -30,7 +31,8 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     ClickOutsideDirective,
     HeaderNotificationComponent,
     ButtonComponent,
-    IconComponent
+    IconComponent,
+    ActionModalComponent
   ],
   host: {
     class: 'block w-full sticky top-0 z-50'
@@ -270,7 +272,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- User Icon -->
               <app-icon name="user" />
 
-              <span>Login</span>
+              <span>Login with SSO</span>
 
               <!-- Right Arrow Icon -->
               <app-icon name="forward" />
@@ -280,6 +282,23 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         </div>
 
       </div>
+
+      <!-- Sign Out Confirmation Modal -->
+      <app-action-modal
+        [isOpen]="showLogoutConfirmModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        title="Sign Out Confirmation"
+        description="Are you sure you want to sign out of the ISMS 2.0 portal?"
+        primaryLabel="Sign Out"
+        primaryVariant="danger"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[440px]"
+        (primaryAction)="confirmLogout()"
+        (secondaryAction)="cancelLogout()"
+        (close)="cancelLogout()"
+      />
     </header>
   `,
   styles: [`
@@ -407,9 +426,20 @@ export class HeaderComponent {
     this.loginClicked.emit();
   }
 
+  readonly showLogoutConfirmModal = signal<boolean>(false);
+
   onLogout(): void {
     this.dropdownOpen.set(false);
+    this.showLogoutConfirmModal.set(true);
+  }
+
+  confirmLogout(): void {
+    this.showLogoutConfirmModal.set(false);
     this.authService.logout();
+  }
+
+  cancelLogout(): void {
+    this.showLogoutConfirmModal.set(false);
   }
 
   onSelectRole(roleId: AssignedRole['id']): void {

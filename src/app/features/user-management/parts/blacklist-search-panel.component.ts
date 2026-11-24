@@ -36,7 +36,7 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../shared'
                 [ngModel]="value()"
                 (ngModelChange)="valueChange.emit($event)"
                 (keydown.enter)="blacklist.emit()"
-                placeholder="Enter SSO ID (e.g. SSO_TP_01) or Username..."
+                placeholder="Search SSO ID or Username..."
                 class="w-full pl-8 text-xs font-medium"
               />
             </div>

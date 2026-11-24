@@ -337,7 +337,7 @@ import { IconComponent } from '../../../../shared';
               [value]="data().website"
               (valueChange)="update('website', $event)"
               (blur)="markTouched('website')"
-              placeholder="https://www.example.com"
+              placeholder="https://example.com"
               [required]="false"
               [error]="getFieldError('website')"
             ></app-form-input>

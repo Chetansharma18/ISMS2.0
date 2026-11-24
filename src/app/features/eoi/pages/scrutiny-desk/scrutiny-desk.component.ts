@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, signal, computed } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   EoiStateService,
   ApplicantResponse,
@@ -12,6 +13,12 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { formatDateMedium, formatTime } from '../../../../shared/utils';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { ShortfallBridgeService } from '../../services/shortfall-bridge.service';
+import {
+  ButtonComponent,
+  IconComponent,
+  StepperComponent,
+  StepperStep
+} from '../../../../shared';
 import { ScrutinyToolbarComponent } from './components/scrutiny-toolbar.component';
 import { ScrutinyAppealCardComponent } from './components/scrutiny-appeal-card.component';
 import { ScrutinyDocViewerComponent } from './components/scrutiny-doc-viewer.component';
@@ -34,6 +41,11 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
   selector: 'app-scrutiny-desk',
   standalone: true,
   imports: [
+    RouterLink,
+    NgClass,
+    ButtonComponent,
+    IconComponent,
+    StepperComponent,
     ScrutinyToolbarComponent,
     ScrutinyAppealCardComponent,
     ScrutinyDecisionRecordComponent,
@@ -45,40 +57,238 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
     ScrutinyDocViewerComponent
   ],
   template: `
-    <div class="w-full min-h-screen bg-white text-slate-800 font-sans px-4 sm:px-5 lg:px-6 py-4 sm:py-5 space-y-5" >
+    <div class="w-full min-h-screen bg-slate-50/50 text-slate-800 font-sans px-4 sm:px-6 lg:px-8 py-5 space-y-5">
 
       <app-scrutiny-toolbar
         [applicant]="applicant()"
-        (reject)="openRejectModal()"
-        (approve)="openApproveModal()"
+        [isRemarked]="isRemarked()"
+        (remark)="openRemarksModal()"
       />
 
       @if (applicant(); as app) {
-        @if (app.status !== 'UNDER_SCRUTINY' && app.appeal?.status !== 'Pending') {
-          <app-scrutiny-decision-record [applicant]="app" />
-        }
+        <!-- Main 2-Column Layout matching Image 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Left Column: Vertical Stepper Navigation -->
+          <div class="lg:col-span-4 xl:col-span-3">
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 sticky top-5">
+              <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 m-0">Review Sections</h2>
+                <span class="text-[11px] font-semibold text-slate-400 tabular-nums">{{ activeStep() }} / {{ steps().length }}</span>
+              </div>
+              <app-stepper
+                variant="vertical"
+                [steps]="steps()"
+                [currentStep]="activeStep()"
+                (stepClick)="onStepSelect($event)"
+              />
+            </div>
+          </div>
 
-        @if (app.appeal) {
-          <app-scrutiny-appeal-card
-            [appeal]="app.appeal"
-            [applicant]="app"
-            [rejectionReason]="getRejectionReason(app)"
-            (accept)="openAcceptAppealModal()"
-            (reject)="openRejectAppealModal()"
-            (viewFile)="openOfficialDoc($event)"
-          />
-        }
+          <!-- Right Column: Content Card corresponding to Active Step -->
+          <div class="lg:col-span-8 xl:col-span-9">
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 min-h-[560px]">
+                <!-- Top Row: Save & Exit + Step Progress -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-5">
+                  <a
+                    [routerLink]="['/admin/responses', app.schemeId || 'ALL']"
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy transition-colors select-none"
+                    title="Return to applicant submissions list"
+                  >
+                    <app-icon name="back" size="xs" />
+                    <span>Save and Exit to Submissions</span>
+                  </a>
 
-        <app-scrutiny-review-sections
-          [applicant]="app"
-          [isDownloadingZip]="isDownloadingZip()"
-          (viewDoc)="openOfficialDoc($event)"
-          (downloadZip)="downloadAllZip()"
-        />
+                  <span class="text-xs font-medium text-slate-400 tabular-nums">
+                    Step {{ activeStep() }} of {{ steps().length }}
+                  </span>
+                </div>
 
-        <app-scrutiny-past-performance [engagements]="app.pastEngagements ?? []" />
+                <!-- Section Title & Subtitle (for steps other than overview) -->
+                @if (stepKey() !== 'overview') {
+                  <div class="mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight m-0">
+                      {{ currentStepTitle() }}
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0">
+                      {{ currentStepSubtitle() }}
+                    </p>
+                  </div>
+                }
 
-        <app-scrutiny-remarks [log]="getActivityLog()" />
+                <!-- Active Step Content -->
+                @if (stepKey() === 'overview') {
+                  <div class="space-y-5 animate-in fade-in duration-150">
+                    <!-- Applicant Header & Status Badge in same format -->
+                    <div class="mb-5">
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
+                          {{ app.anonymousLabel }}
+                        </h2>
+                        <span
+                          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
+                          [ngClass]="statusBadgeClass(app)"
+                        >
+                          {{ statusLabel(app) }}
+                        </span>
+                      </div>
+                      <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">
+                        Proposal under {{ app.schemeName }}
+                      </p>
+
+                      <!-- Summary Grid Card in same format -->
+                      <div class="mt-4 bg-slate-50/80 rounded-xl border border-slate-200/90 p-4 sm:p-5">
+                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
+                          <div>
+                            <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
+                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1 tabular-nums break-all">{{ app.eoiRefNo }}</span>
+                          </div>
+                          <div>
+                            <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>
+                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1">{{ app.schemeName }}</span>
+                          </div>
+                          <div>
+                            <span class="text-[11.5px] text-slate-500 block leading-tight">Registration No.</span>
+                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1 tabular-nums">{{ app.regNumber }}</span>
+                          </div>
+                          <div>
+                            <span class="text-[11.5px] text-slate-500 block leading-tight">Submitted On</span>
+                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1">{{ app.submissionDate }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Scrutiny Decision Record (if decided) -->
+                    @if (app.status !== 'UNDER_SCRUTINY' && app.appeal?.status !== 'Pending') {
+                      <app-scrutiny-decision-record [applicant]="app" />
+                    }
+
+                    <!-- Appeal Quick Callout (if appeal exists) -->
+                    @if (app.appeal) {
+                      <div class="bg-amber-50/70 border border-amber-200/90 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-bold text-amber-900 text-sm">Appeal Request Submitted</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                              Status: {{ app.appeal.status }}
+                            </span>
+                          </div>
+                          <p class="text-xs text-amber-800 mt-1 m-0 leading-relaxed">
+                            This applicant has submitted an appeal against the initial disqualification. Review the appeal justification and uploaded proofs in the Appeal Details section.
+                          </p>
+                        </div>
+                        <button
+                          appButton
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          (click)="onStepSelect(2)"
+                          class="shrink-0"
+                        >
+                          <span>View Appeal</span>
+                          <app-icon name="forward" size="xs" />
+                        </button>
+                      </div>
+                    }
+
+                    <!-- Dossier Contents Highlights -->
+                    <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5">
+                      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3.5">Proposal Contents Overview</h3>
+                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
+                          <span class="text-[11px] text-slate-500 block">Uploaded Documents</span>
+                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.uploadedDocuments.length }} Files</span>
+                        </div>
+                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
+                          <span class="text-[11px] text-slate-500 block">Past Schemes</span>
+                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.pastEngagements?.length ?? 0 }} Schemes</span>
+                        </div>
+                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
+                          <span class="text-[11px] text-slate-500 block">Proposed Centres</span>
+                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.trainingCentres.length }} Centres</span>
+                        </div>
+                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
+                          <span class="text-[11px] text-slate-500 block">Turnover Records</span>
+                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.financialYears.length }} FYs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                @if (stepKey() === 'appeal' && app.appeal) {
+                  <div class="space-y-4 animate-in fade-in duration-150">
+                    <app-scrutiny-appeal-card
+                      [appeal]="app.appeal"
+                      [applicant]="app"
+                      [rejectionReason]="getRejectionReason(app)"
+                      (accept)="openAcceptAppealModal()"
+                      (reject)="openRejectAppealModal()"
+                      (viewFile)="openOfficialDoc($event)"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'organisation') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="organisation"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'signatory') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="signatory"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'bank') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="bank"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'documents') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="documents"
+                      [isDownloadingZip]="isDownloadingZip()"
+                      (viewDoc)="openOfficialDoc($event)"
+                      (downloadZip)="downloadAllZip()"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'past_performance') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-past-performance
+                      [engagements]="app.pastEngagements ?? []"
+                      [initiallyOpen]="true"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'remarks') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-remarks
+                      [log]="getActivityLog()"
+                      [initiallyOpen]="true"
+                    />
+                  </div>
+                }
+            </div>
+          </div>
+        </div>
       }
 
     </div>
@@ -105,6 +315,7 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
       <app-scrutiny-decision-modal
         mode="remark"
         [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [initialRemark]="currentRemark()"
         (confirmed)="confirmAddRemark($event)"
         (close)="closeModals()"
       />
@@ -162,6 +373,123 @@ export class ScrutinyDeskComponent {
   Math = Math;
 
   applicant = signal<ApplicantResponse | undefined>(undefined);
+  hasRemarkedLocally = signal<boolean>(false);
+  activeStep = signal<number>(1);
+
+  readonly steps = computed<StepperStep[]>(() => {
+    const app = this.applicant();
+    const list: StepperStep[] = [
+      { label: 'Overview', description: 'Application summary & fees' }
+    ];
+    if (app?.appeal) {
+      list.push({ label: 'Appeal Details', description: 'Applicant appeal & proofs' });
+    }
+    list.push(
+      { label: 'Organisation Details', description: 'Entity & statutory credentials' },
+      { label: 'Authorized Person Details', description: 'Signatory identity & contact' },
+      { label: 'Bank Details', description: 'Disbursement account details' },
+      { label: 'Uploaded Documents', description: `${app?.uploadedDocuments?.length ?? 0} proposal files` },
+      { label: 'Past Performance', description: `${app?.pastEngagements?.length ?? 0} scheme engagements` },
+      { label: 'Department Remarks', description: 'Officer notes & audit timeline' }
+    );
+    return list;
+  });
+
+  readonly stepKey = computed<'overview' | 'appeal' | 'organisation' | 'signatory' | 'bank' | 'documents' | 'past_performance' | 'remarks'>(() => {
+    const hasAppeal = !!this.applicant()?.appeal;
+    const s = this.activeStep();
+    if (s === 1) return 'overview';
+    if (hasAppeal) {
+      if (s === 2) return 'appeal';
+      if (s === 3) return 'organisation';
+      if (s === 4) return 'signatory';
+      if (s === 5) return 'bank';
+      if (s === 6) return 'documents';
+      if (s === 7) return 'past_performance';
+      if (s === 8) return 'remarks';
+    } else {
+      if (s === 2) return 'organisation';
+      if (s === 3) return 'signatory';
+      if (s === 4) return 'bank';
+      if (s === 5) return 'documents';
+      if (s === 6) return 'past_performance';
+      if (s === 7) return 'remarks';
+    }
+    return 'overview';
+  });
+
+  readonly currentStepTitle = computed(() => {
+    const steps = this.steps();
+    const idx = this.activeStep() - 1;
+    return steps[idx]?.label ?? 'Overview';
+  });
+
+  readonly currentStepSubtitle = computed(() => {
+    const steps = this.steps();
+    const idx = this.activeStep() - 1;
+    return steps[idx]?.description ?? '';
+  });
+
+  prevStep(): void {
+    if (this.activeStep() > 1) {
+      this.activeStep.update(s => s - 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
+  nextStep(): void {
+    if (this.activeStep() < this.steps().length) {
+      this.activeStep.update(s => s + 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
+  onStepSelect(stepNumber: number): void {
+    this.activeStep.set(stepNumber);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  readonly currentRemark = computed(() => {
+    const app = this.applicant();
+    if (!app?.activityLog) return '';
+    const remarkLog = [...app.activityLog].reverse().find(act => act.action === 'REMARK_ADDED');
+    return remarkLog?.description || '';
+  });
+
+  readonly isRemarked = computed(() => {
+    if (this.hasRemarkedLocally()) return true;
+    const app = this.applicant();
+    if (!app) return false;
+    return app.activityLog?.some(act => act.action === 'REMARK_ADDED') ?? false;
+  });
+
+  protected statusLabel(app?: ApplicantResponse): string {
+    if (app?.appeal) {
+      if (app.appeal.status === 'Pending') return 'Appeal Pending Review';
+      if (app.appeal.status === 'Accepted') return 'Appeal Approved';
+      if (app.appeal.status === 'Rejected') return 'Appeal Rejected';
+    }
+    switch (app?.status) {
+      case 'APPROVED': return 'Approved';
+      case 'REJECTED': return 'Rejected';
+      case 'REVERTED': return 'Appeal Request';
+      default: return 'Under Review';
+    }
+  }
+
+  protected statusBadgeClass(app?: ApplicantResponse): Record<string, boolean> {
+    return {
+      'bg-emerald-50 text-emerald-800 border-emerald-200': app?.appeal?.status === 'Accepted' || app?.status === 'APPROVED',
+      'bg-amber-50 text-amber-800 border-amber-200': app?.appeal?.status === 'Pending' || ((app?.status === 'UNDER_SCRUTINY' || app?.status === 'REVERTED') && app?.appeal?.status !== 'Accepted'),
+      'bg-rose-50 text-rose-800 border-rose-200': app?.status === 'REJECTED' || app?.appeal?.status === 'Rejected'
+    };
+  }
 
   // Modal Dialog States
   showApproveModal = signal<boolean>(false);
@@ -285,6 +613,8 @@ export class ScrutinyDeskComponent {
   }
 
   loadApplicant(appId: string): void {
+    this.hasRemarkedLocally.set(false);
+    this.activeStep.set(1);
     this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
       if (data) {
         this.shortfallBridge.syncFromTenderIfNeeded(data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(synced => {
@@ -633,6 +963,8 @@ export class ScrutinyDeskComponent {
     const remark = submission.remark.trim();
     if (!app || !remark) return;
 
+    this.hasRemarkedLocally.set(true);
+
     const now = new Date();
     const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -654,7 +986,7 @@ export class ScrutinyDeskComponent {
       status: app.status,
       technicalScore: app.scrutinyDetails?.technicalScore || 0,
       grade: app.scrutinyDetails?.grade,
-      remarks: app.scrutinyDetails?.remarks ?? remark,
+      remarks: remark,
       shortfall: app.scrutinyDetails?.shortfall,
       activityLog: [...this.getActivityLog(), newActivity],
       scrutinyOfficer: app.scrutinyDetails?.scrutinyOfficer ?? this.reviewerName()

@@ -89,6 +89,27 @@ describe('StepperComponent', () => {
     });
   });
 
+  describe('vertical variant', () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('variant', 'vertical');
+      fixture.detectChanges();
+    });
+
+    it('renders vertical navigation buttons with labels and descriptions', () => {
+      expect(buttons().length).toBe(3);
+      expect(component.verticalLabelClass(2)).toContain('font-bold');
+      expect(component.verticalCircleClass(2)).toContain('border-navy');
+      expect(component.verticalCircleClass(1)).toContain('bg-navy');
+    });
+
+    it('emits stepClick on button click', () => {
+      const emitted: number[] = [];
+      component.stepClick.subscribe((n: number) => emitted.push(n));
+      buttons()[2].click();
+      expect(emitted).toEqual([3]);
+    });
+  });
+
   it('uses the success colour for completed circles and brand colour for the current one', () => {
     expect(component.circleClass(1)).toContain('bg-emerald-600');
     expect(component.circleClass(2)).toContain('bg-primary');

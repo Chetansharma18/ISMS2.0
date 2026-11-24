@@ -20,7 +20,7 @@ import {
   AssociatedSchemesModalComponent,
   MasterItemTarget
 } from './associated-schemes-modal.component';
-import { DataEngineService } from '../../core/services/data-engine.service';
+import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
 
 export type { DocMasterItem };
 
@@ -53,6 +53,7 @@ const CONFIG: MasterCrudConfig<DocMasterItem> = {
   columns: COLUMNS,
   hasStatus: true,
   hideViewAction: true,
+  tagsColumns: ['schemes'],
   modalWidthClass: 'max-w-[560px]',
   filters: [
     {
@@ -133,9 +134,19 @@ export class DocMasterComponent {
   @ViewChild('schemesTemplate', { static: true }) schemesTemplate!: TemplateRef<unknown>;
   @ViewChild(MasterCrudPageComponent) masterCrud?: MasterCrudPageComponent<DocMasterItem>;
 
-  private dataEngine = inject(DataEngineService);
-  private cdr = inject(ChangeDetectorRef);
-  private docRepo = this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' });
+  private dataEngine?: DataEngineService;
+  private cdr?: ChangeDetectorRef;
+  private docRepo?: ResourceRepository<DocMasterItem>;
+
+  constructor() {
+    try {
+      this.dataEngine = inject(DataEngineService);
+      this.cdr = inject(ChangeDetectorRef);
+      this.docRepo = this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' });
+    } catch {
+      // Allowed in isolated unit tests
+    }
+  }
 
   readonly config = CONFIG;
   readonly isSchemesModalOpen = signal<boolean>(false);
@@ -154,22 +165,22 @@ export class DocMasterComponent {
       schemes: item.schemes
     });
     this.isSchemesModalOpen.set(true);
-    this.cdr.markForCheck();
+    this.cdr?.markForCheck();
   }
 
   closeSchemesModal(): void {
     this.isSchemesModalOpen.set(false);
     this.selectedTargetItem.set(null);
-    this.cdr.markForCheck();
+    this.cdr?.markForCheck();
   }
 
   onSchemesUpdated(event: { itemId: string; schemes: string[] }): void {
-    this.docRepo.update(event.itemId, { schemes: event.schemes }).subscribe({
+    this.docRepo?.update(event.itemId, { schemes: event.schemes }).subscribe({
       next: () => {
         this.masterCrud?.items.update(list =>
           list.map(it => (it.id === event.itemId ? { ...it, schemes: event.schemes } : it))
         );
-        this.cdr.markForCheck();
+        this.cdr?.markForCheck();
       }
     });
   }

@@ -138,6 +138,23 @@ interface TwoStepFormData {
       <!-- Custom Template: Action Column -->
       <ng-template #actionTemplate let-item>
         <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap" (click)="$event.stopPropagation()">
+          <!-- View Button -->
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            [disabled]="item.status === 'Inactive'"
+            (click)="openViewModal(item)"
+            [title]="item.status === 'Inactive' ? 'Actions are disabled for inactive users' : 'View Details'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Actions are disabled for inactive users' : 'View Details'"
+          >
+            <app-icon name="eye" size="sm" />
+          </button>
+
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
           <!-- Edit Button -->
           <button
             appButton
@@ -145,9 +162,10 @@ interface TwoStepFormData {
             size="sm"
             iconOnly
             type="button"
+            [disabled]="item.status === 'Inactive'"
             (click)="openEditModal(item)"
-            title="Edit"
-            aria-label="Edit"
+            [title]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
           >
             <app-icon name="edit" size="sm" />
           </button>
@@ -255,6 +273,48 @@ interface TwoStepFormData {
         </div>
       </app-action-modal>
 
+      <!-- VIEW MODAL -->
+      <app-action-modal
+        [isOpen]="showViewModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        primaryLabel=""
+        secondaryLabel="Close"
+        maxWidthClass="max-w-[480px]"
+        (secondaryAction)="closeViewModal()"
+        (close)="closeViewModal()"
+      >
+        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+          Two Step Verification Details
+        </h2>
+
+        @if (selectedViewItem(); as viewItem) {
+          <div class="mt-4 font-sans text-xs space-y-4">
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Role</span>
+              <span class="font-semibold text-slate-800 text-sm">{{ viewItem.roleType }}</span>
+            </div>
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Authentication Types</span>
+              <div class="flex flex-wrap gap-1.5 mt-1">
+                @for (type of viewItem.authTypes; track type) {
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                    {{ type }}
+                  </span>
+                }
+              </div>
+            </div>
+            <div>
+              <span class="block text-slate-400 font-medium mb-1">Status</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-100 text-slate-600' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'">
+                {{ viewItem.status }}
+              </span>
+            </div>
+          </div>
+        }
+      </app-action-modal>
+
     </app-page-shell>
   `
 })
@@ -273,6 +333,8 @@ export class TwoStepVerificationComponent implements OnInit {
   searchQuery = signal<string>('');
 
   showModal = signal<boolean>(false);
+  showViewModal = signal<boolean>(false);
+  selectedViewItem = signal<TwoStepVerificationItem | null>(null);
   editingId = signal<string | null>(null);
   submitted = signal<boolean>(false);
   isAuthDropdownOpen = signal<boolean>(false);
@@ -410,13 +472,14 @@ export class TwoStepVerificationComponent implements OnInit {
     const unconfigured = this.availableRoles().find(r => !existingRoles.includes(r));
 
     this.formData = {
-      roleType: unconfigured || this.availableRoles()[0] || '',
-      authTypes: ['OTP']
+      roleType: '',
+      authTypes: []
     };
     this.showModal.set(true);
   }
 
   openEditModal(item: TwoStepVerificationItem): void {
+    if (item.status === 'Inactive') return;
     this.editingId.set(item.id);
     this.submitted.set(false);
     this.isAuthDropdownOpen.set(false);
@@ -507,5 +570,18 @@ export class TwoStepVerificationComponent implements OnInit {
         this.items.update(list => list.filter(it => it.id !== item.id));
       }
     });
+  }
+
+  openViewModal(item: TwoStepVerificationItem): void {
+    if (item.status === 'Inactive') {
+      return;
+    }
+    this.selectedViewItem.set(item);
+    this.showViewModal.set(true);
+  }
+
+  closeViewModal(): void {
+    this.showViewModal.set(false);
+    this.selectedViewItem.set(null);
   }
 }

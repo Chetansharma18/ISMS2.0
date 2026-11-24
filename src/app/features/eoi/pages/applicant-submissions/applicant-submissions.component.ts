@@ -271,19 +271,33 @@ export class ApplicantSubmissionsComponent {
 
     this.isDownloadingExcel.set(true);
     try {
-      let gradeOptions = ['A+', 'A', 'B', 'C', 'D'];
+      let gradeOptions: (string | { grade: string; range?: string })[] = [
+        { grade: 'A+', range: '85 - 100' },
+        { grade: 'A', range: '70 - 84' },
+        { grade: 'B', range: '55 - 69' },
+        { grade: 'C', range: '40 - 54' },
+        { grade: 'D', range: '0 - 39' }
+      ];
       if (this.dataEngine) {
         try {
           const masters = await firstValueFrom(
             this.dataEngine.for<GradingMasterItem>('GRADING_MASTERS', { idKey: 'id' }).getAll()
           );
-          const activeGrades = (masters || [])
-            .filter(g => g.status !== 'Inactive')
-            .map(g => g.grade?.trim())
-            .filter((g): g is string => !!g);
-          const unique = Array.from(new Set(activeGrades));
-          if (unique.length > 0) {
-            gradeOptions = unique;
+          const activeItems = (masters || []).filter(g => g.status !== 'Inactive' && !!g.grade);
+          if (activeItems.length > 0) {
+            const seen = new Set<string>();
+            const unique: { grade: string; range?: string }[] = [];
+            for (const g of activeItems) {
+              const gradeName = g.grade.trim();
+              if (!seen.has(gradeName)) {
+                seen.add(gradeName);
+                const r = (g.range || (g.minimum !== undefined && g.maximum !== undefined ? `${g.minimum} - ${g.maximum}` : '')).trim();
+                unique.push({ grade: gradeName, range: r });
+              }
+            }
+            if (unique.length > 0) {
+              gradeOptions = unique;
+            }
           }
         } catch (e) {
           console.warn('Could not load grades from data engine, using defaults', e);

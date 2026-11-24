@@ -37,7 +37,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
     <app-list-page
       title="MoU Management"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'MoU Management' }]"
-      searchPlaceholder="Search uploaded MoUs by title, file name..."
+      searchPlaceholder="Search MoUs by title, file name..."
       [(searchQuery)]="searchQuery"
       [columns]="mouColumns"
       [data]="filteredDocuments()"

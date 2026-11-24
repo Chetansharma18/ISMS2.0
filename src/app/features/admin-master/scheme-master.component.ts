@@ -78,6 +78,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   columns: COLUMNS,
   hasStatus: true,
   hideViewAction: true,
+  actionColumnWidth: 'w-44 min-w-[175px]',
   modalWidthClass: 'max-w-[840px]',
   filters: [
     {
@@ -237,7 +238,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
           size="sm"
           iconOnly
           type="button"
-          (click)="$event.stopPropagation(); masterCrud?.openEditModal(item)"
+          (click)="$event.stopPropagation(); openEditModal(item)"
           title="Edit"
           aria-label="Edit"
         >
@@ -255,7 +256,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
           <app-switch
             [checked]="item.status !== 'Inactive'"
             [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
-            (toggled)="masterCrud?.toggleStatus(item)"
+            (toggled)="toggleStatus(item)"
           />
         </div>
       </div>
@@ -300,6 +301,14 @@ export class SchemeMasterComponent {
     this.isReqModalOpen.set(false);
     this.selectedSchemeForReq.set(null);
     this.cdr.markForCheck();
+  }
+
+  openEditModal(item: SchemeMasterItem): void {
+    this.masterCrud?.openEditModal(item);
+  }
+
+  toggleStatus(item: SchemeMasterItem): void {
+    this.masterCrud?.toggleStatus(item);
   }
 
   formatBudget(val: number | undefined | null): string {

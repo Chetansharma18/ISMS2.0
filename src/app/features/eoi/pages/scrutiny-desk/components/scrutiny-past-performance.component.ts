@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, input, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { IconComponent, TableColumn, TableComponent } from '../../../../../shared';
 import type { PastEngagement } from '../../../services/eoi-state.models';
@@ -109,9 +109,16 @@ function percent(part: number, whole: number): number {
     </section>
   `
 })
-export class ScrutinyPastPerformanceComponent {
+export class ScrutinyPastPerformanceComponent implements OnInit {
   readonly engagements = input<PastEngagement[]>([]);
+  readonly initiallyOpen = input<boolean>(false);
   readonly isOpen = signal<boolean>(false);
+
+  ngOnInit(): void {
+    if (this.initiallyOpen()) {
+      this.isOpen.set(true);
+    }
+  }
 
   toggleOpen(): void {
     this.isOpen.update(v => !v);

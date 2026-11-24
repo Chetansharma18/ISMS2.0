@@ -77,6 +77,8 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   deleteConfirmText?: (item: T) => string;
   /** Whether to hide the View action button in the table action column */
   hideViewAction?: boolean;
+  /** Explicit column width for the Action column (e.g. 'w-44 min-w-[175px]') */
+  actionColumnWidth?: string;
   /** Explicit column definitions for the View Details modal (defaults to config.columns) */
   viewColumns?: TableColumn<T>[];
   /** Dynamic top filter dropdowns (e.g. Sector, Category, Department) */

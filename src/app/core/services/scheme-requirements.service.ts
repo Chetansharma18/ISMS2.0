@@ -65,6 +65,149 @@ export class SchemeRequirementsService {
     if (savedSnapshots && savedSnapshots.length > 0) {
       this.snapshots.set(savedSnapshots);
     }
+
+    // 4. Automatically sync with latest Doc Master & Annexure Master configurations
+    this.syncWithMasters();
+  }
+
+  /**
+   * Synchronizes scheme requirement mappings with the latest definitions in Doc Master and Annexure Master.
+   */
+  syncWithMasters(): void {
+    try {
+      this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' }).getAll().subscribe({
+        next: (docs) => {
+          this.dataEngine.for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' }).getAll().subscribe({
+            next: (annexes) => {
+              this.applyMastersSync(docs || [], annexes || []);
+            },
+            error: () => {}
+          });
+        },
+        error: () => {}
+      });
+    } catch {
+      // Ignored in mock-less isolated test runs
+    }
+  }
+
+  applyMastersSync(docs: DocMasterItem[], annexes: AnnexureMasterItem[]): void {
+    if (!docs.length && !annexes.length) return;
+
+    const currentMappings = [...this.mappings()];
+    const docMap = new Map<string, DocMasterItem>();
+    for (const d of docs) {
+      docMap.set(d.id, d);
+      docMap.set(d.docName.trim().toLowerCase(), d);
+    }
+
+    const annexMap = new Map<string, AnnexureMasterItem>();
+    for (const a of annexes) {
+      annexMap.set(a.id, a);
+      annexMap.set(a.annexureName.trim().toLowerCase(), a);
+    }
+
+    let modified = false;
+
+    // 1. Update existing mappings' masterItemName and status to match master
+    const updated = currentMappings.map(m => {
+      if (m.requirementType === 'DOCUMENT') {
+        const found = docMap.get(m.masterItemId) || docMap.get(m.masterItemName.trim().toLowerCase());
+        if (found && (m.masterItemName !== found.docName || m.masterItemId !== found.id || m.status !== found.status)) {
+          modified = true;
+          return {
+            ...m,
+            masterItemId: found.id,
+            masterItemName: found.docName,
+            status: found.status || 'Active'
+          };
+        }
+      } else if (m.requirementType === 'ANNEXURE') {
+        const found = annexMap.get(m.masterItemId) || annexMap.get(m.masterItemName.trim().toLowerCase());
+        if (found && (m.masterItemName !== found.annexureName || m.masterItemId !== found.id || m.status !== found.status)) {
+          modified = true;
+          return {
+            ...m,
+            masterItemId: found.id,
+            masterItemName: found.annexureName,
+            status: found.status || 'Active'
+          };
+        }
+      }
+      return m;
+    });
+
+    // 2. Ensure every doc's assigned schemes have a mapping
+    for (const d of docs) {
+      for (const sch of d.schemes || []) {
+        const exists = updated.some(
+          m => m.requirementType === 'DOCUMENT' &&
+               m.masterItemId === d.id &&
+               m.schemeName.trim().toLowerCase() === sch.trim().toLowerCase()
+        );
+        if (!exists) {
+          modified = true;
+          updated.push({
+            id: `srm-sync-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            schemeId: `sch-${Date.now()}`,
+            schemeName: sch.trim(),
+            requirementType: 'DOCUMENT',
+            masterItemId: d.id,
+            masterItemCode: `DOC-${d.id.toUpperCase()}`,
+            masterItemName: d.docName,
+            category: 'Compliance & Verification',
+            isMandatory: true,
+            applicantCategory: 'ALL',
+            displayOrder: updated.length + 1,
+            maxSizeMb: 25,
+            acceptedFormats: ['PDF', 'JPEG', 'PNG'],
+            status: 'Active',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+        }
+      }
+    }
+
+    // 3. Ensure every annexure's assigned schemes have a mapping
+    for (const a of annexes) {
+      for (const sch of a.schemes || []) {
+        const exists = updated.some(
+          m => m.requirementType === 'ANNEXURE' &&
+               m.masterItemId === a.id &&
+               m.schemeName.trim().toLowerCase() === sch.trim().toLowerCase()
+        );
+        if (!exists) {
+          modified = true;
+          updated.push({
+            id: `srm-sync-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+            schemeId: `sch-${Date.now()}`,
+            schemeName: sch.trim(),
+            requirementType: 'ANNEXURE',
+            masterItemId: a.id,
+            masterItemCode: `ANNEX-${a.id.toUpperCase()}`,
+            masterItemName: a.annexureName,
+            category: 'Official Format',
+            isMandatory: a.annexureName.includes('Annexure-1') || a.annexureName.includes('Covering'),
+            applicantCategory: 'ALL',
+            displayOrder: updated.length + 1,
+            templateFileName: `${a.annexureName.replace(/[^a-zA-Z0-9_-]/g, '_')}_Format.pdf`,
+            templateVersion: '1.0',
+            completionMethod: 'DOWNLOAD_UPLOAD',
+            maxSizeMb: 25,
+            acceptedFormats: ['PDF', 'DOCX'],
+            status: 'Active',
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+        }
+      }
+    }
+
+    if (modified) {
+      this.mappings.set(updated);
+      this.storage.setItem(STORAGE_KEY_REQUIREMENTS, updated);
+    }
   }
 
   /**

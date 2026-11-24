@@ -491,6 +491,7 @@ import { DataEngineService } from '../../core/services/data-engine.service';
 })
 export class SchemeRequirementsModalComponent {
   private schemeReqService = inject(SchemeRequirementsService);
+  private dataEngine = inject(DataEngineService);
 
   readonly isOpen = input<boolean>(false);
   readonly scheme = input<SchemeMasterItem | null>(null);
@@ -503,12 +504,12 @@ export class SchemeRequirementsModalComponent {
   readonly customFields = signal<SchemeCustomField[]>([]);
 
   // Add Document State
-  readonly availableDocsLibrary = signal<DocMasterItem[]>(MOCK_DOC_MASTER_ITEMS);
+  readonly availableDocsLibrary = signal<DocMasterItem[]>([]);
   selectedDocToAdd = '';
   newDocMandatory = true;
 
   // Add Annexure State
-  readonly availableAnnexuresLibrary = signal<AnnexureMasterItem[]>(MOCK_ANNEXURE_MASTER_ITEMS);
+  readonly availableAnnexuresLibrary = signal<AnnexureMasterItem[]>([]);
   selectedAnnexToAdd = '';
   newAnnexMandatory = true;
 
@@ -526,13 +527,49 @@ export class SchemeRequirementsModalComponent {
   });
 
   constructor() {
+    this.loadLibraries();
+
     effect(() => {
       const open = this.isOpen();
       const s = this.scheme();
       if (open && s) {
+        this.schemeReqService.syncWithMasters();
+        this.loadLibraries();
         this.loadSchemeRequirements(s);
       }
     });
+  }
+
+  private loadLibraries(): void {
+    try {
+      this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' }).getAll().subscribe({
+        next: docs => {
+          if (docs && docs.length > 0) {
+            this.availableDocsLibrary.set(docs);
+          } else {
+            this.availableDocsLibrary.set(MOCK_DOC_MASTER_ITEMS);
+          }
+        },
+        error: () => {
+          this.availableDocsLibrary.set(MOCK_DOC_MASTER_ITEMS);
+        }
+      });
+      this.dataEngine.for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' }).getAll().subscribe({
+        next: annexes => {
+          if (annexes && annexes.length > 0) {
+            this.availableAnnexuresLibrary.set(annexes);
+          } else {
+            this.availableAnnexuresLibrary.set(MOCK_ANNEXURE_MASTER_ITEMS);
+          }
+        },
+        error: () => {
+          this.availableAnnexuresLibrary.set(MOCK_ANNEXURE_MASTER_ITEMS);
+        }
+      });
+    } catch {
+      this.availableDocsLibrary.set(MOCK_DOC_MASTER_ITEMS);
+      this.availableAnnexuresLibrary.set(MOCK_ANNEXURE_MASTER_ITEMS);
+    }
   }
 
   private loadSchemeRequirements(s: SchemeMasterItem): void {
@@ -558,13 +595,16 @@ export class SchemeRequirementsModalComponent {
     const s = this.scheme();
     if (!s || !this.selectedDocToAdd) return;
 
+    const foundDoc = this.availableDocsLibrary().find(d => d.docName === this.selectedDocToAdd);
+    const masterId = foundDoc?.id || `doc-${Date.now()}`;
+
     this.schemeReqService.addMapping({
       schemeId: s.id,
       schemeName: s.schemeName,
       schemeCode: s.categoryName || 'GENERAL',
       requirementType: 'DOCUMENT',
-      masterItemId: `doc-${Date.now()}`,
-      masterItemCode: `DOC-${Date.now()}`,
+      masterItemId: masterId,
+      masterItemCode: `DOC-${masterId.toUpperCase()}`,
       masterItemName: this.selectedDocToAdd,
       category: 'Standard',
       isMandatory: this.newDocMandatory,
@@ -574,6 +614,11 @@ export class SchemeRequirementsModalComponent {
       acceptedFormats: ['PDF', 'JPEG', 'PNG'],
       status: 'Active'
     });
+
+    if (foundDoc && !foundDoc.schemes?.includes(s.schemeName)) {
+      const updatedSchemes = [...(foundDoc.schemes || []), s.schemeName];
+      this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' }).update(foundDoc.id, { schemes: updatedSchemes }).subscribe();
+    }
 
     this.selectedDocToAdd = '';
     this.loadSchemeRequirements(s);
@@ -595,13 +640,16 @@ export class SchemeRequirementsModalComponent {
     const s = this.scheme();
     if (!s || !this.selectedAnnexToAdd) return;
 
+    const foundAnnex = this.availableAnnexuresLibrary().find(a => a.annexureName === this.selectedAnnexToAdd);
+    const masterId = foundAnnex?.id || `annex-${Date.now()}`;
+
     this.schemeReqService.addMapping({
       schemeId: s.id,
       schemeName: s.schemeName,
       schemeCode: s.categoryName || 'GENERAL',
       requirementType: 'ANNEXURE',
-      masterItemId: `annex-${Date.now()}`,
-      masterItemCode: `ANNEX-${Date.now()}`,
+      masterItemId: masterId,
+      masterItemCode: `ANNEX-${masterId.toUpperCase()}`,
       masterItemName: this.selectedAnnexToAdd,
       category: 'Official Format',
       isMandatory: this.newAnnexMandatory,
@@ -614,6 +662,11 @@ export class SchemeRequirementsModalComponent {
       acceptedFormats: ['PDF', 'DOCX'],
       status: 'Active'
     });
+
+    if (foundAnnex && !foundAnnex.schemes?.includes(s.schemeName)) {
+      const updatedSchemes = [...(foundAnnex.schemes || []), s.schemeName];
+      this.dataEngine.for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' }).update(foundAnnex.id, { schemes: updatedSchemes }).subscribe();
+    }
 
     this.selectedAnnexToAdd = '';
     this.loadSchemeRequirements(s);

@@ -21,6 +21,7 @@ import {
   MasterItemTarget
 } from './associated-schemes-modal.component';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
+import { SchemeRequirementsService } from '../../core/services/scheme-requirements.service';
 
 export type { DocMasterItem };
 
@@ -137,12 +138,14 @@ export class DocMasterComponent {
   private dataEngine?: DataEngineService;
   private cdr?: ChangeDetectorRef;
   private docRepo?: ResourceRepository<DocMasterItem>;
+  private schemeReqService?: SchemeRequirementsService;
 
   constructor() {
     try {
       this.dataEngine = inject(DataEngineService);
       this.cdr = inject(ChangeDetectorRef);
       this.docRepo = this.dataEngine.for<DocMasterItem>('DOC_MASTERS', { idKey: 'id' });
+      this.schemeReqService = inject(SchemeRequirementsService);
     } catch {
       // Allowed in isolated unit tests
     }
@@ -180,6 +183,7 @@ export class DocMasterComponent {
         this.masterCrud?.items.update(list =>
           list.map(it => (it.id === event.itemId ? { ...it, schemes: event.schemes } : it))
         );
+        this.schemeReqService?.syncWithMasters();
         this.cdr?.markForCheck();
       }
     });

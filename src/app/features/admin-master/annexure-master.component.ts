@@ -21,6 +21,7 @@ import {
   MasterItemTarget
 } from './associated-schemes-modal.component';
 import { DataEngineService, ResourceRepository } from '../../core/services/data-engine.service';
+import { SchemeRequirementsService } from '../../core/services/scheme-requirements.service';
 
 export type { AnnexureMasterItem };
 
@@ -137,12 +138,14 @@ export class AnnexureMasterComponent {
   private dataEngine?: DataEngineService;
   private cdr?: ChangeDetectorRef;
   private annexRepo?: ResourceRepository<AnnexureMasterItem>;
+  private schemeReqService?: SchemeRequirementsService;
 
   constructor() {
     try {
       this.dataEngine = inject(DataEngineService);
       this.cdr = inject(ChangeDetectorRef);
       this.annexRepo = this.dataEngine.for<AnnexureMasterItem>('ANNEXURE_MASTERS', { idKey: 'id' });
+      this.schemeReqService = inject(SchemeRequirementsService);
     } catch {
       // Allowed in isolated unit tests
     }
@@ -180,6 +183,7 @@ export class AnnexureMasterComponent {
         this.masterCrud?.items.update(list =>
           list.map(it => (it.id === event.itemId ? { ...it, schemes: event.schemes } : it))
         );
+        this.schemeReqService?.syncWithMasters();
         this.cdr?.markForCheck();
       }
     });

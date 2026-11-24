@@ -656,7 +656,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
       ...(this.config?.customTemplates || {})
     };
     for (const key of this.config?.tagsColumns || []) {
-      if (this.tagsTemplate) {
+      if (this.tagsTemplate && !this._extraTemplates?.[key] && !this.config?.customTemplates?.[key]) {
         templates[key] = this.tagsTemplate;
       }
     }

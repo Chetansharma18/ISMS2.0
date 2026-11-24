@@ -104,25 +104,21 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
       <div beforeTable class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
         <div class="flex items-center gap-1.5 min-w-[200px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
-          <app-dropdown
-            size="sm"
-            class="flex-1 min-w-[180px] max-w-[240px]"
-            [options]="centerDropdownOptions()"
-            [value]="selectedSdc()"
-            (valueChange)="selectedSdc.set($event)"
-            placeholder="Select Center"
-          />
+          <select appInput size="sm" [ngModel]="selectedSdc()" (ngModelChange)="selectedSdc.set($event)" class="w-[200px] max-w-[220px]">
+            <option value="ALL">All Centers ({{ sdcOptions().length }})</option>
+            @for (s of sdcOptions(); track s.code) {
+              <option [value]="s.code">{{ s.name }}</option>
+            }
+          </select>
         </div>
         <div class="flex items-center gap-1.5 min-w-[200px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Batch:</label>
-          <app-dropdown
-            size="sm"
-            class="flex-1 min-w-[180px] max-w-[240px]"
-            [options]="batchDropdownOptions()"
-            [value]="selectedBatch()"
-            (valueChange)="selectedBatch.set($event)"
-            placeholder="Select Batch"
-          />
+          <select appInput size="sm" [ngModel]="selectedBatch()" (ngModelChange)="selectedBatch.set($event)" class="w-[200px] max-w-[220px]">
+            <option value="ALL">All Batches ({{ batchOptions().length }})</option>
+            @for (b of batchOptions(); track b.code) {
+              <option [value]="b.code">{{ b.code }} - {{ b.course }}</option>
+            }
+          </select>
         </div>
         <div class="flex items-center gap-1.5 min-w-[180px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
@@ -367,7 +363,7 @@ export class AspirantListComponent {
   });
 
   readonly hasActiveFilters = computed(
-    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.activeStatus() !== 'ALL' || this.searchQuery().trim() !== ''
+    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.searchQuery().trim() !== ''
   );
 
   readonly filteredAspirants = computed(() => {
@@ -391,7 +387,6 @@ export class AspirantListComponent {
   });
 
   resetFilters(): void {
-    this.activeStatus.set('ALL');
     this.selectedSdc.set('ALL');
     this.selectedBatch.set('ALL');
     this.selectedScheme.set('ALL');

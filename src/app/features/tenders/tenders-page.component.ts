@@ -398,11 +398,11 @@ export class TendersPageComponent {
   private promptDismissed = false;
 
   readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
-  readonly docMasterItems = signal<DocMasterItem[]>([]);
-  readonly annexureMasterItems = signal<AnnexureMasterItem[]>([]);
-  readonly schemeMasterNames = signal<string[]>([]);
-  readonly schemeCategoryNames = signal<string[]>([]);
-  readonly eoiCategoryNames = signal<string[]>([]);
+  readonly docMasterItems = signal<DocMasterItem[]>(INITIAL_DOC_ITEMS);
+  readonly annexureMasterItems = signal<AnnexureMasterItem[]>(INITIAL_ANNEXURE_ITEMS);
+  readonly schemeMasterNames = signal<string[]>(['MMKVY', 'Rajvik', 'PMMY', 'Vishwakarma Yuva Udyami Protsahan Yojana']);
+  readonly schemeCategoryNames = signal<string[]>(['Rajvik', 'MMKVY', 'Special Initiatives', 'ALL']);
+  readonly eoiCategoryNames = signal<string[]>(['General', 'Special', 'Empanelment']);
 
   /** Scheme names available in the "Configure New EOI" scheme dropdown (sourced from Scheme Master). */
   readonly schemeNameOptions = computed(() => {
@@ -447,6 +447,7 @@ export class TendersPageComponent {
   readonly showAttachmentModal = signal<boolean>(false);
   readonly showCorrigendumModal = signal<boolean>(false);
   private pendingEditScheme: SchemeTender | null = null;
+  private pendingApplyAfterOtrDismiss = false;
 
   pageSize = 10;
   searchQuery = signal<string>('');
@@ -706,6 +707,10 @@ export class TendersPageComponent {
     this.promptDismissed = true;
     this.storage.setSessionString('isms_otr_prompt_dismissed', 'true');
     this.storage.setString('isms_eoi_prompt_shown_new_user', 'true');
+    if (this.pendingApplyAfterOtrDismiss) {
+      this.pendingApplyAfterOtrDismiss = false;
+      this.navigateToSchemeForm(this.selectedScheme());
+    }
   }
 
   // Documents & requirements sourced from centralized mock/API store via SchemeService
@@ -797,20 +802,13 @@ export class TendersPageComponent {
   }
 
   backToList(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.selectedScheme.set(null);
     this.router.navigate([], { relativeTo: this.route, queryParams: {} });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  handleApplyForScheme(): void {
-    // Check if profile is incomplete
-    if (this.isProfileIncomplete()) {
-      this.showOtrPromptModal.set(true);
-      return;
-    }
-
-    // Direct navigation to scheme proposal form without showing the registration preview modal
-    const scheme = this.selectedScheme();
+  private navigateToSchemeForm(scheme: SchemeTender | null): void {
     this.router.navigate(['/scheme-form'], {
       queryParams: {
         refNo: scheme?.refNo || 'RSLDC/EOI/VYUPY/2026-27/01',
@@ -827,12 +825,26 @@ export class TendersPageComponent {
     });
   }
 
+  handleApplyForScheme(): void {
+    // Check if profile is incomplete
+    if (this.isProfileIncomplete()) {
+      this.pendingApplyAfterOtrDismiss = true;
+      this.showOtrPromptModal.set(true);
+      return;
+    }
+
+    // Direct navigation to scheme proposal form without showing the registration preview modal
+    this.navigateToSchemeForm(this.selectedScheme());
+  }
+
   goToProfile(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.dismissOtrPrompt();
     this.router.navigate(['/profile']);
   }
 
   goToRegistration(): void {
+    this.pendingApplyAfterOtrDismiss = false;
     this.dismissOtrPrompt();
     this.router.navigate(['/registration']);
   }
@@ -978,8 +990,8 @@ export class TendersPageComponent {
     if (reqs.annexures.length > 0) {
       this.newEoiData.annexures = reqs.annexures.map((a) => a.masterItemName);
     } else {
-      const annexList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
-      const annexures = parseMasterEntriesByScheme(annexList, schemeName, (a) => a.annexureName || a.annexures);
+      const annexList: AnnexureMasterItem[] = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+      const annexures = parseMasterEntriesByScheme<AnnexureMasterItem>(annexList, schemeName, (a) => a.annexureName || a.annexures);
       this.newEoiData.annexures = [...annexures];
     }
 
@@ -1126,8 +1138,8 @@ export class TendersPageComponent {
   }
 
   getSchemeAnnexures(scheme: SchemeTender): EoiDocumentItem[] {
-    const masterList = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
-    const items = this.resolveMasterSchemeList(scheme.annexures, masterList, scheme, (a) => a.annexureName || a.annexures);
+    const masterList: AnnexureMasterItem[] = this.annexureMasterItems().length > 0 ? this.annexureMasterItems() : INITIAL_ANNEXURE_ITEMS;
+    const items = this.resolveMasterSchemeList(scheme.annexures, masterList, scheme, (a: AnnexureMasterItem) => a.annexureName || a.annexures);
     if (items) {
       return items.map((ann, idx) => ({
         sNo: idx + 1,
@@ -1255,8 +1267,9 @@ export class TendersPageComponent {
     });
 
     if (!validation.isValid) {
-      const firstInvalidKey = Object.keys(validation.errors)[0];
-      if (firstInvalidKey) {
+      if (Object.keys(validation.errors).length > 0) {
+        this.fileError.set('Please fill in all mandatory fields marked with * before publishing.');
+        const firstInvalidKey = Object.keys(validation.errors)[0];
         const fieldMap: Record<string, string> = {
           refNo: 'eoiRefNoInput',
           scheme: 'eoiSchemeSelect',
@@ -1275,10 +1288,17 @@ export class TendersPageComponent {
           el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
           el?.focus();
         }
+      } else if (Object.keys(validation.docErrors).length > 0) {
+        this.fileError.set('Please select a valid document for each required document row.');
+        const docEl = document.querySelector('app-dropdown, .border-dashed');
+        docEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        this.fileError.set('Please complete all mandatory EOI requirements before submitting.');
       }
       return;
     }
 
+    this.fileError.set('');
     this.showConfirmSubmitEoiModal.set(true);
   }
 

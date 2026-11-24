@@ -93,4 +93,71 @@ describe('Step4BankDetailsComponent - Validation & Search (Bugs 5, 6, 7, 9)', ()
     expect(component.banks.length).toBeGreaterThan(0);
     expect(component.banks.some(b => b.includes('State Bank of India'))).toBe(true);
   });
+
+  it('verifies Bug 6: Bank Details field labels have no "for" attribute linking to input IDs', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    const labels = Array.from(compiled.querySelectorAll('label'));
+
+    // Check each bank details input label
+    const branchLabel = labels.find(l => l.textContent?.includes('Branch Name'));
+    expect(branchLabel).toBeDefined();
+    expect(branchLabel?.getAttribute('for')).toBeNull();
+
+    const holderLabel = labels.find(l => l.textContent?.includes('Account Holder Name'));
+    expect(holderLabel).toBeDefined();
+    expect(holderLabel?.getAttribute('for')).toBeNull();
+
+    const accLabel = labels.find(l => l.textContent?.includes('Account Number'));
+    expect(accLabel).toBeDefined();
+    expect(accLabel?.getAttribute('for')).toBeNull();
+
+    const ifscLabel = labels.find(l => l.textContent?.includes('IFSC Code'));
+    expect(ifscLabel).toBeDefined();
+    expect(ifscLabel?.getAttribute('for')).toBeNull();
+
+    const micrLabel = labels.find(l => l.textContent?.includes('MICR Code'));
+    expect(micrLabel).toBeDefined();
+    expect(micrLabel?.getAttribute('for')).toBeNull();
+
+    const bankLabel = labels.find(l => l.textContent?.includes('Name of the Bank'));
+    expect(bankLabel).toBeDefined();
+    expect(bankLabel?.getAttribute('for')).toBeNull();
+  });
+
+  it('verifies Bug 7: Validates Branch Name and Account Holder Name length', () => {
+    formService.updateStep4({ branchName: 'A' });
+    fixture.detectChanges();
+    expect(component.getFieldError('branchName')).toBe('Branch Name must be at least 2 characters');
+
+    formService.updateStep4({ branchName: 'Jaipur Main' });
+    fixture.detectChanges();
+    expect(component.getFieldError('branchName')).toBeUndefined();
+
+    formService.updateStep4({ accountHolderName: 'A' });
+    fixture.detectChanges();
+    expect(component.getFieldError('accountHolderName')).toBe('Account Holder Name must be at least 2 characters');
+
+    formService.updateStep4({ accountHolderName: 'Acme Skill Solutions Ltd' });
+    fixture.detectChanges();
+    expect(component.getFieldError('accountHolderName')).toBeUndefined();
+  });
+
+  it('verifies Bug 7: Cancelled Cheque upload required on submission', () => {
+    expect(component.getFieldError('cancelledChequeDoc')).toBeUndefined();
+
+    validationService.markStepSubmitted(3);
+    fixture.detectChanges();
+    expect(component.getFieldError('cancelledChequeDoc')).toBe('Cancelled Cheque or Bank Passbook upload is required');
+
+    formService.updateStep4({
+      cancelledChequeDoc: {
+        fileName: 'cheque.pdf',
+        fileSize: '1.2 MB',
+        uploadDate: '2026-01-01',
+        status: 'uploaded'
+      }
+    });
+    fixture.detectChanges();
+    expect(component.getFieldError('cancelledChequeDoc')).toBeUndefined();
+  });
 });

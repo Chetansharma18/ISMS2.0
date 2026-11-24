@@ -14,6 +14,9 @@ import { IconComponent } from '../icon/icon.component';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, IconComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   template: `
     @if (isOpen) {
       <div
@@ -38,6 +41,19 @@ import { IconComponent } from '../icon/icon.component';
             <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
           }
 
+          <!-- Close Button -->
+          @if (showCloseButton) {
+            <button
+              type="button"
+              (click)="onClose()"
+              class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+              title="Close"
+              aria-label="Close"
+            >
+              <app-icon name="close" [stroke]="2.5" />
+            </button>
+          }
+
           <!-- Modal Body -->
           <div
             class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
@@ -46,19 +62,6 @@ import { IconComponent } from '../icon/icon.component';
             [class.flex-1]="scrollable"
             [class.min-h-0]="scrollable"
           >
-
-            <!-- Close Button -->
-            @if (showCloseButton) {
-              <button
-                type="button"
-                (click)="onClose()"
-                class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
-                title="Close"
-                aria-label="Close"
-              >
-                <app-icon name="close" [stroke]="2.5" />
-              </button>
-            }
 
             <!-- Badge Pill -->
             @if (badge) {
@@ -82,16 +85,18 @@ import { IconComponent } from '../icon/icon.component';
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full" [class.flex-1]="scrollable" [class.min-h-0]="scrollable" [class.flex]="scrollable" [class.flex-col]="scrollable">
+            <div class="w-full flex-1 min-h-0 flex flex-col overflow-y-auto pr-0.5">
               <ng-content></ng-content>
             </div>
 
             <!-- Action Buttons Footer -->
             @if (primaryLabel || secondaryLabel) {
-              <div [class.mt-auto]="scrollable">
-                <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
+              <div class="mt-auto shrink-0">
+                @if (showFooterDivider) {
+                  <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
+                }
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!secondaryLabel">
                   @if (secondaryLabel) {
                     <button
                       type="button"
@@ -139,6 +144,7 @@ export class ActionModalComponent {
   @Input() showAccentBar = false;
   @Input() accentBarClass = 'bg-navy';
   @Input() showCloseButton = false;
+  @Input() showFooterDivider = true;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;

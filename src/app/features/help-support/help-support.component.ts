@@ -1,5 +1,5 @@
 // ui-guard-allow: page-frame - standalone Help & Support FAQ page without portal shell
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -385,8 +385,16 @@ export type FaqCategory =
     </div>
   `
 })
-export class HelpSupportComponent {
+export class HelpSupportComponent implements OnInit {
   private router = inject(Router);
+  private elementRef = inject(ElementRef);
+
+  ngOnInit(): void {
+    this.scrollToTop(false);
+    if (typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => this.scrollToTop(false));
+    }
+  }
 
   readonly searchQuery = signal<string>('');
   readonly selectedCategory = signal<FaqCategory>('All');
@@ -624,9 +632,19 @@ export class HelpSupportComponent {
     this.router.navigate(['/']);
   }
 
-  scrollToTop(): void {
+  scrollToTop(smooth = true): void {
     if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const behavior: ScrollBehavior = smooth ? 'smooth' : 'auto';
+      window.scrollTo({ top: 0, behavior });
+      const host = this.elementRef?.nativeElement as HTMLElement | undefined;
+      const main = host?.closest('main') || (typeof document !== 'undefined' ? document.querySelector('main') : null);
+      if (main) {
+        if (typeof main.scrollTo === 'function') {
+          main.scrollTo({ top: 0, behavior });
+        } else {
+          main.scrollTop = 0;
+        }
+      }
     }
   }
 }

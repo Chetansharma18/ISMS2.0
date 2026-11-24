@@ -96,7 +96,7 @@ import { ConnectivityService } from './core/services/connectivity.service';
       } @else {
         <main 
           class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
-          [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
+          [style.background-color]="isLandingRoute() && !authService.currentUser() ? '#070e18' : '#FFFFFF'"
         >
           <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>
@@ -164,6 +164,15 @@ export class AppComponent {
         this.isSsoRoute.set(isSso);
         this.isHelpSupportRoute.set(isHelpSupport);
         this.isMobileSidebarOpen.set(false);
+
+        // Reset scroll position on route change so new pages open at the top
+        if (typeof document !== 'undefined') {
+          const scrollMains = document.querySelectorAll('main');
+          scrollMains.forEach(el => {
+            el.scrollTop = 0;
+          });
+          window.scrollTo(0, 0);
+        }
       });
   }
 

@@ -13,7 +13,12 @@ import { IconComponent } from '../../icon/icon.component';
       <!-- Label Row with Required Star, optional infoTooltip, and Character Count -->
       @if (label) {
         <div class="flex items-center justify-between gap-2 mb-1">
-          <label [attr.for]="type === 'date' ? null : id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1">
+          <label
+            [attr.for]="(type === 'date' || disableLabelClick) ? null : id"
+            (click)="onLabelClick($event)"
+            class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1"
+            [class.cursor-default]="type === 'date' || disableLabelClick"
+          >
             <span>{{ label }}</span>
             @if (required) {
               <span class="text-rose-600 font-bold">*</span>
@@ -22,6 +27,7 @@ import { IconComponent } from '../../icon/icon.component';
               <span
                 class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full border border-slate-400 text-slate-500 text-[10px] font-bold cursor-help hover:text-slate-800 hover:border-slate-600 transition-colors ml-0.5"
                 [title]="infoTooltip"
+                (click)="$event.stopPropagation(); $event.preventDefault()"
               >
                 i
               </span>
@@ -45,11 +51,11 @@ import { IconComponent } from '../../icon/icon.component';
         [class.ring-rose-600]="!!error"
         [class.bg-surface-muted]="disabled"
         [class.cursor-not-allowed]="disabled"
-        [class.focus-within:border-primary]="!error && !disabled"
-        [class.focus-within:ring-2]="!error && !disabled"
-        [class.focus-within:ring-primary-light]="!error && !disabled"
-        [class.focus-within:border-rose-600]="!!error && !disabled"
-        [class.focus-within:ring-rose-200]="!!error && !disabled"
+        [class.focus-within:border-primary]="!error && !disabled && !readonly"
+        [class.focus-within:ring-2]="!error && !disabled && !readonly"
+        [class.focus-within:ring-primary-light]="!error && !disabled && !readonly"
+        [class.focus-within:border-rose-600]="!!error && !disabled && !readonly"
+        [class.focus-within:ring-rose-200]="!!error && !disabled && !readonly"
       >
         <!-- Optional Prefix Tag -->
         @if (prefixText) {
@@ -135,6 +141,7 @@ export class FormInputComponent {
   @Input() readonly: boolean = false;
   @Input() uppercase: boolean = false;
   @Input() numericOnly: boolean = false;
+  @Input() coordinateOnly: boolean = false;
   @Input() maxLength?: number;
   @Input() max?: string;
   @Input() min?: string;
@@ -144,15 +151,34 @@ export class FormInputComponent {
   @Input() error?: string;
   @Input() infoTooltip?: string;
   @Input() showCharCount: boolean = false;
+  @Input() disableLabelClick: boolean = false;
 
   @Output() valueChange = new EventEmitter<string>();
   @Output() blur = new EventEmitter<FocusEvent>();
+
+  onLabelClick(event: MouseEvent): void {
+    if (this.type === 'date' || this.disableLabelClick) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     let val = input.value;
     if (this.numericOnly) {
       val = val.replace(/\D/g, '');
+      input.value = val;
+    }
+    if (this.coordinateOnly) {
+      let cleaned = val.replace(/[^0-9.-]/g, '');
+      const isNegative = cleaned.startsWith('-');
+      cleaned = (isNegative ? '-' : '') + cleaned.replace(/-/g, '');
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        cleaned = parts[0] + '.' + parts.slice(1).join('');
+      }
+      val = cleaned;
       input.value = val;
     }
     if (this.uppercase) {
@@ -164,33 +190,99 @@ export class FormInputComponent {
   }
 
   onKeyDown(event: KeyboardEvent): void {
-    if (!this.numericOnly) return;
-    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
-    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+    if (this.numericOnly) {
+      const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+      if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+        return;
+      }
+      if (!/^\d$/.test(event.key)) {
+        event.preventDefault();
+      }
       return;
     }
-    if (!/^\d$/.test(event.key)) {
-      event.preventDefault();
+
+    if (this.coordinateOnly) {
+      const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'];
+      if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+        return;
+      }
+      const input = event.target as HTMLInputElement;
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const current = input.value;
+      const selectedText = current.substring(start, end);
+
+      if (event.key === '-') {
+        const hasMinus = current.includes('-');
+        const replacingMinus = selectedText.includes('-');
+        if (start === 0 && (!hasMinus || replacingMinus)) {
+          return;
+        }
+        event.preventDefault();
+        return;
+      }
+
+      if (event.key === '.') {
+        const hasDot = current.includes('.');
+        const replacingDot = selectedText.includes('.');
+        if (!hasDot || replacingDot) {
+          return;
+        }
+        event.preventDefault();
+        return;
+      }
+
+      if (!/^\d$/.test(event.key)) {
+        event.preventDefault();
+      }
+      return;
     }
   }
 
   onPaste(event: ClipboardEvent): void {
-    if (!this.numericOnly) return;
-    event.preventDefault();
-    const text = event.clipboardData?.getData('text') || '';
-    const digits = text.replace(/\D/g, '');
-    if (!digits) return;
-    const input = event.target as HTMLInputElement;
-    const start = input.selectionStart ?? input.value.length;
-    const end = input.selectionEnd ?? input.value.length;
-    const current = input.value;
-    let nextVal = current.slice(0, start) + digits + current.slice(end);
-    if (this.maxLength) {
-      nextVal = nextVal.slice(0, this.maxLength);
+    if (this.numericOnly) {
+      event.preventDefault();
+      const text = event.clipboardData?.getData('text') || '';
+      const digits = text.replace(/\D/g, '');
+      if (!digits) return;
+      const input = event.target as HTMLInputElement;
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? input.value.length;
+      const current = input.value;
+      let nextVal = current.slice(0, start) + digits + current.slice(end);
+      if (this.maxLength) {
+        nextVal = nextVal.slice(0, this.maxLength);
+      }
+      input.value = nextVal;
+      this.value = nextVal;
+      this.valueChange.emit(nextVal);
+      return;
     }
-    input.value = nextVal;
-    this.value = nextVal;
-    this.valueChange.emit(nextVal);
+
+    if (this.coordinateOnly) {
+      event.preventDefault();
+      const text = event.clipboardData?.getData('text') || '';
+      const input = event.target as HTMLInputElement;
+      const start = input.selectionStart ?? input.value.length;
+      const end = input.selectionEnd ?? input.value.length;
+      const current = input.value;
+      const nextVal = current.slice(0, start) + text + current.slice(end);
+
+      let cleaned = nextVal.replace(/[^0-9.-]/g, '');
+      const isNegative = cleaned.startsWith('-');
+      cleaned = (isNegative ? '-' : '') + cleaned.replace(/-/g, '');
+      const parts = cleaned.split('.');
+      if (parts.length > 2) {
+        cleaned = parts[0] + '.' + parts.slice(1).join('');
+      }
+      if (this.maxLength) {
+        cleaned = cleaned.slice(0, this.maxLength);
+      }
+      input.value = cleaned;
+      this.value = cleaned;
+      this.valueChange.emit(cleaned);
+      return;
+    }
   }
 
   onBlur(event: FocusEvent): void {

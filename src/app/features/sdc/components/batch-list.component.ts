@@ -53,7 +53,7 @@ import { FilterTabsComponent } from '../../../shared';
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Batch Management' }]"
       [searchable]="true"
       [(searchQuery)]="searchQuery"
-      searchPlaceholder="Search Batch Code, Course, Sector, Center, Scheme..."
+      searchPlaceholder="Search Batch, Course, Sector, Center..."
       [columns]="batchColumns"
       [data]="filteredBatches()"
       [pagination]="true"
@@ -158,7 +158,7 @@ import { FilterTabsComponent } from '../../../shared';
               <div class="text-[11px] text-secondary leading-tight mt-px tabular-nums">{{ person.ssoId }}</div>
             </div>
           } @else if (isApproved(b)) {
-            <button appButton variant="outline" size="sm" type="button" (click)="assigningBatch.set(b)" title="Assign the Attender User of this batch">
+            <button appButton variant="outline" size="sm" type="button" (click)="assigningBatch.set(b)">
               <app-icon name="plus" size="sm" />
               <span>Assign Attender User</span>
             </button>

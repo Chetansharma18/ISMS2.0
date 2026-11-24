@@ -119,16 +119,13 @@ const COMMENT_PRESETS = [
             <label class="block text-xs font-semibold text-slate-800" for="revert-days">
               Response Time <span class="text-rose-600">*</span>
             </label>
-            <select
-              appInput
-              id="revert-days"
-              (change)="dueDays.set(+$any($event.target).value)"
-              class="w-full cursor-pointer"
-            >
-              @for (days of dayOptions; track days) {
-                <option [value]="days" [selected]="days === dueDays()">{{ days }} days</option>
-              }
-            </select>
+            <app-dropdown
+              inputId="revert-days"
+              [options]="dayDropdownOptions"
+              [value]="dueDays().toString()"
+              (valueChange)="dueDays.set(+$event)"
+              placeholder="Select response time"
+            />
           </div>
 
           <!-- Comment -->
@@ -180,6 +177,10 @@ export class ScrutinyRevertModalComponent {
 
   protected readonly other = OTHER;
   protected readonly dayOptions = RESPONSE_DAY_OPTIONS;
+  protected readonly dayDropdownOptions = RESPONSE_DAY_OPTIONS.map(days => ({
+    value: days.toString(),
+    label: `${days} days`
+  }));
   protected readonly commentPresets = COMMENT_PRESETS;
 
   protected readonly documents = signal<string[]>([]);

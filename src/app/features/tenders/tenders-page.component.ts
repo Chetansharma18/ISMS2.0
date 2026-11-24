@@ -214,9 +214,6 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
             [statusOptions]="statusFilterOptions()"
             [filters]="schemeFilters()"
             [(filterValues)]="filterValues"
-            [totalCount]="schemes().length"
-            [filteredCount]="filteredSchemes().length"
-            itemUnit="schemes"
             (resetFilters)="resetFilters()"
           />
 
@@ -468,16 +465,11 @@ export class TendersPageComponent {
   readonly statusFilter = signal<string>('ALL');
   readonly filterValues = signal<Record<string, string>>({});
 
-  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => {
-    const all = this.schemes();
-    const active = all.filter(s => !isSchemeClosed(s)).length;
-    const expired = all.filter(s => isSchemeClosed(s)).length;
-    return [
-      { value: 'ALL', label: 'All Status', count: all.length },
-      { value: 'Active', label: 'Active', count: active },
-      { value: 'Expired', label: 'Expired', count: expired }
-    ];
-  });
+  readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
+    { value: 'ALL', label: 'All Status' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Expired', label: 'Expired' }
+  ]);
 
   readonly schemeFilters = computed<MasterFilterConfig[]>(() => [
     {

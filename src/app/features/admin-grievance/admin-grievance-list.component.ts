@@ -13,6 +13,7 @@ import {
   EmptyStateComponent,
   IconComponent,
   InputDirective,
+  DropdownComponent,
   TableColumn
 } from '../../shared';
 import { DataEngineService } from '../../core/services/data-engine.service';
@@ -35,7 +36,8 @@ export type { AdminGrievance };
     ActionModalComponent,
     StatusBadgeComponent,
     IconComponent,
-    InputDirective
+    InputDirective,
+    DropdownComponent
   ],
   template: `
     <app-list-page
@@ -56,60 +58,48 @@ export type { AdminGrievance };
       }"
     >
       <!-- Scheme-wise Filter Toolbar -->
-      <div beforeTable class="bg-slate-50 border border-slate-200/90 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs">
+      <div beforeTable class="bg-slate-50 border border-slate-200/90 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs relative z-10">
         <div class="flex items-center gap-2.5 sm:gap-3.5 flex-wrap">
           <!-- Scheme Filter -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[220px] max-w-[340px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider flex items-center gap-1">
               <app-icon name="filter" size="xs" class="text-slate-500" />
               <span>Scheme:</span>
             </label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedScheme()"
-              (ngModelChange)="selectedScheme.set($event)"
-              class="min-w-[220px] max-w-[340px] text-xs font-medium text-slate-800"
-            >
-              <option value="ALL">All Schemes ({{ grievances().length }})</option>
-              @for (s of schemeOptions(); track s) {
-                <option [value]="s">{{ s }} ({{ getSchemeCount(s) }})</option>
-              }
-            </select>
+              class="flex-1"
+              [options]="schemeDropdownOptions()"
+              [value]="selectedScheme()"
+              (valueChange)="selectedScheme.set($event)"
+              placeholder="All Schemes"
+            />
           </div>
 
           <!-- Issue Type Filter -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[170px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Issue Type:</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedIssueType()"
-              (ngModelChange)="selectedIssueType.set($event)"
-              class="min-w-[130px] text-xs font-medium text-slate-800"
-            >
-              <option value="ALL">All Issue Types</option>
-              @for (type of issueTypeOptions; track type) {
-                <option [value]="type">{{ type }}</option>
-              }
-            </select>
+              class="flex-1"
+              [options]="issueTypeDropdownOptions"
+              [value]="selectedIssueType()"
+              (valueChange)="selectedIssueType.set($event)"
+              placeholder="All Issue Types"
+            />
           </div>
 
           <!-- Status Filter -->
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-1.5 min-w-[150px]">
             <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Status:</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedStatus()"
-              (ngModelChange)="selectedStatus.set($event)"
-              class="min-w-[120px] text-xs font-medium text-slate-800"
-            >
-              <option value="ALL">All Status</option>
-              @for (st of statusOptions; track st) {
-                <option [value]="st">{{ st }}</option>
-              }
-            </select>
+              class="flex-1"
+              [options]="statusDropdownOptions"
+              [value]="selectedStatus()"
+              (valueChange)="selectedStatus.set($event)"
+              placeholder="All Status"
+            />
           </div>
 
           <!-- Reset Filters Button -->
@@ -125,10 +115,6 @@ export type { AdminGrievance };
               <span>Reset Filters</span>
             </button>
           }
-        </div>
-
-        <div class="text-[11px] text-slate-500 font-medium whitespace-nowrap">
-          Showing <span class="font-bold text-slate-800">{{ filteredGrievances().length }}</span> of {{ grievances().length }} grievances
         </div>
       </div>
     </app-list-page>
@@ -257,21 +243,19 @@ export type { AdminGrievance };
                   <div class="grid grid-cols-2 gap-4">
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Priority <span class="text-rose-500">*</span></label>
-                      <select appInput [(ngModel)]="forwardForm.priority" class="w-full">
-                        <option value="" disabled selected>Select priority</option>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                      </select>
+                      <app-dropdown
+                        [options]="['Low', 'Medium', 'High']"
+                        [(value)]="forwardForm.priority"
+                        placeholder="Select priority"
+                      />
                     </div>
                     <div>
                       <label class="block text-[13px] font-semibold text-slate-700 mb-1.5">Concerned User <span class="text-rose-500">*</span></label>
-                      <select appInput [(ngModel)]="forwardForm.concernedUser" class="w-full">
-                        <option value="" disabled selected>Select admin user</option>
-                        <option value="Admin User 1">Admin User 1</option>
-                        <option value="Admin User 2">Admin User 2</option>
-                        <option value="Admin User 3">Admin User 3</option>
-                      </select>
+                      <app-dropdown
+                        [options]="['Admin User 1', 'Admin User 2', 'Admin User 3']"
+                        [(value)]="forwardForm.concernedUser"
+                        placeholder="Select admin user"
+                      />
                     </div>
                   </div>
                   <div>
@@ -335,6 +319,21 @@ export class AdminGrievanceListComponent {
 
   readonly issueTypeOptions = ['Technical', 'accounts', 'Enquire'] as const;
   readonly statusOptions = ['Open', 'In progress', 'Resolved', 'closed'] as const;
+
+  readonly schemeDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Schemes' },
+    ...this.schemeOptions().map(s => ({ value: s, label: s }))
+  ]);
+
+  readonly issueTypeDropdownOptions = [
+    { value: 'ALL', label: 'All Issue Types' },
+    ...this.issueTypeOptions.map(t => ({ value: t, label: t }))
+  ];
+
+  readonly statusDropdownOptions = [
+    { value: 'ALL', label: 'All Status' },
+    ...this.statusOptions.map(st => ({ value: st, label: st }))
+  ];
 
   readonly isFiltered = computed(() =>
     this.selectedScheme() !== 'ALL' ||

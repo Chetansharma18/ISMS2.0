@@ -13,17 +13,20 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-4 font-sans">
+    <div class="space-y-6 font-sans">
 
-      <div class="flex items-center justify-end">
-        <span class="text-xs font-medium text-[#625663]">
-          {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
-        </span>
-      </div>
-
+      <!-- 1. SUPPORTING DOCUMENTS TABLE -->
       <app-table
         [columns]="documentColumns"
-        [data]="state.eoiDocuments()"
+        [data]="state.supportingDocs()"
+        [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
+      >
+      </app-table>
+
+      <!-- 2. ANNEXURES TABLE -->
+      <app-table
+        [columns]="annexureColumns"
+        [data]="state.annexureDocs()"
         [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
       >
       </app-table>
@@ -85,8 +88,8 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
           &larr; {{ state.hasCustomFields() ? 'Back to Scheme Proposal Details' : 'Back to Registration Profile' }}
         </button>
 
-        <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">
-          Proceed to Complete Preview &rarr;
+        <button appButton size="lg" (click)="state.goToStep(3)">
+          Proceed to Preview &rarr;
         </button>
       </div>
 
@@ -101,8 +104,15 @@ export class Step3UploadDocumentsComponent {
   protected readonly maxSizeMb = DOC_MAX_SIZE_MB;
 
   protected readonly documentColumns: TableColumn<EoiDocumentItem>[] = [
-    { key: 'id', label: 'S. No.', align: 'center', width: 'w-14' },
+    { key: '$index', label: 'S. No.', align: 'center', width: 'w-14' },
     { key: 'name', label: 'Supporting Document', type: 'custom', width: 'min-w-[240px]' },
+    { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[200px] w-[250px]' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-[270px] whitespace-nowrap' }
+  ];
+
+  protected readonly annexureColumns: TableColumn<EoiDocumentItem>[] = [
+    { key: '$index', label: 'S. No.', align: 'center', width: 'w-14' },
+    { key: 'name', label: 'Annexure Name', type: 'custom', width: 'min-w-[240px]' },
     { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[200px] w-[250px]' },
     { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-[270px] whitespace-nowrap' }
   ];

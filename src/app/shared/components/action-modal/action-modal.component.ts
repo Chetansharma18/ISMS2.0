@@ -22,7 +22,10 @@ import { IconComponent } from '../icon/icon.component';
         (click)="onBackdropClick($event)"
       >
         <div
-          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans overflow-hidden my-auto max-h-[90vh] flex flex-col"
+          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
+          [class.overflow-visible]="!scrollable"
+          [class.overflow-hidden]="scrollable"
+          [class.max-h-[90vh]]="scrollable"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"
@@ -32,11 +35,17 @@ import { IconComponent } from '../icon/icon.component';
         >
           <!-- Top Accent Bar -->
           @if (showAccentBar) {
-            <div class="h-1 w-full shrink-0" [ngClass]="accentBarClass"></div>
+            <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
           }
 
           <!-- Modal Body -->
-          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 overflow-y-auto flex-1 flex flex-col min-h-0">
+          <div
+            class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
+            [class.overflow-y-auto]="scrollable"
+            [class.overflow-visible]="!scrollable"
+            [class.flex-1]="scrollable"
+            [class.min-h-0]="scrollable"
+          >
 
             <!-- Close Button -->
             @if (showCloseButton) {
@@ -73,13 +82,13 @@ import { IconComponent } from '../icon/icon.component';
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full flex-1 min-h-0 flex flex-col">
+            <div class="w-full" [class.flex-1]="scrollable" [class.min-h-0]="scrollable" [class.flex]="scrollable" [class.flex-col]="scrollable">
               <ng-content></ng-content>
             </div>
 
             <!-- Action Buttons Footer -->
             @if (primaryLabel || secondaryLabel) {
-              <div class="mt-auto">
+              <div [class.mt-auto]="scrollable">
                 <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
 
                 <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.sm:flex-row-reverse]="!secondaryLabel">
@@ -134,6 +143,8 @@ export class ActionModalComponent {
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;
   @Input() reverseButtons = false;
+  /** When true, forces the modal body to scroll internally instead of natural height with overlay dropdowns */
+  @Input() scrollable = false;
   /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
   @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
 

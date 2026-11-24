@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, IconComponent, InputDirective } from '../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective } from '../../../shared';
 import {
   DynamicFormBuilderItem,
   DynamicFormField,
@@ -26,7 +26,7 @@ import {
   selector: 'app-dynamic-form-renderer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective],
+  imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, DropdownComponent],
   template: `
     <div class="space-y-5 font-sans text-slate-800">
 
@@ -269,23 +269,16 @@ import {
 
                 <!-- 8. Dropdown -->
                 @else if (field.type === 'dropdown') {
-                  <div class="relative w-full">
-                    <select
-                      [id]="field.id"
-                      appInput
-                      size="sm"
-                      [(ngModel)]="values[field.id]"
-                      (ngModelChange)="onFieldInput(field)"
-                      [invalid]="hasError(field.id)"
-                      class="w-full pr-8"
-                    >
-                      <option value="" disabled selected>-- Select {{ field.label }} --</option>
-                      @for (opt of getFieldOptions(field); track opt) {
-                        <option [value]="opt">{{ opt }}</option>
-                      }
-                    </select>
-                    <app-icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  </div>
+                  <app-dropdown
+                    [inputId]="field.id"
+                    size="sm"
+                    [options]="getFieldOptions(field)"
+                    [(value)]="values[field.id]"
+                    (valueChange)="onFieldInput(field)"
+                    [invalid]="hasError(field.id)"
+                    [placeholder]="'-- Select ' + field.label + ' --'"
+                    class="w-full"
+                  />
                 }
 
                 <!-- 9. Radio Options -->

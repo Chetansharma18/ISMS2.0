@@ -362,8 +362,8 @@ export class ApplicantSubmissionsComponent {
     const docTitle = isApproved
       ? 'IN-PRINCIPLE APPROVAL (IPA) LETTER'
       : isRejected
-      ? 'APPLICATION REVIEW & SCRUTINY OUTCOME'
-      : 'APPLICATION SUBMISSION DOSSIER SUMMARY';
+        ? 'APPLICATION REVIEW & SCRUTINY OUTCOME'
+        : 'APPLICATION SUBMISSION DOSSIER SUMMARY';
 
     pdf.setTextColor(11, 53, 88);
     pdf.setFont('helvetica', 'bold');
@@ -427,8 +427,8 @@ export class ApplicantSubmissionsComponent {
       isApproved
         ? 'Subject: In-Principle Approval (IPA) for Allocation of Physical Training Targets FY 2026-27'
         : isRejected
-        ? 'Subject: Intimation of Application Scrutiny & Evaluation Outcome'
-        : 'Subject: Acknowledgment & Dossier Summary for EOI Application',
+          ? 'Subject: Intimation of Application Scrutiny & Evaluation Outcome'
+          : 'Subject: Acknowledgment & Dossier Summary for EOI Application',
       18,
       y + 5.5
     );

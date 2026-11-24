@@ -10,6 +10,7 @@ import {
   ButtonComponent,
   IconComponent,
   InputDirective,
+  DropdownComponent,
   PageShellComponent
 } from '../../../shared';
 import { AspirantPortalService, TrainingCalendarItem } from '../services/aspirant-portal.service';
@@ -29,7 +30,7 @@ import { StorageService } from '../../../core/services/storage.service';
     ActionModalComponent,
     ButtonComponent,
     IconComponent,
-    InputDirective,
+    DropdownComponent,
     PageShellComponent
   ],
   template: `
@@ -48,53 +49,25 @@ import { StorageService } from '../../../core/services/storage.service';
         <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
 
           <!-- Dropdown Filter: District -->
-          <div class="relative w-full sm:w-44 md:w-48 shrink-0">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="map-pin" size="sm" [stroke]="2" />
-            </span>
-            <select
-              appInput
+          <div class="w-full sm:w-44 md:w-48 shrink-0">
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedDistrict()"
-              (ngModelChange)="selectedDistrict.set($event)"
-              class="w-full pl-8 truncate"
-              style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
-              title="Filter by District"
-              aria-label="Filter by District"
-            >
-              <option value="">All Districts</option>
-              @for (d of availableDistricts(); track d) {
-                <option [value]="d">{{ d }}</option>
-              }
-            </select>
-            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="chevron-down" size="sm" [stroke]="2" />
-            </span>
+              [options]="districtDropdownOptions()"
+              [value]="selectedDistrict()"
+              (valueChange)="selectedDistrict.set($event)"
+              placeholder="All Districts"
+            />
           </div>
 
           <!-- Dropdown Filter: Sector -->
-          <div class="relative w-full sm:w-48 md:w-56 shrink-0">
-            <span class="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="suitcase" size="sm" [stroke]="2" />
-            </span>
-            <select
-              appInput
+          <div class="w-full sm:w-48 md:w-56 shrink-0">
+            <app-dropdown
               size="sm"
-              [ngModel]="selectedSector()"
-              (ngModelChange)="selectedSector.set($event)"
-              class="w-full pl-8 truncate"
-              style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
-              title="Filter by Sector"
-              aria-label="Filter by Sector"
-            >
-              <option value="">All Sectors</option>
-              @for (s of availableSectors(); track s) {
-                <option [value]="s">{{ s }}</option>
-              }
-            </select>
-            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="chevron-down" size="sm" [stroke]="2" />
-            </span>
+              [options]="sectorDropdownOptions()"
+              [value]="selectedSector()"
+              (valueChange)="selectedSector.set($event)"
+              placeholder="All Sectors"
+            />
           </div>
 
           <!-- Reset Filters Button (visible when any filter or query is active) -->
@@ -183,10 +156,6 @@ import { StorageService } from '../../../core/services/storage.service';
             >
               Clear All
             </button>
-          </div>
-
-          <div class="text-[11px] text-slate-500 font-medium">
-            Showing <strong class="font-semibold text-slate-800">{{ filteredBatches().length }}</strong> of {{ portalService.calendarItems().length }} training batches
           </div>
         </div>
       }
@@ -336,6 +305,11 @@ export class TrainingCalendarComponent implements OnInit {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   });
 
+  readonly districtDropdownOptions = computed(() => [
+    { value: '', label: 'All Districts' },
+    ...this.availableDistricts().map(d => ({ value: d, label: d }))
+  ]);
+
   readonly availableSectors = computed(() => {
     const items = this.portalService.calendarItems();
     const set = new Set<string>();
@@ -344,6 +318,11 @@ export class TrainingCalendarComponent implements OnInit {
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   });
+
+  readonly sectorDropdownOptions = computed(() => [
+    { value: '', label: 'All Sectors' },
+    ...this.availableSectors().map(s => ({ value: s, label: s }))
+  ]);
 
   readonly hasActiveFilters = computed(() => {
     return !!this.selectedDistrict() || !!this.selectedSector() || !!this.searchQuery().trim();

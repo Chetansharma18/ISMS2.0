@@ -76,12 +76,7 @@ export class SchemeFormState {
     'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
   );
 
-  // Scheme-Specific Custom Proposal Dynamic Fields
-  readonly schemeCustomFields = computed(() => {
-    const sName = this.schemeName() || this.schemeTitle();
-    if (!sName) return [];
-    return this.schemeReqService.getCustomFieldsForScheme(sName);
-  });
+  readonly schemeCustomFields = signal<any[]>([]);
 
   readonly hasCustomFields = computed(() => this.schemeCustomFields().length > 0);
 
@@ -212,10 +207,13 @@ export class SchemeFormState {
   eoiDocuments = signal<EoiDocumentItem[]>(createInitialEoiDocuments());
 
   readonly mandatoryDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'mandatory'));
-  readonly annexureDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'annexure'));
+  readonly supportingDocs = computed(() => this.eoiDocuments().filter(d => d.category !== 'annexure'));
+  readonly annexureDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'annexure'));
   readonly remainingDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'remaining'));
 
   readonly mandatoryAttachedCount = computed(() => countUploaded(this.mandatoryDocs()));
+  readonly attachedSupportingDocsCount = computed(() => countUploaded(this.supportingDocs()));
+  readonly attachedAnnexureDocsCount = computed(() => countUploaded(this.annexureDocs()));
   readonly annexureAttachedCount = computed(() => countUploaded(this.annexureDocs()));
   readonly remainingAttachedCount = computed(() => countUploaded(this.remainingDocs()));
 
@@ -615,14 +613,14 @@ export class SchemeFormState {
       dossierDocs.length > 0
         ? dossierDocs
         : submittedDocs.map(doc => ({
-            id: `doc-${doc.id}`,
-            title: doc.name,
-            fileSize: doc.fileSize,
-            category:
-              doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
-            verified: true,
-            comment: doc.comment
-          }));
+          id: `doc-${doc.id}`,
+          title: doc.name,
+          fileSize: doc.fileSize,
+          category:
+            doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+          verified: true,
+          comment: doc.comment
+        }));
 
     const refLower = (this.schemeRefNo() || '').toLowerCase();
     const nameLower = (this.schemeName() || '').toLowerCase();

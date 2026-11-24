@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActionModalComponent, InputDirective } from '../../../shared';
+import { ActionModalComponent, DropdownComponent, InputDirective } from '../../../shared';
 import { UserManagementItem } from '../../../core/models/user-management.model';
 import { BLACKLIST_DURATION_OPTIONS } from '../user-management.util';
 
@@ -13,7 +13,7 @@ export interface BlacklistConfigSubmission {
 @Component({
   selector: 'app-user-blacklist-modal',
   standalone: true,
-  imports: [CommonModule, ActionModalComponent, InputDirective],
+  imports: [CommonModule, ActionModalComponent, InputDirective, DropdownComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-action-modal
@@ -55,17 +55,14 @@ export interface BlacklistConfigSubmission {
             <label for="blacklist-scheme-select" class="block font-semibold text-slate-700 mb-1">
               Select Scheme <span class="text-rose-600">*</span>
             </label>
-            <select
-              id="blacklist-scheme-select"
-              appInput
-              class="w-full cursor-pointer bg-white"
+            <app-dropdown
+              inputId="blacklist-scheme-select"
+              [options]="resolvedSchemeOptions()"
               [value]="selectedScheme()"
-              (change)="selectedScheme.set($any($event.target).value)"
-            >
-              @for (scheme of resolvedSchemeOptions(); track scheme) {
-                <option [value]="scheme" [selected]="scheme === selectedScheme()">{{ scheme }}</option>
-              }
-            </select>
+              (valueChange)="selectedScheme.set($event)"
+              placeholder="Select Scheme"
+              class="w-full"
+            />
             <p class="text-[11px] text-slate-500 mt-1 mb-0">
               Select "All Schemes" to enforce a state-wide debarment across all RSLDC schemes.
             </p>
@@ -76,17 +73,14 @@ export interface BlacklistConfigSubmission {
             <label for="blacklist-years-select" class="block font-semibold text-slate-700 mb-1">
               Blacklist Duration (Years) <span class="text-rose-600">*</span>
             </label>
-            <select
-              id="blacklist-years-select"
-              appInput
-              class="w-full cursor-pointer bg-white"
+            <app-dropdown
+              inputId="blacklist-years-select"
+              [options]="yearsOptions"
               [value]="selectedYears()"
-              (change)="selectedYears.set($any($event.target).value)"
-            >
-              @for (opt of yearsOptions; track opt) {
-                <option [value]="opt" [selected]="opt === selectedYears()">{{ opt }}</option>
-              }
-            </select>
+              (valueChange)="selectedYears.set($event)"
+              placeholder="Select Duration"
+              class="w-full"
+            />
             <p class="text-[11px] text-slate-500 mt-1 mb-0">
               Standard guideline duration is 3 years per RSLDC MoU terms.
             </p>

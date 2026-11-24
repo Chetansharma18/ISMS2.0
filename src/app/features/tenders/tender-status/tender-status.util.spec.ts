@@ -65,7 +65,7 @@ describe('isBeforeClosingDate', () => {
 describe('canEditTender / remainingEdits', () => {
   const now = new Date(2026, 5, 15, 12, 0, 0);
 
-  it('allows editing before closing while edits remain', () => {
+  it('allows editing before closing while edits remain for submitted status', () => {
     expect(canEditTender(makeTender({ editCount: 2 }), now)).toBe(true);
   });
 
@@ -75,6 +75,19 @@ describe('canEditTender / remainingEdits', () => {
 
   it('blocks editing after the closing date', () => {
     expect(canEditTender(makeTender({ closingDate: '01-Jan-2026' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Approved or Accepted', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Approved' }), now)).toBe(false);
+    expect(canEditTender(makeTender({ submittedStatus: 'Accepted' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Rejected', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Rejected' }), now)).toBe(false);
+  });
+
+  it('blocks editing when status is Under Review', () => {
+    expect(canEditTender(makeTender({ submittedStatus: 'Under Review' }), now)).toBe(false);
   });
 
   it('computes remaining edits and never goes negative', () => {
@@ -105,6 +118,20 @@ describe('filterTenders', () => {
   it('matches on rejection reason and status', () => {
     expect(filterTenders(list, 'missing pan').map(t => t.id)).toEqual(['2']);
     expect(filterTenders(list, 'rejected').map(t => t.id)).toEqual(['2']);
+  });
+
+  it('filters by status, schemeName, and schemeCategory with criteria object', () => {
+    const multiList = [
+      makeTender({ id: '1', schemeTitle: 'Scheme A', schemeCategory: 'RAJVIK', submittedStatus: 'Submitted' }),
+      makeTender({ id: '2', schemeTitle: 'Scheme B', schemeCategory: 'SAMARTH', submittedStatus: 'Approved' }),
+      makeTender({ id: '3', schemeTitle: 'Scheme A', schemeCategory: 'RAJVIK', submittedStatus: 'Rejected' })
+    ];
+
+    expect(filterTenders(multiList, { status: 'Approved' }).map(t => t.id)).toEqual(['2']);
+    expect(filterTenders(multiList, { schemeName: 'Scheme A' }).map(t => t.id)).toEqual(['1', '3']);
+    expect(filterTenders(multiList, { schemeCategory: 'SAMARTH' }).map(t => t.id)).toEqual(['2']);
+    expect(filterTenders(multiList, { schemeName: 'Scheme A', status: 'Rejected' }).map(t => t.id)).toEqual(['3']);
+    expect(filterTenders(multiList, { status: 'ALL', schemeName: 'ALL', schemeCategory: 'ALL' })).toBe(multiList);
   });
 
   it('returns an empty list when nothing matches', () => {

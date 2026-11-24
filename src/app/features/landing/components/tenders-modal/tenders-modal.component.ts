@@ -23,6 +23,7 @@ interface Tender {
       title="Official Tenders & RFP Notices"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
       size="lg"
+      [scrollBody]="true"
       (close)="onModalClose()"
     >
         <div class="space-y-2.5">

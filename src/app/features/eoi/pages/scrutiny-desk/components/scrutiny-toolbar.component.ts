@@ -37,9 +37,8 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
           <span
             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
             [ngClass]="{
-              'bg-sky-50 text-sky-800 border-sky-200': applicant()?.appeal?.status === 'Accepted' && !!applicant()?.appeal?.response,
-              'bg-emerald-50 text-emerald-800 border-emerald-200': (applicant()?.appeal?.status === 'Accepted' && !applicant()?.appeal?.response) || applicant()?.status === 'APPROVED',
-              'bg-amber-50 text-amber-800 border-amber-200': (applicant()?.status === 'UNDER_SCRUTINY' || applicant()?.status === 'REVERTED') && applicant()?.appeal?.status !== 'Accepted',
+              'bg-emerald-50 text-emerald-800 border-emerald-200': applicant()?.appeal?.status === 'Accepted' || applicant()?.status === 'APPROVED',
+              'bg-amber-50 text-amber-800 border-amber-200': applicant()?.appeal?.status === 'Pending' || ((applicant()?.status === 'UNDER_SCRUTINY' || applicant()?.status === 'REVERTED') && applicant()?.appeal?.status !== 'Accepted'),
               'bg-rose-50 text-rose-800 border-rose-200': applicant()?.status === 'REJECTED' || applicant()?.appeal?.status === 'Rejected'
             }"
           >
@@ -49,7 +48,6 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 
         <!-- Review actions -->
         <div class="flex items-center gap-2 flex-wrap">
-          <button appButton variant="outline" size="sm" (click)="remarks.emit()" title="Add a remark">Remarks</button>
           <button appButton variant="danger" size="sm" (click)="reject.emit()" title="Reject application">Reject</button>
           <button appButton size="sm" (click)="approve.emit()" title="Approve application">Approve</button>
         </div>
@@ -85,17 +83,14 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 })
 export class ScrutinyToolbarComponent {
   readonly applicant = input<ApplicantResponse | undefined>();
-  readonly remarks = output<void>();
   readonly reject = output<void>();
   readonly approve = output<void>();
 
   protected statusLabel(): string {
     const app = this.applicant();
     if (app?.appeal) {
-      if (app.appeal.status === 'Pending') return 'Appeal Request';
-      if (app.appeal.status === 'Accepted') {
-        return app.appeal.response ? 'Appeal Response Submitted' : 'Appeal Accepted';
-      }
+      if (app.appeal.status === 'Pending') return 'Appeal Pending Review';
+      if (app.appeal.status === 'Accepted') return 'Appeal Approved';
       if (app.appeal.status === 'Rejected') return 'Appeal Rejected';
     }
     switch (app?.status) {

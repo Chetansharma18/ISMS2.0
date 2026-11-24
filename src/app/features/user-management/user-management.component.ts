@@ -385,9 +385,9 @@ export class UserManagementComponent {
   readonly blacklistDurationOptions = BLACKLIST_DURATION_OPTIONS;
 
   readonly userStatusOptions = computed<StatusFilterOption[]>(() => [
-    { value: 'ALL', label: 'All', count: this.users().length },
-    { value: 'Active', label: 'Active', count: this.users().filter(u => u.schemeStatus === 'Active').length },
-    { value: 'Inactive', label: 'Inactive', count: this.users().filter(u => u.schemeStatus === 'Inactive').length }
+    { value: 'ALL', label: 'All' },
+    { value: 'Active', label: 'Active' },
+    { value: 'Inactive', label: 'Inactive' }
   ]);
 
   readonly userFilters = computed<MasterFilterConfig[]>(() => [
@@ -514,13 +514,6 @@ export class UserManagementComponent {
       key: 'districtName',
       label: 'District Name',
       cellClass: 'whitespace-nowrap text-slate-700'
-    },
-    {
-      key: 'schemeStatus',
-      label: 'Scheme Status',
-      align: 'center',
-      type: 'custom',
-      width: 'w-32'
     },
     {
       key: 'action',

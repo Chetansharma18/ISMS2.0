@@ -57,20 +57,14 @@ import {
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiSchemeSelect">
             Scheme <span class="text-[#DC2626] font-bold">*</span>
           </label>
-          <select
-            id="eoiSchemeSelect"
-            appInput
-            [(ngModel)]="data().scheme"
-            (ngModelChange)="onSchemeChange($event)"
-            (blur)="onBlur('scheme')"
+          <app-dropdown
+            inputId="eoiSchemeSelect"
+            [options]="schemeNameOptions()"
+            [value]="data().scheme"
+            (valueChange)="onSchemeChange($event)"
+            placeholder="-- Select Scheme --"
             [invalid]="hasError('scheme')"
-            class="w-full"
-          >
-            <option value="" disabled [selected]="!data().scheme">-- Select Scheme --</option>
-            @for (name of schemeNameOptions(); track name) {
-              <option [value]="name">{{ name }}</option>
-            }
-          </select>
+          />
           @if (hasError('scheme')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('scheme') }}</p>
           }
@@ -81,22 +75,15 @@ import {
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiSchemeCategorySelect">
             Scheme Category
           </label>
-          <select
-            id="eoiSchemeCategorySelect"
-            appInput
-            [(ngModel)]="data().schemeCategory"
-            (ngModelChange)="onFieldChange('schemeCategory')"
+          <app-dropdown
+            inputId="eoiSchemeCategorySelect"
+            [options]="schemeCategoryOptions()"
+            [value]="data().schemeCategory"
+            (valueChange)="data().schemeCategory = $event; onFieldChange('schemeCategory')"
             [disabled]="isCategoryLocked()"
-            [class.bg-slate-50]="isCategoryLocked()"
-            [class.cursor-not-allowed]="isCategoryLocked()"
+            placeholder="-- Select Scheme Category --"
             [invalid]="hasError('schemeCategory')"
-            class="w-full"
-          >
-            <option value="" [selected]="!data().schemeCategory">-- Select Scheme Category --</option>
-            @for (cat of schemeCategoryOptions(); track cat) {
-              <option [value]="cat">{{ cat }}</option>
-            }
-          </select>
+          />
           @if (hasError('schemeCategory')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('schemeCategory') }}</p>
           }
@@ -107,20 +94,14 @@ import {
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiCategorySelect">
             EOI Category <span class="text-[#DC2626] font-bold">*</span>
           </label>
-          <select
-            id="eoiCategorySelect"
-            appInput
-            [(ngModel)]="data().eoiCategory"
-            (blur)="onBlur('eoiCategory')"
-            (ngModelChange)="onFieldChange('eoiCategory')"
+          <app-dropdown
+            inputId="eoiCategorySelect"
+            [options]="eoiCategoryOptions()"
+            [value]="data().eoiCategory"
+            (valueChange)="data().eoiCategory = $event; onFieldChange('eoiCategory')"
+            placeholder="-- Select EOI Category --"
             [invalid]="hasError('eoiCategory')"
-            class="w-full"
-          >
-            <option value="" disabled [selected]="!data().eoiCategory">-- Select EOI Category --</option>
-            @for (eoiCat of eoiCategoryOptions(); track eoiCat) {
-              <option [value]="eoiCat">{{ eoiCat }}</option>
-            }
-          </select>
+          />
           @if (hasError('eoiCategory')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('eoiCategory') }}</p>
           }

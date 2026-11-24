@@ -78,22 +78,28 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
           <p>
             <strong>Subject:</strong>
             @if (isEmpanelment()) {
-              Empanelment order against EOI Ref No. {{ order()?.eoiRefNo }} under {{ order()?.schemeName }} for FY 2026-2027.
+              {{ order()?.subject || ('Empanelment order against EOI Ref No. ' + (order()?.eoiRefNo || '') + ' under ' + (order()?.schemeName || '') + ' for FY 2026-2027.') }}
             } @else {
-              Final Rejection & Disqualification Order against EOI Ref No. {{ order()?.eoiRefNo }} under {{ order()?.schemeName }}.
+              {{ order()?.rejectionSubject || ('Final Rejection & Disqualification Order against EOI Ref No. ' + (order()?.eoiRefNo || '') + ' under ' + (order()?.schemeName || '') + '.') }}
             }
           </p>
         </div>
 
         <!-- Preamble text matching state order standard -->
-        <div class="text-xs sm:text-sm text-slate-800 leading-relaxed mb-4 text-justify font-sans">
+        <div class="text-xs sm:text-sm text-slate-800 leading-relaxed mb-4 text-justify font-sans space-y-2">
           @if (isEmpanelment()) {
             <p class="indent-6">
-              An Expression of Interest (EOI) was published under <strong>{{ order()?.schemeName }}</strong> for empanelment of Project Implementing Agencies (PIAs) / Training Partners. Pursuant to technical evaluation, scrutiny of submitted statutory credentials, and the State Empanelment Committee appraisal process, the following agencies are hereby shortlisted and empaneled under the scheme for Financial Year 2026-2027:
+              {{ order()?.preamble1 || ('An Expression of Interest (EOI) was published under ' + (order()?.schemeName || '') + ' for empanelment of Project Implementing Agencies (PIAs) / Training Partners.') }}
+            </p>
+            <p class="indent-6">
+              {{ order()?.preamble2 || 'Pursuant to technical evaluation, scrutiny of submitted statutory credentials, and the State Empanelment Committee appraisal process, the following agencies are hereby shortlisted and empaneled under the scheme for Financial Year 2026-2027:' }}
             </p>
           } @else {
             <p class="indent-6">
-              This bears reference to the technical proposal dossiers submitted under <strong>{{ order()?.schemeName }}</strong> (EOI Ref No. {{ order()?.eoiRefNo }}). As per recommendations of the Desk Appraisal Committee followed by the De Novo Assessment process, proposals submitted by following agencies are not found eligible as per the statutory criteria laid down in EOI:
+              {{ order()?.rejectionPreamble1 || ('This bears reference to the technical proposal dossiers submitted under ' + (order()?.schemeName || '') + ' (EOI Ref No. ' + (order()?.eoiRefNo || '') + ').') }}
+            </p>
+            <p class="indent-6">
+              {{ order()?.rejectionPreamble2 || 'As per recommendations of the Desk Appraisal Committee followed by the De Novo Assessment process, proposals submitted by following agencies are not found eligible as per the statutory criteria laid down in EOI:' }}
             </p>
           }
         </div>
@@ -161,7 +167,7 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
 
         <!-- Approval Clause -->
         <p class="text-xs font-sans text-slate-800 mb-8 font-medium">
-          This issues with the approval of the competent authority.
+          {{ order()?.approvalClause || 'This issue with the approval of the competent authority.' }}
         </p>
 
         <!-- Signatory & Digital Signature Box -->
@@ -181,10 +187,10 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
             <!-- Official Signer Title -->
             <div class="mb-3">
               <span class="font-bold text-sm text-slate-900 block">
-                {{ isEmpanelment() ? 'Managing Director' : 'Scheme OIC' }}
+                {{ isEmpanelment() ? (order()?.signatoryName || 'Managing Director') : (order()?.rejectionSignatoryName || 'Scheme OIC') }}
               </span>
               <span class="text-xs text-slate-600 block">
-                {{ isEmpanelment() ? 'RSLDC (Govt. of Rajasthan)' : order()?.schemeName }}
+                {{ isEmpanelment() ? (order()?.signatoryDesignation || 'RSLDC (Govt. of Rajasthan)') : (order()?.rejectionSignatoryDesignation || (order()?.schemeName || '')) }}
               </span>
             </div>
 

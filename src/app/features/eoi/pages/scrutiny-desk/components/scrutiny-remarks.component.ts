@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, input, signal } from '@angular/core';
 import { IconComponent } from '../../../../../shared';
 import type { ApplicationActivityLog } from '../../../services/eoi-state.models';
 
@@ -93,9 +93,16 @@ export function departmentRemarks(log: ApplicationActivityLog[]): DepartmentRema
     </section>
   `
 })
-export class ScrutinyRemarksComponent {
+export class ScrutinyRemarksComponent implements OnInit {
   readonly log = input<ApplicationActivityLog[]>([]);
+  readonly initiallyOpen = input<boolean>(false);
   readonly isOpen = signal<boolean>(false);
+
+  ngOnInit(): void {
+    if (this.initiallyOpen()) {
+      this.isOpen.set(true);
+    }
+  }
 
   protected readonly remarks = computed(() => departmentRemarks(this.log()));
 

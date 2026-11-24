@@ -130,7 +130,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               [value]="data().micrCode"
               (valueChange)="update('micrCode', $event)"
               (blur)="markTouched('micrCode')"
-              placeholder="Enter MICR code (9 digits)"
+              placeholder="Enter MICR code"
               [maxLength]="9"
               [error]="getFieldError('micrCode')"
             ></app-form-input>

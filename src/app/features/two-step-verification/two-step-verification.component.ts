@@ -123,9 +123,10 @@ interface TwoStepFormData {
             size="sm"
             iconOnly
             type="button"
+            [disabled]="item.status === 'Inactive'"
             (click)="openViewModal(item)"
-            title="View Details"
-            aria-label="View Details"
+            [title]="item.status === 'Inactive' ? 'Cannot view inactive configuration' : 'View Details'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Cannot view inactive configuration' : 'View Details'"
           >
             <app-icon name="eye" size="sm" />
           </button>
@@ -139,9 +140,10 @@ interface TwoStepFormData {
             size="sm"
             iconOnly
             type="button"
+            [disabled]="item.status === 'Inactive'"
             (click)="openEditModal(item)"
-            title="Edit"
-            aria-label="Edit"
+            [title]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
           >
             <app-icon name="edit" size="sm" />
           </button>
@@ -431,6 +433,7 @@ export class TwoStepVerificationComponent implements OnInit {
   }
 
   openEditModal(item: TwoStepVerificationItem): void {
+    if (item.status === 'Inactive') return;
     this.editingId.set(item.id);
     this.submitted.set(false);
     this.isAuthDropdownOpen.set(false);
@@ -524,6 +527,7 @@ export class TwoStepVerificationComponent implements OnInit {
   }
 
   openViewModal(item: TwoStepVerificationItem): void {
+    if (item.status === 'Inactive') return;
     this.selectedViewItem.set(item);
     this.showViewModal.set(true);
   }

@@ -208,9 +208,27 @@ export class AspirantProfileFormComponent implements OnInit {
           type: 'date',
           required: true,
           colSpan: 1,
+          max: new Date().toISOString().split('T')[0],
+          validator: (val: any) => {
+            if (!val) return null;
+            const selected = new Date(val);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (selected > today) {
+              return 'Date of Birth cannot be in the future.';
+            }
+            return null;
+          },
           onChange: (val, field, model) => {
             if (val) {
-              model.age = calculateAgeFromDob(val);
+              const selected = new Date(val);
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              if (selected > today) {
+                model.age = 0;
+              } else {
+                model.age = calculateAgeFromDob(val);
+              }
             }
           }
         },
@@ -526,7 +544,15 @@ export class AspirantProfileFormComponent implements OnInit {
       this.formData.idNumber = event.value;
     }
     if (event.key === 'dob' && event.value) {
-      this.formData.age = calculateAgeFromDob(event.value);
+      const selected = new Date(event.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selected > today) {
+        this.notification.error('Date of Birth cannot be in the future.');
+        this.formData.age = 0;
+      } else {
+        this.formData.age = calculateAgeFromDob(event.value);
+      }
     }
     if (event.key === 'relationType') {
       this.formData.relation = event.value;
@@ -550,6 +576,16 @@ export class AspirantProfileFormComponent implements OnInit {
     if (!data.termsAccepted) {
       this.notification.warning('Please accept the Terms & Conditions before submitting.');
       return;
+    }
+
+    if (data.dob) {
+      const selected = new Date(data.dob);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selected > today) {
+        this.notification.error('Date of Birth cannot be in the future.');
+        return;
+      }
     }
 
     this.isSubmitting.set(true);

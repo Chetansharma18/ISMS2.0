@@ -58,7 +58,6 @@ import { StorageService } from '../../../core/services/storage.service';
               [ngModel]="selectedDistrict()"
               (ngModelChange)="selectedDistrict.set($event)"
               class="w-full pl-8 truncate"
-              style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
               title="Filter by District"
               aria-label="Filter by District"
             >
@@ -67,9 +66,6 @@ import { StorageService } from '../../../core/services/storage.service';
                 <option [value]="d">{{ d }}</option>
               }
             </select>
-            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="chevron-down" size="sm" [stroke]="2" />
-            </span>
           </div>
 
           <!-- Dropdown Filter: Sector -->
@@ -83,7 +79,6 @@ import { StorageService } from '../../../core/services/storage.service';
               [ngModel]="selectedSector()"
               (ngModelChange)="selectedSector.set($event)"
               class="w-full pl-8 truncate"
-              style="-webkit-appearance: none; -moz-appearance: none; appearance: none;"
               title="Filter by Sector"
               aria-label="Filter by Sector"
             >
@@ -92,9 +87,6 @@ import { StorageService } from '../../../core/services/storage.service';
                 <option [value]="s">{{ s }}</option>
               }
             </select>
-            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 z-10 flex items-center">
-              <app-icon name="chevron-down" size="sm" [stroke]="2" />
-            </span>
           </div>
 
           <!-- Reset Filters Button (visible when any filter or query is active) -->

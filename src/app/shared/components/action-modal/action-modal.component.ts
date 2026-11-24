@@ -43,7 +43,7 @@ import { IconComponent } from '../icon/icon.component';
             <button
               type="button"
               (click)="onClose()"
-              class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+              class="absolute top-4 right-5 sm:right-6 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
               title="Close"
               aria-label="Close"
             >

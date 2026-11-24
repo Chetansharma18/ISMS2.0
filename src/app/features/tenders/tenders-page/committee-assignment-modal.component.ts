@@ -41,7 +41,7 @@ import { filterAdmins } from './tenders-page.util';
       (close)="close.emit()"
     >
       @if (scheme(); as s) {
-        <div class="mt-3 font-sans text-xs space-y-4">
+        <div class="mt-3 font-sans text-xs space-y-4 pb-3">
           <!-- Scheme Info Header Banner -->
           <div class="bg-[#F8EDF1] border border-[#EADCE2] rounded-lg p-3 flex flex-col gap-1">
             <div class="flex items-center justify-between">
@@ -244,7 +244,7 @@ import { filterAdmins } from './tenders-page.util';
               @if (isMemberDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="mt-1.5 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col font-sans animate-in fade-in duration-150"
+                  class="mt-1.5 mb-3 bg-white border border-slate-200 rounded-lg shadow-xs flex flex-col font-sans animate-in fade-in duration-150 overflow-hidden"
                 >
                   <!-- Search Bar -->
                   <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">

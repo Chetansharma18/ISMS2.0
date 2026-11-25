@@ -1,0 +1,163 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ButtonComponent, IconComponent } from '../../../../shared';
+
+interface SchemeCard {
+  id: string;
+  name: string;
+  code: string;
+  department: string;
+  eligibility: string;
+  targetGroup: string;
+  status: 'Open for EOI' | 'Active Batches' | 'Ongoing';
+  statusColor: string;
+  highlight: string;
+}
+
+@Component({
+  selector: 'app-schemes-section',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, ButtonComponent, IconComponent],
+  host: {
+    class: 'block w-full'
+  },
+  template: `
+    <section id="schemes" class="py-14 bg-slate-50 border-b border-slate-200 scroll-mt-20">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+          <div>
+            <span class="text-xs font-bold text-navy uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full border border-blue-200/70">
+              State & Central Flagship Programmes
+            </span>
+            <h2 class="landing-section-title text-2xl sm:text-3xl lg:text-[32px] font-bold text-navy mt-2 tracking-tight font-sans" >
+              Active Government Schemes
+            </h2>
+            <p class="landing-body-text text-base sm:text-lg text-slate-500 mt-1 max-w-2xl text-left">
+              Empanelling Training Partners and offering funded NSQF-aligned courses to Rajasthan youth.
+            </p>
+          </div>
+
+          <div class="shrink-0 flex items-center gap-2">
+            <span class="text-xs text-slate-500 font-medium">Filter:</span>
+            <span class="text-xs font-semibold px-2.5 py-1 rounded bg-navy text-white">All Schemes (4)</span>
+          </div>
+        </div>
+
+        <!-- Scheme Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          @for (scheme of schemes; track scheme.id) {
+            <div class="bg-white rounded-xl border border-slate-200 shadow-2xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden">
+              <div class="p-6">
+                <!-- Status Badge & Code -->
+                <div class="flex items-center justify-between gap-2 mb-3">
+                  <span class="tabular-nums text-[11px] font-bold text-slate-400">
+                    {{ scheme.code }}
+                  </span>
+                  <span class="text-[11px] font-bold px-2 py-0.5 rounded {{ scheme.statusColor }}">
+                    {{ scheme.status }}
+                  </span>
+                </div>
+
+                <h3 class="text-base font-bold text-navy leading-snug min-h-[44px]">
+                  {{ scheme.name }}
+                </h3>
+
+                <p class="text-xs font-medium text-slate-400 mt-1">
+                  {{ scheme.department }}
+                </p>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 space-y-2 text-xs">
+                  <div class="flex items-start justify-between">
+                    <span class="text-slate-500">Eligibility:</span>
+                    <span class="font-semibold text-slate-800 text-right">{{ scheme.eligibility }}</span>
+                  </div>
+                  <div class="flex items-start justify-between">
+                    <span class="text-slate-500">Focus Group:</span>
+                    <span class="font-semibold text-slate-800 text-right">{{ scheme.targetGroup }}</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 p-2.5 rounded-lg bg-orange-50/60 border border-orange-100 text-[11px] text-orange-600 font-medium flex items-center gap-1.5">
+                  <app-icon name="info-filled" solid size="sm" />
+                  <span>{{ scheme.highlight }}</span>
+                </div>
+              </div>
+
+              <!-- Footer CTA -->
+              <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                >
+                  Guidelines (PDF)
+                </button>
+
+                <button
+                  appButton
+                  size="sm"
+                  type="button"
+                >
+                  Apply EOI
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+
+      </div>
+    </section>
+  `
+})
+export class SchemesSectionComponent {
+  schemes: SchemeCard[] = [
+    {
+      id: 'elstp',
+      name: 'Employment Linked Skill Training (ELSTP)',
+      code: 'RSLDC-ELSTP-01',
+      department: 'RSLDC State Component',
+      eligibility: '10th / 12th Pass (Age 18-35)',
+      targetGroup: 'Unemployed Youth of Rajasthan',
+      status: 'Open for EOI',
+      statusColor: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+      highlight: 'Mandatory 70% wage employment placement'
+    },
+    {
+      id: 'pmkvy',
+      name: 'PM Kaushal Vikas Yojana (PMKVY 4.0)',
+      code: 'MSDE-PMKVY-04',
+      department: 'Govt of India & RSLDC',
+      eligibility: 'School/College Dropouts',
+      targetGroup: 'Industry 4.0 & Green Jobs',
+      status: 'Active Batches',
+      statusColor: 'bg-blue-50 text-navy border border-blue-200',
+      highlight: '100% Govt funded NSQF curriculum'
+    },
+    {
+      id: 'samarth',
+      name: 'Samarth Scheme for Marginalized',
+      code: 'RSLDC-SAMARTH-02',
+      department: 'Special Cohorts Cell',
+      eligibility: 'Literate / Any Qualification',
+      targetGroup: 'SC / ST / Divyang / Nomadic',
+      status: 'Open for EOI',
+      statusColor: 'bg-emerald-50 text-emerald-800 border border-emerald-200',
+      highlight: 'Full boarding & lodging stipend support'
+    },
+    {
+      id: 'saksham',
+      name: 'Saksham Scheme for Women',
+      code: 'RSLDC-SAKSHAM-03',
+      department: 'Women Empowerment Wing',
+      eligibility: 'Female Candidates (Age 18-45)',
+      targetGroup: 'Self-Help Groups & Rural Women',
+      status: 'Ongoing',
+      statusColor: 'bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]',
+      highlight: 'Micro-entrepreneurship kit & bank linkage'
+    }
+  ];
+}

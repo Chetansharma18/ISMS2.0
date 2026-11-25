@@ -1,0 +1,44 @@
+name: CI
+
+# Runs on every pull request and on every push except the deploy branch (deploy.yml checks that one).
+# Make this check "required" in the repository settings (branch protection) so nothing merges red.
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - Production
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: UI uses the shared components
+        run: npm run check:ui
+
+      - name: AI tool instructions match AGENTS.md
+        run: node tools/sync-ai-rules.mjs --check
+
+      - name: Icons match tools/icons.map.json
+        run: node tools/build-icons.mjs --check
+
+      - name: Type and template check
+        run: npx ngc -p tsconfig.app.json --noEmit
+
+      - name: Unit tests
+        run: npx ng test --no-watch
+
+      - name: Production build
+        run: npm run build

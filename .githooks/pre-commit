@@ -1,0 +1,9 @@
+#!/bin/sh
+# Blocks a commit that hand-writes UI the shared kit already has (see AGENTS.md).
+# Installed automatically by "npm install" (tools/install-hooks.mjs). Takes about a second.
+if ! node tools/ui-guard.mjs || ! node tools/sync-ai-rules.mjs --check || ! node tools/build-icons.mjs --check; then
+  echo ""
+  echo "Commit blocked: use the shared UI kit components (AGENTS.md, section 14 of PROJECT_ARCHITECTURE_AND_WORKFLOW_GUIDE.md)."
+  echo "Starting a new page?  npm run new:page -- list <feature>/<name> \"Title\""
+  exit 1
+fi

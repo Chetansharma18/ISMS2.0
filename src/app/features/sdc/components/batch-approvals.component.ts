@@ -1,0 +1,497 @@
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { BatchService } from '../services/batch.service';
+import { BatchRecord } from '../models/batch.model';
+import { SdcService } from '../services/sdc.service';
+import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-order-list.component';
+import {
+  batchStatusLabel,
+  isBatchApproved,
+  isBatchInApproval,
+  isBatchRejected,
+  isBatchReturned,
+  isBatchWithdrawn
+} from '../utils/batch-approval.util';
+import {
+  ButtonComponent,
+  IconComponent,
+  InputDirective,
+  PageHeaderComponent,
+  PageShellComponent,
+  TableComponent,
+  TableColumn,
+  ActionModalComponent,
+  DropdownComponent,
+  DropdownOption
+} from '../../../shared';
+import { FilterTabsComponent } from '../../../shared';
+
+@Component({
+  selector: 'app-batch-approvals',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    FilterTabsComponent,
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    ButtonComponent,
+    IconComponent,
+    InputDirective,
+    PageHeaderComponent,
+    PageShellComponent,
+    TableComponent,
+    ActionModalComponent,
+    DropdownComponent
+  ],
+  template: `
+    <app-page-shell>
+
+        <!-- Page Header via Reusable PageHeaderComponent -->
+        <app-page-header
+          title="Batches"
+          [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management', url: '/admin/sdc' }, { label: 'Batches' }]"
+          [searchable]="true"
+          searchPlaceholder="Search batch code, course, center, scheme..."
+          [(searchQuery)]="searchQuery"
+        ></app-page-header>
+
+        <!-- Status Filter Badges / Pills Toolbar -->
+        <div class="flex items-center justify-between gap-3 pt-1">
+          <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
+        </div>
+
+        <!-- Admin Advanced Filter Bar (Center, Scheme, District) -->
+        <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
+          
+          <!-- Filter: Center Name -->
+          <div class="flex items-center gap-1.5 min-w-[200px]">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
+            <app-dropdown
+              size="sm"
+              class="flex-1 min-w-[180px] max-w-[240px]"
+              [options]="centerDropdownOptions()"
+              [value]="selectedCenter()"
+              (valueChange)="selectedCenter.set($event)"
+              placeholder="Select Center"
+            />
+          </div>
+
+          <!-- Filter: Scheme -->
+          <div class="flex items-center gap-1.5 min-w-[180px]">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
+            <app-dropdown
+              size="sm"
+              class="flex-1 min-w-[160px]"
+              [options]="schemeDropdownOptions()"
+              [value]="selectedScheme()"
+              (valueChange)="selectedScheme.set($event)"
+              placeholder="Select Scheme"
+            />
+          </div>
+
+          <!-- Filter: District -->
+          <div class="flex items-center gap-1.5 min-w-[180px]">
+            <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
+            <app-dropdown
+              size="sm"
+              class="flex-1 min-w-[160px]"
+              [options]="districtDropdownOptions()"
+              [value]="selectedDistrict()"
+              (valueChange)="selectedDistrict.set($event)"
+              placeholder="Select District"
+            />
+          </div>
+
+          <!-- Reset filters -->
+          @if (hasActiveFilters()) {
+            <button
+              appButton
+              variant="danger"
+              size="sm"
+              type="button"
+              (click)="resetFilters()"
+              class="ml-auto"
+            >
+              Reset Filters
+            </button>
+          }
+
+        </div>
+
+        <!-- Batches Table via Reusable TableComponent -->
+        <app-table
+          [columns]="batchColumns"
+          [data]="filteredBatches()"
+          [pagination]="true"
+          [pageSize]="pageSize"
+          itemUnit="batches"
+          emptyMessage="No batches available matching the selected criteria."
+          [customTemplates]="{
+            batchCode: batchCodeTemplate,
+            course: courseTemplate,
+            scheme: schemeTemplate,
+            centerName: centerNameTemplate,
+            size: sizeTemplate,
+            schedule: scheduleTemplate,
+            status: statusTemplate,
+            actions: actionsTemplate
+          }"
+        >
+        </app-table>
+
+        <!-- Template: Batch Code -->
+        <ng-template #batchCodeTemplate let-batch>
+          <div class="text-center tabular-nums font-normal text-slate-800 text-[13px]">
+            {{ batch.batchCode }}
+          </div>
+        </ng-template>
+
+        <!-- Template: Course, with its sector below -->
+        <ng-template #courseTemplate let-batch>
+          <div class="text-center py-0.5">
+            <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ batch.courseName }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px">{{ batch.sector || '—' }}</div>
+          </div>
+        </ng-template>
+
+        <!-- Template: Scheme, with its category below -->
+        <ng-template #schemeTemplate let-batch>
+          <div class="text-center py-0.5">
+            <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ batch.scheme || '—' }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px">{{ schemeCategory(batch) }}</div>
+          </div>
+        </ng-template>
+
+        <!-- Template: SDC center, with its district below -->
+        <ng-template #centerNameTemplate let-batch>
+          <div class="text-center py-0.5">
+            <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ batch.sdcName }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px">{{ batch.sdcDistrict || '—' }}</div>
+          </div>
+        </ng-template>
+
+        <!-- Template: Batch size the partner entered. Aspirants are registered after approval, so none are counted here. -->
+        <ng-template #sizeTemplate let-batch>
+          <div class="text-center tabular-nums font-normal text-slate-800 text-[13px]">{{ batchSize(batch) }}</div>
+        </ng-template>
+
+        <!-- Template: Start date, with the end date below -->
+        <ng-template #scheduleTemplate let-batch>
+          <div class="text-center py-0.5 tabular-nums">
+            <div class="font-normal text-slate-800 text-[13px] leading-tight">{{ batch.startDate }}</div>
+            <div class="text-[11px] text-secondary leading-tight mt-px">to {{ batch.endDate }}</div>
+          </div>
+        </ng-template>
+
+        <!-- Template: Status (Approved in green, Rejected in red, everything else in amber), like the SDC table -->
+        <ng-template #statusTemplate let-batch>
+          <div class="flex items-center justify-center">
+            @if (isApproved(batch)) {
+              <span class="whitespace-nowrap font-normal text-[13px] text-emerald-700">{{ statusLabel(batch) }}</span>
+            } @else if (isWithdrawn(batch)) {
+              <span class="whitespace-nowrap font-normal text-[13px] text-slate-500">{{ statusLabel(batch) }}</span>
+            } @else if (isRejected(batch)) {
+              <span class="whitespace-nowrap font-normal text-[13px] text-red-600">{{ statusLabel(batch) }}</span>
+            } @else {
+              <span class="whitespace-nowrap font-normal text-[13px] text-amber-700">{{ statusLabel(batch) }}</span>
+            }
+          </div>
+        </ng-template>
+
+        <!-- Template: Actions (Approve Batch + View Details) -->
+        <ng-template #actionsTemplate let-batch>
+          <!-- The department only views a batch here; it decides on the details screen. -->
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap py-0.5">
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="viewDetails(batch)"
+              title="View Batch Details"
+              aria-label="View Batch Details"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
+
+            @if (isApproved(batch)) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                (click)="openWithdrawModal(batch)"
+                title="Withdraw Request"
+                aria-label="Withdraw Request"
+              >
+                <app-icon name="ban" size="sm" class="text-rose-600" />
+              </button>
+            }
+          </div>
+        </ng-template>
+
+      <!-- Confirmation Modal for Withdrawing Batch -->
+      <app-action-modal
+        [isOpen]="!!batchToWithdraw()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        accentBarClass="bg-rose-600"
+        title="Withdraw Request"
+        primaryLabel="Submit Withdraw Request"
+        primaryVariant="danger"
+        secondaryLabel=""
+        maxWidthClass="max-w-[460px]"
+        (primaryAction)="confirmWithdraw()"
+        (secondaryAction)="cancelWithdraw()"
+        (close)="cancelWithdraw()"
+      >
+        @if (batchToWithdraw(); as b) {
+          <div class="space-y-3 mt-2">
+            <p class="text-sm text-slate-700 m-0 leading-relaxed font-sans">
+              Are you sure you want to withdraw batch <strong class="text-slate-900 font-semibold tabular-nums">{{ b.batchCode }}</strong>?
+            </p>
+
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs space-y-1.5">
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Course</span>
+                <span class="font-medium text-slate-800">{{ b.courseName }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Center</span>
+                <span class="font-medium text-slate-800">{{ b.sdcName }}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-slate-500">Schedule</span>
+                <span class="font-medium text-slate-800 tabular-nums">{{ b.startDate }} to {{ b.endDate }}</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-xs font-semibold text-slate-700">Reason for Withdrawal (Optional)</label>
+              <input
+                appInput
+                type="text"
+                size="sm"
+                class="w-full"
+                placeholder="e.g. Schedule cancellation or administrative decision"
+                [(ngModel)]="withdrawReason"
+              />
+            </div>
+
+            <p class="text-[11.5px] text-amber-700 m-0">
+              Once withdrawn, this batch will be inactive and further trainee registrations will be stopped.
+            </p>
+          </div>
+        }
+      </app-action-modal>
+    </app-page-shell>
+  `
+})
+export class BatchApprovalsComponent {
+  readonly batchService = inject(BatchService);
+  readonly router = inject(Router);
+
+  activeFilter = signal<string>('All');
+  selectedCenter = signal<string>('ALL');
+  selectedScheme = signal<string>('ALL');
+  selectedDistrict = signal<string>('ALL');
+  searchQuery = signal<string>('');
+
+  private readonly sdcService = inject(SdcService);
+
+  readonly pageSize = 10;
+
+  readonly batchToWithdraw = signal<BatchRecord | null>(null);
+  withdrawReason = '';
+
+  isWithdrawn(b: BatchRecord): boolean {
+    return isBatchWithdrawn(b);
+  }
+
+  openWithdrawModal(batch: BatchRecord): void {
+    this.batchToWithdraw.set(batch);
+    this.withdrawReason = '';
+  }
+
+  cancelWithdraw(): void {
+    this.batchToWithdraw.set(null);
+    this.withdrawReason = '';
+  }
+
+  confirmWithdraw(): void {
+    const batch = this.batchToWithdraw();
+    if (!batch) return;
+
+    this.batchService.withdrawBatch(batch.id, this.withdrawReason.trim() || undefined, 'Department Admin');
+    this.cancelWithdraw();
+  }
+
+  readonly batchColumns: TableColumn<BatchRecord>[] = [
+    { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
+    { key: 'batchCode', label: 'Batch Code', align: 'center', type: 'custom', width: 'w-32' },
+    { key: 'course', label: 'Course & Sector', align: 'center', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'scheme', label: 'Scheme & Category', align: 'center', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'centerName', label: 'SDC Center', align: 'center', type: 'custom', width: 'min-w-[180px]' },
+    { key: 'size', label: 'Batch Size', align: 'center', type: 'custom', width: 'w-24' },
+    { key: 'schedule', label: 'Start & End Date', align: 'center', type: 'custom', width: 'w-36' },
+    { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32 min-w-[100px]' }
+  ];
+
+  /** The batch size the partner entered (the capacity once the department has approved). */
+  batchSize(b: BatchRecord): number {
+    return b.approvedBatchStrength || b.maxStrength || 0;
+  }
+
+  /** Scheme category of the center the batch belongs to, in normal case ("Rajvik", "Samarth"). */
+  schemeCategory(b: BatchRecord): string {
+    return categoryLabel(this.sdcService.getSdcById(b.sdcId)?.schemeCategory);
+  }
+
+  readonly centerList = computed(() => {
+    const list = this.batchService.batches();
+    return Array.from(new Set(list.map(b => b.sdcName).filter((c): c is string => !!c)));
+  });
+
+  readonly schemeList = computed(() => {
+    const list = this.batchService.batches();
+    return Array.from(new Set(list.map(b => b.scheme).filter((s): s is string => !!s)));
+  });
+
+  readonly districtList = computed(() => {
+    const list = this.batchService.batches();
+    return Array.from(new Set(list.map(b => b.sdcDistrict).filter((d): d is string => !!d)));
+  });
+
+  readonly centerDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Centers', value: 'ALL' },
+    ...this.centerList().map(c => ({ label: c, value: c }))
+  ]);
+
+  readonly schemeDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Schemes', value: 'ALL' },
+    ...this.schemeList().map(sch => ({ label: sch, value: sch }))
+  ]);
+
+  readonly districtDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Districts', value: 'ALL' },
+    ...this.districtList().map(dst => ({ label: dst, value: dst }))
+  ]);
+
+  isApproved(b: BatchRecord): boolean {
+    return isBatchApproved(b);
+  }
+
+  isRejected(b: BatchRecord): boolean {
+    return isBatchRejected(b);
+  }
+
+  isReturned(b: BatchRecord): boolean {
+    return isBatchReturned(b);
+  }
+
+  /** Every batch reaches the department as soon as it is created. */
+  private readonly submittedBatches = computed(() => this.batchService.batches());
+
+  readonly filterOptions = computed(() => {
+    const all = this.submittedBatches();
+    const pending = all.filter(b => isBatchInApproval(b));
+    const approved = all.filter(b => this.isApproved(b));
+    const rejected = all.filter(b => this.isRejected(b));
+    return [
+      { id: 'All', label: 'All', count: all.length },
+      { id: 'Pending', label: 'Pending', count: pending.length },
+      { id: 'Approved', label: 'Approved', count: approved.length },
+      { id: 'Withdrawn', label: 'Withdrawn', count: all.filter(b => this.isWithdrawn(b)).length },
+      { id: 'Returned', label: 'Returned to TP', count: all.filter(b => this.isReturned(b)).length },
+      { id: 'Rejected', label: 'Rejected', count: rejected.length }
+    ];
+  });
+
+  readonly filteredBatches = computed(() => {
+    let list = this.submittedBatches();
+    const filter = this.activeFilter();
+
+    if (filter === 'Pending') {
+      list = list.filter(b => isBatchInApproval(b));
+    } else if (filter === 'Approved') {
+      list = list.filter(b => this.isApproved(b));
+    } else if (filter === 'Withdrawn') {
+      list = list.filter(b => this.isWithdrawn(b));
+    } else if (filter === 'Returned') {
+      list = list.filter(b => this.isReturned(b));
+    } else if (filter === 'Rejected') {
+      list = list.filter(b => this.isRejected(b));
+    }
+
+    if (this.selectedCenter() !== 'ALL') {
+      list = list.filter(b => b.sdcName === this.selectedCenter());
+    }
+
+    if (this.selectedScheme() !== 'ALL') {
+      list = list.filter(b => b.scheme === this.selectedScheme());
+    }
+
+    if (this.selectedDistrict() !== 'ALL') {
+      list = list.filter(b => b.sdcDistrict === this.selectedDistrict());
+    }
+
+    const q = this.searchQuery().trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        b =>
+          b.batchCode.toLowerCase().includes(q) ||
+          (b.batchName && b.batchName.toLowerCase().includes(q)) ||
+          b.courseName.toLowerCase().includes(q) ||
+          b.sdcName.toLowerCase().includes(q) ||
+          b.scheme.toLowerCase().includes(q) ||
+          (b.sector && b.sector.toLowerCase().includes(q))
+      );
+    }
+
+    return list;
+  });
+
+  hasActiveFilters(): boolean {
+    return (
+      this.selectedCenter() !== 'ALL' ||
+      this.selectedScheme() !== 'ALL' ||
+      this.selectedDistrict() !== 'ALL' ||
+      this.searchQuery().trim().length > 0
+    );
+  }
+
+  resetFilters(): void {
+    this.selectedCenter.set('ALL');
+    this.selectedScheme.set('ALL');
+    this.selectedDistrict.set('ALL');
+    this.searchQuery.set('');
+  }
+
+  setFilter(id: string): void {
+    this.activeFilter.set(id);
+  }
+
+  formatStatus(status: string): string {
+    if (!status) return 'PENDING';
+    if (status === 'ONGOING') return 'ONGOING';
+    if (status === 'PENDING_APPROVAL' || status === 'INSPECTION_PENDING') return 'PENDING';
+    return status;
+  }
+
+  /** Status in words: "Pending approval", "Approved", "Rejected", "Returned to TP". */
+  statusLabel(b: BatchRecord): string {
+    return batchStatusLabel(b);
+  }
+
+  viewDetails(batch: BatchRecord): void {
+    this.router.navigate(['/batches', batch.id]);
+  }
+}

@@ -1,0 +1,456 @@
+import { Injectable, signal } from '@angular/core';
+import {
+  OtrFormData,
+  Step1OrgDetails,
+  OfficerInCharge,
+  Step3AuthorizedPerson,
+  Step4BankDetails,
+  REGEX,
+  ToastInfo
+} from '../models/otr-form.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OtrValidationService {
+  /** Tracks steps that have had submit attempted */
+  submittedSteps = signal<Set<number>>(new Set<number>());
+
+  /** Tracks completed/valid steps */
+  completedSteps = signal<Set<number>>(new Set<number>());
+
+  /** Global feedback notification toast */
+  toast = signal<ToastInfo | null>(null);
+
+  showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'error', stepNumber?: number): void {
+    this.toast.set({ message, type, stepNumber });
+    setTimeout(() => {
+      this.toast.set(null);
+    }, 4500);
+  }
+
+  clearToast(): void {
+    this.toast.set(null);
+  }
+
+  markStepSubmitted(stepNumber: number): void {
+    const next = new Set(this.submittedSteps());
+    next.add(stepNumber);
+    this.submittedSteps.set(next);
+  }
+
+  resetSubmittedSteps(): void {
+    this.submittedSteps.set(new Set<number>());
+  }
+
+  /* ==========================================================================
+     Step 1: Organization Details Validation (Sub-sections 1 to 4)
+     ========================================================================== */
+  validateStep1SubStep1(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
+    if (!step1.fullName?.trim()) {
+      errors.push('Organization Name is mandatory.');
+    }
+    if (!step1.natureOfEntity?.trim()) {
+      errors.push('Nature of Entity selection is mandatory.');
+    }
+    if (!step1.preferredSector?.trim()) {
+      errors.push('Preferred Sector selection is mandatory.');
+    }
+    if (!step1.gstRegistered) {
+      errors.push('GST Registered selection is mandatory.');
+    } else if (step1.gstRegistered === 'Yes') {
+      if (!step1.gstin?.trim()) {
+        errors.push('GSTIN Number is mandatory when GST Registered is Yes.');
+      } else if (!REGEX.GSTIN.test(step1.gstin.toUpperCase())) {
+        errors.push('Invalid GSTIN format (15 characters statutory format, e.g. 08ABCDE1234F1Z5).');
+      }
+      if (!step1.gstCertDoc || step1.gstCertDoc.status !== 'uploaded') {
+        errors.push('GST Registration Certificate upload is mandatory.');
+      }
+    }
+
+    if (!step1.msmeRegistered) {
+      errors.push('MSME / Udyam Registered selection is mandatory.');
+    } else if (step1.msmeRegistered === 'Yes') {
+      if (!step1.udyamNumber?.trim()) {
+        errors.push('Udyam Registration Number is mandatory when MSME Registered is Yes.');
+      } else if (!REGEX.UDYAM.test(step1.udyamNumber)) {
+        errors.push('Invalid Udyam Number format (Required: UDYAM-XX-00-0000000).');
+      }
+      if (!step1.msmeCertDoc || step1.msmeCertDoc.status !== 'uploaded') {
+        errors.push('MSME / Udyam Certificate upload is mandatory.');
+      }
+    }
+
+    return errors;
+  }
+
+  validateStep1SubStep2(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
+    if (!step1.registrationNumber?.trim()) {
+      errors.push('Registration / CIN Number is mandatory.');
+    }
+    if (!step1.dateOfRegistration) {
+      errors.push('Date of Registration is mandatory.');
+    } else if (new Date(step1.dateOfRegistration) > new Date()) {
+      errors.push('Date of Registration cannot be a future date.');
+    }
+    if (!step1.stateOfLegalReg?.trim()) {
+      errors.push('State/UT of Legal Registration is mandatory.');
+    }
+    if (!step1.companyPan?.trim()) {
+      errors.push('Company PAN is mandatory.');
+    } else if (!REGEX.PAN.test(step1.companyPan.toUpperCase())) {
+      errors.push('Invalid Company PAN format (Required: 5 letters, 4 digits, 1 letter, e.g. ABCDE1234F).');
+    }
+    if (!step1.registrationCertDoc || step1.registrationCertDoc.status !== 'uploaded') {
+      errors.push('Certificate of Registration Document upload is mandatory.');
+    }
+    if (!step1.panCardDoc || step1.panCardDoc.status !== 'uploaded') {
+      errors.push('Organization PAN Card Document upload is mandatory.');
+    }
+
+    return errors;
+  }
+
+  validateStep1SubStep3(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
+    if (!step1.contactNo?.trim()) {
+      errors.push('Company Contact Number is mandatory.');
+    } else if (!REGEX.INDIAN_MOBILE.test(step1.contactNo) && !/^[0-9]{7,12}$/.test(step1.contactNo.replace(/[-\s]/g, ''))) {
+      errors.push('Invalid Company Contact Number (Enter 10-digit mobile or landline number).');
+    }
+    if (!step1.emailId?.trim()) {
+      errors.push('Official Company Email-ID is mandatory.');
+    } else if (!REGEX.EMAIL.test(step1.emailId.trim())) {
+      errors.push('Invalid Official Company Email-ID format.');
+    }
+    if (step1.website?.trim() && !REGEX.URL.test(step1.website.trim())) {
+      errors.push('Invalid Website URL format.');
+    }
+
+    return errors;
+  }
+
+  validateStep1SubStep4(step1: Step1OrgDetails): string[] {
+    const errors: string[] = [];
+
+    if (!step1.registeredAddress?.trim()) {
+      errors.push('Registered Premise Address is mandatory.');
+    }
+    if (!step1.registeredState?.trim()) {
+      errors.push('Registered State is mandatory.');
+    }
+    if (!step1.registeredDistrict?.trim()) {
+      errors.push('Registered District is mandatory.');
+    }
+    if (!step1.registeredPincode?.trim()) {
+      errors.push('Registered PIN Code is mandatory.');
+    } else if (!REGEX.INDIAN_PIN.test(step1.registeredPincode)) {
+      errors.push('Invalid Registered PIN Code (Must be 6 numeric digits not starting with 0).');
+    }
+
+    if (!step1.sameAsRegistered) {
+      if (!step1.officeAddress?.trim()) {
+        errors.push('Operational Office Address is mandatory.');
+      }
+      if (!step1.officeState?.trim()) {
+        errors.push('Operational Office State is mandatory.');
+      }
+      if (!step1.officeDistrict?.trim()) {
+        errors.push('Operational Office District is mandatory.');
+      }
+      if (!step1.officePincode?.trim()) {
+        errors.push('Operational Office PIN Code is mandatory.');
+      } else if (!REGEX.INDIAN_PIN.test(step1.officePincode)) {
+        errors.push('Invalid Operational Office PIN Code (Must be 6 numeric digits).');
+      }
+    }
+
+    return errors;
+  }
+
+  validateStep1SubStep(subStep: number, step1: Step1OrgDetails): string[] {
+    switch (subStep) {
+      case 1:
+        return this.validateStep1SubStep1(step1);
+      case 2:
+        return this.validateStep1SubStep2(step1);
+      case 3:
+        return this.validateStep1SubStep3(step1);
+      case 4:
+        return this.validateStep1SubStep4(step1);
+      default:
+        return [];
+    }
+  }
+
+  validateStep1(step1: Step1OrgDetails): string[] {
+    return [
+      ...this.validateStep1SubStep1(step1),
+      ...this.validateStep1SubStep2(step1),
+      ...this.validateStep1SubStep3(step1),
+      ...this.validateStep1SubStep4(step1)
+    ];
+  }
+
+  /* ==========================================================================
+     Step 2: Officer In-Charge Directory Validation
+     ========================================================================== */
+  validateOfficerInCharge(oicList: OfficerInCharge[]): string[] {
+    return this.validateStep2(oicList);
+  }
+
+  validateSingleOic(oic: OfficerInCharge, index: number): string[] {
+    const prefix = 'Officer In-Charge: ';
+    const errors: string[] = [];
+
+    if (!oic.name?.trim() || oic.name.trim().length < 2) {
+      errors.push(`${prefix}Full Name is mandatory (min 2 characters).`);
+    }
+    if (!oic.designation?.trim()) {
+      errors.push(`${prefix}Designation selection is mandatory.`);
+    }
+    if (!oic.mobileNo?.trim()) {
+      errors.push(`${prefix}Mobile Number is mandatory.`);
+    } else if (!REGEX.INDIAN_MOBILE.test(oic.mobileNo)) {
+      errors.push(`${prefix}Invalid Mobile Number (10 digits starting with 6-9).`);
+    }
+    if (!oic.emailId?.trim()) {
+      errors.push(`${prefix}Official Email-ID is mandatory.`);
+    } else if (!REGEX.EMAIL.test(oic.emailId)) {
+      errors.push(`${prefix}Invalid Official Email-ID.`);
+    }
+    if (!oic.pan?.trim()) {
+      errors.push(`${prefix}PAN is mandatory.`);
+    } else if (!REGEX.PAN.test(oic.pan.toUpperCase())) {
+      errors.push(`${prefix}Invalid PAN format (e.g. ABCDE1234F).`);
+    }
+    if (!oic.aadhaarNo?.trim()) {
+      errors.push(`${prefix}Aadhaar Number is mandatory.`);
+    } else if (!REGEX.AADHAAR.test(oic.aadhaarNo)) {
+      errors.push(`${prefix}Invalid Aadhaar Number (Must be exactly 12 digits).`);
+    }
+    if (oic.voterIdNo?.trim() && !REGEX.VOTER_ID.test(oic.voterIdNo.toUpperCase())) {
+      errors.push(`${prefix}Invalid Voter ID format (e.g. ABC1234567).`);
+    }
+    if (oic.passportNo?.trim() && !REGEX.PASSPORT.test(oic.passportNo.toUpperCase())) {
+      errors.push(`${prefix}Invalid Passport Number format.`);
+    }
+    if (!oic.appointmentLetterDoc || oic.appointmentLetterDoc.status !== 'uploaded') {
+      errors.push(`${prefix}Appointment / Authorization Letter upload is mandatory.`);
+    }
+
+    return errors;
+  }
+
+  validateStep2(oicList: OfficerInCharge[]): string[] {
+    const errors: string[] = [];
+
+    if (!oicList || oicList.length === 0) {
+      errors.push('At least 1 Officer In-Charge record is strictly required.');
+      return errors;
+    }
+
+    oicList.forEach((oic, idx) => {
+      errors.push(...this.validateSingleOic(oic, idx));
+    });
+
+    // Cross-record duplicate checks
+    const pans = new Map<string, number>();
+    const mobiles = new Map<string, number>();
+
+    oicList.forEach((oic, idx) => {
+      const cleanPan = oic.pan?.trim().toUpperCase();
+      if (cleanPan) {
+        if (pans.has(cleanPan)) {
+          errors.push(`Duplicate PAN detected between Officer #${pans.get(cleanPan)! + 1} and Officer #${idx + 1} (${cleanPan}).`);
+        } else {
+          pans.set(cleanPan, idx);
+        }
+      }
+
+      const cleanMobile = oic.mobileNo?.trim();
+      if (cleanMobile) {
+        if (mobiles.has(cleanMobile)) {
+          errors.push(`Duplicate Mobile Number detected between Officer #${mobiles.get(cleanMobile)! + 1} and Officer #${idx + 1} (${cleanMobile}).`);
+        } else {
+          mobiles.set(cleanMobile, idx);
+        }
+      }
+    });
+
+    return errors;
+  }
+
+  /* ==========================================================================
+     Step 3: Authorized Signatory Validation
+     ========================================================================== */
+  validateStep3(step3: Step3AuthorizedPerson): string[] {
+    const errors: string[] = [];
+
+    // 1. Personal Information
+    const hasName = (step3.firstName?.trim() || step3.name?.trim());
+    if (!hasName || hasName.length < 2) {
+      errors.push('Authorized Person First Name is mandatory (min 2 chars).');
+    }
+
+    // 2. Contact Information
+    if (!step3.mobileNo?.trim()) {
+      errors.push('Mobile Number is mandatory.');
+    } else if (!REGEX.INDIAN_MOBILE.test(step3.mobileNo)) {
+      errors.push('Invalid Mobile Number (10 digits starting with 6-9).');
+    }
+    if (!step3.emailId?.trim()) {
+      errors.push('Email Address is mandatory.');
+    } else if (!REGEX.EMAIL.test(step3.emailId.trim())) {
+      errors.push('Invalid Email Address format.');
+    }
+
+    // 3. Dynamic Identity Verification
+    const docType = step3.identityDocType?.trim() || (step3.aadhaarNo ? 'Aadhaar Card' : step3.pan ? 'PAN Card' : '');
+    const docNumber = (
+      step3.identityDocNumber?.trim() ||
+      (docType === 'Aadhaar Card' ? step3.aadhaarNo :
+       docType === 'PAN Card' ? step3.pan :
+       docType === 'Voter ID Card' ? step3.voterIdNo :
+       docType === 'Jan Aadhaar Card' ? step3.bhamashahNo :
+       docType === 'Passport' ? step3.passportNo : '')
+    )?.trim();
+
+    if (!docType) {
+      errors.push('Identity Document Type selection is mandatory.');
+    } else if (!docNumber) {
+      errors.push(`${this.getDocNumberName(docType)} is mandatory.`);
+    } else {
+      switch (docType) {
+        case 'Aadhaar Card':
+          if (!REGEX.AADHAAR.test(docNumber)) {
+            errors.push('Invalid Aadhaar Number (Must be 12 numeric digits).');
+          }
+          break;
+        case 'PAN Card':
+          if (!REGEX.PAN.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Personal PAN format (e.g. ABCDE1234F).');
+          }
+          break;
+        case 'Voter ID Card':
+          if (!REGEX.VOTER_ID.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Voter ID format (e.g. ABC1234567).');
+          }
+          break;
+        case 'Jan Aadhaar Card':
+          if (!/^[0-9A-Za-z-]{7,16}$/.test(docNumber)) {
+            errors.push('Invalid Jan Aadhaar Number format.');
+          }
+          break;
+        case 'Passport':
+          if (!REGEX.PASSPORT.test(docNumber.toUpperCase())) {
+            errors.push('Invalid Passport Number format.');
+          }
+          break;
+      }
+    }
+
+    if (!step3.idProofDoc || step3.idProofDoc.status !== 'uploaded') {
+      errors.push('Identity Document upload is mandatory.');
+    }
+
+    // 4. Authorization Documents
+    if (!step3.authorizationLetterDoc || step3.authorizationLetterDoc.status !== 'uploaded') {
+      errors.push('Authorization Letter / Board Resolution document upload is mandatory.');
+    }
+
+    return errors;
+  }
+
+  private getDocNumberName(docType: string): string {
+    switch (docType) {
+      case 'Aadhaar Card': return 'Aadhaar Number';
+      case 'PAN Card': return 'PAN Number';
+      case 'Voter ID Card': return 'Voter ID Number';
+      case 'Jan Aadhaar Card': return 'Jan Aadhaar Number';
+      case 'Passport': return 'Passport Number';
+      default: return 'Document Number';
+    }
+  }
+
+  /* ==========================================================================
+     Step 4: Bank Details Validation
+     ========================================================================== */
+  validateStep4(step4: Step4BankDetails): string[] {
+    const errors: string[] = [];
+
+    if (!step4.bankName?.trim()) {
+      errors.push('Bank Name selection is mandatory.');
+    }
+    if (!step4.branchName?.trim()) {
+      errors.push('Branch Name is mandatory.');
+    }
+    if (!step4.accountHolderName?.trim()) {
+      errors.push('Account Holder Name is mandatory.');
+    }
+    if (!step4.accountNo?.trim()) {
+      errors.push('Bank Account Number is mandatory.');
+    } else if (!REGEX.BANK_ACCOUNT.test(step4.accountNo.trim())) {
+      errors.push('Invalid Bank Account Number (Must be 9 to 18 numeric digits).');
+    }
+    if (!step4.ifscCode?.trim()) {
+      errors.push('IFSC Code is mandatory.');
+    } else if (!REGEX.IFSC.test(step4.ifscCode.trim().toUpperCase())) {
+      errors.push('Invalid IFSC Code (11 alphanumeric characters, 5th character strictly 0, e.g. SBIN0031804).');
+    }
+    if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode.trim())) {
+      errors.push('Invalid MICR Code (Must be exactly 9 numeric digits).');
+    }
+    if (!step4.cancelledChequeDoc || step4.cancelledChequeDoc.status !== 'uploaded') {
+      errors.push('Upload of Cancelled Cheque or First Page of Bank Passbook is mandatory.');
+    }
+
+    return errors;
+  }
+
+  /* ==========================================================================
+     Orchestration Helpers
+     ========================================================================== */
+  getStepErrors(stepNumber: number, formData: OtrFormData): string[] {
+    switch (stepNumber) {
+      case 1:
+        return this.validateStep1(formData.step1);
+      case 2:
+        return this.validateStep3(formData.step3); // Step 2: Authorized Person Details
+      case 3:
+        return this.validateStep4(formData.step4); // Step 3: Bank Details
+      case 4:
+        return []; // Step 4: Preview & Submit
+      default:
+        return [];
+    }
+  }
+
+  isStepValid(stepNumber: number, formData: OtrFormData): boolean {
+    return this.getStepErrors(stepNumber, formData).length === 0;
+  }
+
+  getFirstInvalidStep(formData: OtrFormData): number | null {
+    for (let step = 1; step <= 3; step++) {
+      if (!this.isStepValid(step, formData)) {
+        return step;
+      }
+    }
+    return null;
+  }
+
+  validateAll(formData: OtrFormData): { step1: string[]; step2: string[]; step3: string[]; step4: string[] } {
+    return {
+      step1: this.validateStep1(formData.step1),
+      step2: this.validateStep2(formData.step2),
+      step3: this.validateStep3(formData.step3),
+      step4: this.validateStep4(formData.step4)
+    };
+  }
+}

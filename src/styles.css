@@ -1,0 +1,1114 @@
+/* =========================================================
+   ISMS GLOBAL DESIGN SYSTEM & STYLESHEET
+   Unified Single Global CSS File for ISMS Application
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. TAILWIND CORE
+   --------------------------------------------------------- */
+@import "tailwindcss";
+
+/* ---------------------------------------------------------
+   2. TAILWIND @THEME DEFINITION
+   --------------------------------------------------------- */
+@theme {
+  /* The one font of the portal. Noto Sans Devanagari is listed so Hindi text falls back to it glyph by glyph. */
+  --font-sans: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* font-mono resolves to the same font, so a stray one cannot add a second typeface on screen.
+     font-serif is left as it is: it is used only by the printed letters (sanction order, IPA, MoU). */
+  --font-mono: var(--font-sans);
+
+  /* Centralized Design System Palette - Light Burgundy, Dusty Rose, Soft Peach, White */
+  --color-primary: #7C0E44;
+  --color-primary-dark: #5E0832;
+  --color-primary-light: #F8EDF1;
+  --color-secondary: #AA5E7A;
+  --color-muted-rose: #D49A9A;
+  --color-light-peach: #F2DACE;
+
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #FCF8FA;
+  --color-surface-blush: #F8EDF1;
+  --color-surface-rose: #F6E7EA;
+
+  --color-border: #EADCE2;
+  --color-field-border: #E5D6DE;
+
+  --color-text-primary: #25212A;
+  --color-text-secondary: #625663;
+  --color-text-muted: #89818A;
+
+  /* Theme-aligned aliases */
+  --color-gov-blue: #7C0E44;
+  --color-gov-blue-dark: #5E0832;
+  --color-header-blue: #7C0E44;
+  --color-table-header: #F6E7EC;
+  --color-sso-blue: #7C0E44;
+
+  /* Aliases kept for existing markup: text-brand / text-brand-dark / border-theme */
+  --color-brand: #7C0E44;
+  --color-brand-dark: #5E0832;
+  --color-theme: #EADCE2;
+
+  /* Deep burgundy used for headers, primary CTAs and document chrome */
+  --color-navy: #7C0E44;
+  --color-navy-dark: #5E0832;
+
+  /* Dusty rose accent */
+  --color-ocean: #AA5E7A;
+  --color-ocean-dark: #7C0E44;
+
+  /* Neutral surfaces and form borders */
+  --color-surface-muted: #FCF8FA;
+}
+
+/* Horizontal scrollers (steppers, tab strips) that should scroll without a visible bar.
+   Used by StepperComponent, registration-shell and scheme-form tab filters. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------
+   3. CSS DESIGN TOKENS (:root)
+   --------------------------------------------------------- */
+:root {
+  /* Brand */
+  --color-primary: #7C0E44;
+  --color-primary-dark: #5E0832;
+  --color-primary-light: #F8EDF1;
+  --color-secondary: #AA5E7A;
+  --color-muted-rose: #D49A9A;
+  --color-light-peach: #F2DACE;
+
+  /* Backgrounds */
+  --color-background: #FFFFFF;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #FCF8FA;
+  --color-surface-blush: #F8EDF1;
+  --color-surface-rose: #F6E7EA;
+
+  /* Text */
+  --color-text-primary: #25212A;
+  --color-text-secondary: #625663;
+  --color-text-muted: #89818A;
+
+  /* Border */
+  --color-border: #EADCE2;
+  --color-field-border: #E5D6DE;
+
+  /* Typography System (Strict Inter Font & Enterprise Scale) */
+  --font-family-base: var(--font-sans);
+
+  /* Enterprise Scale Tokens */
+  --font-size-page-title: 24px;
+  --font-size-section-title: 18px;
+  --font-size-modal-title: 18px;
+  --font-size-modal-desc: 13px;
+  --font-size-form-label: 13px;
+  --font-size-input-value: 14px;
+  --font-size-dropdown-option: 14px;
+  --font-size-table-header: 13px;
+  --font-size-table-content: 14px;
+  --font-size-readonly-label: 12px;
+  --font-size-readonly-value: 14px;
+  --font-size-button: 14px;
+  --font-size-helper: 12px;
+  --font-size-validation: 12px;
+
+  /* Legacy aliases for compatibility */
+  --portal-font-size-title: 18px;
+  --portal-font-size-body: 14px;
+  --portal-font-size-label: 13px;
+  --portal-font-size-table: 14px;
+  --portal-font-size-small: 13px;
+  --font-size-card-title: 16px;
+  --font-size-body: 14px;
+  --font-size-label: 13px;
+  --font-size-table: 14px;
+  --font-size-small: 12px;
+  --font-size-caption: 12px;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line Heights */
+  --line-height-body: 20px;
+  --line-height-heading: 24px;
+
+  /* Spacing Tokens */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+
+  /* Form & Component Gaps */
+  --gap-field: 16px;
+  --gap-label-input: 6px;
+  --gap-validation: 4px;
+
+  /* Radius Tokens */
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+
+  /* Dimensions */
+  --height-input: 40px;
+  --height-button: 40px;
+  --modal-max-height: 90dvh;
+  --modal-padding-desktop: 24px;
+  --modal-padding-mobile: 16px;
+
+  /* Semantic Feedback Colors */
+  --color-success: #10B981;
+  --color-success-dark: #059669;
+  --color-success-light: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-warning-dark: #D97706;
+  --color-warning-light: #FFFBEB;
+  --color-error: #EF4444;
+  --color-error-dark: #DC2626;
+  --color-error-light: #FEF2F2;
+  --color-info: #3B82F6;
+  --color-info-dark: #2563EB;
+  --color-info-light: #EFF6FF;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(31, 41, 51, 0.06);
+  --shadow-modal: 0 8px 24px rgba(31, 41, 51, 0.12);
+
+  /* Transition */
+  --transition-fast: 150ms ease;
+}
+
+/* ---------------------------------------------------------
+   4. GLOBAL RESET & BASE ELEMENTS
+   --------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 17px;
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
+  background-color: #FFFFFF !important;
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: var(--font-weight-regular);
+  line-height: 22px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* Ensure all route host elements inherit pure white */
+app-root,
+router-outlet+* {
+  background-color: #ffffff;
+}
+
+
+input,
+button,
+select,
+textarea {
+  font-family: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  text-transform: none !important;
+}
+
+/* ---------------------------------------------------------
+   5. STANDARDIZED NORMAL HEADINGS (PORTAL TYPOGRAPHY)
+   --------------------------------------------------------- */
+@layer base {
+  :where(h1, h2, h3, h4, h5, h6) {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  :where(h1) {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 700;
+  }
+
+  :where(h2) {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+  }
+
+  :where(h3) {
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  :where(h4) {
+    font-size: 15px;
+    line-height: 22px;
+    font-weight: 600;
+  }
+
+  :where(h5, h6) {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+  }
+}
+
+/* ---------------------------------------------------------
+   6. TEXT & LINKS
+   --------------------------------------------------------- */
+:where(p) {
+  margin: 0;
+  font-size: 15px;
+  line-height: 24px;
+}
+
+:where(small) {
+  font-size: var(--font-size-small, 11.5px);
+}
+
+.form-error-text {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: #e11d48 !important;
+}
+
+.form-hint-text {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: #7a8792 !important;
+}
+
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+:where(a) {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+:where(a:hover) {
+  color: var(--color-primary-dark);
+}
+
+/* ---------------------------------------------------------
+   Sidebar Navigation Overrides
+   Guarantees pure white / crisp readable text & icons for
+   inactive navigation items on the burgundy gradient background,
+   and light peach (#F2DACE) with burgundy (#7C0E44) for active item.
+   --------------------------------------------------------- */
+app-sidebar aside nav a {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+app-sidebar aside nav a:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+app-sidebar aside nav a app-icon,
+app-sidebar aside nav a span {
+  color: inherit !important;
+}
+
+app-sidebar aside nav a.active-link,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"],
+app-sidebar aside nav a[class*="text-[#7C0E44]"] {
+  background-color: #F2DACE !important;
+  color: #7C0E44 !important;
+}
+
+app-sidebar aside nav a.active-link app-icon,
+app-sidebar aside nav a.active-link span,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"] app-icon,
+app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
+  color: #7C0E44 !important;
+}
+
+/* Language Segmented Toggle in Header */
+.lang-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  background-color: #FCF8FA;
+  border: 1px solid #EADCE2;
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.lang-toggle-btn {
+  height: 28px !important;
+  padding: 0 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #625663 !important;
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 6px !important;
+  transition: all var(--transition-fast) !important;
+  cursor: pointer;
+}
+
+.lang-toggle-btn:hover {
+  color: #7C0E44 !important;
+}
+
+.lang-toggle-btn.active {
+  background-color: #FFFFFF !important;
+  color: #7C0E44 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.08) !important;
+}
+
+/* ---------------------------------------------------------
+   7. BUTTON SYSTEM
+   --------------------------------------------------------- */
+@layer components {
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--height-button);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+/* Primary action: deep burgundy, white text. */
+.btn-primary {
+  color: #FFFFFF !important;
+  background-color: #7C0E44;
+  border-color: #7C0E44;
+}
+
+.btn-primary:hover {
+  background-color: #5E0832;
+  border-color: #5E0832;
+}
+
+.btn-secondary {
+  color: #FFFFFF !important;
+  background-color: #AA5E7A;
+  border-color: #AA5E7A;
+}
+
+.btn-secondary:hover {
+  background-color: #8C4B64;
+  border-color: #8C4B64;
+}
+
+/* Secondary action next to a primary one: white with a dusty rose border (Back, View, Cancel, Close). */
+.btn-outline {
+  color: #7C0E44;
+  background-color: #FFFFFF;
+  border-color: #AA5E7A;
+  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.05);
+}
+
+.btn-outline:hover {
+  background-color: #F8EDF1;
+  border-color: #7C0E44;
+  color: #5E0832;
+}
+
+.btn-reset {
+  color: #7C0E44;
+  background-color: #FFFFFF;
+  border-color: #EADCE2;
+}
+
+.btn-reset:hover {
+  background-color: #F8EDF1;
+  border-color: #AA5E7A;
+}
+
+.btn-sm {
+  height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-small);
+  line-height: 18px;
+}
+
+.btn-lg {
+  height: 44px;
+  padding: 0 var(--space-6);
+  font-size: var(--font-size-body);
+  line-height: 22px;
+}
+
+.btn-danger {
+  color: #FFFFFF !important;
+  background-color: #C5221F;
+  border-color: #C5221F;
+}
+
+.btn-danger:hover {
+  background-color: #A51D1A;
+  border-color: #A51D1A;
+}
+
+.btn-ghost {
+  color: var(--color-primary);
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.btn-ghost:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* Quiet text action on a dark background (footer links) */
+.btn-inverse {
+  color: #CBD5E1 !important;
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.btn-inverse:hover {
+  color: #FFFFFF !important;
+  text-decoration: underline;
+}
+
+/* Smallest size: a remove (x) inside a chip, a thumbnail or a dense row */
+.btn-xs {
+  height: 22px;
+  padding: 0 var(--space-2);
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.btn-icon.btn-xs {
+  width: 22px;
+  padding: 0;
+}
+
+/* Modifiers shared by every variant */
+.btn {
+  gap: var(--space-2);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.btn:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+/* Square button that holds only an icon (close, delete, print) */
+.btn-icon {
+  width: var(--height-button);
+  padding: 0;
+}
+
+.btn-icon.btn-sm {
+  width: 32px;
+}
+}
+
+/* ---------------------------------------------------------
+   8. FORM CONTROLS & INPUTS
+   --------------------------------------------------------- */
+@layer components {
+.form-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-label);
+  font-weight: var(--font-weight-medium);
+  line-height: 20px;
+}
+
+.form-control {
+  width: 100%;
+  height: var(--height-input);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-field-border, #E5D6DE);
+  border-radius: var(--radius-control);
+  outline: none;
+  background-color: var(--color-surface, #FFFFFF);
+  color: var(--color-text-primary, #25212A);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+select.form-control {
+  transition: none;
+}
+
+.form-control:focus {
+  border-color: #AA5E7A;
+  box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2);
+  outline: none !important;
+}
+
+.form-control::placeholder {
+  color: var(--color-text-muted, #89818A);
+}
+
+/* Compact field for filters, toolbars and table cells */
+.form-control-sm {
+  height: 32px;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-small);
+}
+
+/* A text area grows with its rows instead of keeping the single-line height */
+textarea.form-control {
+  height: auto;
+  min-height: var(--height-input);
+  padding: var(--space-2) var(--space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.form-control.is-invalid {
+  border-color: #E11D48;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #E11D48;
+  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.15);
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+  background-color: #F8FAFC;
+  cursor: not-allowed;
+}
+
+/* Text typed straight into a printed letter or a table cell: no box around it */
+.form-control.form-control-plain {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: inherit;
+}
+
+/* Only a bottom line (sign-in forms) */
+.form-control.form-control-underline {
+  height: auto;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-bottom: 1px solid #94A3B8;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.form-control.form-control-underline:focus {
+  border-bottom-color: var(--color-navy);
+  box-shadow: none;
+}
+
+.form-control.form-control-plain:focus {
+  box-shadow: none;
+  background-color: rgba(23, 74, 110, 0.06);
+}
+}
+
+/* =========================================================
+   UNIVERSAL SELECT DROPDOWN STYLING
+   Ensures consistent, beautifully spaced custom chevron arrows
+   across all SDC forms, detail pages, and modals in ISMS 2.0.
+   ========================================================= */
+select,
+.form-select {
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748B' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-position: right 0.75rem center !important;
+  background-repeat: no-repeat !important;
+  background-size: 14px 14px !important;
+  padding-right: 2.25rem !important;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+select::-ms-expand,
+.form-select::-ms-expand {
+  display: none;
+}
+
+select.h-7,
+select.h-8 {
+  background-position: right 0.5rem center !important;
+  padding-right: 1.75rem !important;
+  background-size: 12px 12px !important;
+}
+
+select:disabled,
+.form-select:disabled {
+  background-color: #f8fafc !important;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.form-select:focus,
+select:focus {
+  border-color: #AA5E7A !important;
+  box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2) !important;
+}
+
+/* ---------------------------------------------------------
+   9. CARDS
+   --------------------------------------------------------- */
+.card {
+  background-color: var(--color-surface, #FFFFFF);
+  border: 1px solid var(--color-border, #EADCE2);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(37, 33, 42, 0.05);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-4);
+  background-color: #F8E9EE;
+  color: #7C0E44;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
+  font-weight: 600;
+}
+
+.card-body {
+  padding: var(--space-4);
+}
+
+/* ---------------------------------------------------------
+   10. TABLES (STANDARDIZED PORTAL TABLE SYSTEM)
+   --------------------------------------------------------- */
+.table,
+table.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-surface, #FFFFFF);
+  font-size: 13px;
+  font-family: var(--font-sans);
+}
+
+.table th,
+table.table th {
+  height: 48px;
+  padding: 0 var(--space-3);
+  background-color: #F6E7EC;
+  color: #7C0E44;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.table td,
+table.table td,
+app-table td {
+  height: 48px;
+  padding: 0 var(--space-3);
+  color: #25212A;
+  border-bottom: 1px solid var(--color-border, #EADCE2);
+  font-size: 13px !important;
+  font-weight: 400 !important; /* Uniform normal font inside all table data cells matching Active Schemes / Tender Status */
+}
+
+/* Ensure data cell spans, links, divs inside portal tables default to 13px text size and strictly normal font weight */
+.table tbody td,
+table.table tbody td,
+app-table tbody td {
+  font-size: 13px !important;
+}
+
+.table tbody td span:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]),
+.table tbody td div:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]),
+table.table tbody td span:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
+table.table tbody td div:not([class*="text-[10"]):not([class*="text-[11"]):not([class*="text-[9"]):not(.badge):not([class*="badge"]):not(.btn):not([class*="btn"]),
+app-table tbody td a:not(.btn):not([class*="btn"]) {
+  font-weight: 400 !important;
+}
+
+/* Table links normal weight with clean hover transition */
+.table tbody td a:not(.btn):not([class*="btn"]),
+table tbody td a:not(.btn):not([class*="btn"]) {
+  font-weight: 400 !important;
+  color: var(--color-primary);
+}
+
+.table tbody td a:not(.btn):not([class*="btn"]):hover,
+table tbody td a:not(.btn):not([class*="btn"]):hover {
+  color: var(--color-primary-dark);
+}
+
+.table tbody tr:hover,
+table.table tbody tr:hover {
+  background-color: #FAF2F5;
+}
+
+/* ---------------------------------------------------------
+   11. BADGES
+   --------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-control);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Government Portal Style Blinking Badge Animation */
+@keyframes isms-blink {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.45));
+  }
+  50% {
+    opacity: 0.28;
+    filter: none;
+  }
+}
+
+.animate-blink {
+  animation: isms-blink 1.2s ease-in-out infinite;
+}
+
+.badge-success {
+  background-color: #E4F4E8;
+  color: #18733B;
+  border: 1px solid #C3E8CC;
+}
+
+.badge-warning {
+  background-color: #FFF0E5;
+  color: #B85B18;
+  border: 1px solid #FFD8BD;
+}
+
+.badge-danger {
+  background-color: #FCE8E8;
+  color: #C62828;
+  border: 1px solid #F9C5C5;
+}
+
+.badge-info {
+  background-color: #E8F0FE;
+  color: #2459B3;
+  border: 1px solid #C5D9F8;
+}
+
+.badge-submitted {
+  background-color: #FFF2D9;
+  color: #996000;
+  border: 1px solid #FFE1A8;
+}
+
+.badge-returned {
+  background-color: #F2EAF8;
+  color: #75409A;
+  border: 1px solid #E3CEF0;
+}
+
+/* ---------------------------------------------------------
+   12. PAGE & SECTION LAYOUT
+   --------------------------------------------------------- */
+.page-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--space-6);
+}
+
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-title {
+  font-size: var(--portal-font-size-title, 16px);
+  line-height: 24px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.page-subtitle {
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+}
+
+.section {
+  margin-bottom: var(--space-7);
+}
+
+.section-title {
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-section-title);
+  line-height: 26px;
+  font-weight: var(--font-weight-semibold);
+}
+
+
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+/* ---------------------------------------------------------
+   13. THEME GLOBAL UTILITIES
+   --------------------------------------------------------- */
+/* Colour utilities (bg-primary, bg-primary-dark, bg-primary-light, bg-background, bg-surface,
+   border-primary, text-brand, text-brand-dark, border-theme, bg-navy, text-ocean ...) are generated
+   by Tailwind from the @theme tokens above. They used to be hand-written `!important` classes, which
+   silently beat every hover:/focus:/disabled: variant. Add new brand colours to @theme instead. */
+/* ---------------------------------------------------------
+   14. ACCESSIBILITY & STATE
+   --------------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:focus-visible:is(.is-invalid, [aria-invalid="true"], :invalid),
+.is-invalid :focus-visible,
+[data-invalid="true"] :focus-visible,
+.border-rose-600 :focus-visible,
+.border-rose-600:focus-within {
+  outline-color: #DC2626 !important;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ---------------------------------------------------------
+   15. ONE FONT
+   The whole portal uses one typeface (Inter, with Noto Sans Devanagari for Hindi). Screens never set a family:
+   they change size and weight only (text-xs ... text-2xl, font-medium, font-semibold, tabular-nums for IDs).
+   Code, pre, kbd and samp are reset to it too (Tailwind would otherwise switch them to a monospace face).
+   --------------------------------------------------------- */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-sans);
+}
+
+/* ---------------------------------------------------------
+   16. CUSTOM SCROLLBARS
+   --------------------------------------------------------- */
+/* Chrome, Edge, Safari, Opera */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #174a6e;
+}
+
+/* Mobile: Natural touch overlay scrolling */
+@media (max-width: 640px) {
+  ::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    display: none !important;
+  }
+
+  * {
+    scrollbar-width: none !important;
+  }
+}
+
+/* ---------------------------------------------------------
+   17. GLOBAL PRINT STYLESHEET (@media print)
+   Ensures ONLY the document page content is printed cleanly
+   (hides outer app header, sidebar, footer, buttons, action bars,
+   and strips input borders, outlines, & select dropdown arrows).
+   --------------------------------------------------------- */
+@media print {
+
+  /* 1. Hide external app shell and non-printable controls */
+  app-header,
+  app-sidebar,
+  app-footer,
+  app-page-header,
+  .print\:hidden,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* 2. Reset html/body/root containers for clean page flow */
+  html,
+  body,
+  app-root,
+  .h-screen,
+  main {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    float: none !important;
+    position: static !important;
+    display: block !important;
+    box-shadow: none !important;
+  }
+
+  /* 3. Standard A4 Page Print Margins */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 12mm 12mm 12mm;
+  }
+
+  /* 4. Strip borders, outlines, backgrounds, and dropdown chevrons from all inputs */
+  input,
+  textarea,
+  select {
+    border: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    /* Removes dropdown chevron SVG arrows */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    color: #000000 !important;
+    resize: none !important;
+    font-family: inherit !important;
+  }
+
+  /* Remove number input spin buttons in print */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield !important;
+  }
+
+  /* 5. Document Container Formatting */
+  .sanction-document-page {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  /* 6. Clean Table Print Layout */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    page-break-inside: auto;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  th,
+  td {
+    border: 1px solid #111827 !important;
+    color: #000000 !important;
+  }
+}

@@ -1,262 +1,629 @@
 import { Routes } from '@angular/router';
-import { AuthenticatedLayoutComponent } from './layout/authenticated-layout/authenticated-layout.component';
-import { roleGuard } from './core/auth/auth.guard';
+import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
 
 export const routes: Routes = [
-  // Screen 1: Portal Landing (Krtika's Component)
   {
     path: '',
-    loadComponent: () => import('./landing/landing.component').then(m => m.LandingComponent)
+    loadComponent: () =>
+      import('./features/landing/landing.component').then(
+        (m) => m.LandingComponent
+      )
   },
   {
-    path: 'schemes',
-    loadComponent: () => import('./features/eoi/schemes/scheme-listing.component').then(m => m.SchemeListingComponent)
+    path: 'sso-login',
+    loadComponent: () =>
+      import('./features/auth/pages/sso-login/sso-login.component').then(
+        (m) => m.SsoLoginComponent
+      )
   },
-  
-  // Forms Module (Redirect to Unified TP-PIA Registration)
   {
-    path: 'forms',
-    redirectTo: 'auth/register',
+    path: 'dashboard',
+    redirectTo: 'registration',
     pathMatch: 'full'
   },
   {
-    path: 'forms/tp-pia-registration',
-    redirectTo: 'auth/register',
-    pathMatch: 'full'
-  },
-
-  // Screen 0: SSO Login Portal
-  {
-    path: 'auth/login',
-    loadComponent: () => import('./features/authentication/sso-login/sso-login.component').then(m => m.SsoLoginComponent)
+    path: 'registration',
+    loadComponent: () =>
+      import('./features/registration/registration-shell.component').then(
+        (m) => m.RegistrationShellComponent
+      )
   },
   {
-    path: 'auth/sso-mapping',
-    loadComponent: () => import('./features/authentication/sso-mapping/sso-mapping.component').then(m => m.SsoMappingComponent)
-  },
-
-  // Screen 2: One-Time Registration
-  {
-    path: 'auth/register',
-    loadComponent: () => import('./features/authentication/registration/registration-shell.component').then(m => m.RegistrationShellComponent)
+    path: 'otr',
+    redirectTo: 'registration'
   },
   {
-    path: 'auth/registration',
-    loadComponent: () => import('./features/authentication/registration/registration-shell.component').then(m => m.RegistrationShellComponent)
+    path: 'scheme-form',
+    loadComponent: () =>
+      import('./features/eoi/components/scheme-form/scheme-form.component').then(
+        (m) => m.SchemeFormComponent
+      )
   },
-
-  // Screen 3: Saved Master Profile
+  {
+    path: 'tenders',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
+  },
   {
     path: 'profile',
-    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
-  },
-  // Screen 4: Scheme Details / Application Form
-  {
-    path: 'eoi/apply/:id',
-    loadComponent: () => import('./features/eoi/application-wizard/application-wizard.component').then(m => m.ApplicationWizardComponent)
-  },
-
-  // Screen 5: EMD Fee Payment
-  {
-    path: 'eoi/payment/:id',
-    loadComponent: () => import('./features/eoi/emd-payment/emd-payment.component').then(m => m.EmdPaymentComponent)
-  },
-
-  // Screen 6: Preview & Submit
-  {
-    path: 'eoi/preview/:id',
-    loadComponent: () => import('./features/eoi/preview-submit/preview-submit.component').then(m => m.PreviewSubmitComponent)
-  },
-
-  // Screen 7: Acknowledgement Receipt
-  {
-    path: 'eoi/acknowledgement/:id',
-    loadComponent: () => import('./features/eoi/receipts/acknowledgement-receipt.component').then(m => m.AcknowledgementReceiptComponent)
-  },
-
-  // Screen 8: Application Status Tracker (Admin Scrutiny)
-  {
-    path: 'eoi/tracker/:id',
-    loadComponent: () => import('./features/eoi/status-tracker/status-tracker.component').then(m => m.StatusTrackerComponent)
+    loadComponent: () =>
+      import('./features/profile/profile-page.component').then(
+        (m) => m.ProfilePageComponent
+      )
   },
   {
-    path: 'eoi/tracker',
-    redirectTo: 'eoi/tracker/ISMS-EOI-2026-9871',
+    path: 'training-calendar',
+    loadComponent: () =>
+      import('./features/aspirant/pages/training-calendar.component').then(
+        (m) => m.TrainingCalendarComponent
+      )
+  },
+  {
+    path: 'expressed-interest',
+    loadComponent: () =>
+      import('./features/aspirant/pages/expressed-interest.component').then(
+        (m) => m.ExpressedInterestComponent
+      )
+  },
+  {
+    path: 'grievance',
+    loadComponent: () =>
+      import('./features/grievance/grievance-list.component').then(
+        (m) => m.GrievanceListComponent
+      )
+  },
+  {
+    path: 'tender-status',
+    loadComponent: () =>
+      import('./features/tenders/tender-status.component').then(
+        (m) => m.TenderStatusComponent
+      )
+  },
+  {
+    path: 'payment-history',
+    loadComponent: () =>
+      import('./features/payment-history/payment-history.component').then(
+        (m) => m.PaymentHistoryComponent
+      )
+  },
+  {
+    path: 'privacy-policy',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'terms-and-conditions',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'help-support',
+    loadComponent: () =>
+      import('./features/help-support/help-support.component').then(
+        (m) => m.HelpSupportComponent
+      )
+  },
+  {
+    path: 'history',
+    redirectTo: 'payment-history',
     pathMatch: 'full'
   },
   {
-    path: 'eoi/status',
-    redirectTo: 'eoi/tracker/ISMS-EOI-2026-9871',
+    path: 'transactions',
+    redirectTo: 'payment-history',
     pathMatch: 'full'
   },
-
-  // Screen 9a: Outcome — Approved (TP Certificate & Grade)
   {
-    path: 'eoi/outcome-approved/:id',
-    loadComponent: () => import('./features/eoi/outcome/outcome-approved.component').then(m => m.OutcomeApprovedComponent)
-  },
-
-  // Screen 9b: Outcome — Rejected (EMD Refund Status)
-  {
-    path: 'eoi/outcome-rejected/:id',
-    loadComponent: () => import('./features/eoi/outcome/outcome-rejected.component').then(m => m.OutcomeRejectedComponent)
-  },
-
-  // Screen 10: TP Dashboard (Post-Approval)
-  {
-    path: 'eoi/dashboard',
-    loadComponent: () => import('./features/eoi/dashboard/dashboard.component').then(m => m.DashboardComponent)
+    path: 'ipa',
+    loadComponent: () =>
+      import('./features/ipa/ipa-list.component').then(
+        (m) => m.IpaListComponent
+      )
   },
   {
-    path: 'eoi/tender-status',
-    loadComponent: () => import('./features/eoi/my-applications/my-applications.component').then(m => m.MyApplicationsComponent)
-  },
-  {
-    path: 'eoi/my-applications',
-    redirectTo: 'eoi/tender-status',
+    path: 'tp/ipa',
+    redirectTo: 'ipa',
     pathMatch: 'full'
   },
-
-  // Screen 14: Department User (Admin) — EOI View
+  {
+    path: 'admin/grievance',
+    loadComponent: () =>
+      import('./features/admin-grievance/admin-grievance-list.component').then(
+        (m) => m.AdminGrievanceListComponent
+      )
+  },
+  {
+    path: 'admin/batch-approvals',
+    loadComponent: () =>
+      import('./features/sdc/components/batch-approvals.component').then(
+        (m) => m.BatchApprovalsComponent
+      )
+  },
+  {
+    path: 'admin/batch-detail/:id',
+    loadComponent: () =>
+      import('./features/sdc/components/batch-detail.component').then(
+        (m) => m.BatchDetailComponent
+      )
+  },
+  {
+    path: 'admin/batches/:id',
+    redirectTo: 'batches/:id'
+  },
+  {
+    path: 'batch-approvals',
+    redirectTo: 'admin/batch-approvals',
+    pathMatch: 'full'
+  },
   {
     path: 'admin/eoi-view',
-    loadComponent: () => import('./features/admin/dept-eoi-view/dept-eoi-view.component').then(m => m.DeptEoiViewComponent)
+    loadComponent: () =>
+      import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(
+        (m) => m.DepartmentEoiViewComponent
+      )
   },
-
-  // Screen 15: Department User (Admin) — Responses List
+  {
+    path: 'admin/empanelment-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/empanelment-orders/empanelment-orders.component').then(
+        (m) => m.EmpanelmentOrdersPageComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-orders',
+    redirectTo: 'admin/empanelment-order'
+  },
+  {
+    path: 'admin/sanction-orders',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
+        (m) => m.SanctionOrderListComponent
+      )
+  },
+  {
+    path: 'admin/ipa',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-list.component').then((m) => m.IpaListComponent)
+  },
+  {
+    path: 'admin/ipa/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-list/ipa-approved-tps.component').then(
+        (m) => m.IpaApprovedTpsComponent
+      )
+  },
+  {
+    path: 'admin/mou',
+    loadComponent: () =>
+      import('./features/eoi/pages/mou-management/mou-management.component').then(
+        (m) => m.MouManagementComponent
+      )
+  },
+  {
+    path: 'admin/mou-draft/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/mou/mou-draft.component').then((m) => m.MouDraftComponent)
+  },
+  {
+    path: 'admin/eoi-sanction-editor/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-sanction-editor/eoi-sanction-editor.component').then(
+        (m) => m.EoiSanctionEditorComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-order-editor/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-empanelment-editor/eoi-empanelment-editor.component').then(
+        (m) => m.EoiEmpanelmentEditorComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-order-editor',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-empanelment-editor/eoi-empanelment-editor.component').then(
+        (m) => m.EoiEmpanelmentEditorComponent
+      )
+  },
   {
     path: 'admin/responses/:schemeId',
-    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent)
+    loadComponent: () =>
+      import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
+        (m) => m.ApplicantSubmissionsComponent
+      )
   },
   {
     path: 'admin/responses',
-    loadComponent: () => import('./features/admin/responses-list/responses-list.component').then(m => m.ResponsesListComponent)
+    loadComponent: () =>
+      import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(
+        (m) => m.ApplicantSubmissionsComponent
+      )
   },
-
-  // Screen 16: Department User (Admin) — Detailed Profile Review Desk
+  {
+    path: 'admin/ipa-editor/:schemeId/:appId',
+    loadComponent: () =>
+      import('./features/eoi/pages/ipa-editor/ipa-editor.component').then(
+        (m) => m.IpaEditorComponent
+      )
+  },
+  {
+    path: 'admin/sanction-order/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
+        (m) => m.SanctionOrderComponent
+      )
+  },
+  {
+    path: 'admin/sanction-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order/sanction-order.component').then(
+        (m) => m.SanctionOrderComponent
+      )
+  },
   {
     path: 'admin/review/:applicationId',
-    loadComponent: () => import('./features/admin/profile-review/profile-review.component').then(m => m.ProfileReviewComponent)
+    loadComponent: () =>
+      import('./features/eoi/pages/scrutiny-desk/scrutiny-desk.component').then(
+        (m) => m.ScrutinyDeskComponent
+      )
   },
-
-  // Screen 17: Super Admin — Masters (CRUD)
   {
-    path: 'admin/masters',
-    loadComponent: () => import('./features/admin/super-admin/masters/masters.component').then(m => m.MastersComponent)
+    path: 'admin/camera-monitoring/batches/:sdcId',
+    redirectTo: 'admin/camera-monitoring'
   },
-
-  // Screen 18: Super Admin — Configure EOI (Dynamic Form Builder)
   {
-    path: 'admin/configure-eoi',
-    loadComponent: () => import('./features/admin/super-admin/configure-eoi/configure-eoi.component').then(m => m.ConfigureEoiComponent)
+    path: 'admin/camera-monitoring/:tpId',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-sdc-list.component').then(
+        (m) => m.CameraSdcListComponent
+      )
   },
-
-  // Screen 19: Super Admin — Manage Users
   {
-    path: 'admin/manage-users',
-    loadComponent: () => import('./features/admin/super-admin/manage-users/manage-users.component').then(m => m.ManageUsersComponent)
+    path: 'admin/camera-monitoring',
+    loadComponent: () =>
+      import('./features/sdc/components/camera-monitoring.component').then(
+        (m) => m.CameraMonitoringComponent
+      )
   },
-
-  // Current Working Feature: Super Admin Panel
   {
-    path: 'admin',
-    loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+    path: 'admin/eoi-configuration',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
   },
-
-  // ==========================================
-  // ISMS 2.0 NEW WORKFLOW ROUTES
-  // ==========================================
   {
-    path: '',
-    component: AuthenticatedLayoutComponent,
-    canActivate: [roleGuard],
+    path: 'admin/two-step-verification',
+    loadComponent: () =>
+      import('./features/two-step-verification/two-step-verification.component').then(
+        (m) => m.TwoStepVerificationComponent
+      )
+  },
+  {
+    path: 'admin/dynamic-form-builder',
+    loadComponent: () =>
+      import('./features/dynamic-form-builder/dynamic-form-builder.component').then(
+        (m) => m.DynamicFormBuilderComponent
+      )
+  },
+  {
+    path: 'dynamic-form-builder',
+    redirectTo: 'admin/dynamic-form-builder',
+    pathMatch: 'full'
+  },
+  {
+    path: 'admin/master/eoi-category',
+    loadComponent: () =>
+      import('./features/admin-master/eoi-category-master.component').then(
+        (m) => m.EoiCategoryMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/scheme',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-master.component').then(
+        (m) => m.SchemeMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/scheme-category',
+    loadComponent: () =>
+      import('./features/admin-master/scheme-category-master.component').then(
+        (m) => m.SchemeCategoryMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/sector',
+    loadComponent: () =>
+      import('./features/admin-master/sector-master.component').then(
+        (m) => m.SectorMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/course',
+    loadComponent: () =>
+      import('./features/admin-master/course-master.component').then(
+        (m) => m.CourseMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/permission',
+    loadComponent: () =>
+      import('./features/admin-master/permission-master.component').then(
+        (m) => m.PermissionMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/user-role',
+    loadComponent: () =>
+      import('./features/admin-master/user-role-master.component').then(
+        (m) => m.UserRoleMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/district-block',
+    loadComponent: () =>
+      import('./features/admin-master/district-block-master.component').then(
+        (m) => m.DistrictBlockMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/designation',
+    loadComponent: () =>
+      import('./features/admin-master/designation-master.component').then(
+        (m) => m.DesignationMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/doc',
+    loadComponent: () =>
+      import('./features/admin-master/doc-master.component').then(
+        (m) => m.DocMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/annexure',
+    loadComponent: () =>
+      import('./features/admin-master/annexure-master.component').then(
+        (m) => m.AnnexureMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/remark',
+    loadComponent: () =>
+      import('./features/admin-master/remark-master.component').then(
+        (m) => m.RemarkMasterComponent
+      )
+  },
+  {
+    path: 'admin/master/grading',
+    loadComponent: () =>
+      import('./features/admin-master/grading-master.component').then(
+        (m) => m.GradingMasterComponent
+      )
+  },
+  {
+    path: 'admin/user-management',
+    loadComponent: () =>
+      import('./features/user-management/user-management.component').then(
+        (m) => m.UserManagementComponent
+      )
+  },
+  {
+    path: 'admin/master/:type',
+    loadComponent: () =>
+      import('./features/tenders/tenders-page.component').then(
+        (m) => m.TendersPageComponent
+      )
+  },
+  {
+    path: 'admin/master',
+    loadComponent: () =>
+      import('./features/admin-master/eoi-category-master.component').then(
+        (m) => m.EoiCategoryMasterComponent
+      )
+  },
+  {
+    path: 'sdc',
     children: [
       {
-        path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
-      },
-      
-      // ================= DEPARTMENT MODULE =================
-      {
-        path: 'department/tenders',
-        loadComponent: () => import('./features/department/tender-management/tender-list.component').then(m => m.TenderListComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-list.component').then(
+            (m) => m.SdcListComponent
+          )
       },
       {
-        path: 'department/sanction-orders',
-        loadComponent: () => import('./features/department/sanction-orders/sanction-order-list.component').then(m => m.SanctionOrderListComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
-      },
-      {
-        path: 'department/sanction-orders/create',
-        loadComponent: () => import('./features/department/sanction-orders/sanction-order-create.component').then(m => m.SanctionOrderCreateComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
-      },
-      {
-        path: 'admin/courses',
-        loadComponent: () => import('./features/admin/department/admin-courses.component').then(m => m.AdminCoursesComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN'] }
-      },
-      
-      // ================= AUDITOR MODULE =================
-      {
-        path: 'auditor/dashboard',
-        loadComponent: () => import('./features/auditor/auditor-dashboard.component').then(m => m.AuditorDashboardComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
-      },
-      {
-        path: 'auditor/tps',
-        loadComponent: () => import('./features/auditor/auditor-tp-list.component').then(m => m.AuditorTpListComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
-      },
-      {
-        path: 'auditor/tps/:id',
-        loadComponent: () => import('./features/auditor/auditor-tp-detail.component').then(m => m.AuditorTpDetailComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
-      },
-      {
-        path: 'auditor/inspection/:id',
-        loadComponent: () => import('./features/auditor/inspection.component').then(m => m.InspectionComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'AUDITOR'] }
-      },
-
-      // ================= TP MODULE =================
-      {
-        path: 'tp/courses',
-        loadComponent: () => import('./features/tp-pia/courses/tp-courses.component').then(m => m.TpCoursesComponent),
-        data: { roles: ['TP_PIA'] }
-      },
-
-      // ================= SDC MODULE =================
-      {
-        path: 'sdcs',
-        loadComponent: () => import('./features/sdc/pages/sdc-list/sdc-list.component').then(m => m.SdcListComponent),
-        data: { roles: ['TP_PIA'] }
-      },
-      {
-        path: 'sdcs/create',
-        loadComponent: () => import('./features/sdc/pages/sdc-create/sdc-create.component').then(m => m.SdcCreateComponent),
-        data: { roles: ['TP_PIA'] }
-      },
-      {
-        path: 'sdcs/:id',
-        loadComponent: () => import('./features/sdc/pages/sdc-detail/sdc-detail.component').then(m => m.SdcDetailComponent),
-        data: { roles: ['SUPER_ADMIN', 'DEPARTMENT_ADMIN', 'TP_PIA', 'INSPECTOR', 'APPROVAL_AUTHORITY', 'AUDITOR'] }
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-create.component').then(
+            (m) => m.SdcCreateComponent
+          )
       },
       {
         path: 'batches',
-        loadComponent: () => import('./features/batches/pages/batch-list/batch-list.component').then(m => m.BatchListComponent),
-        data: { roles: ['TP_PIA'] }
+        loadComponent: () =>
+          import('./features/sdc/components/batch-list.component').then(
+            (m) => m.BatchListComponent
+          )
       },
       {
-        path: 'batches/create',
-        loadComponent: () => import('./features/batches/pages/batch-create/batch-create.component').then(m => m.BatchCreateComponent),
-        data: { roles: ['TP_PIA'] }
+        path: ':sdcId/batch/create',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-detail.component').then(
+            (m) => m.SdcDetailComponent
+          )
       }
     ]
   },
-
-  // Fallback
+  {
+    path: 'sdcs',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-list.component').then(
+            (m) => m.SdcListComponent
+          )
+      },
+      {
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-create.component').then(
+            (m) => m.SdcCreateComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/sdc-detail.component').then(
+            (m) => m.SdcDetailComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'batches',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-list.component').then(
+            (m) => m.BatchListComponent
+          )
+      },
+      {
+        path: 'create',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      },
+      {
+        path: ':id/edit',
+        // The same form as Create Batch, filled with the batch being edited.
+        loadComponent: () =>
+          import('./features/sdc/components/batch-form.component').then(
+            (m) => m.BatchFormComponent
+          )
+      },
+      {
+        path: ':batchId/map-aspirant',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-mapping.component').then(
+            (m) => m.AspirantMappingComponent
+          )
+      },
+      {
+        path: 'map-aspirant',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-mapping.component').then(
+            (m) => m.AspirantMappingComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/batch-detail.component').then(
+            (m) => m.BatchDetailComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'tp/sanction-orders',
+    // Same table as the department's; the training partner can only view released orders.
+    data: { viewOnly: true },
+    loadComponent: () =>
+      import('./features/eoi/pages/sanction-order-list/sanction-order-list.component').then(
+        (m) => m.SanctionOrderListComponent
+      )
+  },
+  {
+    path: 'sanction-orders',
+    redirectTo: 'tp/sanction-orders',
+    pathMatch: 'full'
+  },
+  {
+    path: 'mou',
+    redirectTo: 'admin/mou',
+    pathMatch: 'full'
+  },
+  {
+    path: 'aspirants',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-list.component').then(
+            (m) => m.AspirantListComponent
+          )
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sdc/components/aspirant-detail.component').then(
+            (m) => m.AspirantDetailComponent
+          )
+      }
+    ]
+  },
+  {
+    path: 'tp/aspirants',
+    redirectTo: 'aspirants',
+    pathMatch: 'full'
+  },
+  {
+    // Attendance of the aspirants of approved batches: biometric and offline marking, reports, analytics, notifications.
+    path: 'attendance',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/attendance/attendance-list.component').then(
+            (m) => m.AttendanceListComponent
+          )
+      },
+      {
+        path: ':batchId',
+        loadComponent: () =>
+          import('./features/attendance/attendance-batch.component').then(
+            (m) => m.AttendanceBatchComponent
+          )
+      }
+    ]
+  },
+  {
+    // User Management of the training partner: the Center Heads, faculty and Attender Users it created.
+    path: 'tp/users',
+    loadComponent: () =>
+      import('./features/sdc/components/tp-user-list.component').then(
+        (m) => m.TpUserListComponent
+      )
+  },
   {
     path: '**',
     redirectTo: ''

@@ -1,0 +1,812 @@
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { of, switchMap } from 'rxjs';
+import { OtrFormService } from '../../../registration/services/otr-form.service';
+import { formatDateMedium, formatDateTime, formatInr } from '../../../../shared/utils';
+import { StepperStep } from '../../../../shared/components/stepper/stepper.component';
+import {
+  Step1OrgDetails,
+  OfficerInCharge,
+  Step3AuthorizedPerson,
+  Step4BankDetails,
+  FileDoc
+} from '../../../registration/models/otr-form.model';
+import { SubmittedTender, SubmittedTenderDoc, createSampleDocs } from '../../../../core/models/tender.model';
+import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { EoiDraftService } from '../../../../core/services/eoi-draft.service';
+import { ApplicantResponse, DossierDocument, EoiStateService } from '../../services/eoi-state.service';
+import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
+import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
+import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
+import { SchemeRequirementsService } from '../../../../core/services/scheme-requirements.service';
+import {
+  countUploaded,
+  emdPaymentModeLabel,
+  filterDocsByCategory,
+  formatFileSize,
+  formatOfficeAddress,
+  formatRegisteredAddress,
+  formatResidenceAddress,
+  numberToIndianWords,
+  parseFeeAmount,
+  procPaymentModeLabel
+} from './scheme-form.util';
+
+/** How long the processing-fee success screen stays up before Step 2 opens by itself. */
+const PROC_FEE_SUCCESS_REDIRECT_MS = 2500;
+
+/** How long the payment + submission success screen stays up before the receipts page opens. */
+const SUBMISSION_SUCCESS_REDIRECT_MS = 3000;
+
+/**
+ * Component-scoped state and actions shared by the EOI application wizard
+ * (provided by SchemeFormComponent and injected by the step components).
+ */
+@Injectable()
+export class SchemeFormState {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private otrFormService = inject(OtrFormService);
+  private receipts = inject(SchemeFormReceiptsService);
+  private docViewer = inject(DocumentViewerService);
+  private schemeReqService = inject(SchemeRequirementsService);
+
+  private draftStore = inject(EoiDraftService);
+  private draftRestored = false;
+  private schemeQueryParams: Record<string, string> = {};
+  /** True once the application has been submitted; a submitted application is no longer a draft. */
+  private readonly submitted = signal<boolean>(false);
+
+  readonly otrData = this.otrFormService.formData;
+
+  currentStep = signal<number>(1);
+
+  schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
+  schemeRefNo = signal<string>('RSLDC/EOI/MMKVY Cat I II III/2026-27/01');
+  schemeName = signal<string>('MMKVY');
+  schemeCode = signal<string>('MMKVY');
+  schemeCategory = signal<string>('ALL');
+  schemeEoiCategory = signal<string>('General');
+  schemeDatePublished = signal<string>('15/09/2026');
+  schemeClosingDate = signal<string>('30/11/2026');
+  schemeEmdFee = signal<string>('₹50,000');
+  schemeProcessFee = signal<string>('₹2,000');
+  schemeDescription = signal<string>(
+    'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
+  );
+
+  readonly schemeCustomFields = signal<any[]>([]);
+
+  readonly hasCustomFields = computed(() => this.schemeCustomFields().length > 0);
+
+  readonly customFieldAnswers = signal<Record<string, any>>({});
+
+  updateCustomAnswer(fieldKey: string, value: any): void {
+    this.customFieldAnswers.update(curr => ({ ...curr, [fieldKey]: value }));
+  }
+
+  // Dynamic Step Indices
+  readonly stepIndexProfile = 1;
+  readonly stepIndexCustomFields = computed(() => this.hasCustomFields() ? 2 : -1);
+  readonly stepIndexDocuments = computed(() => this.hasCustomFields() ? 3 : 2);
+  readonly stepIndexPreview = computed(() => this.hasCustomFields() ? 4 : 3);
+  readonly stepIndexProcFee = computed(() => this.hasCustomFields() ? 5 : 4);
+  readonly stepIndexEmd = computed(() => this.hasCustomFields() ? 6 : 5);
+  readonly stepIndexReceipts = computed(() => this.hasCustomFields() ? 7 : 6);
+
+  readonly wizardSteps = computed<StepperStep[]>(() => {
+    if (this.hasCustomFields()) {
+      return [
+        { label: 'Registration Profile' },
+        { label: 'Scheme Proposal Details' },
+        { label: 'Upload Documents' },
+        { label: 'Complete Preview' },
+        { label: 'Processing Fee' },
+        { label: 'EMD Payment' },
+        { label: 'Submission Receipt' }
+      ];
+    }
+    return [
+      { label: 'Registration Profile' },
+      { label: 'Upload Documents' },
+      { label: 'Complete Preview' },
+      { label: 'Processing Fee' },
+      { label: 'EMD Payment' },
+      { label: 'Submission Receipt' }
+    ];
+  });
+
+  /** Dynamic completion indicators matching whether custom fields step is active */
+  readonly completedWizardSteps = computed(() => {
+    const done: number[] = [];
+    if (this.procFeePaid()) done.push(this.stepIndexProcFee());
+    if (this.submitted()) done.push(this.stepIndexEmd());
+    if (this.currentStep() === this.wizardSteps().length) done.push(this.wizardSteps().length);
+    return done;
+  });
+
+  // Step 1: Processing Fee State & Payment Methods
+  procFeePaid = signal<boolean>(false);
+  isProcPaying = signal<boolean>(false);
+  showProcFeeSuccessModal = signal<boolean>(false);
+  procFeeDate = signal<string>('04 Oct 2026, 08:35 PM');
+  procPaymentMethod = signal<'upi' | 'card' | 'netbanking' | 'e-gras'>('upi');
+  upiOption = signal<'id' | 'qr'>('id');
+  upiId = signal<string>('skills.enterprise@okaxis');
+  upiVerified = signal<boolean>(true);
+  cardData = { number: '4532 8901 2345 6789', name: 'AUTHORIZED SIGNATORY', expiry: '08/29', cvv: '782' };
+  selectedBank = signal<string>('sbi');
+
+  // Step 5: EMD Payment Mode & Inputs
+  paymentMethod = signal<'upi' | 'card' | 'netbanking' | 'e-gras' | 'exemption'>('upi');
+  emdUpiId = signal<string>('treasury.corp@okhdfcbank');
+  emdCardData = { number: '5241 6800 1192 4001', name: 'AUTHORIZED SIGNATORY', expiry: '11/28', cvv: '439' };
+  emdSelectedBank = signal<string>('sbi');
+  isPaymentProcessing = signal<boolean>(false);
+  showEmdSuccessModal = signal<boolean>(false);
+  /** EOI Submission Reference Number issued when the application is submitted. */
+  readonly eoiApplicationId = signal<string>('ISMS-EOI-2026-9842');
+  /** Payment reference numbers returned by the payment gateway. */
+  readonly procPaymentRef = 'CIN-SBI-9912081';
+  readonly emdPaymentRef = computed(() => (this.paymentMethod() === 'exemption' ? 'Exempted' : 'CIN-SBI-9912082'));
+  readonly copiedRef = signal<boolean>(false);
+  submissionTimestamp = signal<string>('04 Oct 2026, 08:35 PM');
+
+  // Number & Currency Dynamic Computations
+  readonly numericProcessFee = computed(() => parseFeeAmount(this.schemeProcessFee(), 2000));
+
+  readonly numericEmdFee = computed(() => parseFeeAmount(this.schemeEmdFee(), 50000));
+
+  readonly totalPayableAmount = computed(() => {
+    return this.numericProcessFee() + this.numericEmdFee();
+  });
+
+  readonly formattedProcessFee = computed(() => formatInr(this.numericProcessFee(), { fractionDigits: 2 }));
+
+  readonly formattedEmdFee = computed(() => formatInr(this.numericEmdFee(), { fractionDigits: 2 }));
+
+  readonly formattedTotalFee = computed(() => formatInr(this.totalPayableAmount(), { fractionDigits: 2 }));
+
+  readonly processFeeInWords = computed(() => {
+    return this.numberToIndianWords(this.numericProcessFee());
+  });
+
+  readonly emdFeeInWords = computed(() => {
+    return this.numberToIndianWords(this.numericEmdFee());
+  });
+
+  readonly totalFeeInWords = computed(() => {
+    return this.numberToIndianWords(this.totalPayableAmount());
+  });
+
+  get selectedProcPaymentModeLabel(): string {
+    return procPaymentModeLabel(this.procPaymentMethod());
+  }
+
+  get emdPaymentModeLabel(): string {
+    return emdPaymentModeLabel(this.paymentMethod());
+  }
+
+  // Step 2: OTR Data Models
+  editableStep1: Step1OrgDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step1));
+  editableStep2: OfficerInCharge[] = JSON.parse(JSON.stringify(this.otrFormService.formData().step2));
+  editableStep3: Step3AuthorizedPerson = JSON.parse(JSON.stringify(this.otrFormService.formData().step3));
+  editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
+
+  // Step 2: Registration Profile View / Edit Mode (Disabled by default, unlock via Edit button)
+  isEditingStep2 = signal<boolean>(false);
+
+  // Step 4: Inline Registration Profile Editing in Complete Preview
+  isEditingOtrInPreview = signal<boolean>(false);
+
+  // Step 3: Documents Tab Filter
+  selectedDocTab = signal<'all' | 'mandatory' | 'annexure' | 'remaining'>('all');
+
+  /** 16 Proposal Documents strictly matching Screenshot */
+  eoiDocuments = signal<EoiDocumentItem[]>(createInitialEoiDocuments());
+
+  readonly mandatoryDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'mandatory'));
+  readonly supportingDocs = computed(() => this.eoiDocuments().filter(d => d.category !== 'annexure'));
+  readonly annexureDocs = computed(() => this.eoiDocuments().filter(d => d.category === 'annexure'));
+  readonly remainingDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'remaining'));
+
+  readonly mandatoryAttachedCount = computed(() => countUploaded(this.mandatoryDocs()));
+  readonly attachedSupportingDocsCount = computed(() => countUploaded(this.supportingDocs()));
+  readonly attachedAnnexureDocsCount = computed(() => countUploaded(this.annexureDocs()));
+  readonly annexureAttachedCount = computed(() => countUploaded(this.annexureDocs()));
+  readonly remainingAttachedCount = computed(() => countUploaded(this.remainingDocs()));
+
+  readonly filteredDocuments = computed(() => filterDocsByCategory(this.eoiDocuments(), this.selectedDocTab()));
+
+  readonly attachedDocsCount = computed(() => countUploaded(this.eoiDocuments()));
+
+  /** Statutory declaration on the preview step: the applicant must tick it themselves. */
+  declarationAgreed = signal<boolean>(false);
+
+  // Document Viewer Modal State
+  isViewerOpen = signal<boolean>(false);
+  activeViewerDoc = signal<FileDoc | null>(null);
+  activeViewerTitle = signal<string>('');
+
+  get registeredAddressText(): string {
+    return formatRegisteredAddress(this.editableStep1);
+  }
+
+  get officeAddressText(): string {
+    return formatOfficeAddress(this.editableStep1);
+  }
+
+  get residenceAddressText(): string {
+    return formatResidenceAddress(this.editableStep3);
+  }
+
+  numberToIndianWords(num: number): string {
+    return numberToIndianWords(num);
+  }
+
+  constructor() {
+    this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
+      if (params['refNo']) this.schemeRefNo.set(params['refNo']);
+      this.schemeQueryParams = Object.fromEntries(
+        Object.entries(params).filter(([, v]) => typeof v === 'string')
+      ) as Record<string, string>;
+      if (params['title']) this.schemeTitle.set(params['title']);
+      if (params['schemeName']) this.schemeName.set(params['schemeName']);
+      if (params['code']) this.schemeCode.set(params['code']);
+      if (params['category']) this.schemeCategory.set(params['category']);
+      if (params['schemeCategory']) this.schemeCategory.set(params['schemeCategory']);
+      if (params['eoiCategory']) this.schemeEoiCategory.set(params['eoiCategory']);
+      if (params['datePublished']) this.schemeDatePublished.set(params['datePublished']);
+      if (params['closingDate']) this.schemeClosingDate.set(params['closingDate']);
+      if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
+      if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
+      if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
+      const schName = params['schemeName'] || params['title'] || this.schemeName();
+      if (schName) {
+        this.loadSchemeRequirements(schName);
+      }
+      if (params['refNo'] && !this.draftRestored) {
+        this.draftRestored = true;
+        this.restoreDraft(params['refNo']);
+      }
+    });
+
+    // Keep a draft up to date as the applicant fills their application,
+    // so the Active Schemes page can flag this application as pending.
+    effect(() => {
+      const paid = this.procFeePaid();
+      const step = this.currentStep();
+      const docs = this.eoiDocuments();
+      const refNo = this.schemeRefNo();
+      const procFeeDate = this.procFeeDate();
+      if (this.submitted() || step >= this.wizardSteps().length) return;
+      this.draftStore.save({
+        refNo,
+        schemeName: this.schemeName(),
+        queryParams: this.schemeQueryParams,
+        step: Math.max(step, 1),
+        procFeePaid: paid,
+        procFeeDate,
+        documents: docs
+          .filter(d => d.status === 'uploaded' || !!d.comment?.trim())
+          .map(d => ({
+            id: d.id,
+            fileName: d.fileName,
+            fileSize: d.fileSize,
+            uploadedDate: d.uploadedDate,
+            comment: d.comment
+          })),
+        updatedAt: new Date().toISOString()
+      });
+    });
+  }
+
+  /** Dynamically loads requirements (custom proposal fields, documents, and annexures) for the selected scheme. */
+  private loadSchemeRequirements(schName: string): void {
+    this.schemeReqService.syncWithMasters();
+    const reqs = this.schemeReqService.getRequirementsForScheme(schName);
+    if (reqs.customFields && reqs.customFields.length > 0) {
+      this.schemeCustomFields.set(reqs.customFields);
+    }
+    if ((reqs.documents && reqs.documents.length > 0) || (reqs.annexures && reqs.annexures.length > 0)) {
+      const existingDocs = this.eoiDocuments();
+      const existingMap = new Map<string, EoiDocumentItem>();
+      for (const d of existingDocs) {
+        existingMap.set(d.name.trim().toLowerCase(), d);
+      }
+
+      let nextId = 1;
+      const newDocs: EoiDocumentItem[] = [];
+
+      for (const doc of reqs.documents) {
+        const prev = existingMap.get(doc.masterItemName.trim().toLowerCase());
+        newDocs.push({
+          id: nextId++,
+          name: doc.masterItemName,
+          description: doc.category || 'Compliance & Verification',
+          fileName: prev?.fileName || '',
+          fileSize: prev?.fileSize || '',
+          uploadedDate: prev?.uploadedDate || '',
+          isMandatory: doc.isMandatory,
+          status: prev?.status || 'pending',
+          category: doc.isMandatory ? 'mandatory' : 'supporting',
+          comment: prev?.comment
+        });
+      }
+
+      for (const annex of reqs.annexures) {
+        const prev = existingMap.get(annex.masterItemName.trim().toLowerCase());
+        newDocs.push({
+          id: nextId++,
+          name: annex.masterItemName,
+          description: annex.category || 'Official Format',
+          fileName: prev?.fileName || '',
+          fileSize: prev?.fileSize || '',
+          uploadedDate: prev?.uploadedDate || '',
+          isMandatory: annex.isMandatory,
+          status: prev?.status || 'pending',
+          category: 'annexure',
+          comment: prev?.comment
+        });
+      }
+
+      this.eoiDocuments.set(newDocs);
+    }
+  }
+
+  /** Reopens an application that was left unfinished: fee status, uploaded documents and the step. */
+  private restoreDraft(refNo: string): void {
+    const draft = this.draftStore.get(refNo);
+    if (!draft) return;
+    this.procFeePaid.set(draft.procFeePaid);
+    this.procFeeDate.set(draft.procFeeDate);
+    this.eoiDocuments.update(docs =>
+      docs.map(doc => {
+        const saved = draft.documents.find(d => d.id === doc.id);
+        return saved
+          ? { ...doc, ...saved, status: saved.fileName ? ('uploaded' as const) : doc.status }
+          : doc;
+      })
+    );
+    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps().length - 1));
+  }
+
+  goToStep(step: number): void {
+    if (step < 1 || step > this.wizardSteps().length) return;
+    this.currentStep.set(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  setUpiHandle(handle: string): void {
+    const currentBase = (this.upiId() || 'skills').split('@')[0];
+    this.upiId.set(`${currentBase}${handle}`);
+    this.upiVerified.set(true);
+  }
+
+  verifyUpi(): void {
+    this.upiVerified.set(true);
+  }
+
+  payProcessingFeeAndProceed(): void {
+    this.isProcPaying.set(true);
+    setTimeout(() => {
+      this.isProcPaying.set(false);
+      this.procFeePaid.set(true);
+      this.procFeeDate.set(formatDateTime(new Date()));
+      this.showProcFeeSuccessModal.set(true);
+      // The success screen carries the applicant on to EMD Payment by itself.
+      setTimeout(() => {
+        this.showProcFeeSuccessModal.set(false);
+        this.goToStep(this.stepIndexEmd());
+      }, PROC_FEE_SUCCESS_REDIRECT_MS);
+    }, 600);
+  }
+
+  saveStep2Changes(): void {
+    this.otrFormService.updateStep1(this.editableStep1);
+    this.otrFormService.updateStep2(this.editableStep2);
+    this.otrFormService.updateStep3(this.editableStep3);
+    this.otrFormService.updateStep4(this.editableStep4);
+  }
+
+  toggleStep2Edit(): void {
+    if (this.isEditingStep2()) {
+      this.saveStep2Changes();
+      this.isEditingStep2.set(false);
+    } else {
+      this.isEditingStep2.set(true);
+    }
+  }
+
+  saveAndProceedToDocuments(): void {
+    this.saveStep2Changes();
+    this.isEditingStep2.set(false);
+    this.goToStep(this.hasCustomFields() ? this.stepIndexCustomFields() : this.stepIndexDocuments());
+  }
+
+  saveAndProceedToStep3(): void {
+    this.saveAndProceedToDocuments();
+  }
+
+  togglePreviewOtrEdit(): void {
+    if (this.isEditingOtrInPreview()) {
+      // Save changes back to OTR form service state
+      this.otrFormService.updateStep1(this.editableStep1);
+      this.otrFormService.updateStep2(this.editableStep2);
+      this.otrFormService.updateStep3(this.editableStep3);
+      this.otrFormService.updateStep4(this.editableStep4);
+      this.isEditingOtrInPreview.set(false);
+    } else {
+      this.isEditingOtrInPreview.set(true);
+    }
+  }
+
+  onFileSelected(event: Event, doc: EoiDocumentItem): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const fileSize = formatFileSize(file.size);
+      const uploadedDate = formatDateMedium(new Date(), '-');
+      this.eoiDocuments.update(docs => docs.map(d => d.id === doc.id ? {
+        ...d,
+        fileName: file.name,
+        fileSize,
+        uploadedDate,
+        status: 'uploaded'
+      } : d));
+      input.value = '';
+    }
+  }
+
+  attachAllSampleDocs(): void {
+    this.eoiDocuments.update(docs => docs.map((doc, idx) => ({
+      ...doc,
+      status: 'uploaded',
+      fileName: `Scan_Annexure_${doc.id}_Signed.pdf`,
+      fileSize: `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`,
+      uploadedDate: '04-Oct-2026'
+    })));
+  }
+
+  replaceOtrDoc(event: Event, type: 'regCert' | 'panCard' | 'gstCert' | 'msmeCert' | 'authLetter' | 'authIdProof' | 'bankDoc'): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const fileSize = formatFileSize(file.size);
+      const docObj: FileDoc = {
+        fileName: file.name,
+        fileSize,
+        uploadDate: '04/10/2026',
+        status: 'uploaded'
+      };
+
+      if (type === 'regCert') this.editableStep1.registrationCertDoc = docObj;
+      if (type === 'panCard') this.editableStep1.panCardDoc = docObj;
+      if (type === 'gstCert') this.editableStep1.gstCertDoc = docObj;
+      if (type === 'msmeCert') this.editableStep1.msmeCertDoc = docObj;
+      if (type === 'authLetter') this.editableStep3.authorizationLetterDoc = docObj;
+      if (type === 'authIdProof') this.editableStep3.idProofDoc = docObj;
+      if (type === 'bankDoc') this.editableStep4.cancelledChequeDoc = docObj;
+
+      input.value = '';
+    }
+  }
+
+  removeOtrDoc(type: 'regCert' | 'panCard' | 'gstCert' | 'msmeCert' | 'authLetter' | 'authIdProof' | 'bankDoc'): void {
+    if (type === 'regCert') this.editableStep1.registrationCertDoc = null;
+    if (type === 'panCard') this.editableStep1.panCardDoc = null;
+    if (type === 'gstCert') this.editableStep1.gstCertDoc = null;
+    if (type === 'msmeCert') this.editableStep1.msmeCertDoc = null;
+    if (type === 'authLetter') this.editableStep3.authorizationLetterDoc = null;
+    if (type === 'authIdProof') this.editableStep3.idProofDoc = null;
+    if (type === 'bankDoc') this.editableStep4.cancelledChequeDoc = null;
+  }
+
+  removeSchemeDoc(doc: EoiDocumentItem): void {
+    this.eoiDocuments.update(docs =>
+      docs.map(d => (d.id === doc.id ? { ...d, status: 'pending' as const, fileName: '', fileSize: '', uploadedDate: '' } : d))
+    );
+  }
+
+  updateDocComment(docId: number, comment: string, trim = false): void {
+    const nextValue = trim ? comment.trim() : comment;
+    this.eoiDocuments.update(docs =>
+      docs.map(d => (d.id === docId ? { ...d, comment: nextValue || undefined } : d))
+    );
+  }
+
+  replaceOicDoc(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0] && this.editableStep2[index]) {
+      const file = input.files[0];
+      const fileSize = formatFileSize(file.size);
+      this.editableStep2[index].appointmentLetterDoc = {
+        fileName: file.name,
+        fileSize,
+        uploadDate: '04/10/2026',
+        status: 'uploaded'
+      };
+      input.value = '';
+    }
+  }
+
+  viewDoc(fileName: string, title: string, fileSize: string = '1.2 MB'): void {
+    this.docViewer.openDocument({
+      fileName,
+      fileSize,
+      uploadDate: '04/10/2026',
+      status: 'uploaded'
+    }, title);
+  }
+
+  closeViewer(): void {
+    this.isViewerOpen.set(false);
+    this.activeViewerDoc.set(null);
+  }
+
+  triggerEmdPayment(): void {
+    this.isPaymentProcessing.set(true);
+    setTimeout(() => {
+      this.isPaymentProcessing.set(false);
+      const now = new Date();
+      this.submissionTimestamp.set(formatDateTime(now));
+      this.recordSubmittedTender(now);
+      this.submitted.set(true);
+      this.draftStore.clear(this.schemeRefNo());
+      this.showEmdSuccessModal.set(true);
+      // The combined payment + submission screen cannot be dismissed: it opens the receipts page by itself.
+      setTimeout(() => this.closeSuccessModalAndGoToStep6(), SUBMISSION_SUCCESS_REDIRECT_MS);
+    }, 800);
+  }
+
+  closeSuccessModalAndGoToStep6(): void {
+    this.showEmdSuccessModal.set(false);
+    this.goToStep(this.stepIndexReceipts());
+  }
+
+  downloadAllReceipts(): void {
+    this.downloadAcknowledgmentReceipt();
+    setTimeout(() => this.downloadEmdReceipt(), 300);
+    setTimeout(() => this.downloadProcessingFeeReceipt(), 600);
+  }
+
+  copyRef(): void {
+    const id = this.eoiApplicationId();
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(id).catch(() => {
+        this.fallbackCopyText(id);
+      });
+    } else {
+      this.fallbackCopyText(id);
+    }
+    this.copiedRef.set(true);
+    setTimeout(() => this.copiedRef.set(false), 3000);
+  }
+
+  private fallbackCopyText(text: string): void {
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    } catch {
+      // ignore
+    }
+  }
+
+  private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
+  private readonly eoiStateService = inject(EoiStateService);
+
+  private recordSubmittedTender(now: Date): void {
+    const appRef = this.eoiApplicationId();
+    const appliedDateStr = formatDateMedium(now, '-');
+    const sampleDocs = createSampleDocs();
+    const currentDocs = this.eoiDocuments();
+
+    const submittedDocs: SubmittedTenderDoc[] = currentDocs.map((doc, idx) => {
+      const sample = sampleDocs[idx];
+      const category: SubmittedTenderDoc['category'] =
+        doc.category === 'mandatory' ? 'mandatory' : doc.category === 'annexure' ? 'annexure' : 'supporting';
+      return {
+        id: doc.id,
+        name: doc.name,
+        category,
+        fileName: doc.fileName || sample?.fileName || `Document_${doc.id}.pdf`,
+        fileSize: doc.fileSize || sample?.fileSize || '1.2 MB',
+        status: doc.status === 'uploaded' ? 'uploaded' : sample?.status || 'pending',
+        comment: doc.comment?.trim() || undefined
+      };
+    });
+
+    const newSubmission: SubmittedTender = {
+      id: `t-${Date.now()}`,
+      appRef: this.eoiApplicationId(),
+      appliedDate: appliedDateStr,
+      closingDate: this.schemeClosingDate() || '30-Nov-2026',
+      schemeTitle: this.schemeTitle(),
+      schemeName: this.schemeName(),
+      schemeCategory: this.schemeCategory() || 'ALL',
+      department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
+      emdAmount: this.paymentMethod() === 'exemption' ? '₹ 0 (Exempted)' : this.formattedEmdFee(),
+      processingFee: this.formattedProcessFee(),
+      transactionRef: this.procPaymentRef,
+      emdTransactionRef: this.emdPaymentRef(),
+      submittedStatus: 'Submitted',
+      eoiStatus: 'Under Review',
+      editCount: 0,
+      maxEdits: 3,
+      orgDetails: this.editableStep1,
+      signatoryDetails: this.editableStep3,
+      officers: this.editableStep2,
+      bankDetails: this.editableStep4,
+      documents: submittedDocs
+    };
+    // Idempotent: only create the submission once per application reference.
+    this.tenderRepo
+      .getAll()
+      .pipe(switchMap(list => (list.some(t => t.appRef === appRef) ? of(null) : this.tenderRepo.create(newSubmission))))
+      .subscribe();
+
+    // Also register the submitted application on the Department side (EoiStateService)
+    // so Department officers immediately see all uploaded supporting documents & applicant comments.
+    const dossierDocs: DossierDocument[] = currentDocs
+      .filter(doc => doc.status === 'uploaded' || !!doc.comment?.trim())
+      .map(doc => ({
+        id: `doc-${doc.id}`,
+        title: doc.name,
+        fileSize: doc.fileSize ? `${doc.fileSize}` : '1.2 MB PDF',
+        category:
+          doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+        verified: doc.status === 'uploaded',
+        comment: doc.comment?.trim() || undefined
+      }));
+
+    const uploadedDocuments: DossierDocument[] =
+      dossierDocs.length > 0
+        ? dossierDocs
+        : submittedDocs.map(doc => ({
+          id: `doc-${doc.id}`,
+          title: doc.name,
+          fileSize: doc.fileSize,
+          category:
+            doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
+          verified: true,
+          comment: doc.comment
+        }));
+
+    const refLower = (this.schemeRefNo() || '').toLowerCase();
+    const nameLower = (this.schemeName() || '').toLowerCase();
+    const schemeId =
+      refLower.includes('samarth') || nameLower.includes('samarth')
+        ? 'SAMARTH-02'
+        : refLower.includes('saksham') || nameLower.includes('saksham')
+          ? 'SAKSHAM-03'
+          : 'MMKVY-01';
+
+    const deptResponse: ApplicantResponse = {
+      id: appRef,
+      anonymousLabel: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      actualLegalName: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
+      regNumber: this.editableStep1.registrationNumber || appRef,
+      schemeId,
+      schemeName: this.schemeName(),
+      eoiRefNo: this.schemeRefNo(),
+      submissionDate: formatDateTime(now),
+      status: 'UNDER_SCRUTINY',
+      statusDisplay: 'Under Review',
+      emdFee: this.paymentMethod() === 'exemption' ? 0 : this.numericEmdFee(),
+      emdStatus: 'PAID',
+      processingFee: this.numericProcessFee(),
+      processingFeeStatus: 'PAID',
+      organisation: {
+        legalName: this.editableStep1.fullName,
+        tradeName: this.editableStep1.shortName || this.editableStep1.fullName,
+        entityType: this.editableStep1.natureOfEntity || 'Private Limited Company',
+        registrationNumber: this.editableStep1.registrationNumber,
+        dateOfRegistration: this.editableStep1.dateOfRegistration,
+        stateOfRegistration: this.editableStep1.stateOfLegalReg || 'Rajasthan',
+        panNumber: this.editableStep1.companyPan,
+        gstin: this.editableStep1.gstin || 'Not Applicable',
+        turnover: this.editableStep1.turnOver || '₹ 12.50 Cr (Avg. 3 FY)',
+        registeredAddress: this.registeredAddressText,
+        operationalAddress: this.officeAddressText,
+        website: this.editableStep1.website || '',
+        email: this.editableStep1.emailId,
+        contactNumber: this.editableStep1.contactNo
+      },
+      authorizedSignatory: {
+        name: this.editableStep3.name,
+        designation: this.editableStep3.designation,
+        email: this.editableStep3.emailId,
+        contactNumber: this.editableStep3.mobileNo,
+        residenceAddress: this.residenceAddressText,
+        state: this.editableStep3.state || 'Rajasthan',
+        pan: this.editableStep3.pan,
+        aadhaarNo: this.editableStep3.aadhaarNo,
+        typeIdProof: this.editableStep3.identityDocType || 'PAN Card',
+        idNo: this.editableStep3.identityDocNumber || this.editableStep3.pan,
+        bhamashahNo: this.editableStep3.bhamashahNo || 'N/A',
+        voterIdNo: this.editableStep3.voterIdNo || 'N/A',
+        passportNo: this.editableStep3.passportNo || 'N/A',
+        serviceTaxNo: 'N/A'
+      },
+      bankDetails: {
+        bankName: this.editableStep4.bankName,
+        branchName: this.editableStep4.branchName,
+        accountHolderName: this.editableStep4.accountHolderName,
+        accountNumber: this.editableStep4.accountNo,
+        ifscCode: this.editableStep4.ifscCode,
+        accountType: this.editableStep4.accountType || 'Current Account'
+      },
+      trainingCentres: [],
+      financialYears: this.editableStep1.financialYears || [],
+      placementTrackRecord: [],
+      annualActionPlan: [],
+      uploadedDocuments,
+      customFields: this.schemeCustomFields().map((f: any) => ({
+        key: f.fieldKey,
+        label: f.label,
+        value: this.customFieldAnswers()[f.fieldKey] ?? 'N/A'
+      }))
+    };
+
+    this.eoiStateService.submitApplicantResponse(deptResponse);
+  }
+
+  goToTenderStatus(): void {
+    this.showEmdSuccessModal.set(false);
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) {
+      void this.router.navigateByUrl(returnUrl);
+    } else {
+      this.router.navigate(['/tender-status']);
+    }
+  }
+
+  printReceipt(): void {
+    window.print();
+  }
+  /** Snapshot of the values printed on the generated receipts. */
+  private receiptData(): SchemeReceiptData {
+    return {
+      schemeTitle: this.schemeTitle(),
+      schemeName: this.schemeName(),
+      schemeRefNo: this.schemeRefNo(),
+      submissionTimestamp: this.submissionTimestamp(),
+      procFeeDate: this.procFeeDate(),
+      procPaymentModeLabel: this.selectedProcPaymentModeLabel,
+      numericProcessFee: this.numericProcessFee(),
+      formattedProcessFee: this.formattedProcessFee(),
+      processFeeInWords: this.processFeeInWords(),
+      emdExempted: this.paymentMethod() === 'exemption',
+      numericEmdFee: this.numericEmdFee(),
+      formattedEmdFee: this.formattedEmdFee(),
+      emdFeeInWords: this.emdFeeInWords(),
+      formattedTotalFee: this.formattedTotalFee(),
+      org: this.editableStep1,
+      signatory: this.editableStep3,
+      documents: this.eoiDocuments()
+    };
+  }
+
+  downloadProcessingFeeReceipt(): void {
+    this.receipts.downloadProcessingFeeReceipt(this.receiptData());
+  }
+
+  downloadAcknowledgmentReceipt(): void {
+    this.receipts.downloadAcknowledgmentReceipt(this.receiptData());
+  }
+
+  downloadEmdReceipt(): void {
+    this.receipts.downloadEmdReceipt(this.receiptData());
+  }
+
+  downloadProposalApplication(): void {
+    this.receipts.downloadProposalApplication(this.receiptData());
+  }
+}

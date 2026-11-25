@@ -1,31 +1,49 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import { AuthService } from './auth.service';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService, UserRole } from './auth.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+/**
+ * Ensures user is authenticated before accessing the route.
+ */
+export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  if (authService.isAuthenticated()) {
+  if (authService.currentUser()) {
     return true;
   }
 
-  return router.createUrlTree(['/login'], { queryParams: { returnUrl: state.url } });
+  router.navigate(['/sso-login']);
+  return false;
 };
 
-export const roleGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
-  
-  const expectedRoles = route.data?.['roles'] as Array<string>;
-  
-  if (!authService.isAuthenticated()) {
-    return router.createUrlTree(['/login']);
-  }
-  
-  if (!expectedRoles || expectedRoles.length === 0 || authService.hasRole(expectedRoles)) {
-    return true;
-  }
-  
-  return router.createUrlTree(['/unauthorized']); // Or redirect to dashboard
+/**
+ * Factory guard for checking specific required roles on a route.
+ */
+export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
+  return () => {
+    const authService = inject(AuthService);
+    const router = inject(Router);
+    const user = authService.currentUser();
+
+    if (!user) {
+      router.navigate(['/sso-login']);
+      return false;
+    }
+
+    if (allowedRoles.includes(user.role)) {
+      return true;
+    }
+
+    // Redirect to default home/dashboard if unauthorized
+    router.navigate(['/']);
+    return false;
+  };
 };
+
+/**
+ * Convenience guard for department admin and super admin routes.
+ */
+export const adminGuard: CanActivateFn = roleGuard(['dept_admin', 'super_admin']);
+export const superAdminGuard: CanActivateFn = roleGuard(['super_admin']);
+

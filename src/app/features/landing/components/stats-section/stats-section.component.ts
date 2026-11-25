@@ -1,0 +1,106 @@
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IconComponent } from '../../../../shared';
+
+interface StatMetric {
+  count: string;
+  label: string;
+  description: string;
+  badge: string;
+  iconBg: string;
+  iconColor: string;
+}
+
+@Component({
+  selector: 'app-stats-section',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, IconComponent],
+  host: {
+    class: 'block w-full'
+  },
+  template: `
+    <section class="py-12 bg-white border-b border-slate-200">
+      <div class="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto mb-10">
+          <span class="text-xs font-bold text-orange-600 uppercase tracking-wider bg-orange-50 px-3 py-1 rounded-full border border-orange-200/60">
+            Real-Time Governance Metrics
+          </span>
+          <div style="font-size: 2.4rem; line-height: 1.15; font-weight: 900; color: #7C0E44; margin-top: 10px; letter-spacing: -0.025em;">
+            Impact Across Rajasthan
+          </div>
+          <p class="text-[14px] sm:text-[15px] text-slate-500 mt-2 mx-auto max-w-2xl">
+            Transparent reporting of candidate mobilization, training infrastructure, and scheme disbursements.
+          </p>
+        </div>
+
+        <!-- 4 Column Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          @for (stat of stats; track stat.label) {
+            <div class="p-6 rounded-xl border border-[#EADCE2] bg-white hover:border-[#AA5E7A] transition-all duration-200 shadow-2xs hover:shadow-xs flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-bold px-2 py-0.5 rounded {{ stat.badge }}">
+                    Live Record
+                  </span>
+                  <div class="w-8 h-8 rounded-lg {{ stat.iconBg }} {{ stat.iconColor }} flex items-center justify-center">
+                    <app-icon name="trending-up" [stroke]="2" />
+                  </div>
+                </div>
+
+                <div style="font-size: 2.4rem; line-height: 1.05; font-weight: 800; color: #7C0E44; letter-spacing: -0.02em;" class="tabular-nums mt-1">
+                  {{ stat.count }}
+                </div>
+                <p class="text-[13px] sm:text-[14px] font-bold text-slate-700 mt-1.5 leading-snug">
+                  {{ stat.label }}
+                </p>
+              </div>
+
+              <p class="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-200/60">
+                {{ stat.description }}
+              </p>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  `
+})
+export class StatsSectionComponent {
+  stats: StatMetric[] = [
+    {
+      count: '50',
+      label: 'Districts Covered',
+      description: 'Comprehensive skill delivery spanning all districts of Rajasthan.',
+      badge: 'bg-blue-50 text-navy',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-navy'
+    },
+    {
+      count: '1,280+',
+      label: 'Accredited Training Centers',
+      description: 'Standardized infrastructure empanelled through biometric verification.',
+      badge: 'bg-orange-50 text-orange-600',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    {
+      count: '5,42,000+',
+      label: 'Youth Trained & Certified',
+      description: 'Industry-recognized NSQF certifications completed successfully.',
+      badge: 'bg-emerald-50 text-emerald-800',
+      iconBg: 'bg-emerald-100',
+      iconColor: 'text-emerald-700'
+    },
+    {
+      count: '₹248.5 Cr',
+      label: 'Direct Scheme Benefits Disbursed',
+      description: 'Aadhaar-linked DBT payouts to training partners and youth stipends.',
+      badge: 'bg-[#F8EDF1] text-[#7C0E44]',
+      iconBg: 'bg-[#F8EDF1]',
+      iconColor: 'text-[#7C0E44]'
+    }
+  ];
+}

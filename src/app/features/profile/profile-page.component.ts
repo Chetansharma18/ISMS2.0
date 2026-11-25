@@ -1,0 +1,438 @@
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../../core/auth/auth.service';
+import { PermissionService } from '../../core/permissions/permission.service';
+import { OtrFormService } from '../registration/services/otr-form.service';
+import { OtrValidationService } from '../registration/services/otr-validation.service';
+import { OtrPdfService } from '../registration/services/otr-pdf.service';
+import { DocumentViewerService } from '../../core/services/document-viewer.service';
+import { DocumentViewerModalComponent } from '../../shared/components/document-viewer-modal/document-viewer-modal.component';
+import { FileDoc } from '../registration/models/otr-form.model';
+import { formatDate } from '../../shared/utils';
+import { ButtonComponent, IconComponent, ProgressRingComponent } from '../../shared';
+import { AspirantProfileFormComponent } from '../aspirant/components/aspirant-profile-form.component';
+import { AspirantPortalService } from '../aspirant/services/aspirant-portal.service';
+
+export interface RegistrationStepItem {
+  id: string;
+  stepNumber: number;
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  icon: 'building' | 'user' | 'bank' | 'document';
+}
+
+@Component({
+  selector: 'app-profile-page',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, DocumentViewerModalComponent, AspirantProfileFormComponent, ButtonComponent, IconComponent, ProgressRingComponent],
+  template: `
+    <div class="w-full min-h-full font-sans p-4 sm:p-5 space-y-4" style="background-color: #FFFFFF;">
+
+      @if (isAspirant()) {
+        <!-- ====================================================================
+             ASPIRANT PROFILE VIEW
+             ==================================================================== -->
+        <!-- 1. HERO BANNER -->
+        <div class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FCF0F2]">
+          <div
+            class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
+            style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
+          ></div>
+          <div
+            class="absolute inset-0 pointer-events-none"
+            style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
+          ></div>
+          <div class="relative z-10 flex items-center gap-3">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+                Aspirant Profile Summary
+              </h1>
+              <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">
+                Complete your candidate registration steps to become eligible to express interest in training programs under RSLDC.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. ASPIRANT OTR PROGRESS CARD: Circular Donut Chart + Details -->
+        <div class="w-full bg-white border border-[#EADCE2] rounded-[10px] p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+          <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
+            <app-progress-ring
+              [value]="aspirantCompletionPercentage()"
+              [complete]="isAspirantComplete()"
+              class="w-20 h-20 sm:w-24 sm:h-24"
+            />
+
+            <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+              <h2 class="text-base sm:text-[17px] font-bold text-[#25212A] m-0">Aspirant Registration</h2>
+              <p class="text-xs sm:text-[13px] text-[#625663] leading-relaxed m-0 max-w-3xl">
+                Complete all mandatory candidate registration steps to become eligible for skill training admissions. Once complete, you can express interest for all open training programs.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. ASPIRANT REGISTRATION FORM (With OTR Step Progress Header) -->
+        <app-aspirant-profile-form (profileSaved)="onAspirantProfileSaved()"></app-aspirant-profile-form>
+      } @else {
+        <!-- ====================================================================
+             1. HERO BANNER: Profile Summary with Heritage Backdrop & Alert Box
+             ==================================================================== -->
+        <div class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4 px-5 py-3.5 sm:px-7 sm:py-4 bg-[#FCF0F2]">
+          <!-- Panoramic Fort Heritage Image -->
+          <div
+            class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
+            style="background-image: url('/hero-bg.png'); background-position: right 20%; opacity: 0.95;"
+          ></div>
+          <!-- Soft Gradient Overlay: seamlessly fades fort into left background -->
+          <div
+            class="absolute inset-0 pointer-events-none"
+            style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
+          ></div>
+
+          <!-- Left: Title & Subtitle -->
+          <div class="relative z-10 flex items-center gap-3">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-[#7C0E44] m-0">
+                Profile Summary
+              </h1>
+              <p class="text-xs sm:text-[13px] text-[#625663] mt-1 m-0 font-normal">
+                Complete your registration steps to become eligible for scheme proposals under RSLDC.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ====================================================================
+             2. OTR PROGRESS CARD: Circular Donut Chart + Details + CTA
+             ==================================================================== -->
+        <div class="w-full bg-white border border-[#EADCE2] rounded-[10px] p-4 sm:p-6 shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
+          <!-- Left: Donut Chart + Information + Progress Bar -->
+          <div class="flex flex-col sm:flex-row items-center sm:items-start md:items-center text-center sm:text-left gap-4 sm:gap-6 flex-1 min-w-0">
+          
+          <!-- Circular Progress Donut Chart (SVG) -->
+          <app-progress-ring
+            [value]="completionPercentage()"
+            [complete]="!isProfileIncomplete()"
+            class="w-20 h-20 sm:w-24 sm:h-24"
+          />
+
+          <!-- Text Details -->
+          <div class="flex-1 min-w-0 space-y-1.5 sm:space-y-2">
+            <h2 class="text-base sm:text-[17px] font-bold text-[#25212A] m-0">Organization Registration</h2>
+            <p class="text-xs sm:text-[13px] text-[#625663] leading-relaxed m-0 max-w-3xl">
+              Complete all mandatory registration steps to become eligible for scheme proposals under RSLDC. Once complete, you can apply for all open EOI opportunities.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Primary Action Button + Mandatory Warning Notice -->
+        <div class="shrink-0 flex flex-col items-stretch sm:items-start lg:items-end gap-2.5 w-full sm:w-auto">
+          <button appButton size="lg" type="button" (click)="goToRegistration()" class="w-full sm:w-auto">
+            <span>{{ ctaButtonText() }}</span>
+            <app-icon name="forward" />
+          </button>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           3. REGISTRATION STEPS (Vertical Connected Timeline with 4 Steps)
+           ==================================================================== -->
+      <div class="space-y-3 pt-1">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 m-0">Registration Steps</h3>
+          <p class="text-xs sm:text-[13px] text-slate-500 mt-0.5 m-0 font-normal">
+            Follow the steps below to complete your profile. You can continue from where you left off.
+          </p>
+        </div>
+
+        <!-- Timeline Items List -->
+        <div class="space-y-0 pt-2">
+          @for (step of sections(); track step.stepNumber; let i = $index, last = $last, first = $first) {
+            <div class="flex items-stretch gap-3 sm:gap-5 mb-4 last:mb-0">
+              
+              <!-- Timeline Node: Number Circle + Vertical Connecting Line -->
+              <div class="relative flex flex-col items-center justify-center shrink-0 w-8">
+                <!-- Top connecting line: bridges the gap from previous row to this circle -->
+                @if (!first) {
+                  <div
+                    class="absolute -top-[18px] bottom-1/2 w-[2px] left-1/2 -translate-x-1/2 transition-colors"
+                    [ngClass]="sections()[i - 1]?.isCompleted ? 'bg-navy' : 'bg-slate-200'"
+                  ></div>
+                }
+
+                <!-- Bottom connecting line: goes from this circle to the bottom of this row -->
+                @if (!last) {
+                  <div
+                    class="absolute top-1/2 bottom-0 w-[2px] left-1/2 -translate-x-1/2 transition-colors"
+                    [ngClass]="step.isCompleted ? 'bg-navy' : 'bg-slate-200'"
+                  ></div>
+                }
+
+                <!-- Step Number Circle -->
+                <div
+                  class="w-8 h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 z-10 shadow-2xs transition-colors"
+                  [ngClass]="{
+                    'bg-navy text-white': step.isCompleted || isCurrentStep(step.stepNumber),
+                    'bg-slate-100 text-slate-400 border border-slate-200': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                  }"
+                >
+                  {{ step.stepNumber }}
+                </div>
+              </div>
+
+              <!-- Step Card Box -->
+              <div
+                class="flex-1 bg-white rounded-[10px] border border-[#EADCE2] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xs hover:shadow-xs transition-all"
+              >
+                <!-- Left: Icon Box + Title & Description -->
+                <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
+                  <!-- Icon Container Box -->
+                  <div
+                    class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+                    [ngClass]="{
+                      'bg-[#E4F4E8] text-[#18733B]': step.isCompleted,
+                      'bg-[#E8F0FE] text-[#2459B3]': !step.isCompleted && isCurrentStep(step.stepNumber),
+                      'bg-[#FCF8FA] text-[#89818A] border border-[#EADCE2]': !step.isCompleted && !isCurrentStep(step.stepNumber)
+                    }"
+                  >
+                    @switch (step.icon) {
+                      @case ('building') {
+                        <!-- Organization Details Icon -->
+                        <app-icon name="building" size="xl" [stroke]="1.8" />
+                      }
+                      @case ('user') {
+                        <!-- Authorized Person User Icon -->
+                        <app-icon name="user" size="xl" [stroke]="1.8" />
+                      }
+                      @case ('bank') {
+                        <!-- Bank Columns Icon -->
+                        <app-icon name="bank" size="xl" [stroke]="1.8" />
+                      }
+                      @case ('document') {
+                        <!-- Preview & Submit Document Icon -->
+                        <app-icon name="document" size="xl" [stroke]="1.8" />
+                      }
+                    }
+                  </div>
+
+                  <!-- Title & Subtitle -->
+                  <div class="min-w-0">
+                    <h4 class="text-[15px] font-bold text-slate-800 m-0 leading-snug">{{ step.title }}</h4>
+                    <p class="text-xs text-slate-500 m-0 mt-0.5 leading-relaxed">{{ step.description }}</p>
+                  </div>
+                </div>
+
+                <!-- Right: Status Pill & Action Button -->
+                <div class="flex items-center justify-between md:justify-end gap-3 sm:gap-4 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-slate-100">
+                  <!-- Status Pill -->
+                  @if (step.isCompleted) {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#ECFDF5] text-green-700 border border-[#A7F3D0] select-none">
+                      <app-icon name="check" size="sm" [stroke]="2.5" />
+                      <span>Completed</span>
+                    </span>
+                  } @else if (isCurrentStep(step.stepNumber)) {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FFFBEB] text-[#B45309] border border-[#FDE68A] select-none">
+                      <app-icon name="clock-circle" size="sm" [stroke]="2" />
+                      <span>Pending</span>
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-400 border border-slate-200 select-none">
+                      <app-icon name="clock-circle" size="sm" [stroke]="2" />
+                      <span>Pending</span>
+                    </span>
+                  }
+
+                  <!-- Action Button -->
+                  @if (step.isCompleted) {
+                    <button appButton variant="outline" size="sm" type="button" (click)="navigateToStep(step.stepNumber)" class="min-w-[105px]">
+                      <span>View Details</span>
+                    </button>
+                  } @else if (isCurrentStep(step.stepNumber)) {
+                    <button appButton size="sm" type="button" (click)="navigateToStep(step.stepNumber)" class="min-w-[125px]">
+                      <span>Continue Step</span>
+                      <app-icon name="forward" size="sm" />
+                    </button>
+                  }
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+      <!-- Reusable Document Preview Modal (preserved for document review) -->
+      <app-document-viewer-modal
+        [isOpen]="isDocViewerOpen()"
+        [doc]="selectedDoc()"
+        [title]="selectedDocTitle()"
+        (close)="isDocViewerOpen.set(false)"
+      ></app-document-viewer-modal>
+
+    </div>
+  `
+})
+export class ProfilePageComponent {
+  private router = inject(Router);
+  private authService = inject(AuthService);
+  private permissions = inject(PermissionService);
+  private otrFormService = inject(OtrFormService);
+  private validationService = inject(OtrValidationService);
+  private pdfService = inject(OtrPdfService);
+  private docViewer = inject(DocumentViewerService);
+  protected readonly aspirantPortal = inject(AspirantPortalService);
+
+  readonly currentUser = this.authService.currentUser;
+  readonly formData = this.otrFormService.formData;
+
+  readonly isExistingUser = computed(() => {
+    return this.currentUser()?.role === 'existing_user' || this.permissions.hasRole('existing_user') || this.formData().status === 'Submitted';
+  });
+
+  readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
+  readonly isAspirantComplete = this.aspirantPortal.isProfileComplete;
+  readonly aspirantCompletionPercentage = computed(() => this.isAspirantComplete() ? 100 : 0);
+
+  /** Document viewer modal state */
+  readonly isDocViewerOpen = signal(false);
+  readonly selectedDoc = signal<FileDoc | null>(null);
+  readonly selectedDocTitle = signal('');
+
+  /** 4 Standard Registration Steps */
+  readonly sections = computed<RegistrationStepItem[]>(() => {
+    const data = this.formData();
+    const isSubmitted = data.status === 'Submitted';
+
+    const isStep1Complete = isSubmitted || this.validationService.validateStep1(data.step1).length === 0;
+    const isStep2Complete = isSubmitted || this.validationService.validateStep3(data.step3).length === 0;
+    const isStep3Complete = isSubmitted || this.validationService.validateStep4(data.step4).length === 0;
+    const isStep4Complete = isSubmitted;
+
+    return [
+      {
+        id: 'org',
+        stepNumber: 1,
+        title: 'Organization Details',
+        description: 'Provide your organization / company details, registration information and documents.',
+        isCompleted: isStep1Complete,
+        icon: 'building'
+      },
+      {
+        id: 'auth',
+        stepNumber: 2,
+        title: 'Authorized Person',
+        description: 'Provide details of the authorized person who can represent the organization.',
+        isCompleted: isStep2Complete,
+        icon: 'user'
+      },
+      {
+        id: 'bank',
+        stepNumber: 3,
+        title: 'Bank Details',
+        description: 'Provide your bank account details for payment and fund transfer.',
+        isCompleted: isStep3Complete,
+        icon: 'bank'
+      },
+      {
+        id: 'preview',
+        stepNumber: 4,
+        title: this.isExistingUser() ? 'Preview' : 'Preview & Submit',
+        description: this.isExistingUser() ? 'Review all details.' : 'Review all details and submit your registration.',
+        isCompleted: isStep4Complete,
+        icon: 'document'
+      }
+    ];
+  });
+
+  /** Count of completed sections (0 to 4) */
+  readonly completedSectionsCount = computed(() => {
+    return this.sections().filter(s => s.isCompleted).length;
+  });
+
+  /** Overall completion percentage (0% to 100%) */
+  readonly completionPercentage = computed(() => {
+    const data = this.formData();
+    if (data.status === 'Submitted') return 100;
+    const count = this.completedSectionsCount();
+    return Math.round((count / 4) * 100);
+  });
+
+  /** Identifies the earliest incomplete step number (1 to 4) */
+  readonly currentPendingStep = computed(() => {
+    const list = this.sections();
+    const firstIncomplete = list.find(s => !s.isCompleted);
+    return firstIncomplete ? firstIncomplete.stepNumber : 1;
+  });
+
+  /** Whether a step number is the next one pending completion */
+  isCurrentStep(stepNumber: number): boolean {
+    return this.currentPendingStep() === stepNumber;
+  }
+
+  /** Checks if profile is incomplete */
+  readonly isProfileIncomplete = computed(() => {
+    const user = this.currentUser();
+    const data = this.formData();
+    if (data.status === 'Submitted') return false;
+    if (!user) return true;
+    if (this.permissions.hasRole('new_user')) {
+      return this.completedSectionsCount() < 4;
+    }
+    return user.isProfileComplete === false;
+  });
+
+  /** Primary CTA button text */
+  readonly ctaButtonText = computed(() => {
+    const count = this.completedSectionsCount();
+    if (count === 0) return 'Start Registration';
+    if (count === 4) return 'Review Registration';
+    return 'Continue Registration';
+  });
+
+  isStepAccessible(stepNumber: number): boolean {
+    if (stepNumber === 1) return true;
+    const list = this.sections();
+    const target = list.find(s => s.stepNumber === stepNumber);
+    if (target?.isCompleted) return true;
+    return this.isCurrentStep(stepNumber);
+  }
+
+  /** Navigates to a specific step in the registration form */
+  navigateToStep(stepNumber: number): void {
+    if (!this.isStepAccessible(stepNumber)) {
+      this.router.navigate(['/registration'], { queryParams: { step: this.currentPendingStep() } });
+      return;
+    }
+    this.router.navigate(['/registration'], { queryParams: { step: stepNumber } });
+  }
+
+  /** Navigates to the first incomplete step */
+  goToRegistration(): void {
+    this.navigateToStep(this.currentPendingStep());
+  }
+
+  /** Opens document in another tab in Chrome */
+  openDoc(doc: FileDoc | null, title: string, defaultName = 'document.pdf'): void {
+    this.docViewer.openDocument(doc || {
+      fileName: defaultName,
+      fileSize: '1.45 MB',
+      uploadDate: formatDate(new Date()),
+      status: 'uploaded'
+    }, title);
+  }
+
+  /** Print / Download profile PDF */
+  downloadProfilePdf(): void {
+    this.pdfService.printOtrProfile(this.formData());
+  }
+
+  onAspirantProfileSaved(): void {
+    this.authService.markProfileCompleted();
+  }
+}

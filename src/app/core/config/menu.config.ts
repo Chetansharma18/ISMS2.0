@@ -1,0 +1,46 @@
+import { UserRole } from '../models/role.model';
+
+export interface MenuItem {
+  label: string;
+  route: string;
+  icon?: string;
+  roles?: UserRole[];
+  badge?: string;
+  children?: MenuItem[];
+}
+
+export const MAIN_NAV_ITEMS: MenuItem[] = [
+  {
+    label: 'Home',
+    route: '/',
+    icon: 'home'
+  },
+  {
+    label: 'Registration (OTR)',
+    route: '/registration',
+    icon: 'assignment',
+    roles: ['new_user', 'existing_user']
+  },
+  {
+    label: 'Active Scheme',
+    route: '/tenders',
+    icon: 'gavel'
+  },
+  {
+    label: 'EOI Status',
+    route: '/tender-status',
+    icon: 'fact_check',
+    roles: ['existing_user']
+  },
+  {
+    label: 'Department EOI View',
+    route: '/admin/eoi-view',
+    icon: 'admin_panel_settings',
+    roles: ['dept_admin']
+  },
+  {
+    label: 'My Profile',
+    route: '/profile',
+    icon: 'person'
+  }
+];

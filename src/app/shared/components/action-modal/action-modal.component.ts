@@ -1,0 +1,243 @@
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  HostListener,
+  ChangeDetectionStrategy,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  inject
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IconComponent } from '../icon/icon.component';
+import { ModalService } from '../../services/modal.service';
+
+export type ActionModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+
+const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
+  xs: 'max-w-[360px]',
+  sm: 'max-w-[400px]',
+  md: 'max-w-[560px]',
+  lg: 'max-w-[720px]',
+  xl: 'max-w-[960px]',
+  '2xl': 'max-w-[1200px]',
+  full: 'max-w-full'
+};
+
+@Component({
+  selector: 'app-action-modal',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, IconComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
+  template: `
+    @if (isOpen) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+        style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
+        (click)="onBackdropClick($event)"
+      >
+        <div
+          class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
+          [class.overflow-visible]="!scrollable"
+          [class.overflow-hidden]="scrollable"
+          [class.max-h-[90vh]]="scrollable"
+          [ngClass]="resolvedMaxWidthClass"
+          style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
+          role="dialog"
+          aria-modal="true"
+          [attr.aria-labelledby]="title ? titleId : null"
+          (click)="$event.stopPropagation()"
+        >
+          <!-- Top Accent Bar -->
+          @if (showAccentBar) {
+            <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
+          }
+
+          <!-- Close Button -->
+          @if (showCloseButton) {
+            <button
+              type="button"
+              (click)="onClose()"
+              class="absolute top-4 right-5 sm:right-6 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+              title="Close"
+              aria-label="Close"
+            >
+              <app-icon name="close" [stroke]="2.5" />
+            </button>
+          }
+
+          <!-- Modal Body -->
+          <div
+            class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
+            [class.overflow-y-auto]="scrollable"
+            [class.overflow-visible]="!scrollable"
+            [class.flex-1]="scrollable"
+            [class.min-h-0]="scrollable"
+          >
+
+            <!-- Badge Pill -->
+            @if (badge) {
+              <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-widest bg-amber-50 text-amber-800 border border-amber-200 mb-3">
+                {{ badge }}
+              </div>
+            }
+
+            <!-- Title -->
+            @if (title) {
+              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+                {{ title }}
+              </h2>
+            }
+
+            <!-- Description -->
+            @if (description) {
+              <p class="m-0 mt-2 text-[#625663] font-normal leading-relaxed" style="font-size: 13.5px;">
+                {{ description }}
+              </p>
+            }
+
+            <!-- Projected Custom Slot -->
+            <div class="w-full flex-1 min-h-0 flex flex-col overflow-y-auto pr-0.5">
+              <ng-content></ng-content>
+            </div>
+
+            <!-- Action Buttons Footer -->
+            @if (primaryLabel || secondaryLabel) {
+              <div class="mt-auto shrink-0">
+                @if (showFooterDivider) {
+                  <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
+                }
+
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!secondaryLabel">
+                  @if (secondaryLabel) {
+                    <button
+                      type="button"
+                      (click)="onSecondaryAction()"
+                      class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#AA5E7A] text-[#7C0E44] text-sm font-medium hover:bg-[#F8EDF1] transition-colors cursor-pointer"
+                    >
+                      {{ secondaryLabel }}
+                    </button>
+                  }
+                  @if (primaryLabel) {
+                    <button
+                      type="button"
+                      (click)="onPrimaryAction()"
+                      [disabled]="disablePrimary"
+                      class="w-full py-2.5 px-5 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                      [ngClass]="primaryVariantClass"
+                      [class.sm:flex-1]="secondaryLabel"
+                      [class.sm:w-auto]="!secondaryLabel"
+                      [class.sm:min-w-[130px]]="!secondaryLabel"
+                    >
+                      {{ primaryLabel }}
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+          </div>
+        </div>
+      </div>
+    }
+  `
+})
+export class ActionModalComponent implements OnChanges, OnDestroy {
+  private static nextId = 0;
+  private readonly modalService = inject(ModalService);
+  private wasOpen = false;
+
+  readonly titleId = `action-modal-title-${++ActionModalComponent.nextId}`;
+
+  @Input() isOpen = false;
+  @Input() title = '';
+  @Input() description = '';
+  @Input() badge = '';
+  @Input() primaryLabel = 'Confirm';
+  @Input() secondaryLabel = 'Cancel';
+  @Input() showPrimaryArrow = true;
+  @Input() showAccentBar = false;
+  @Input() accentBarClass = 'bg-navy';
+  @Input() showCloseButton = false;
+  @Input() showFooterDivider = true;
+  @Input() size?: ActionModalSize;
+  @Input() maxWidthClass = 'max-w-[490px]';
+  @Input() closeOnBackdrop = true;
+  @Input() disablePrimary = false;
+  @Input() reverseButtons = false;
+  /** When true, forces the modal body to scroll internally instead of natural height with overlay dropdowns */
+  @Input() scrollable = false;
+  /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
+  @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
+
+  get resolvedMaxWidthClass(): string {
+    if (this.size && ACTION_MODAL_WIDTHS[this.size]) {
+      return ACTION_MODAL_WIDTHS[this.size];
+    }
+    return this.maxWidthClass;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen']) {
+      if (this.isOpen && !this.wasOpen) {
+        this.modalService.registerModalOpen();
+        this.wasOpen = true;
+      } else if (!this.isOpen && this.wasOpen) {
+        this.modalService.registerModalClose();
+        this.wasOpen = false;
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.wasOpen) {
+      this.modalService.registerModalClose();
+      this.wasOpen = false;
+    }
+  }
+
+  get primaryVariantClass(): string {
+    switch (this.primaryVariant) {
+      case 'success':
+        return 'bg-emerald-600 hover:bg-emerald-700';
+      case 'danger':
+        return 'bg-rose-600 hover:bg-rose-700';
+      default:
+        return 'bg-navy hover:bg-navy-dark';
+    }
+  }
+
+  @Output() primaryAction = new EventEmitter<void>();
+  @Output() secondaryAction = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.isOpen) {
+      this.onClose();
+    }
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    if (this.closeOnBackdrop && event.target === event.currentTarget) {
+      this.onClose();
+    }
+  }
+
+  onPrimaryAction(): void {
+    this.primaryAction.emit();
+  }
+
+  onSecondaryAction(): void {
+    this.secondaryAction.emit();
+  }
+
+  onClose(): void {
+    this.close.emit();
+  }
+}

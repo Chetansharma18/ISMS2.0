@@ -1,0 +1,649 @@
+import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { OtrFormService } from '../../services/otr-form.service';
+import { OtrValidationService } from '../../services/otr-validation.service';
+import {
+  Step3AuthorizedPerson,
+  DESIGNATIONS_MASTER,
+  STATES_MASTER,
+  IDENTITY_DOCUMENT_TYPES,
+  FileDoc,
+  REGEX
+} from '../../models/otr-form.model';
+
+import { FormInputComponent } from '../../../../shared/components/form-controls/form-input/form-input.component';
+import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
+import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
+import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
+
+interface DocConfig {
+  label: string;
+  placeholder: string;
+  type: 'text' | 'tel';
+  uppercase: boolean;
+  maxLength: number;
+}
+
+const DOC_CONFIGS: Record<string, DocConfig> = {
+  'Aadhaar Card': {
+    label: 'Aadhaar Number',
+    placeholder: 'Enter Aadhaar number',
+    type: 'tel',
+    uppercase: false,
+    maxLength: 12
+  },
+  'PAN Card': {
+    label: 'PAN Number',
+    placeholder: 'Enter PAN number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 10
+  },
+  'Voter ID Card': {
+    label: 'Voter ID Number',
+    placeholder: 'Enter Voter ID number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 20
+  },
+  'Jan Aadhaar Card': {
+    label: 'Jan Aadhaar Number',
+    placeholder: 'Enter Jan Aadhaar number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 16
+  },
+  'Passport': {
+    label: 'Passport Number',
+    placeholder: 'Enter passport number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 8
+  }
+};
+
+const DEFAULT_DOC_CONFIG: DocConfig = {
+  label: 'Document Number',
+  placeholder: 'Enter document number',
+  type: 'text',
+  uppercase: false,
+  maxLength: 50
+};
+
+@Component({
+  selector: 'app-step3-auth-person',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    CommonModule,
+    FormsModule,
+    FormInputComponent,
+    FormSelectComponent,
+    FormTextareaComponent,
+    FormFileUploadComponent
+  ],
+  template: `
+    <div class="w-full space-y-6 font-sans">
+
+      <!-- ====================================================================
+           1. PERSONAL INFORMATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            1. Personal Information
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- 1. First Name * (Col 1) -->
+          <div>
+            <app-form-input
+              label="First Name"
+              [value]="firstName()"
+              (valueChange)="onFirstNameChange($event)"
+              (blur)="markTouched('firstName')"
+              placeholder="Enter first name"
+              [required]="true"
+              [maxLength]="50"
+              [error]="getFieldError('firstName')"
+            ></app-form-input>
+          </div>
+
+          <!-- 2. Last Name (Col 2) -->
+          <div>
+            <app-form-input
+              label="Last Name"
+              [value]="lastName()"
+              (valueChange)="onLastNameChange($event)"
+              placeholder="Enter last name"
+              [required]="false"
+              [maxLength]="50"
+              [error]="getFieldError('lastName')"
+            ></app-form-input>
+          </div>
+
+          <!-- 3. Designation (Col 3) -->
+          <div>
+            <app-form-select
+              label="Designation"
+              [value]="data().designation"
+              (valueChange)="update('designation', $event)"
+              [options]="designations"
+              placeholder="Select designation"
+              [required]="false"
+              [error]="getFieldError('designation')"
+            ></app-form-select>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
+
+      <!-- ====================================================================
+           2. CONTACT INFORMATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            2. Contact Information
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- Row 1: Mobile Number * (Col 1) -->
+          <div>
+            <app-form-input
+              label="Mobile Number"
+              type="tel"
+              [numericOnly]="true"
+              [value]="data().mobileNo"
+              (valueChange)="update('mobileNo', $event)"
+              (blur)="markTouched('mobileNo')"
+              placeholder="10-digit mobile number"
+              [required]="true"
+              [maxLength]="10"
+              [error]="getFieldError('mobileNo')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 1: Email Address * (Col 2) -->
+          <div>
+            <app-form-input
+              label="Email Address"
+              type="email"
+              [value]="data().emailId"
+              (valueChange)="update('emailId', $event)"
+              (blur)="markTouched('emailId')"
+              placeholder="Enter email address"
+              [required]="true"
+              [error]="getFieldError('emailId')"
+            ></app-form-input>
+          </div>
+
+          <!-- Row 1: State (Col 3) -->
+          <div>
+            <app-form-select
+              label="State"
+              [value]="data().state"
+              (valueChange)="update('state', $event)"
+              [options]="states"
+              placeholder="Select state"
+              [required]="false"
+              [error]="getFieldError('state')"
+            ></app-form-select>
+          </div>
+
+          <!-- Row 2: Residential Address (Spans across all 3 cols on desktop) -->
+          <div class="col-span-1 md:col-span-3">
+            <app-form-textarea
+              label="Residential Address"
+              [value]="data().residenceAddress"
+              (valueChange)="update('residenceAddress', $event)"
+              placeholder="Enter house/flat no., street, locality, city, PIN code"
+              [rows]="1"
+              [maxLength]="500"
+              [required]="false"
+              [error]="getFieldError('residenceAddress')"
+            ></app-form-textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
+
+      <!-- ====================================================================
+           3. IDENTITY VERIFICATION
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            3. Identity Verification
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- A. Identity Document Type * (Col 1) -->
+          <div>
+            <app-form-select
+              label="Identity Document Type"
+              [value]="selectedDocType()"
+              (valueChange)="onDocTypeChange($event)"
+              [options]="identityDocTypes"
+              placeholder="Select identity document"
+              [required]="true"
+              [error]="getFieldError('identityDocType')"
+            ></app-form-select>
+          </div>
+
+          <!-- B. Corresponding Document Number * (Col 2) -->
+          <div>
+            <app-form-input
+              [label]="currentDocConfig().label"
+              [type]="currentDocConfig().type"
+              [value]="currentDocNumber()"
+              (valueChange)="onDocNumberChange($event)"
+              (blur)="markTouched('identityDocNumber')"
+              [placeholder]="currentDocConfig().placeholder"
+              [required]="true"
+              [uppercase]="currentDocConfig().uppercase"
+              [maxLength]="currentDocConfig().maxLength"
+              [disabled]="!selectedDocType()"
+              [error]="getFieldError('identityDocNumber')"
+            ></app-form-input>
+          </div>
+
+          <!-- C. Upload Identity Document * (Col 1 of row 2, side-by-side balanced) -->
+          <div class="col-span-1">
+            <app-form-file-upload
+              label="Upload Identity Document"
+              [dropzoneStyle]="true"
+              [uploadPrompt]="'Upload ' + (selectedDocType() || 'Identity Document')"
+              [fileDoc]="data().idProofDoc"
+              (fileChange)="updateFileDoc('idProofDoc', $event)"
+              [required]="true"
+              [disabled]="!selectedDocType()"
+              [error]="getFieldError('idProofDoc')"
+            ></app-form-file-upload>
+          </div>
+        </div>
+      </section>
+
+      <!-- Divider -->
+      <div class="pt-2 border-t border-[#E8EEF5]"></div>
+
+      <!-- ====================================================================
+           4. AUTHORIZATION DOCUMENTS
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+            4. Authorization Documents
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <div class="col-span-1">
+            <app-form-file-upload
+              label="Authorization Letter / Board Resolution"
+              [dropzoneStyle]="true"
+              uploadPrompt="Upload Authorization Letter / Board Resolution"
+              [fileDoc]="data().authorizationLetterDoc"
+              (fileChange)="updateFileDoc('authorizationLetterDoc', $event)"
+              [required]="true"
+              [error]="getFieldError('authorizationLetterDoc')"
+            ></app-form-file-upload>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  `,
+  styles: [`
+    :host {
+      display: block;
+      width: 100%;
+    }
+
+    :host ::ng-deep app-form-input label,
+    :host ::ng-deep app-form-select label,
+    :host ::ng-deep app-form-textarea label,
+    :host ::ng-deep app-form-file-upload label {
+      font-size: 14px !important;
+      font-weight: 500 !important;
+      color: #334155 !important;
+      margin-bottom: 6px !important;
+    }
+
+    :host ::ng-deep app-form-input label .text-rose-600,
+    :host ::ng-deep app-form-select label .text-rose-600,
+    :host ::ng-deep app-form-textarea label .text-rose-600,
+    :host ::ng-deep app-form-file-upload label .text-rose-500 {
+      color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative:not(.border-rose-600):focus-within {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600 {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:hover:not(.cursor-not-allowed) {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
+    }
+
+    :host ::ng-deep app-form-input input {
+      font-size: 14px !important;
+      color: #334155 !important;
+    }
+
+    :host ::ng-deep app-form-input input::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"] {
+      height: 44px !important;
+      min-height: 44px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"]:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea {
+      min-height: 72px !important;
+      border-radius: 6px !important;
+      border-color: #D6E3F0 !important;
+      background-color: #FFFFFF !important;
+      font-size: 14px !important;
+      color: #334155 !important;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:hover:not(:disabled) {
+      border-color: #B5CBE0 !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea:focus {
+      border-color: #477DAF !important;
+      box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-textarea textarea::placeholder {
+      color: #94A3B8 !important;
+      font-size: 14px !important;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border,
+    :host ::ng-deep app-form-file-upload .rounded-md.border {
+      min-height: 72px !important;
+      border-color: #D6E3F0 !important;
+      border-radius: 6px !important;
+      background-color: #FFFFFF !important;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    :host ::ng-deep app-form-file-upload .rounded-lg.border:hover:not(.cursor-not-allowed) {
+      border-color: #B5CBE0 !important;
+      background-color: #F8FAFC !important;
+    }
+  `]
+})
+export class Step3AuthPersonComponent {
+  private otrFormService = inject(OtrFormService);
+  private validationService = inject(OtrValidationService);
+
+  readonly designations = DESIGNATIONS_MASTER;
+  readonly states = STATES_MASTER;
+  readonly identityDocTypes = IDENTITY_DOCUMENT_TYPES;
+
+  readonly data = computed(() => this.otrFormService.step3());
+  readonly isSubmitted = computed(() => this.validationService.submittedSteps().has(2));
+  readonly touchedFields = signal<Set<string>>(new Set<string>());
+
+  markTouched(field: string): void {
+    this.touchedFields.update(set => {
+      if (set.has(field)) return set;
+      const next = new Set(set);
+      next.add(field);
+      return next;
+    });
+  }
+
+  readonly firstName = computed(() => {
+    const d = this.data();
+    if (d.firstName !== undefined && d.firstName !== null) {
+      return d.firstName;
+    }
+    if (d.name) {
+      const parts = d.name.trim().split(/\s+/);
+      return parts[0] || '';
+    }
+    return '';
+  });
+
+  readonly lastName = computed(() => {
+    const d = this.data();
+    if (d.lastName !== undefined && d.lastName !== null) {
+      return d.lastName;
+    }
+    if (d.name) {
+      const parts = d.name.trim().split(/\s+/);
+      return parts.slice(1).join(' ') || '';
+    }
+    return '';
+  });
+
+  readonly selectedDocType = computed(() => {
+    const d = this.data();
+    if (d.identityDocType) return d.identityDocType;
+    if (d.aadhaarNo) return 'Aadhaar Card';
+    if (d.pan) return 'PAN Card';
+    if (d.voterIdNo) return 'Voter ID Card';
+    if (d.bhamashahNo) return 'Jan Aadhaar Card';
+    if (d.passportNo) return 'Passport';
+    return 'Aadhaar Card';
+  });
+
+  readonly currentDocConfig = computed(() => {
+    const type = this.selectedDocType();
+    return DOC_CONFIGS[type] || DEFAULT_DOC_CONFIG;
+  });
+
+  readonly currentDocNumber = computed(() => {
+    const d = this.data();
+    if (d.identityDocNumber !== undefined && d.identityDocNumber !== null && d.identityDocNumber !== '') {
+      return d.identityDocNumber;
+    }
+    const type = this.selectedDocType();
+    switch (type) {
+      case 'Aadhaar Card': return d.aadhaarNo || '';
+      case 'PAN Card': return d.pan || '';
+      case 'Voter ID Card': return d.voterIdNo || '';
+      case 'Jan Aadhaar Card': return d.bhamashahNo || '';
+      case 'Passport': return d.passportNo || '';
+      default: return '';
+    }
+  });
+
+  onFirstNameChange(value: string): void {
+    const first = value;
+    const last = this.lastName();
+    const fullName = [first.trim(), last.trim()].filter(Boolean).join(' ');
+    this.otrFormService.updateStep3({
+      firstName: first,
+      lastName: last,
+      name: fullName
+    });
+  }
+
+  onLastNameChange(value: string): void {
+    const first = this.firstName();
+    const last = value;
+    const fullName = [first.trim(), last.trim()].filter(Boolean).join(' ');
+    this.otrFormService.updateStep3({
+      firstName: first,
+      lastName: last,
+      name: fullName
+    });
+  }
+
+  onDocTypeChange(newType: string): void {
+    // When document type changes:
+    // 1. Clear previous document number
+    // 2. Clear mapped numbers
+    // 3. Reset uploaded identity file so mismatched file isn't submitted
+    this.otrFormService.updateStep3({
+      identityDocType: newType,
+      identityDocNumber: '',
+      pan: '',
+      aadhaarNo: '',
+      voterIdNo: '',
+      bhamashahNo: '',
+      passportNo: '',
+      idProofDoc: null
+    });
+  }
+
+  onDocNumberChange(value: string): void {
+    const clean = value.trim();
+    const type = this.selectedDocType();
+    const updates: Partial<Step3AuthorizedPerson> = {
+      identityDocNumber: clean
+    };
+
+    // Synchronize to statutory backend fields for complete compatibility
+    if (type === 'Aadhaar Card') {
+      updates.aadhaarNo = clean;
+    } else if (type === 'PAN Card') {
+      updates.pan = clean.toUpperCase();
+    } else if (type === 'Voter ID Card') {
+      updates.voterIdNo = clean.toUpperCase();
+    } else if (type === 'Jan Aadhaar Card') {
+      updates.bhamashahNo = clean.toUpperCase();
+    } else if (type === 'Passport') {
+      updates.passportNo = clean.toUpperCase();
+    }
+
+    this.otrFormService.updateStep3(updates);
+  }
+
+  getFieldError(field: string): string | undefined {
+    const isSubmitted = this.isSubmitted();
+    const isTouched = this.touchedFields().has(field);
+    const d = this.data();
+
+    if (field === 'firstName' || field === 'name') {
+      if ((isSubmitted || isTouched) && !this.firstName()?.trim() && !d.name?.trim()) {
+        return 'Authorized Person First Name is required';
+      }
+      return undefined;
+    }
+
+    if (field === 'mobileNo') {
+      if ((isSubmitted || isTouched) && !d.mobileNo?.trim()) return 'Mobile Number is required';
+      if (d.mobileNo?.trim() && !REGEX.INDIAN_MOBILE.test(d.mobileNo)) return 'Invalid 10-digit Mobile Number';
+      return undefined;
+    }
+
+    if (field === 'emailId') {
+      const email = d.emailId?.trim();
+      if ((isSubmitted || isTouched) && !email) return 'Email Address is required';
+      if (email && !REGEX.EMAIL.test(email)) return 'Invalid Email Address format';
+      return undefined;
+    }
+
+    if (field === 'identityDocType') {
+      if ((isSubmitted || isTouched) && !this.selectedDocType()) return 'Identity Document Type is required';
+      return undefined;
+    }
+
+    if (field === 'identityDocNumber') {
+      const type = this.selectedDocType();
+      const num = this.currentDocNumber().trim();
+      if ((isSubmitted || isTouched) && !type) return 'Identity Document Type is required';
+      if ((isSubmitted || isTouched) && !num) return `${this.currentDocConfig().label} is required`;
+      if (num && type) {
+        switch (type) {
+          case 'Aadhaar Card':
+            if (!REGEX.AADHAAR.test(num)) return 'Invalid 12-digit Aadhaar Number';
+            break;
+          case 'PAN Card':
+            if (!REGEX.PAN.test(num.toUpperCase())) return 'Invalid PAN format (e.g. ABCDE1234F)';
+            break;
+          case 'Voter ID Card':
+            if (!REGEX.VOTER_ID.test(num.toUpperCase())) return 'Invalid Voter ID format';
+            break;
+          case 'Jan Aadhaar Card':
+            if (!/^[0-9A-Za-z-]{7,16}$/.test(num)) return 'Invalid Jan Aadhaar Number format';
+            break;
+          case 'Passport':
+            if (!REGEX.PASSPORT.test(num.toUpperCase())) return 'Invalid Passport Number format';
+            break;
+        }
+      }
+      return undefined;
+    }
+
+    if (!isSubmitted) return undefined;
+
+    switch (field) {
+      case 'idProofDoc':
+        if (!d.idProofDoc || d.idProofDoc.status !== 'uploaded') {
+          return 'Identity Document upload is required';
+        }
+        return undefined;
+      case 'authorizationLetterDoc':
+        if (!d.authorizationLetterDoc || d.authorizationLetterDoc.status !== 'uploaded') {
+          return 'Authorization Letter upload is required';
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  }
+
+  update(field: keyof Step3AuthorizedPerson, value: string): void {
+    this.otrFormService.updateStep3({ [field]: value });
+  }
+
+  updateFileDoc(field: 'authorizationLetterDoc' | 'idProofDoc', file: FileDoc | null): void {
+    this.otrFormService.updateStep3({ [field]: file });
+  }
+}

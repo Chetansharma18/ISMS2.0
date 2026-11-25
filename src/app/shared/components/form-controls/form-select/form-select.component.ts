@@ -1,0 +1,491 @@
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  signal,
+  ElementRef,
+  HostListener,
+  ChangeDetectionStrategy,
+  ViewChild,
+  Injector,
+  afterNextRender,
+  inject,
+  OnDestroy
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { IconComponent } from '../../icon/icon.component';
+import { ButtonComponent } from '../../button/button.component';
+import { OverlayService, ConnectedOverlayRef } from '../../../services/overlay.service';
+
+/** One choice of a select: the value it stores and the text it shows. */
+export interface SelectItem {
+  value: string;
+  label: string;
+  disabled?: boolean;
+}
+
+@Component({
+  selector: 'app-form-select',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, FormsModule, IconComponent, ButtonComponent],
+  template: `
+    <div class="w-full flex flex-col relative">
+      <!-- Label Row -->
+      @if (label) {
+        <div class="flex items-center justify-between mb-1 font-sans">
+          <label
+            (click)="onLabelClick($event)"
+            class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1"
+            [class.cursor-default]="disableLabelClick"
+          >
+            <span>{{ label }}</span>
+            @if (required) {
+              <span class="text-rose-600 font-bold ml-0.5">*</span>
+            }
+          </label>
+        </div>
+      }
+
+      <!-- Select Button / Display Box -->
+      <button
+        #trigger
+        [id]="id"
+        type="button"
+        (click)="toggleDropdown()"
+        (blur)="onBlur($event)"
+        [disabled]="disabled"
+        class="w-full h-[35px] flex items-center justify-between px-2.5 text-xs sm:text-[13px] leading-[20px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
+        [class.border-theme]="!error"
+        [class.border-rose-600]="!!error"
+        [class.ring-1]="!!error"
+        [class.ring-rose-600]="!!error"
+        [class.bg-surface-muted]="disabled"
+        [class.cursor-not-allowed]="disabled"
+        [class.focus:border-primary]="!disabled && !error"
+        [class.focus:ring-2]="!disabled && !error"
+        [class.focus:ring-primary-light]="!disabled && !error"
+        aria-haspopup="listbox"
+        [attr.aria-expanded]="isOpen()"
+      >
+        <span [class.text-muted]="!selectedLabel()" [class.text-primary]="!!selectedLabel()" class="truncate">
+          {{ selectedLabel() || placeholder }}
+        </span>
+
+        <div class="flex items-center gap-1 shrink-0 ml-2">
+          @if (clearable && !disabled && (multiple ? selectedValues().length > 0 : !!value)) {
+            <span
+              role="button"
+              tabindex="0"
+              class="text-slate-400 hover:text-slate-600 cursor-pointer p-0.5 rounded transition-colors inline-flex items-center justify-center"
+              (click)="clearSelection($event)"
+              (keydown.enter)="clearSelection($event)"
+              (keydown.space)="clearSelection($event)"
+              title="Clear selection"
+              aria-label="Clear selection"
+            >
+              <app-icon name="close" size="xs" [stroke]="2.5" />
+            </span>
+          }
+
+          <app-icon
+            name="chevron-down"
+            [stroke]="2"
+            class="text-muted transition-transform duration-200"
+            [class.rotate-180]="isOpen()"
+          />
+        </div>
+      </button>
+
+      <!-- Dropdown Popup Menu with Outside-Click Detector -->
+      @if (isOpen()) {
+        <div
+          #panel
+          class="bg-white rounded-[6px] border border-theme shadow-[0_12px_32px_rgba(31,41,51,0.16)] overflow-hidden font-sans"
+          role="listbox"
+        >
+          <!-- Search input for large lists -->
+          @if (shouldShowSearch()) {
+            <div class="p-2 border-b border-theme bg-surface-muted flex items-center gap-2">
+              <div class="relative flex-1 flex items-center">
+                <input
+                  #searchInput
+                  type="text"
+                  [ngModel]="searchQuery()"
+                  (ngModelChange)="searchQuery.set($event)"
+                  placeholder="Search options..."
+                  class="w-full h-[32px] pl-2.5 pr-8 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
+                  (click)="$event.stopPropagation()"
+                />
+                @if (searchQuery()) {
+                  <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
+                    type="button"
+                    class="form-select-search-clear absolute right-1.5 top-1/2 -translate-y-1/2"
+                    style="height: 22px !important; min-height: 22px !important; width: 22px !important; padding: 0 !important; border: none !important; background-color: transparent !important; box-shadow: none !important;"
+                    aria-label="Clear search"
+                    title="Clear search"
+                    (click)="clearSearch($event, searchInput)"
+                  >
+                    <app-icon name="close" size="xs" [stroke]="2" />
+                  </button>
+                }
+              </div>
+              @if (multiple) {
+                <button
+                  appButton
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  class="shrink-0 text-xs whitespace-nowrap"
+                  (click)="toggleSelectAll($event)"
+                >
+                  {{ areAllFilteredSelected() ? 'Clear' : 'Select All' }}
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Options List -->
+          <ul class="max-h-56 overflow-y-auto py-1 divide-y divide-border/40 text-[13px]">
+            @for (opt of filteredEntries(); track opt.value) {
+              <li
+                (click)="toggleOption(opt, $event)"
+                class="px-3 py-2 cursor-pointer transition-colors flex items-center justify-between gap-2.5"
+                [class.bg-primary-light]="isOptionSelected(opt.value)"
+                [class.text-brand]="isOptionSelected(opt.value)"
+                [class.font-medium]="isOptionSelected(opt.value)"
+                [class.hover:bg-surface-muted]="!isOptionSelected(opt.value) && !opt.disabled"
+                [class.text-primary]="!isOptionSelected(opt.value)"
+                [class.opacity-50]="opt.disabled"
+                [class.cursor-not-allowed]="opt.disabled"
+                role="option"
+                [attr.aria-selected]="isOptionSelected(opt.value)"
+                [attr.aria-disabled]="opt.disabled ? true : null"
+              >
+                <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                  @if (multiple) {
+                    <input
+                      type="checkbox"
+                      tabindex="-1"
+                      aria-hidden="true"
+                      class="w-4 h-4 rounded text-navy border-slate-300 accent-navy shrink-0 pointer-events-none"
+                      [checked]="isOptionSelected(opt.value)"
+                      [disabled]="opt.disabled"
+                    />
+                  }
+                  <span class="truncate">{{ opt.label }}</span>
+                </div>
+                @if (!multiple && isOptionSelected(opt.value)) {
+                  <app-icon name="check" [stroke]="2" class="text-brand shrink-0" />
+                }
+              </li>
+            } @empty {
+              <li class="px-3 py-3 text-center text-[12px] text-muted">
+                No results found
+              </li>
+            }
+          </ul>
+
+          <!-- Footer for Multiple Selection -->
+          @if (multiple) {
+            <div class="p-2 border-t border-theme bg-surface-muted flex items-center justify-between text-xs font-sans">
+              <span class="text-slate-600 font-medium">{{ selectedValues().length }} selected</span>
+              <button
+                appButton
+                size="sm"
+                type="button"
+                (click)="isOpen.set(false)"
+              >
+                Done
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Inline Error Message -->
+      @if (error) {
+        <div class="form-error-text text-rose-600 font-medium mt-0.5 flex items-center gap-1 leading-tight animate-fade-in" style="font-size: 11px !important; line-height: 14px !important;">
+          <app-icon name="error" size="xs" [stroke]="2.5" />
+          <span style="font-size: 11px !important; line-height: 14px !important;">{{ error }}</span>
+        </div>
+      }
+
+      <!-- Helper Hint -->
+      @if (!error && hint) {
+        <div class="form-hint-text text-slate-400 mt-0.5 leading-tight" style="font-size: 11px !important; line-height: 14px !important;">
+          {{ hint }}
+        </div>
+      }
+    </div>
+  `,
+  styles: [`
+    .form-error-text {
+      font-size: 11px !important;
+      line-height: 14px !important;
+    }
+    .form-hint-text {
+      font-size: 11px !important;
+      line-height: 14px !important;
+    }
+  `]
+})
+export class FormSelectComponent implements OnDestroy {
+  private static nextId = 0;
+  readonly id = `form-select-${++FormSelectComponent.nextId}`;
+
+  @ViewChild('trigger') triggerElement?: ElementRef<HTMLButtonElement>;
+  @ViewChild('panel') panelElement?: ElementRef<HTMLElement>;
+
+  private overlayService = inject(OverlayService);
+  private injector = inject(Injector);
+  private overlayRef: ConnectedOverlayRef | null = null;
+
+  @Input() label: string = '';
+  @Input() value: string = '';
+  @Input() multiple: boolean = false;
+  @Input() values: string[] = [];
+  /** Plain options: the text is both what is shown and the value. */
+  @Input() options: string[] = [];
+  /** Options whose shown text differs from the value; used instead of `options` when given. */
+  @Input() items?: SelectItem[];
+  @Input() placeholder: string = 'Please select';
+  @Input() required: boolean = false;
+  @Input() disabled: boolean = false;
+  @Input() clearable: boolean = false;
+  @Input() direction: 'down' | 'up' | 'auto' = 'auto';
+  @Input() hint?: string;
+  @Input() error?: string;
+  @Input() disableLabelClick: boolean = false;
+
+  @Output() valueChange = new EventEmitter<string>();
+  @Output() valuesChange = new EventEmitter<string[]>();
+  @Output() blur = new EventEmitter<FocusEvent | void>();
+
+  isOpen = signal<boolean>(false);
+  readonly openDirection = signal<'up' | 'down'>('down');
+  searchQuery = signal<string>('');
+
+  constructor(private elementRef: ElementRef) { }
+
+  /** Every option as value and shown text. */
+  protected entries(): SelectItem[] {
+    return this.items ?? (this.options || []).map(option => ({ value: option, label: option }));
+  }
+
+  shouldShowSearch(): boolean {
+    return this.entries().length > 6;
+  }
+
+  /** Resolved selected values in multiple or single mode. */
+  selectedValues(): string[] {
+    if (this.values && this.values.length > 0) {
+      return this.values;
+    }
+    if (this.value) {
+      return this.value.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  isOptionSelected(val: string): boolean {
+    if (this.multiple) {
+      return this.selectedValues().includes(val);
+    }
+    return this.value === val;
+  }
+
+  /** The shown text of the chosen option(s). */
+  selectedLabel(): string {
+    if (this.multiple) {
+      const list = this.selectedValues();
+      if (list.length === 0) return '';
+      if (list.length <= 2) {
+        return list.join(', ');
+      }
+      return `${list[0]}, ${list[1]} (+${list.length - 2} more)`;
+    }
+    if (!this.value) return '';
+    return this.entries().find(entry => entry.value === this.value)?.label ?? this.value;
+  }
+
+  filteredEntries(): SelectItem[] {
+    const list = this.entries();
+    const q = this.searchQuery().trim().toLowerCase();
+    return q ? list.filter(item => item.label.toLowerCase().includes(q)) : list;
+  }
+
+  toggleDropdown(): void {
+    if (!this.disabled) {
+      const willOpen = !this.isOpen();
+      this.isOpen.set(willOpen);
+      this.searchQuery.set('');
+      if (willOpen) {
+        this.updateDirection();
+        afterNextRender(() => {
+          const panel = this.panelElement?.nativeElement;
+          const trigger = this.triggerElement?.nativeElement;
+          if (panel && trigger) {
+            this.overlayRef = this.overlayService.attachConnectedOverlay(
+              trigger,
+              panel,
+              { preferredMaxHeight: 280, gap: 4 },
+              () => this.closeDropdown()
+            );
+          }
+        }, { injector: this.injector });
+      } else {
+        this.closeDropdown();
+      }
+    }
+  }
+
+  closeDropdown(): void {
+    if (!this.isOpen()) return;
+    this.isOpen.set(false);
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
+    this.blur.emit();
+  }
+
+  ngOnDestroy(): void {
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
+  }
+
+  onLabelClick(event: MouseEvent): void {
+    if (this.disableLabelClick) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  onBlur(event: FocusEvent): void {
+    if (!this.isOpen()) {
+      this.blur.emit(event);
+    }
+  }
+
+  updateDirection(): void {
+    if (this.direction !== 'auto') {
+      this.openDirection.set(this.direction);
+      return;
+    }
+    if (typeof window === 'undefined') {
+      this.openDirection.set('down');
+      return;
+    }
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    this.openDirection.set(spaceBelow < 300 && spaceAbove > spaceBelow ? 'up' : 'down');
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onWindowChange(): void {
+    if (this.isOpen()) {
+      this.updateDirection();
+    }
+  }
+
+  clearSelection(event: Event): void {
+    event.stopPropagation();
+    this.value = '';
+    this.valueChange.emit('');
+    if (this.multiple) {
+      this.values = [];
+      this.valuesChange.emit([]);
+    }
+  }
+
+  clearSearch(event?: Event, searchInput?: HTMLInputElement): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.searchQuery.set('');
+    if (searchInput) {
+      searchInput.focus();
+    }
+  }
+
+  toggleOption(option: SelectItem, event?: MouseEvent): void {
+    if (option.disabled) return;
+    if (event) {
+      event.stopPropagation();
+    }
+
+    if (!this.multiple) {
+      this.value = option.value;
+      this.valueChange.emit(option.value);
+      this.isOpen.set(false);
+      this.blur.emit();
+      return;
+    }
+
+    const current = [...this.selectedValues()];
+    const idx = current.indexOf(option.value);
+    if (idx >= 0) {
+      current.splice(idx, 1);
+    } else {
+      current.push(option.value);
+    }
+
+    this.values = current;
+    this.value = current.join(', ');
+    this.valueChange.emit(this.value);
+    this.valuesChange.emit(current);
+  }
+
+  areAllFilteredSelected(): boolean {
+    const list = this.filteredEntries().filter(e => !e.disabled);
+    if (list.length === 0) return false;
+    const current = this.selectedValues();
+    return list.every(e => current.includes(e.value));
+  }
+
+  toggleSelectAll(event: MouseEvent): void {
+    event.stopPropagation();
+    const list = this.filteredEntries().filter(e => !e.disabled).map(e => e.value);
+    const current = this.selectedValues();
+    const allSelected = list.length > 0 && list.every(v => current.includes(v));
+
+    let updated: string[];
+    if (allSelected) {
+      updated = current.filter(v => !list.includes(v));
+    } else {
+      const set = new Set([...current, ...list]);
+      updated = Array.from(set);
+    }
+
+    this.values = updated;
+    this.value = updated.join(', ');
+    this.valueChange.emit(this.value);
+    this.valuesChange.emit(updated);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+    const inHost = this.elementRef.nativeElement.contains(target);
+    const inPanel = this.panelElement?.nativeElement?.contains(target);
+    if (!inHost && !inPanel) {
+      if (this.isOpen()) {
+        this.closeDropdown();
+      }
+    }
+  }
+}

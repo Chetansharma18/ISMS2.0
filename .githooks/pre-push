@@ -1,0 +1,8 @@
+#!/bin/sh
+# Before a push: UI rules and a full type + template check (about half a minute).
+# Skip once with:  git push --no-verify   (CI runs the same checks and will still fail the pull request).
+node tools/ui-guard.mjs || exit 1
+npx ngc -p tsconfig.app.json --noEmit || {
+  echo "Push blocked: fix the TypeScript / template errors above."
+  exit 1
+}

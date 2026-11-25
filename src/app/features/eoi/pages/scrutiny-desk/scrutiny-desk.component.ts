@@ -1,0 +1,1101 @@
+import { Component, DestroyRef, inject, signal, computed } from '@angular/core';
+import { NgClass } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import {
+  EoiStateService,
+  ApplicantResponse,
+  ApplicantAppeal,
+  DossierDocument,
+  ApplicationActivityLog
+} from '../../services/eoi-state.service';
+import { NotificationService } from '../../../../core/services/notification.service';
+import { formatDateMedium, formatTime } from '../../../../shared/utils';
+import { AuthService } from '../../../../core/auth/auth.service';
+import { ShortfallBridgeService } from '../../services/shortfall-bridge.service';
+import {
+  ButtonComponent,
+  IconComponent,
+  StepperComponent,
+  StepperStep
+} from '../../../../shared';
+import { ScrutinyToolbarComponent } from './components/scrutiny-toolbar.component';
+import { ScrutinyAppealCardComponent } from './components/scrutiny-appeal-card.component';
+import { ScrutinyDocViewerComponent } from './components/scrutiny-doc-viewer.component';
+import { ScrutinyDecisionRecordComponent } from './components/scrutiny-decision-record.component';
+import { ScrutinyReviewSectionsComponent } from './components/scrutiny-review-sections.component';
+import { ScrutinyPastPerformanceComponent } from './components/scrutiny-past-performance.component';
+import { RevertSubmission, ScrutinyRevertModalComponent } from './components/scrutiny-revert-modal.component';
+import { ScrutinyRemarksComponent } from './components/scrutiny-remarks.component';
+import { ScrutinyPdfService } from './scrutiny-pdf.service';
+import {
+  DecisionSubmission,
+  GradeOption,
+  ScrutinyDecisionModalComponent
+} from './components/scrutiny-decision-modal.component';
+import { ActivePreviewDocument } from './scrutiny-desk.util';
+import { DataEngineService } from '../../../../core/services/data-engine.service';
+import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
+
+@Component({
+  selector: 'app-scrutiny-desk',
+  standalone: true,
+  imports: [
+    RouterLink,
+    NgClass,
+    ButtonComponent,
+    IconComponent,
+    StepperComponent,
+    ScrutinyToolbarComponent,
+    ScrutinyAppealCardComponent,
+    ScrutinyDecisionRecordComponent,
+    ScrutinyReviewSectionsComponent,
+    ScrutinyPastPerformanceComponent,
+    ScrutinyRemarksComponent,
+    ScrutinyRevertModalComponent,
+    ScrutinyDecisionModalComponent,
+    ScrutinyDocViewerComponent
+  ],
+  template: `
+    <div class="w-full min-h-screen bg-slate-50/50 text-slate-800 font-sans px-4 sm:px-6 lg:px-8 py-5 space-y-5">
+
+      <app-scrutiny-toolbar
+        [applicant]="applicant()"
+        [isRemarked]="isRemarked()"
+        (remark)="openRemarksModal()"
+      />
+
+      @if (applicant(); as app) {
+        <!-- Main 2-Column Layout matching Image 1 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Left Column: Vertical Stepper Navigation -->
+          <div class="lg:col-span-4 xl:col-span-3">
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5 sticky top-5">
+              <div class="flex items-center justify-between pb-3 mb-2 border-b border-slate-100">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 m-0">Review Sections</h2>
+                <span class="text-[11px] font-semibold text-slate-400 tabular-nums">{{ activeStep() }} / {{ steps().length }}</span>
+              </div>
+              <app-stepper
+                variant="vertical"
+                [steps]="steps()"
+                [currentStep]="activeStep()"
+                (stepClick)="onStepSelect($event)"
+              />
+            </div>
+          </div>
+
+          <!-- Right Column: Content Card corresponding to Active Step -->
+          <div class="lg:col-span-8 xl:col-span-9">
+            <div class="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-5 sm:p-7 min-h-[560px]">
+                <!-- Top Row: Save & Exit + Step Progress -->
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3.5 mb-5">
+                  <a
+                    [routerLink]="['/admin/responses', app.schemeId || 'ALL']"
+                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy transition-colors select-none"
+                    title="Return to applicant submissions list"
+                  >
+                    <app-icon name="back" size="xs" />
+                    <span>Save and Exit to Submissions</span>
+                  </a>
+
+                  <span class="text-xs font-medium text-slate-400 tabular-nums">
+                    Step {{ activeStep() }} of {{ steps().length }}
+                  </span>
+                </div>
+
+                <!-- Section Title & Subtitle (for steps other than overview) -->
+                @if (stepKey() !== 'overview') {
+                  <div class="mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight m-0">
+                      {{ currentStepTitle() }}
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0">
+                      {{ currentStepSubtitle() }}
+                    </p>
+                  </div>
+                }
+
+                <!-- Active Step Content -->
+                @if (stepKey() === 'overview') {
+                  <div class="space-y-6 animate-in fade-in duration-150">
+                    <!-- Applicant Header & Status Badge -->
+                    <div>
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight m-0">
+                          {{ app.anonymousLabel }}
+                        </h2>
+                        <span
+                          class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold border"
+                          [ngClass]="statusBadgeClass(app)"
+                        >
+                          {{ statusLabel(app) }}
+                        </span>
+                      </div>
+                      <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0 font-medium">
+                        Proposal under {{ app.schemeName }}
+                      </p>
+
+                      <!-- Clean Definition List (No nested grey box borders) -->
+                      <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs py-4 my-4 border-y border-slate-100">
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">EOI Reference No.</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums break-all">{{ app.eoiRefNo }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Scheme</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block">{{ app.schemeName }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Registration No.</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums">{{ app.regNumber }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Submitted On</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums">{{ app.submissionDate }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Scrutiny Decision Record (if decided) -->
+                    @if (app.status !== 'UNDER_SCRUTINY' && app.appeal?.status !== 'Pending') {
+                      <app-scrutiny-decision-record [applicant]="app" />
+                    }
+
+                    <!-- Appeal Quick Callout (if appeal exists) -->
+                    @if (app.appeal) {
+                      <div
+                        class="p-4 sm:p-5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        [class.bg-emerald-50/60]="app.appeal.status === 'Accepted'"
+                        [class.border-emerald-200]="app.appeal.status === 'Accepted'"
+                        [class.bg-amber-50/60]="app.appeal.status === 'Pending'"
+                        [class.border-amber-200]="app.appeal.status === 'Pending'"
+                        [class.bg-rose-50/60]="app.appeal.status === 'Rejected'"
+                        [class.border-rose-200]="app.appeal.status === 'Rejected'"
+                      >
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span
+                              class="font-bold text-sm"
+                              [class.text-emerald-950]="app.appeal.status === 'Accepted'"
+                              [class.text-amber-950]="app.appeal.status === 'Pending'"
+                              [class.text-rose-950]="app.appeal.status === 'Rejected'"
+                            >
+                              {{ app.appeal.status === 'Accepted' ? 'Statutory Appeal Approved & Qualified' : (app.appeal.status === 'Rejected' ? 'Statutory Appeal Rejected' : 'Statutory Appeal Pending Committee Review') }}
+                            </span>
+                            <span
+                              class="px-2 py-0.5 rounded text-[11px] font-bold"
+                              [class.bg-emerald-100]="app.appeal.status === 'Accepted'"
+                              [class.text-emerald-800]="app.appeal.status === 'Accepted'"
+                              [class.bg-amber-100]="app.appeal.status === 'Pending'"
+                              [class.text-amber-800]="app.appeal.status === 'Pending'"
+                              [class.bg-rose-100]="app.appeal.status === 'Rejected'"
+                              [class.text-rose-800]="app.appeal.status === 'Rejected'"
+                            >
+                              {{ app.appeal.status === 'Accepted' ? 'Grade A+ (88/100)' : 'Awaiting Review' }}
+                            </span>
+                          </div>
+                          <p class="text-xs text-slate-700 mt-1.5 m-0 leading-relaxed font-normal">
+                            {{ app.appeal.reply || 'Appeal against initial disqualification submitted with verified UDIN documentation.' }}
+                          </p>
+                        </div>
+                        <button
+                          appButton
+                          variant="outline"
+                          size="sm"
+                          type="button"
+                          (click)="onStepSelect(2)"
+                          class="shrink-0"
+                        >
+                          <span>View Appeal History &amp; Logs</span>
+                          <app-icon name="forward" size="xs" />
+                        </button>
+                      </div>
+                    }
+
+                    <!-- Dossier Contents Highlights -->
+                    <div class="space-y-3 pt-2">
+                      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0">Proposal Contents Overview</h3>
+                      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Uploaded Documents</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.uploadedDocuments.length }} Files</span>
+                        </div>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Past Schemes</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.pastEngagements?.length ?? 0 }} Schemes</span>
+                        </div>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Proposed Centres</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.trainingCentres.length }} Centres</span>
+                        </div>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Turnover Records</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.financialYears.length }} FYs</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
+
+                @if (stepKey() === 'appeal' && app.appeal) {
+                  <div class="space-y-4 animate-in fade-in duration-150">
+                    <app-scrutiny-appeal-card
+                      [appeal]="app.appeal"
+                      [applicant]="app"
+                      [rejectionReason]="getRejectionReason(app)"
+                      (accept)="openAcceptAppealModal()"
+                      (reject)="openRejectAppealModal()"
+                      (viewFile)="openOfficialDoc($event)"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'organisation') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="organisation"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'signatory') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="signatory"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'bank') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="bank"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'documents') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-review-sections
+                      [applicant]="app"
+                      activeSection="documents"
+                      [isDownloadingZip]="isDownloadingZip()"
+                      (viewDoc)="openOfficialDoc($event)"
+                      (downloadZip)="downloadAllZip()"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'past_performance') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-past-performance
+                      [engagements]="app.pastEngagements ?? []"
+                      [initiallyOpen]="true"
+                    />
+                  </div>
+                }
+
+                @if (stepKey() === 'remarks') {
+                  <div class="animate-in fade-in duration-150">
+                    <app-scrutiny-remarks
+                      [log]="getActivityLog()"
+                      [initiallyOpen]="true"
+                    />
+                  </div>
+                }
+
+                <!-- Bottom Step Navigation Footer -->
+                <div class="border-t border-slate-100 pt-5 mt-8 flex items-center justify-between gap-3">
+                  <button
+                    appButton
+                    variant="outline"
+                    size="sm"
+                    [disabled]="activeStep() === 1"
+                    (click)="prevStep()"
+                    title="Go to previous review section"
+                  >
+                    <app-icon name="back" size="xs" />
+                    <span>Previous Step</span>
+                  </button>
+
+                  @if (activeStep() < steps().length) {
+                    <button
+                      appButton
+                      variant="primary"
+                      size="sm"
+                      (click)="nextStep()"
+                      title="Proceed to next review section"
+                    >
+                      <span>Next: {{ getNextStepLabel() }}</span>
+                      <app-icon name="forward" size="xs" />
+                    </button>
+                  } @else {
+                    <a
+                      appButton
+                      variant="primary"
+                      size="sm"
+                      [routerLink]="['/admin/responses', app.schemeId || 'ALL']"
+                      title="Finish review and return to submissions list"
+                    >
+                      <app-icon name="check" size="xs" />
+                      <span>Finish Review &amp; Exit</span>
+                    </a>
+                  }
+                </div>
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <!-- Document / PDF viewer modal -->
+    <app-scrutiny-doc-viewer
+      [doc]="activeDoc()"
+      [applicant]="applicant()"
+      (close)="closeDocViewer()"
+      (downloadPdf)="downloadDocPdf()"
+    />
+
+    @if (showRevertModal()) {
+      <app-scrutiny-revert-modal
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [documentOptions]="shortfallDocTitles()"
+        [isAppeal]="!!applicant()?.appeal"
+        (confirmed)="confirmRevert($event)"
+        (close)="closeModals()"
+      />
+    }
+
+    @if (showRemarksModal()) {
+      <app-scrutiny-decision-modal
+        mode="remark"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [initialRemark]="currentRemark()"
+        (confirmed)="confirmAddRemark($event)"
+        (close)="closeModals()"
+      />
+    }
+
+    @if (showRejectModal()) {
+      <app-scrutiny-decision-modal
+        mode="reject"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        (confirmed)="confirmReject($event)"
+        (close)="closeModals()"
+      />
+    }
+
+    @if (showRejectAppealModal()) {
+      <app-scrutiny-decision-modal
+        mode="reject"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        (confirmed)="confirmRejectAppeal($event)"
+        (close)="closeModals()"
+      />
+    }
+
+    @if (showApproveModal()) {
+      <app-scrutiny-decision-modal
+        mode="approve"
+        [applicantLabel]="applicant()?.anonymousLabel ?? ''"
+        [grades]="schemeGrades()"
+        (confirmed)="confirmApprove($event)"
+        (close)="closeModals()"
+      />
+    }
+  `
+})
+export class ScrutinyDeskComponent {
+  private eoiStateService = inject(EoiStateService);
+  private route = inject(ActivatedRoute);
+  private notifications = inject(NotificationService);
+  private pdfService = inject(ScrutinyPdfService);
+  private shortfallBridge = inject(ShortfallBridgeService);
+  private auth = inject(AuthService);
+  private gradingRepo = inject(DataEngineService).for<GradingMasterItem>('GRADING_MASTERS', { idKey: 'id' });
+
+  /** Name recorded against every action and remark, so it is clear who said what. */
+  private reviewerName(): string {
+    // Committee members are shown by a number only (no name or designation). The number is
+    // derived from the signed-in user, so the same user is always the same member.
+    const ssoId = this.auth.currentUser()?.ssoId ?? '';
+    let sum = 0;
+    for (const ch of ssoId) sum += ch.charCodeAt(0);
+    return `Committee Member ${(sum % 5) + 1}`;
+  }
+  private destroyRef = inject(DestroyRef);
+
+  Math = Math;
+
+  applicant = signal<ApplicantResponse | undefined>(undefined);
+  hasRemarkedLocally = signal<boolean>(false);
+  activeStep = signal<number>(1);
+
+  readonly steps = computed<StepperStep[]>(() => {
+    const app = this.applicant();
+    const list: StepperStep[] = [
+      { label: 'Overview', description: 'Application summary & fees' }
+    ];
+    if (app?.appeal) {
+      list.push({ label: 'Appeal Details', description: 'Applicant appeal & proofs' });
+    }
+    list.push(
+      { label: 'Organisation Details', description: 'Entity & statutory credentials' },
+      { label: 'Authorized Person Details', description: 'Signatory identity & contact' },
+      { label: 'Bank Details', description: 'Disbursement account details' },
+      { label: 'Uploaded Documents', description: `${app?.uploadedDocuments?.length ?? 0} proposal files` },
+      { label: 'Past Performance', description: `${app?.pastEngagements?.length ?? 0} scheme engagements` },
+      { label: 'Department Remarks', description: 'Officer notes & audit timeline' }
+    );
+    return list;
+  });
+
+  readonly stepKey = computed<'overview' | 'appeal' | 'organisation' | 'signatory' | 'bank' | 'documents' | 'past_performance' | 'remarks'>(() => {
+    const hasAppeal = !!this.applicant()?.appeal;
+    const s = this.activeStep();
+    if (s === 1) return 'overview';
+    if (hasAppeal) {
+      if (s === 2) return 'appeal';
+      if (s === 3) return 'organisation';
+      if (s === 4) return 'signatory';
+      if (s === 5) return 'bank';
+      if (s === 6) return 'documents';
+      if (s === 7) return 'past_performance';
+      if (s === 8) return 'remarks';
+    } else {
+      if (s === 2) return 'organisation';
+      if (s === 3) return 'signatory';
+      if (s === 4) return 'bank';
+      if (s === 5) return 'documents';
+      if (s === 6) return 'past_performance';
+      if (s === 7) return 'remarks';
+    }
+    return 'overview';
+  });
+
+  readonly currentStepTitle = computed(() => {
+    const steps = this.steps();
+    const idx = this.activeStep() - 1;
+    return steps[idx]?.label ?? 'Overview';
+  });
+
+  readonly currentStepSubtitle = computed(() => {
+    const steps = this.steps();
+    const idx = this.activeStep() - 1;
+    return steps[idx]?.description ?? '';
+  });
+
+  prevStep(): void {
+    if (this.activeStep() > 1) {
+      this.activeStep.update(s => s - 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
+  nextStep(): void {
+    if (this.activeStep() < this.steps().length) {
+      this.activeStep.update(s => s + 1);
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }
+
+  getNextStepLabel(): string {
+    const s = this.activeStep();
+    const steps = this.steps();
+    if (s < steps.length) {
+      return steps[s]?.label ?? 'Next Section';
+    }
+    return 'Finish Review';
+  }
+
+  onStepSelect(stepNumber: number): void {
+    this.activeStep.set(stepNumber);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  readonly currentRemark = computed(() => {
+    const app = this.applicant();
+    if (!app?.activityLog) return '';
+    const remarkLog = [...app.activityLog].reverse().find(act => act.action === 'REMARK_ADDED');
+    return remarkLog?.description || '';
+  });
+
+  readonly isRemarked = computed(() => {
+    if (this.hasRemarkedLocally()) return true;
+    const app = this.applicant();
+    if (!app) return false;
+    return app.activityLog?.some(act => act.action === 'REMARK_ADDED') ?? false;
+  });
+
+  protected statusLabel(app?: ApplicantResponse): string {
+    if (app?.appeal) {
+      if (app.appeal.status === 'Pending') return 'Appeal Pending Review';
+      if (app.appeal.status === 'Accepted') return 'Appeal Approved';
+      if (app.appeal.status === 'Rejected') return 'Appeal Rejected';
+    }
+    switch (app?.status) {
+      case 'APPROVED': return 'Approved';
+      case 'REJECTED': return 'Rejected';
+      case 'REVERTED': return 'Appeal Request';
+      default: return 'Under Review';
+    }
+  }
+
+  protected statusBadgeClass(app?: ApplicantResponse): Record<string, boolean> {
+    return {
+      'bg-emerald-50 text-emerald-800 border-emerald-200': app?.appeal?.status === 'Accepted' || app?.status === 'APPROVED',
+      'bg-amber-50 text-amber-800 border-amber-200': app?.appeal?.status === 'Pending' || ((app?.status === 'UNDER_SCRUTINY' || app?.status === 'REVERTED') && app?.appeal?.status !== 'Accepted'),
+      'bg-rose-50 text-rose-800 border-rose-200': app?.status === 'REJECTED' || app?.appeal?.status === 'Rejected'
+    };
+  }
+
+  // Modal Dialog States
+  showApproveModal = signal<boolean>(false);
+  showRejectModal = signal<boolean>(false);
+  showRevertModal = signal<boolean>(false);
+  showRejectAppealModal = signal<boolean>(false);
+  showRemarksModal = signal<boolean>(false);
+
+  /** Active grades from the Grading Master, highest first. */
+  readonly grades = signal<GradeOption[]>([]);
+
+  /** Grades specifically linked to the applicant's scheme (or general/all schemes). Deduplicated to ensure each grade appears only once. */
+  readonly schemeGrades = computed<GradeOption[]>(() => {
+    const app = this.applicant();
+    const all = this.grades();
+    const deduplicate = (list: GradeOption[]) => {
+      const seen = new Set<string>();
+      return list.filter(g => {
+        const clean = g.grade?.trim();
+        if (!clean || seen.has(clean)) return false;
+        seen.add(clean);
+        return true;
+      });
+    };
+
+    if (!app?.schemeName) return deduplicate(all);
+    const scheme = app.schemeName.toLowerCase().trim();
+    const matched = all.filter(g => {
+      if (!g.schemeName || g.schemeName === 'ALL Schemes' || g.schemeName === 'ALL') return true;
+      const s = g.schemeName.toLowerCase().trim();
+      return s === scheme || scheme.includes(s) || s.includes(scheme);
+    });
+    return deduplicate(matched.length > 0 ? matched : all);
+  });
+
+  // Document Viewer State
+  activeDoc = signal<ActivePreviewDocument | null>(null);
+  isDownloadingZip = signal<boolean>(false);
+
+  // Available TP / OTR documents for the shortfall dropdown
+  readonly availableShortfallDocs = computed(() => {
+    const app = this.applicant();
+    const defaultDocs = [
+      { id: 'DOC_REG', title: 'Organisation Registration Certificate', category: 'OTR' },
+      { id: 'DOC_PAN', title: 'Organisation PAN Card', category: 'OTR' },
+      { id: 'DOC_GST', title: 'GST Registration Certificate', category: 'OTR' },
+      { id: 'DOC_BALANCE', title: 'Audited Balance Sheet / Turnover Certificate', category: 'Proposal' },
+      { id: 'DOC_BOARD', title: 'Board Resolution / Power of Attorney', category: 'Proposal' },
+      { id: 'DOC_NSDC', title: 'NSDC Partner Certificate', category: 'Proposal' },
+      { id: 'DOC_ADDITIONAL', title: 'Additional Supporting Document', category: 'Proposal' },
+      { id: 'DOC_SIGNATORY', title: 'Authorized Signatory Identity Proof (Aadhaar / Voter ID)', category: 'OTR' },
+      { id: 'DOC_BANK', title: 'Bank Account Mandate / Cancelled Cheque', category: 'OTR' },
+      { id: 'DOC_CENTRE', title: 'Training Centre Infrastructure & Equipment Proof', category: 'Proposal' },
+      { id: 'DOC_AFFIDAVIT', title: 'Non-Blacklisting Declaration & Affidavit (Rs. 100 Stamp)', category: 'Statutory' },
+      { id: 'DOC_EMD', title: 'EMD Statutory Deposit Receipt / Challan', category: 'Statutory' }
+    ];
+
+    if (!app?.uploadedDocuments?.length) {
+      return defaultDocs;
+    }
+
+    const uploaded = app.uploadedDocuments.map(d => ({
+      id: d.id,
+      title: d.title,
+      category: d.category || 'Uploaded'
+    }));
+
+    const seen = new Set<string>();
+    const list: { id: string; title: string; category: string }[] = [];
+    for (const doc of [...uploaded, ...defaultDocs]) {
+      const key = doc.title.toLowerCase().trim();
+      if (!seen.has(key)) {
+        seen.add(key);
+        list.push(doc);
+      }
+    }
+    return list;
+  });
+
+  /** Document names offered in the shortfall dropdown. */
+  readonly shortfallDocTitles = computed(() => this.availableShortfallDocs().map(d => d.title));
+
+  constructor() {
+    // Grades offered when approving come from the Grading Master (active grades only).
+    this.gradingRepo
+      .getAll()
+      .pipe(takeUntilDestroyed())
+      .subscribe(items =>
+        this.grades.set(
+          items
+            .filter(item => item.status !== 'Inactive')
+            .sort((a, b) => b.maximum - a.maximum)
+            .map(({ grade, minimum, maximum, range, schemeName }) => ({ grade, minimum, maximum, range, schemeName }))
+        )
+      );
+
+    this.route.params.pipe(takeUntilDestroyed()).subscribe(params => {
+      const appId = params['applicationId'];
+      if (appId) {
+        this.loadApplicant(appId);
+      }
+    });
+  }
+
+  protected getRejectionReason(app: ApplicantResponse): string {
+    if (app.status === 'APPROVED') {
+      return app.scrutinyDetails?.remarks || 'Application proposal approved by the scrutiny committee.';
+    }
+    const disqualification = app.scrutinyDetails?.disqualificationReason;
+    if (disqualification && disqualification !== app.appeal?.reply) {
+      return disqualification;
+    }
+    const remarks = app.scrutinyDetails?.remarks;
+    if (remarks && remarks !== app.appeal?.reply) {
+      return remarks;
+    }
+    const isCompany4 = app.id.includes('4') || app.anonymousLabel.includes('4');
+    return isCompany4
+      ? 'Annual turnover criteria not met for last 3 financial years (CA certificate missing valid UDIN).'
+      : 'Technical qualification criteria not met (CA turnover certificate missing valid UDIN).';
+  }
+
+  loadApplicant(appId: string): void {
+    this.hasRemarkedLocally.set(false);
+    this.activeStep.set(1);
+    this.eoiStateService.getResponseById(appId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
+      if (data) {
+        this.shortfallBridge.syncFromTenderIfNeeded(data).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(synced => {
+          this.applicant.set(synced);
+        });
+      } else {
+        this.applicant.set(undefined);
+      }
+    });
+  }
+
+  // --- Activity History Timeline Stream ---
+  getActivityLog(): ApplicationActivityLog[] {
+    const app = this.applicant();
+    if (app?.activityLog && app.activityLog.length > 0) {
+      return app.activityLog;
+    }
+
+    const subDate = app?.submissionDate || '08/09/2026 14:30 PM';
+    const initial: ApplicationActivityLog[] = [
+      {
+        id: 'ACT-1',
+        timestamp: subDate,
+        action: 'SUBMITTED',
+        title: 'EOI Proposal Submitted & Statutory Fee Paid',
+        actor: `${app?.authorizedSignatory?.name || 'Applicant'} (${app?.authorizedSignatory?.designation || 'Authorized Signatory'})`,
+        actorRole: 'Applicant / TP',
+        description: `Complete proposal submitted under ${app?.schemeName || 'MMKVY'}. EMD Fee (₹${app?.emdFee?.toLocaleString() || '50,000'}) and Processing Fee (₹${app?.processingFee?.toLocaleString() || '2,000'}) successfully deposited via e-Challan. 7 Supporting documents uploaded.`,
+        badgeClass: 'bg-blue-50 text-blue-800 border-blue-200'
+      },
+      {
+        id: 'ACT-2',
+        timestamp: '09/09/2026 10:15 AM',
+        action: 'UNDER_REVIEW',
+        title: 'Application Assigned to Scrutiny Desk',
+        actor: 'Scrutiny Desk',
+        actorRole: 'Department Scrutiny Officer',
+        description: 'Proposal dossier marked for Stage-1 technical eligibility scrutiny, statutory OTR document validation, and training infrastructure review.',
+        badgeClass: 'bg-amber-50 text-amber-800 border-amber-200'
+      }
+    ];
+
+    if (app?.status === 'REVERTED' && app.scrutinyDetails?.shortfall) {
+      const isAppeal = !!app.appeal;
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '10/09/2026 11:30 AM',
+        action: 'REVERTED',
+        title: isAppeal ? 'Appeal Accepted' : 'Appeal Clarification Requested (Reverted to Applicant)',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Department Scrutiny Officer',
+        description: isAppeal
+          ? `Appeal accepted. Response time: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`
+          : `Clarification request issued for ${app.scrutinyDetails.shortfall.documents.length} document(s).${app.scrutinyDetails.shortfall.officeOrderRef ? ` Office Order Ref: ${app.scrutinyDetails.shortfall.officeOrderRef}.` : ''} Rectification window: ${app.scrutinyDetails.shortfall.deadlineDays} Days. Remarks: "${app.scrutinyDetails.remarks}"`,
+        badgeClass: isAppeal ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
+        meta: {
+          documents: app.scrutinyDetails.shortfall.documents,
+          officeOrderRef: app.scrutinyDetails.shortfall.officeOrderRef,
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    } else if (app?.status === 'APPROVED' && app.scrutinyDetails) {
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '11/09/2026 16:45 PM',
+        action: 'APPROVED',
+        title: 'Application Approved & Empanelled',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Empanelment Committee',
+        description: `Technical Evaluation Score awarded: ${app.scrutinyDetails.technicalScore}/100 (${app.scrutinyDetails.grade}). Empanelment recommendation: "${app.scrutinyDetails.remarks}"`,
+        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+        meta: {
+          score: app.scrutinyDetails.technicalScore,
+          grade: app.scrutinyDetails.grade,
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    } else if (app?.status === 'REJECTED' && app.scrutinyDetails) {
+      initial.push({
+        id: 'ACT-3',
+        timestamp: app.scrutinyDetails.decisionTimestamp || '11/09/2026 15:20 PM',
+        action: 'REJECTED',
+        title: 'Application Disqualified & Rejected',
+        actor: app.scrutinyDetails.scrutinyOfficer || 'Committee Member 1',
+        actorRole: 'Department Scrutiny Officer',
+        description: `Application disqualified. Reason: "${app.scrutinyDetails.remarks}". Statutory EMD refund initiated.`,
+        badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+        meta: {
+          remarks: app.scrutinyDetails.remarks
+        }
+      });
+    }
+
+    return initial;
+  }
+
+  // --- Modal Openers ---
+  openApproveModal(): void {
+    this.showApproveModal.set(true);
+  }
+
+  openRejectModal(): void {
+    this.showRejectModal.set(true);
+  }
+
+  openAcceptAppealModal(): void {
+    this.openApproveModal();
+  }
+
+  openRejectAppealModal(): void {
+    this.showRejectAppealModal.set(true);
+  }
+
+  openRevertModal(): void {
+    this.showRevertModal.set(true);
+  }
+
+  openRemarksModal(): void {
+    this.showRemarksModal.set(true);
+  }
+
+  closeModals(): void {
+    this.showApproveModal.set(false);
+    this.showRejectModal.set(false);
+    this.showRevertModal.set(false);
+    this.showRejectAppealModal.set(false);
+    this.showRemarksModal.set(false);
+  }
+
+  // --- Actions ---
+  /** Approves the application with the score and grade chosen by the committee member. */
+  confirmApprove(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    if (!app) return;
+
+    const grade = submission.grade ?? '';
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'APPROVED',
+      title: 'Application Approved',
+      actor: this.reviewerName(),
+      actorRole: 'Empanelment Committee',
+      description: `Approved with grade ${grade}.`,
+      badgeClass: 'bg-sky-50 text-navy border-sky-200',
+      meta: {
+        grade,
+        remarks: submission.remark || undefined
+      }
+    };
+
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Accepted',
+      decidedAt: nowStr
+    } : undefined;
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'APPROVED',
+      scrutinyOfficer: this.reviewerName(),
+      grade,
+      remarks: submission.remark,
+      appeal: updatedAppeal,
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'APPROVED', submission.remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    this.closeModals();
+    this.notifications.success(`${app.anonymousLabel} has been approved (grade ${grade}).`, 'Application Approved');
+    this.loadApplicant(app.id);
+  }
+
+  /** Rejects the application. The remark is mandatory. */
+  confirmReject(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    if (!app || !submission.remark) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REJECTED',
+      title: 'Application Rejected',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: 'Application rejected.',
+      badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+      meta: {
+        remarks: submission.remark
+      }
+    };
+
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Rejected',
+      decidedAt: nowStr,
+      decisionRemarks: submission.remark
+    } : undefined;
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'REJECTED',
+      scrutinyOfficer: this.reviewerName(),
+      technicalScore: 0,
+      remarks: submission.remark,
+      disqualificationReason: submission.remark,
+      appeal: updatedAppeal,
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    this.shortfallBridge.syncStatusToTender(app.id, 'REJECTED', submission.remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    this.closeModals();
+    this.notifications.success(`${app.anonymousLabel} has been rejected.`, 'Application Rejected');
+    this.loadApplicant(app.id);
+  }
+
+
+  /** Raises the shortfall: returns the application to the applicant with the documents asked for. */
+  confirmRevert(submission: RevertSubmission): void {
+    const app = this.applicant();
+    if (!app) return;
+
+    const now = new Date();
+    const raisedOnWithTime = `${formatDateMedium(now, '-')}, ${formatTime(now)}`;
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const isAppealFlow = !!app.appeal;
+    const dueDays = isAppealFlow ? 7 : submission.dueDays;
+    const due = new Date(now);
+    due.setDate(due.getDate() + dueDays);
+
+    const title = isAppealFlow ? 'Appeal Accepted' : 'Appeal Clarification Requested';
+    const actionDesc = isAppealFlow
+      ? `Appeal accepted. Response time: ${dueDays} days.`
+      : `Clarification requested for ${submission.documents.length} document(s). Response time: ${dueDays} days.`;
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REVERTED',
+      title,
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: actionDesc,
+      badgeClass: isAppealFlow ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200',
+      meta: {
+        documents: submission.documents,
+        remarks: submission.comment
+      }
+    };
+
+    const updatedAppeal: ApplicantAppeal | undefined = app.appeal ? {
+      ...app.appeal,
+      status: 'Accepted',
+      decidedAt: raisedOnWithTime,
+      decisionRemarks: submission.comment
+    } : undefined;
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'REVERTED',
+      scrutinyOfficer: this.reviewerName(),
+      technicalScore: 0,
+      grade: 'Grade E',
+      remarks: submission.comment,
+      appeal: updatedAppeal,
+      shortfall: {
+        documents: submission.documents,
+        deadlineDays: dueDays,
+        revertedAt: now.toLocaleDateString('en-GB')
+      },
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    // Show the shortfall, with the files shared by the department, on the applicant's Tender Status page.
+    this.shortfallBridge
+      .raiseNotice(app.id, {
+        raisedOn: raisedOnWithTime,
+        raisedBy: 'Department',
+        dueDate: formatDateMedium(due, '-'),
+        remarks: submission.comment,
+        requiredDocs: submission.documents,
+        sharedDocs: submission.sharedFiles
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+
+    this.closeModals();
+    const successMsg = isAppealFlow
+      ? 'Appeal accepted and clarification request sent to applicant.'
+      : 'Clarification request sent to the applicant.';
+    this.notifications.success(successMsg, isAppealFlow ? 'Appeal Accepted' : 'Clarification Requested');
+    this.loadApplicant(app.id);
+  }
+
+  /** Rejects the applicant's appeal against a rejection. */
+  confirmRejectAppeal(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    if (!app) return;
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const remark = submission.remark.trim() || 'Appeal criteria not met.';
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REJECTED',
+      title: 'Appeal Rejected',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: `Applicant's appeal rejected. Reason: "${remark}".`,
+      badgeClass: 'bg-rose-50 text-rose-800 border-rose-200',
+      meta: { remarks: remark }
+    };
+
+    const updatedAppeal: ApplicantAppeal = {
+      ...(app.appeal || { submittedOn: nowStr, reply: '', files: [] }),
+      status: 'Rejected',
+      decisionRemarks: remark,
+      decidedAt: nowStr
+    };
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: 'REJECTED',
+      scrutinyOfficer: this.reviewerName(),
+      remarks: remark,
+      appeal: updatedAppeal,
+      activityLog: [...this.getActivityLog(), newActivity]
+    });
+
+    this.shortfallBridge.rejectAppealNotice(app.id, remark).pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+
+    this.closeModals();
+    this.notifications.info('Applicant appeal has been rejected.', 'Appeal Rejected');
+    this.loadApplicant(app.id);
+  }
+
+  /** Records a remark against the signed-in committee member. It reaches the Scheme OIC automatically. */
+  confirmAddRemark(submission: DecisionSubmission): void {
+    const app = this.applicant();
+    const remark = submission.remark.trim();
+    if (!app || !remark) return;
+
+    this.hasRemarkedLocally.set(true);
+
+    const now = new Date();
+    const nowStr = now.toLocaleDateString('en-GB') + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const newActivity: ApplicationActivityLog = {
+      id: `ACT-${Date.now()}`,
+      timestamp: nowStr,
+      action: 'REMARK_ADDED',
+      title: 'Remark added',
+      actor: this.reviewerName(),
+      actorRole: 'Department Scrutiny Officer',
+      description: remark,
+      badgeClass: 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]',
+      meta: {
+        remarks: remark
+      }
+    };
+
+    this.eoiStateService.updateScrutinyDecision(app.id, {
+      status: app.status,
+      technicalScore: app.scrutinyDetails?.technicalScore || 0,
+      grade: app.scrutinyDetails?.grade,
+      remarks: remark,
+      shortfall: app.scrutinyDetails?.shortfall,
+      activityLog: [...this.getActivityLog(), newActivity],
+      scrutinyOfficer: app.scrutinyDetails?.scrutinyOfficer ?? this.reviewerName()
+    });
+
+    this.closeModals();
+    this.notifications.success('Your remark has been recorded.', 'Remark Added');
+    this.loadApplicant(app.id);
+  }
+
+
+  /** Opens the Document / PDF Viewer for a dossier document directly in another tab in Chrome. */
+  openOfficialDoc(doc?: { title?: string; fileName?: string } | DossierDocument): void {
+    window.open(encodeURI('/document/ISMS RFP.pdf'), '_blank');
+  }
+
+  closeDocViewer(): void {
+    this.activeDoc.set(null);
+  }
+
+  /** Generates and downloads the official PDF for the document in the viewer. */
+  downloadDocPdf(): void {
+    const doc = this.activeDoc();
+    if (!doc) return;
+    this.pdfService.downloadDocPdf(doc, this.applicant());
+  }
+
+  /** Generates and downloads all verified proposal documents in a ZIP file. */
+  async downloadAllZip(): Promise<void> {
+    const app = this.applicant();
+    const docs = app?.uploadedDocuments;
+    if (!app || !docs || docs.length === 0) return;
+
+    this.isDownloadingZip.set(true);
+    try {
+      await this.pdfService.downloadAllZip(app, docs);
+    } catch (err) {
+      console.error('Error generating zip:', err);
+    } finally {
+      this.isDownloadingZip.set(false);
+    }
+  }
+}

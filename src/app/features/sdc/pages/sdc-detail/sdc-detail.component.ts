@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { SdcTimelineComponent } from '../../components/sdc-timeline/sdc-timeline.component';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { PermissionService } from '../../../../core/permissions/permission.service';
 
 @Component({
   selector: 'app-sdc-detail',
@@ -23,7 +23,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
           </div>
         </div>
         
-        <div class="flex gap-2" *ngIf="sdc.status === 'PENDING_APPROVAL' && authService.hasRole(['DEPARTMENT_ADMIN', 'APPROVAL_AUTHORITY'])">
+        <div class="flex gap-2" *ngIf="sdc.status === 'PENDING_APPROVAL' && permissions.hasRole(['dept_admin', 'super_admin'])">
           <button (click)="takeAction('REJECT')" class="px-4 py-2 bg-white border border-red-200 text-red-600 rounded-lg text-sm font-bold hover:bg-red-50 transition">Reject</button>
           <button (click)="takeAction('RETURN')" class="px-4 py-2 bg-white border border-amber-200 text-amber-600 rounded-lg text-sm font-bold hover:bg-amber-50 transition">Return to TP</button>
           <button (click)="takeAction('APPROVE')" class="px-4 py-2 bg-approve-700 text-white rounded-lg text-sm font-bold hover:bg-green-800 transition shadow-sm">Approve SDC</button>
@@ -73,7 +73,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 
           <!-- Inspection Tab -->
           <div *ngIf="activeTab === 'inspection'">
-            <div *ngIf="sdc.status === 'PENDING_INSPECTION' && authService.hasRole('INSPECTOR')" class="bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <div *ngIf="sdc.status === 'PENDING_INSPECTION' && permissions.hasPermission('scrutinize_eoi')" class="bg-blue-50 border border-blue-200 rounded-lg p-5">
               <h3 class="font-bold text-rsldc-navy mb-2">Pending Inspection</h3>
               <p class="text-sm text-slate-600 mb-4">Please submit your inspection report with findings and recommendations.</p>
               <button (click)="completeInspection()" class="bg-rsldc-navy text-white px-4 py-2 rounded-lg text-sm font-bold">Complete Inspection</button>
@@ -137,7 +137,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
                 </div>
                 
                 <!-- Course Admin Actions -->
-                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-2" *ngIf="sdc.status === 'PENDING_APPROVAL' && authService.hasRole(['DEPARTMENT_ADMIN', 'APPROVAL_AUTHORITY'])">
+                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end gap-2" *ngIf="sdc.status === 'PENDING_APPROVAL' && permissions.hasRole(['dept_admin', 'super_admin'])">
                    <button class="px-3 py-1.5 bg-white border border-red-200 text-red-600 rounded text-xs font-bold hover:bg-red-50 transition">
                      Reject Course
                    </button>
@@ -201,7 +201,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
   `
 })
 export class SdcDetailComponent {
-  authService = inject(AuthService);
+  permissions = inject(PermissionService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 

@@ -1,0 +1,96 @@
+/* =========================================================
+   ISMS 2.0 PUBLIC LANDING PAGE STYLES
+   Scoped exclusively for Landing Page to prevent conflicts
+   with internal portal pages, forms, and tables.
+   ========================================================= */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* 1. Flagship Hero Banner Typography */
+:host ::ng-deep .landing-hero-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: #ffffff !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+@media (min-width: 640px) {
+  :host ::ng-deep .landing-hero-title {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :host ::ng-deep .landing-hero-title {
+    font-size: 3.75rem;
+  }
+}
+
+/* Hero Description: Crisp, pure high-contrast white text */
+:host ::ng-deep .landing-hero-desc {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.75;
+  color: #ffffff !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  max-width: 44rem;
+  opacity: 0.98;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+@media (min-width: 640px) {
+  :host ::ng-deep .landing-hero-desc {
+    font-size: 1.1875rem;
+    line-height: 1.8;
+  }
+}
+
+@media (min-width: 1024px) {
+  :host ::ng-deep .landing-hero-desc {
+    font-size: 1.275rem;
+  }
+}
+
+/* 2. Public Section Titles (About, Services, etc.) */
+:host ::ng-deep .landing-section-title {
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: #0b3558;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+@media (min-width: 640px) {
+  :host ::ng-deep .landing-section-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :host ::ng-deep .landing-section-title {
+    font-size: 2.75rem;
+  }
+}
+
+/* 3. Section Body Text (Comfortable, increased readable size & justified) */
+:host ::ng-deep .landing-body-text {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.85;
+  color: #334155;
+  font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+@media (min-width: 640px) {
+  :host ::ng-deep .landing-body-text {
+    font-size: 1.1875rem;
+    line-height: 1.9;
+  }
+}

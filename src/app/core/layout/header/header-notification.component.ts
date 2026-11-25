@@ -1,0 +1,189 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  HostListener,
+  inject,
+  signal
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
+import { PortalNotificationService } from '../../services/portal-notification.service';
+import { PortalNotification } from '../../models/portal-notification.model';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { IconComponent } from '../../../shared/components/icon/icon.component';
+
+@Component({
+  selector: 'app-header-notification',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, RouterModule, ClickOutsideDirective, ButtonComponent, IconComponent],
+  host: {
+    class: 'relative block'
+  },
+  template: `
+    <div class="relative inline-block text-left" (appClickOutside)="closeDropdown()">
+      <!-- Notification Bell Trigger -->
+      <button
+        appButton
+        iconOnly
+        [variant]="isOpen() ? 'secondary' : 'outline'"
+        type="button"
+        id="portal-notification-bell-btn"
+        (click)="toggleDropdown()"
+        class="relative"
+        [attr.aria-expanded]="isOpen()"
+        aria-haspopup="true"
+        aria-label="Notifications"
+        [title]="unreadCount() > 0 ? (unreadCount() + ' unread notifications') : 'Notifications'"
+      >
+        <!-- Bell Icon -->
+        <app-icon name="bell" size="auto" [stroke]="2" class="w-4 h-4 sm:w-[18px] sm:h-[18px]" />
+
+        <!-- Unread Count Badge -->
+        @if (unreadCount() > 0) {
+          <span
+            class="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[17px] h-[17px] px-1 text-[9.5px] font-bold text-white bg-[#EA580C] rounded-full shadow-xs ring-2 ring-white"
+            aria-hidden="true"
+          >
+            {{ unreadCount() > 9 ? '9+' : unreadCount() }}
+
+            @if (hasNewArrivals()) {
+              <span class="absolute inset-0 rounded-full bg-[#EA580C] animate-ping opacity-70"></span>
+            }
+          </span>
+        }
+      </button>
+
+      <!-- Dropdown Popover -->
+      @if (isOpen()) {
+        <div
+          class="absolute right-0 sm:right-0 top-full mt-2 w-[320px] xs:w-[360px] sm:w-[380px] max-w-[calc(100vw-24px)] bg-white border border-[#EADCE2] rounded-xl shadow-xl z-[120] overflow-hidden flex flex-col font-sans animate-in fade-in zoom-in-95 duration-150"
+          role="dialog"
+          aria-label="Notifications"
+        >
+          <!-- Header: Simple title and Mark all read -->
+          <div class="px-4 py-3 bg-[#FCF8FA] border-b border-[#EADCE2] flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs sm:text-sm font-bold text-[#7C0E44]">Notifications</span>
+              @if (unreadCount() > 0) {
+                <span class="text-[10px] font-bold px-1.5 py-0.2 bg-[#EA580C]/15 text-[#C2410C] rounded-full">
+                  {{ unreadCount() }} New
+                </span>
+              }
+            </div>
+
+            @if (unreadCount() > 0) {
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                type="button"
+                (click)="markAllAsRead()"
+              >
+                Mark all read
+              </button>
+            }
+          </div>
+
+          <!-- Notification Items List -->
+          <div class="max-h-[360px] overflow-y-auto divide-y divide-[#EADCE2] overscroll-contain">
+            @for (item of notifications(); track item.id) {
+              <div
+                (click)="onItemClick(item)"
+                class="p-3.5 transition-colors cursor-pointer flex items-start gap-3 border-l-[3px]"
+                [ngClass]="!item.isRead 
+                  ? 'bg-[#FAF2F5] hover:bg-[#F8EDF1] border-l-[#7C0E44]' 
+                  : 'bg-white hover:bg-slate-50 border-l-transparent'"
+              >
+                <!-- Unread status dot -->
+                <div class="pt-1 shrink-0">
+                  @if (!item.isRead) {
+                    <span class="block w-2 h-2 rounded-full bg-[#EA580C]"></span>
+                  } @else {
+                    <span class="block w-2 h-2 rounded-full bg-slate-300"></span>
+                  }
+                </div>
+
+                <!-- Main Content -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-baseline justify-between gap-2">
+                    <h4
+                      class="text-xs leading-snug m-0 truncate"
+                      [ngClass]="!item.isRead ? 'font-bold text-[#7C0E44]' : 'font-medium text-[#25212A]'"
+                    >
+                      {{ item.title }}
+                    </h4>
+                    <span class="text-[10px] text-slate-400 shrink-0 whitespace-nowrap">
+                      {{ item.timeAgo }}
+                    </span>
+                  </div>
+
+                  <p class="text-[11.5px] text-slate-600 mt-1 leading-relaxed m-0">
+                    {{ item.message }}
+                  </p>
+                </div>
+              </div>
+            } @empty {
+              <div class="py-8 px-4 text-center">
+                <p class="text-xs text-slate-500 m-0">No notifications at the moment.</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  `
+})
+export class HeaderNotificationComponent {
+  private notificationService = inject(PortalNotificationService);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  readonly isOpen = signal<boolean>(false);
+
+  readonly notifications = this.notificationService.notifications;
+  readonly unreadCount = this.notificationService.unreadCount;
+  readonly hasNewArrivals = this.notificationService.hasNewArrivals;
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.isOpen.set(false);
+      });
+  }
+
+  @HostListener('keydown.escape')
+  onEscape(): void {
+    if (this.isOpen()) {
+      this.closeDropdown();
+    }
+  }
+
+  toggleDropdown(): void {
+    this.isOpen.update(v => !v);
+  }
+
+  closeDropdown(): void {
+    this.isOpen.set(false);
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead();
+  }
+
+  onItemClick(item: PortalNotification): void {
+    this.notificationService.markAsRead(item.id);
+    this.closeDropdown();
+    if (item.route) {
+      this.router.navigateByUrl(item.route);
+    }
+  }
+}

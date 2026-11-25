@@ -28,6 +28,39 @@ export type { DocMasterItem };
 export const DOC_MASTER_STORAGE_KEY = 'DOC_MASTER_ITEMS';
 export const INITIAL_DOC_ITEMS: DocMasterItem[] = MOCK_DOC_MASTER_ITEMS;
 
+export const DOC_TYPE_OPTIONS: string[] = [
+  'Statutory & Legal',
+  'Financial Documents',
+  'Technical & Infrastructure',
+  'Past Experience & Track Record',
+  'Affidavit & Undertaking',
+  'Organization & Signatory',
+  'Accreditation & Affiliation',
+  'Other / General Document'
+];
+
+export const FORMAT_OPTIONS: string[] = [
+  'PDF',
+  'JPG',
+  'JPEG',
+  'PNG',
+  'DOC',
+  'DOCX',
+  'XLS',
+  'XLSX'
+];
+
+export const SIZE_OPTIONS: string[] = [
+  '1 MB',
+  '2 MB',
+  '5 MB',
+  '10 MB',
+  '15 MB',
+  '20 MB',
+  '25 MB',
+  '50 MB'
+];
+
 const SCHEME_OPTIONS: string[] = [
   'Vishwakarma Yuva Udyami Protsahan Yojana',
   'Mukhyamantri Yuva Swarojgar Yojana (2026)',
@@ -40,23 +73,32 @@ const SCHEME_OPTIONS: string[] = [
 
 const COLUMNS: TableColumn<DocMasterItem>[] = [
   { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-  { key: 'docName', label: 'Document Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[220px]' },
-  { key: 'schemes', label: 'Applicable Schemes', type: 'custom', cellClass: 'text-slate-700 min-w-[150px]' }
+  { key: 'docName', label: 'Document Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[200px]' },
+  { key: 'docType', label: 'Document Type', type: 'custom', cellClass: 'text-slate-700 min-w-[140px]' },
+  { key: 'allowedFormats', label: 'Allowed Formats', type: 'custom', cellClass: 'min-w-[150px]' },
+  { key: 'maxSizeMb', label: 'Size Limit', type: 'custom', align: 'center', cellClass: 'text-center whitespace-nowrap min-w-[95px]' },
+  { key: 'schemes', label: 'Applicable Schemes', type: 'custom', cellClass: 'text-slate-700 min-w-[130px]' }
 ];
 
 const CONFIG: MasterCrudConfig<DocMasterItem> = {
   dataKey: 'DOC_MASTERS',
   entityLabel: 'Document',
   title: 'Doc Master',
-  searchPlaceholder: 'Search by document name or scheme...',
-  searchFields: ['docName', 'schemes'],
+  searchPlaceholder: 'Search by document name, type, format or scheme...',
+  searchFields: ['docName', 'docType', 'schemes', 'allowedFormats'],
   itemUnit: 'documents',
   columns: COLUMNS,
   hasStatus: true,
   hideViewAction: true,
-  tagsColumns: ['schemes'],
-  modalWidthClass: 'max-w-[560px]',
+  tagsColumns: ['schemes', 'allowedFormats'],
+  modalWidthClass: 'max-w-[640px]',
   filters: [
+    {
+      key: 'docType',
+      label: 'Document Type',
+      placeholder: 'All Document Types',
+      options: DOC_TYPE_OPTIONS
+    },
     {
       key: 'schemes',
       label: 'Scheme',
@@ -75,6 +117,33 @@ const CONFIG: MasterCrudConfig<DocMasterItem> = {
       colSpan: 3
     },
     {
+      key: 'docType',
+      label: 'Document Type / Category',
+      type: 'select',
+      required: true,
+      options: DOC_TYPE_OPTIONS,
+      placeholder: 'Select Document Type',
+      colSpan: 1
+    },
+    {
+      key: 'allowedFormats',
+      label: 'Allowed Formats',
+      type: 'multiselect',
+      required: true,
+      options: FORMAT_OPTIONS,
+      placeholder: 'Select Formats',
+      colSpan: 1
+    },
+    {
+      key: 'maxSizeMb',
+      label: 'Max File Size Limit',
+      type: 'select',
+      required: true,
+      options: SIZE_OPTIONS,
+      placeholder: 'Select Size Limit',
+      colSpan: 1
+    },
+    {
       key: 'schemes',
       label: 'Applicable Schemes',
       type: 'multiselect',
@@ -82,15 +151,34 @@ const CONFIG: MasterCrudConfig<DocMasterItem> = {
       options: SCHEME_OPTIONS,
       placeholder: 'Select Applicable Schemes',
       colSpan: 3
+    },
+    {
+      key: 'description',
+      label: 'Upload Guidelines / Description',
+      type: 'textarea',
+      rows: 2,
+      maxLength: 300,
+      placeholder: 'Optional upload instructions or specifications for applicants...',
+      colSpan: 3
     }
   ],
   createDefaults: () => ({
     docName: '',
-    schemes: []
+    docType: 'Statutory & Legal',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    schemes: [],
+    description: ''
   }),
   buildPayload: (formData) => ({
     docName: (formData.docName || '').trim(),
+    docType: formData.docType || 'Statutory & Legal',
+    allowedFormats: Array.isArray(formData.allowedFormats) && formData.allowedFormats.length > 0
+      ? formData.allowedFormats
+      : ['PDF'],
+    maxSizeMb: formData.maxSizeMb || '5 MB',
     schemes: Array.isArray(formData.schemes) ? formData.schemes : [],
+    description: (formData.description || '').trim(),
     status: 'Active'
   }),
   deleteConfirmText: (item) => `Are you sure you want to delete document "${item.docName}"?`
@@ -104,6 +192,34 @@ const CONFIG: MasterCrudConfig<DocMasterItem> = {
   template: `
     <app-master-crud-page [config]="config" [extraTemplates]="extraTemplates">
     </app-master-crud-page>
+
+    <!-- Document Type Pill Template -->
+    <ng-template #docTypeTemplate let-item>
+      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200 whitespace-nowrap">
+        {{ item.docType || 'Statutory & Legal' }}
+      </span>
+    </ng-template>
+
+    <!-- Allowed Formats Badges Template -->
+    <ng-template #formatsTemplate let-item>
+      <div class="flex flex-wrap items-center gap-1">
+        @for (fmt of item.allowedFormats || ['PDF']; track fmt) {
+          <span
+            class="inline-flex items-center px-1.5 py-0.5 rounded text-[10.5px] font-semibold border select-none"
+            [ngClass]="getFormatBadgeClass(fmt)"
+          >
+            {{ fmt }}
+          </span>
+        }
+      </div>
+    </ng-template>
+
+    <!-- File Size Limit Badge Template -->
+    <ng-template #sizeTemplate let-item>
+      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-800 border border-slate-200 whitespace-nowrap">
+        {{ formatSize(item.maxSizeMb) }}
+      </span>
+    </ng-template>
 
     <!-- Compact Interactive Schemes Count Pill Template -->
     <ng-template #schemesTemplate let-item>
@@ -133,6 +249,9 @@ const CONFIG: MasterCrudConfig<DocMasterItem> = {
 })
 export class DocMasterComponent {
   @ViewChild('schemesTemplate', { static: true }) schemesTemplate!: TemplateRef<unknown>;
+  @ViewChild('docTypeTemplate', { static: true }) docTypeTemplate!: TemplateRef<unknown>;
+  @ViewChild('formatsTemplate', { static: true }) formatsTemplate!: TemplateRef<unknown>;
+  @ViewChild('sizeTemplate', { static: true }) sizeTemplate!: TemplateRef<unknown>;
   @ViewChild(MasterCrudPageComponent) masterCrud?: MasterCrudPageComponent<DocMasterItem>;
 
   private dataEngine?: DataEngineService;
@@ -156,7 +275,29 @@ export class DocMasterComponent {
   readonly selectedTargetItem = signal<MasterItemTarget | null>(null);
 
   get extraTemplates(): Record<string, TemplateRef<unknown>> {
-    return { schemes: this.schemesTemplate };
+    return {
+      schemes: this.schemesTemplate,
+      docType: this.docTypeTemplate,
+      allowedFormats: this.formatsTemplate,
+      maxSizeMb: this.sizeTemplate
+    };
+  }
+
+  getFormatBadgeClass(fmt: string): string {
+    const upper = (fmt || '').toUpperCase().trim();
+    if (upper === 'PDF') return 'bg-rose-50 text-rose-700 border-rose-200';
+    if (upper.includes('JPG') || upper.includes('JPEG') || upper.includes('PNG')) {
+      return 'bg-amber-50 text-amber-700 border-amber-200';
+    }
+    if (upper.includes('DOC')) return 'bg-blue-50 text-blue-700 border-blue-200';
+    if (upper.includes('XLS')) return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    return 'bg-slate-50 text-slate-700 border-slate-200';
+  }
+
+  formatSize(size: string | number | undefined): string {
+    if (!size) return '5 MB';
+    if (typeof size === 'number') return `${size} MB`;
+    return String(size).includes('MB') ? String(size) : `${size} MB`;
   }
 
   openAssociatedSchemes(item: DocMasterItem, event: MouseEvent): void {

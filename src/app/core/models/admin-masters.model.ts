@@ -100,6 +100,10 @@ export interface DocMasterItem {
   id: string;
   sNo?: number;
   docName: string;
+  docType?: string;
+  allowedFormats?: string[];
+  maxSizeMb?: string | number;
+  description?: string;
   schemes: string[];
   documents?: string;
   schemeName?: string;

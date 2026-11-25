@@ -500,6 +500,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 1,
     id: 'doc-1',
     docName: 'Company PAN Card',
+    docType: 'Statutory & Legal',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Clear scanned copy of Organization PAN card with authorized stamp.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)',
@@ -513,6 +517,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 2,
     id: 'doc-2',
     docName: 'GST Registration Certificate',
+    docType: 'Statutory & Legal',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Valid GSTIN certificate issued by Goods & Services Tax Department.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Sambal Yojana',
@@ -525,6 +533,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 3,
     id: 'doc-3',
     docName: 'Certificate of Incorporation / Registration',
+    docType: 'Statutory & Legal',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Certificate of incorporation under Companies Act or Trust/Society registration deed.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)',
@@ -536,6 +548,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 4,
     id: 'doc-4',
     docName: 'MSME / Udyam Registration Certificate',
+    docType: 'Statutory & Legal',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Udyam registration certificate issued by Ministry of MSME.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)'
@@ -546,6 +562,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 5,
     id: 'doc-5',
     docName: 'Audited Financial Statements',
+    docType: 'Financial Documents',
+    allowedFormats: ['PDF'],
+    maxSizeMb: '25 MB',
+    description: 'Audited balance sheet and profit & loss statements for the last 3 financial years.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)'
@@ -556,6 +576,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 6,
     id: 'doc-6',
     docName: 'CA-Certified Turnover Certificate',
+    docType: 'Financial Documents',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '10 MB',
+    description: 'Chartered Accountant certified turnover certificate bearing a valid UDIN.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)'
@@ -566,6 +590,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 7,
     id: 'doc-7',
     docName: 'Affidavit for not being blacklisted by any Govt. / PSU',
+    docType: 'Affidavit & Undertaking',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Notarized affidavit on non-judicial stamp paper affirming non-blacklisting.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)',
@@ -579,6 +607,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 8,
     id: 'doc-8',
     docName: 'Authorized Person / Signatory Details',
+    docType: 'Organization & Signatory',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Board resolution or power of attorney authorizing the signatory.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Sambal Yojana'
@@ -589,6 +621,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 9,
     id: 'doc-9',
     docName: 'Details of Officer In-Charge (OIC)',
+    docType: 'Organization & Signatory',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Designation letter and statutory identity proof of the Officer In-Charge.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana'
     ],
@@ -598,6 +634,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 10,
     id: 'doc-10',
     docName: 'Bank Account Details with Cancelled Cheque',
+    docType: 'Financial Documents',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Bank passbook copy or cancelled cheque showing verified IFSC code and account details.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)',
@@ -610,6 +650,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 11,
     id: 'doc-11',
     docName: 'Training Centre Infrastructure Details',
+    docType: 'Technical & Infrastructure',
+    allowedFormats: ['PDF', 'JPG', 'PNG', 'DOCX'],
+    maxSizeMb: '15 MB',
+    description: 'Layout diagrams, classroom carpet area, laboratory and biometric setup photos.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhya Mantri Yuva Kaushal Yojana'
@@ -620,6 +664,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 12,
     id: 'doc-12',
     docName: 'Placement & Training Track Record',
+    docType: 'Past Experience & Track Record',
+    allowedFormats: ['PDF', 'XLSX'],
+    maxSizeMb: '10 MB',
+    description: 'Past candidates trained and certified placement track records with employer details.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhya Mantri Yuva Kaushal Yojana'
@@ -630,6 +678,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 13,
     id: 'doc-13',
     docName: 'NSDC Partnership Certificate',
+    docType: 'Accreditation & Affiliation',
+    allowedFormats: ['PDF', 'JPG', 'PNG'],
+    maxSizeMb: '5 MB',
+    description: 'Official NSDC partnership agreement or Sector Skill Council (SSC) affiliation certificate.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana'
     ],
@@ -639,6 +691,10 @@ export const MOCK_DOC_MASTER_ITEMS: DocMasterItem[] = resolveMock([
     sNo: 14,
     id: 'doc-14',
     docName: 'EOI Document with Sign & Seal on each page',
+    docType: 'Other / General Document',
+    allowedFormats: ['PDF'],
+    maxSizeMb: '25 MB',
+    description: 'Complete downloaded Expression of Interest RFP with authorized signature and seal on each page.',
     schemes: [
       'Vishwakarma Yuva Udyami Protsahan Yojana',
       'Mukhyamantri Yuva Swarojgar Yojana (2026)',

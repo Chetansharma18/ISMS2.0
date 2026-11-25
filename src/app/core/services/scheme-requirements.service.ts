@@ -128,12 +128,22 @@ export class SchemeRequirementsService {
             modified = true;
             continue;
           }
-          if (m.masterItemName !== found.docName || m.masterItemId !== found.id || m.status !== found.status) {
+          const foundSize = typeof found.maxSizeMb === 'number' ? found.maxSizeMb : parseInt(String(found.maxSizeMb || '5').replace(/\D/g, ''), 10) || 5;
+          if (
+            m.masterItemName !== found.docName ||
+            m.masterItemId !== found.id ||
+            m.status !== found.status ||
+            (found.docType && m.category !== found.docType) ||
+            (found.maxSizeMb && m.maxSizeMb !== foundSize)
+          ) {
             modified = true;
             updated.push({
               ...m,
               masterItemId: found.id,
               masterItemName: found.docName,
+              category: found.docType || m.category,
+              maxSizeMb: foundSize,
+              acceptedFormats: found.allowedFormats || m.acceptedFormats || ['PDF', 'JPEG', 'PNG'],
               status: found.status || 'Active'
             });
             continue;
@@ -191,12 +201,12 @@ export class SchemeRequirementsService {
             masterItemId: d.id,
             masterItemCode: `DOC-${d.id.toUpperCase()}`,
             masterItemName: d.docName,
-            category: 'Compliance & Verification',
+            category: d.docType || 'Compliance & Verification',
             isMandatory: true,
             applicantCategory: 'ALL',
             displayOrder: updated.length + 1,
-            maxSizeMb: 25,
-            acceptedFormats: ['PDF', 'JPEG', 'PNG'],
+            maxSizeMb: typeof d.maxSizeMb === 'number' ? d.maxSizeMb : parseInt(String(d.maxSizeMb || '5').replace(/\D/g, ''), 10) || 5,
+            acceptedFormats: d.allowedFormats || ['PDF', 'JPEG', 'PNG'],
             status: 'Active',
             createdAt: Date.now(),
             updatedAt: Date.now()

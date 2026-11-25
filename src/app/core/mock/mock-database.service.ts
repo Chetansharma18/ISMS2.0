@@ -194,15 +194,22 @@ export class MockDatabaseService {
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
           } else {
-            const storedIds = new Set(stored.map((it: any) => String(it.id)));
+            const seedMap = new Map((this.seeds[key] || []).map((s: any) => [String(s.id), s]));
+            const upgraded = stored.map((it: any) => {
+              const seed = seedMap.get(String(it.id));
+              return {
+                ...it,
+                docType: it.docType || seed?.docType || 'Statutory & Legal',
+                allowedFormats: it.allowedFormats || seed?.allowedFormats || ['PDF', 'JPG', 'PNG'],
+                maxSizeMb: it.maxSizeMb || seed?.maxSizeMb || '5 MB',
+                description: it.description || seed?.description || ''
+              };
+            });
+            const storedIds = new Set(upgraded.map((it: any) => String(it.id)));
             const missingSeeds = this.seeds[key].filter(s => !storedIds.has(String(s.id)));
-            if (missingSeeds.length > 0) {
-              const merged = [...stored, ...this.deepClone(missingSeeds)];
-              this.store.set(key, merged);
-              this.saveToStorage(key, merged);
-            } else {
-              this.store.set(key, stored);
-            }
+            const merged = missingSeeds.length > 0 ? [...upgraded, ...this.deepClone(missingSeeds)] : upgraded;
+            this.store.set(key, merged);
+            this.saveToStorage(key, merged);
           }
         } else if (key === 'ANNEXURE_MASTERS') {
           const hasOldSchema = !stored || stored.length === 0 || stored.some((item: any) => !item?.annexureName || !Array.isArray(item?.schemes));

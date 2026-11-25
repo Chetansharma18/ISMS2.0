@@ -5,7 +5,14 @@ import { IpaPdfService } from '../eoi/pages/ipa-editor/ipa-pdf.service';
 import { IpaAllocationService } from '../sdc/services/ipa-allocation.service';
 import type { TpIpa } from './tp-ipa.model';
 import { TpIpaService } from './tp-ipa.service';
-import { ButtonComponent, IconComponent, ListPageComponent, TableColumn } from '../../shared';
+import {
+  ButtonComponent,
+  IconComponent,
+  ListPageComponent,
+  MasterFilterBarComponent,
+  MasterFilterConfig,
+  TableColumn
+} from '../../shared';
 
 /** One In-Principal Approval of the training partner. */
 interface IpaRow {
@@ -37,19 +44,29 @@ interface IpaRow {
   selector: 'app-ipa-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ListPageComponent, ButtonComponent, IconComponent],
+  imports: [ListPageComponent, ButtonComponent, IconComponent, MasterFilterBarComponent],
   template: `
     <app-list-page
       title="In-Principal Approval (IPA)"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'In-Principal Approval (IPA)' }]"
-      searchPlaceholder="Search IPA, Scheme, District, Sector..."
-      [(searchQuery)]="searchQuery"
+      [searchable]="false"
       [columns]="columns"
       [data]="rows()"
       itemUnit="IPAs"
       emptyMessage="No IPA has been released yet."
       [customTemplates]="{ schemeTitle: schemeTemplate, action: actionTemplate }"
-    />
+    >
+      <!-- Filter Bar with Search & Dropdowns -->
+      <app-master-filter-bar
+        beforeTable
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search IPA, Scheme, District, Sector..."
+        [showStatusFilter]="false"
+        [filters]="ipaFilters()"
+        [(filterValues)]="filterValues"
+        (resetFilters)="resetFilters()"
+      />
+    </app-list-page>
 
     <ng-template #schemeTemplate let-row>
       <div class="font-normal text-slate-800 text-[13px] leading-snug">{{ row.schemeTitle }}</div>
@@ -57,17 +74,25 @@ interface IpaRow {
     </ng-template>
 
     <ng-template #actionTemplate let-row>
-      <div class="flex items-center justify-center gap-2">
-        <button appButton variant="outline" size="sm" (click)="viewIpa(row)" title="Open the IPA">
+      <div class="flex items-center justify-center gap-1 sm:gap-1.5">
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          (click)="viewIpa(row)"
+          title="Open the IPA"
+          aria-label="View IPA"
+        >
           <app-icon name="eye" size="sm" />
-          <span>View</span>
         </button>
+        <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
         <button
           appButton
           size="sm"
           [disabled]="row.full"
           (click)="newSdc(row)"
-          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register the new SDC for this IPA'"
+          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register SDC'"
         >
           New SDC
         </button>
@@ -83,19 +108,131 @@ export class IpaListComponent {
   private tpIpaService = inject(TpIpaService);
 
   searchQuery = signal('');
+  readonly filterValues = signal<Record<string, string>>({});
+
+  readonly allIpaRows = computed<IpaRow[]>(() => {
+    return this.tpIpaService.ipas().flatMap(source => this.toRow(source));
+  });
+
+  readonly schemeTitleOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allIpaRows()) {
+      if (r.schemeTitle) set.add(r.schemeTitle);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly categoryOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allIpaRows()) {
+      if (r.category && r.category !== '-') set.add(r.category);
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly districtOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allIpaRows()) {
+      if (r.district) {
+        r.district.split(',').map(d => d.trim()).filter(Boolean).forEach(d => set.add(d));
+      }
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly sectorOptions = computed<string[]>(() => {
+    const set = new Set<string>();
+    for (const r of this.allIpaRows()) {
+      if (r.sector) {
+        r.sector.split(',').map(s => s.trim()).filter(Boolean).forEach(s => set.add(s));
+      }
+    }
+    return Array.from(set).sort();
+  });
+
+  readonly ipaFilters = computed<MasterFilterConfig[]>(() => [
+    {
+      key: 'schemeTitle',
+      label: 'Scheme Name',
+      options: () => this.schemeTitleOptions(),
+      placeholder: 'All Scheme Names'
+    },
+    {
+      key: 'category',
+      label: 'Scheme Category',
+      options: () => this.categoryOptions(),
+      placeholder: 'All Scheme Categories'
+    },
+    {
+      key: 'district',
+      label: 'IPA District(s)',
+      options: () => this.districtOptions(),
+      placeholder: 'All Districts'
+    },
+    {
+      key: 'sector',
+      label: 'IPA Sector(s)',
+      options: () => this.sectorOptions(),
+      placeholder: 'All Sectors'
+    }
+  ]);
+
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.filterValues.set({});
+  }
 
   readonly rows = computed<IpaRow[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    return this.tpIpaService.ipas().flatMap(source => this.toRow(source)).filter(
-      row =>
-        !query ||
-        row.ipaNo.toLowerCase().includes(query) ||
-        row.schemeTitle.toLowerCase().includes(query) ||
-        row.refNo.toLowerCase().includes(query) ||
-        row.category.toLowerCase().includes(query) ||
-        row.district.toLowerCase().includes(query) ||
-        row.sector.toLowerCase().includes(query)
-    );
+    const fv = this.filterValues();
+    const selectedScheme = (fv['schemeTitle'] || '').trim();
+    const selectedCategory = (fv['category'] || '').trim();
+    const selectedDistrict = (fv['district'] || '').trim();
+    const selectedSector = (fv['sector'] || '').trim();
+
+    return this.allIpaRows().filter(row => {
+      // 1. Full-text search
+      if (query) {
+        const matchesQuery =
+          row.ipaNo.toLowerCase().includes(query) ||
+          row.schemeTitle.toLowerCase().includes(query) ||
+          row.refNo.toLowerCase().includes(query) ||
+          row.category.toLowerCase().includes(query) ||
+          row.district.toLowerCase().includes(query) ||
+          row.sector.toLowerCase().includes(query);
+        if (!matchesQuery) return false;
+      }
+
+      // 2. Scheme Name filter
+      if (selectedScheme && selectedScheme !== 'ALL') {
+        if (row.schemeTitle !== selectedScheme && !row.schemeTitle.toLowerCase().includes(selectedScheme.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Scheme Category filter
+      if (selectedCategory && selectedCategory !== 'ALL') {
+        if (row.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 4. District filter
+      if (selectedDistrict && selectedDistrict !== 'ALL') {
+        if (!row.district.toLowerCase().includes(selectedDistrict.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 5. Sector filter
+      if (selectedSector && selectedSector !== 'ALL') {
+        if (!row.sector.toLowerCase().includes(selectedSector.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   });
 
   readonly columns: TableColumn<IpaRow>[] = [

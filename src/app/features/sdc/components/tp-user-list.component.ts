@@ -95,18 +95,48 @@ import { TpUserViewModalComponent } from './tp-user-view-modal.component';
       </ng-template>
 
       <ng-template #actionsTemplate let-u>
-        <div class="flex items-center justify-center gap-2 py-2 px-1 whitespace-nowrap">
-          <button appButton variant="outline" size="sm" class="w-24 shrink-0" type="button" (click)="viewing.set(u)" title="View the details of this user">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 py-1 whitespace-nowrap">
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="viewing.set(u)"
+            title="View Details"
+            aria-label="View Details"
+          >
             <app-icon name="eye" size="sm" />
-            <span>View</span>
           </button>
-          <button appButton variant="outline" size="sm" class="w-24 shrink-0" type="button" (click)="edit(u)" [title]="editTitle(u)">
+
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="edit(u)"
+            [title]="editTitle(u)"
+            aria-label="Edit"
+          >
             <app-icon name="edit" size="sm" />
-            <span>Edit</span>
           </button>
-          <button appButton variant="danger" size="sm" class="w-24 shrink-0" type="button" (click)="unmapping.set(u)" title="Take this user off what they are assigned to">
-            <app-icon name="close" size="sm" />
-            <span>Unmap</span>
+
+          <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="unmapping.set(u)"
+            title="Unmap User"
+            aria-label="Unmap User"
+          >
+            <app-icon name="close" size="sm" class="text-rose-600" />
           </button>
         </div>
       </ng-template>
@@ -142,7 +172,7 @@ import { TpUserViewModalComponent } from './tp-user-view-modal.component';
       [closeOnBackdrop]="false"
       maxWidthClass="max-w-lg"
       primaryLabel="Unmap"
-      secondaryLabel="Cancel"
+      secondaryLabel=""
       (primaryAction)="confirmUnmap()"
       (secondaryAction)="unmapping.set(null)"
       (close)="unmapping.set(null)"
@@ -198,7 +228,7 @@ export class TpUserListComponent {
     { key: 'designation', label: 'Designation', type: 'custom', width: 'min-w-[200px]' },
     { key: 'assignment', label: 'Assigned To', type: 'custom', width: 'min-w-[240px]' },
     { key: 'assignedOn', label: 'Assigned On', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px]', width: 'w-32' },
-    { key: 'actions', label: 'Actions', type: 'custom', align: 'center', width: 'min-w-[340px]' }
+    { key: 'actions', label: 'Actions', type: 'custom', align: 'center', width: 'w-36 min-w-[130px]' }
   ];
 
   private readonly users = computed(() => buildTpUsers(this.sdcs.sdcs(), this.batches.batches(), id => this.sso.find(id)));

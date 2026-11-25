@@ -65,9 +65,7 @@ import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../
       <!-- Template: Attached file & size -->
       <ng-template #fileTemplate let-doc>
         <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded bg-blue-50 border border-blue-200 text-blue-700 font-bold text-[9px] flex items-center justify-center shrink-0">
-            {{ getDocExtension(doc.fileName) }}
-          </span>
+          <app-icon name="pdf-badge" solid size="auto" class="w-5 h-5 text-[#E5252A] select-none shrink-0" />
           <div class="min-w-0">
             <span class="tabular-nums text-xs text-slate-800 block truncate max-w-[200px]" [title]="doc.fileName">
               {{ doc.fileName || 'No file attached' }}

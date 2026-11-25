@@ -10,9 +10,9 @@ function createComponent(): CommitteeAssignmentModalComponent {
 }
 
 const mockAdmins: CommitteeAdmin[] = [
-  { id: 'adm-1', name: 'Ramesh Suresh', ssoId: 'SSO_01', role: 'Super Admin' },
-  { id: 'adm-2', name: 'Ram Shyaam', ssoId: 'SSO_02', role: 'Super Admin' },
-  { id: 'adm-3', name: 'Siddesh', ssoId: 'SSO_03', role: 'Scheme OC' }
+  { id: 'SSO_01', name: 'Committee Member 1', ssoId: 'SSO_01', role: 'Super Admin' },
+  { id: 'SSO_02', name: 'Committee Member 2', ssoId: 'SSO_02', role: 'Super Admin' },
+  { id: 'SSO_03', name: 'Scheme OIC', ssoId: 'SSO_03', role: 'Scheme OC' }
 ];
 
 const mockScheme: SchemeTender = {
@@ -24,8 +24,8 @@ const mockScheme: SchemeTender = {
   closingDate: '31/12/2026',
   eoiCategory: 'General',
   eoiDescription: 'Test scheme',
-  committeeApprover: 'Ramesh Suresh',
-  committeeMembers: ['Ram Shyaam', 'Siddesh']
+  committeeApprover: 'SSO_01',
+  committeeMembers: ['SSO_02', 'SSO_03']
 };
 
 describe('CommitteeAssignmentModalComponent', () => {
@@ -43,9 +43,9 @@ describe('CommitteeAssignmentModalComponent', () => {
 
     expect(comp.filteredApproverAdmins().length).toBe(3);
 
-    comp.approverSearchQuery.set('ramesh');
+    comp.approverSearchQuery.set('member 1');
     expect(comp.filteredApproverAdmins().length).toBe(1);
-    expect(comp.filteredApproverAdmins()[0].name).toBe('Ramesh Suresh');
+    expect(comp.filteredApproverAdmins()[0].name).toBe('Committee Member 1');
 
     comp.approverSearchQuery.set('Super Admin');
     expect(comp.filteredApproverAdmins().length).toBe(2);
@@ -60,9 +60,9 @@ describe('CommitteeAssignmentModalComponent', () => {
 
     expect(comp.filteredMemberAdmins().length).toBe(3);
 
-    comp.memberSearchQuery.set('siddesh');
+    comp.memberSearchQuery.set('oic');
     expect(comp.filteredMemberAdmins().length).toBe(1);
-    expect(comp.filteredMemberAdmins()[0].name).toBe('Siddesh');
+    expect(comp.filteredMemberAdmins()[0].name).toBe('Scheme OIC');
   });
 
   it('allows selecting only 1 approver at a time and clearing it', () => {
@@ -72,13 +72,15 @@ describe('CommitteeAssignmentModalComponent', () => {
     comp.toggleApproverDropdown();
     expect(comp.isApproverDropdownOpen()).toBe(true);
 
-    comp.selectApprover('Ramesh Suresh');
-    expect(comp.selectedApprover()).toBe('Ramesh Suresh');
+    comp.selectApprover('SSO_01');
+    expect(comp.selectedApprover()).toBe('SSO_01');
+    expect(comp.nameOf('SSO_01')).toBe('Committee Member 1');
+    expect(comp.nameOf('UNKNOWN')).toBe('UNKNOWN');
     expect(comp.isApproverDropdownOpen()).toBe(false);
 
     // Selecting a different approver overwrites the previous one
-    comp.selectApprover('Ram Shyaam');
-    expect(comp.selectedApprover()).toBe('Ram Shyaam');
+    comp.selectApprover('SSO_02');
+    expect(comp.selectedApprover()).toBe('SSO_02');
 
     comp.clearApprover();
     expect(comp.selectedApprover()).toBe('');
@@ -88,20 +90,20 @@ describe('CommitteeAssignmentModalComponent', () => {
     const comp = createComponent();
     (comp as any).admins = () => mockAdmins;
 
-    expect(comp.isMemberSelected('Ram Shyaam')).toBe(false);
+    expect(comp.isMemberSelected('SSO_02')).toBe(false);
 
-    comp.toggleMemberSelection('Ram Shyaam');
-    expect(comp.isMemberSelected('Ram Shyaam')).toBe(true);
-    expect(comp.selectedAdminIds()).toEqual(['Ram Shyaam']);
+    comp.toggleMemberSelection('SSO_02');
+    expect(comp.isMemberSelected('SSO_02')).toBe(true);
+    expect(comp.selectedAdminIds()).toEqual(['SSO_02']);
 
-    comp.toggleMemberSelection('Siddesh');
-    expect(comp.selectedAdminIds()).toEqual(['Ram Shyaam', 'Siddesh']);
+    comp.toggleMemberSelection('SSO_03');
+    expect(comp.selectedAdminIds()).toEqual(['SSO_02', 'SSO_03']);
 
     // Toggling again removes the member
-    comp.toggleMemberSelection('Ram Shyaam');
-    expect(comp.selectedAdminIds()).toEqual(['Siddesh']);
+    comp.toggleMemberSelection('SSO_02');
+    expect(comp.selectedAdminIds()).toEqual(['SSO_03']);
 
-    comp.removeAdminSelection('Siddesh');
+    comp.removeAdminSelection('SSO_03');
     expect(comp.selectedAdminIds()).toEqual([]);
   });
 
@@ -112,13 +114,27 @@ describe('CommitteeAssignmentModalComponent', () => {
       emittedPayload = val;
     });
 
-    comp.selectedApprover.set('Ramesh Suresh');
-    comp.selectedAdminIds.set(['Ram Shyaam', 'Siddesh']);
+    comp.selectedApprover.set('SSO_01');
+    comp.selectedAdminIds.set(['SSO_02', 'SSO_03']);
     comp.onSave();
 
     expect(emittedPayload).toEqual({
-      approver: 'Ramesh Suresh',
-      members: ['Ram Shyaam', 'Siddesh']
+      approver: 'SSO_01',
+      members: ['SSO_02', 'SSO_03']
     });
+  });
+
+  it('displays validation error and blocks emission when Save Committee is clicked with blank fields', () => {
+    const comp = createComponent();
+    let emitted = false;
+    comp.save.subscribe(() => {
+      emitted = true;
+    });
+
+    comp.onSave();
+
+    expect(emitted).toBe(false);
+    expect(comp.submitted()).toBe(true);
+    expect(comp.errorMessage()).toContain('Please select an Approver');
   });
 });

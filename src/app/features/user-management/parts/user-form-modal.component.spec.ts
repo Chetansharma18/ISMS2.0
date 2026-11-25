@@ -101,4 +101,40 @@ describe('UserFormModalComponent', () => {
     expect(comp.activeDesignationOptions()).toContain('Special Consultant');
     expect(comp.activeDesignationOptions()).toContain('Managing Director');
   });
+
+  it('enforces numeric-only input and limits on mobileNo and aadhaarId', () => {
+    const { comp } = createComponent();
+
+    // Keydown numeric filter test
+    let prevented = false;
+    const digitEvent = { key: '5', preventDefault: () => { prevented = true; } } as any;
+    comp.filterNumericKey(digitEvent);
+    expect(prevented).toBe(false);
+
+    let alphaPrevented = false;
+    const alphaEvent = { key: 'A', preventDefault: () => { alphaPrevented = true; } } as any;
+    comp.filterNumericKey(alphaEvent);
+    expect(alphaPrevented).toBe(true);
+
+    let backspacePrevented = false;
+    const backspaceEvent = { key: 'Backspace', preventDefault: () => { backspacePrevented = true; } } as any;
+    comp.filterNumericKey(backspaceEvent);
+    expect(backspacePrevented).toBe(false);
+
+    // Mobile input sanitization (10 digits max, numeric only)
+    const mockMobileInput = { value: '98765abc4321099' } as HTMLInputElement;
+    comp.onMobileInput({ target: mockMobileInput } as any);
+    expect(mockMobileInput.value).toBe('9876543210');
+    expect(comp.formData().mobileNo).toBe('9876543210');
+
+    // Aadhaar input sanitization (12 digits max, numeric only)
+    const mockAadhaarInput = { value: '1234abcd5678efgh9012345' } as HTMLInputElement;
+    comp.onAadhaarInput({ target: mockAadhaarInput } as any);
+    expect(mockAadhaarInput.value).toBe('123456789012');
+    expect(comp.formData().aadhaarId).toBe('123456789012');
+
+    // Date of Birth max attribute
+    const today = new Date().toISOString().split('T')[0];
+    expect(comp.maxDateOfBirth).toBe(today);
+  });
 });

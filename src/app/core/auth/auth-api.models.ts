@@ -19,8 +19,28 @@ export interface BackendUser {
 /** Second-factor methods the backend accepts. */
 export type TwoStepMethod = 'OTP' | 'PIN';
 
+/** Whether one second-factor method is allowed for the role and already set up for the user. */
+export interface TwoStepMethodStatus {
+  allowed: boolean;
+  isSet: boolean;
+  /** "Configured", "Not configured", or the masked mobile number. */
+  details?: string;
+}
+
+/** `twoStepStatus` of a 2FA challenge: only the methods the role allows are present. */
+export interface TwoStepStatus {
+  pin?: TwoStepMethodStatus;
+  mobile?: TwoStepMethodStatus;
+  authApp?: TwoStepMethodStatus;
+}
+
 /** Response of verify-login-token, select-role and two-step/verify (fields shared by all three). */
 export interface LoginStepResponse {
+  /** 2FA challenge: which allowed methods the user has set up. */
+  twoStepStatus?: TwoStepStatus | null;
+  /** 2FA challenge where no allowed method is set up yet: lets the user set one up before signing in (15 min). */
+  setupToken?: string | null;
+  setupExpiresAt?: string | null;
   verified?: boolean;
   success?: boolean;
   requiresRoleSelection?: boolean;
@@ -32,12 +52,23 @@ export interface LoginStepResponse {
   /** Only for mobile clients; web sessions use HttpOnly cookies. */
   accessToken?: string | null;
   token?: string | null;
+  /**
+   * switch-role: the backend has ended the current session (access / refresh cookies cleared) and issued this fresh
+   * one-time login token, scoped to the new role (web also gets it as the login_callback_token cookie). It is exchanged
+   * with verify-login-token, exactly like after RajSSO, so the user does not go back to RajSSO.
+   */
+  loginCallbackToken?: string | null;
 }
 
-/** Response of GET /auth/me. */
+/** Response of GET /auth/me. Scoped to the role chosen at sign-in: `roles` holds only that role. */
 export interface CurrentUserResponse extends BackendUser {
   roles?: string[];
   permissions?: string[];
+  /** The role the session was opened with (from the token's `selected_role_id`). */
+  selectedRoleId?: number | null;
+  selectedRole?: BackendRoleSummary | null;
+  /** All active roles of the user, for "Switch Role" (requested from the backend; used when present). */
+  availableRoles?: BackendRoleSummary[] | null;
 }
 
 /** Response of POST /auth/logout. */

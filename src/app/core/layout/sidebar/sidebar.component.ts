@@ -16,12 +16,18 @@ import {
   EOI_CONFIGURATION_NAV,
   EXACT_MATCH,
   EXISTING_USER_NAV,
+  HELP_SUPPORT_NAV,
   MASTER_ICON,
   MASTER_NAV,
+  NavItem,
   NEW_USER_NAV,
+  PRIVACY_POLICY_NAV,
+  PROFILE_NAV,
+  TERMS_AND_CONDITIONS_NAV,
   USER_MANAGEMENT_ICON,
   USER_MANAGEMENT_NAV
 } from './sidebar-nav.config';
+import { TableAccessService } from '../../permissions/table-access.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -34,36 +40,113 @@ import {
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col justify-between select-none overflow-y-auto font-sans w-57 max-w-full"
+      class="relative shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col select-none overflow-hidden font-sans w-57 max-w-full"
       style="background: linear-gradient(180deg, #5E0832 0%, #7C0E44 50%, #4A0626 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
-      <!-- Top: Brand + Nav -->
-      <div class="flex flex-col">
-        
-        <!-- Mobile Sidebar Close Header (Visible only < md) -->
-        <div class="md:hidden flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10">
-          <div class="flex items-center gap-2">
-            <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
-            <span class="text-[11px] text-white/70 font-medium">Menu</span>
-          </div>
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            iconOnly
-            (click)="closeMobileNav.emit()"
-            aria-label="Close navigation menu"
-            title="Close menu"
-          >
-            <app-icon name="close" />
-          </button>
+      <!-- Mobile Sidebar Close Header (Visible only < md) -->
+      <div class="md:hidden shrink-0 flex items-center justify-between px-3.5 py-3 border-b border-white/10 bg-black/10 z-20">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm text-white">ISMS <span class="text-[#F2DACE]">2.0</span></span>
+          <span class="text-[11px] text-white/70 font-medium">Menu</span>
         </div>
+        <button
+          appButton
+          variant="ghost"
+          size="sm"
+          iconOnly
+          (click)="closeMobileNav.emit()"
+          aria-label="Close navigation menu"
+          title="Close menu"
+        >
+          <app-icon name="close" />
+        </button>
+      </div>
 
+      <!-- Scrollable Nav Container: menu scrolls smoothly behind the fixed bottom fort -->
+      <div class="flex-1 min-h-0 overflow-y-auto flex flex-col relative z-0">
         <!-- Navigation Links -->
-        <nav class="flex flex-col gap-1 px-2.5 py-3" aria-label="Main Navigation">
-          @if (isAspirant()) {
+        <!-- pb-32: room under the last link for the fort image (120px) fixed over the bottom of the scroll area,
+             so every link can be scrolled above it -->
+        <nav class="flex flex-col gap-1 px-2.5 pt-3 pb-32" aria-label="Main Navigation">
+          @if (activeContextItem(); as contextItem) {
+            <!-- Help & Support / legal pages: the sidebar shows only that page's link -->
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: contextItem }" />
+          } @else if (permissionDriven()) {
+            <!-- Real sign-in: links come from GET /auth/permissions, grouped by the backend's table categories -->
+            @for (group of navGroups(); track group.label) {
+              @if (group.standalone) {
+                <!-- "Own" category: top-level links, no parent group -->
+                @for (item of group.items; track item.key) {
+                  <a
+                    [routerLink]="item.route"
+                    [queryParams]="item.query"
+                    [title]="item.title"
+                    routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                    #ownRla="routerLinkActive"
+                    [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
+                    [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                    class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+                  >
+                    <app-icon [name]="item.icon" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                    <span class="tracking-tight truncate" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
+                  </a>
+                }
+              } @else {
+              <div class="flex flex-col">
+                <!-- ui-guard-allow: a section header is a navigation row, not a button -->
+                <button
+                  appButton
+                  variant="ghost"
+                  block
+                  type="button"
+                  (click)="toggleGroup(group.label)"
+                  [attr.aria-expanded]="isGroupOpen(group.label)"
+                  class="justify-between h-auto px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white group"
+                >
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <app-icon name="list" class="text-white/80 group-hover:text-white transition-colors" />
+                    <span class="tracking-tight font-medium text-white truncate">{{ group.label }}</span>
+                  </div>
+                  <app-icon
+                    name="chevron-down"
+                    size="sm"
+                    [stroke]="2"
+                    class="text-white/60 group-hover:text-white transition-transform duration-200"
+                    [ngClass]="{ 'transform rotate-180': isGroupOpen(group.label) }"
+                  />
+                </button>
+
+                @if (isGroupOpen(group.label)) {
+                  <div class="flex flex-col gap-0.5 pl-6 pr-1 pt-1 pb-1">
+                    @for (item of group.items; track item.key) {
+                      <a
+                        [routerLink]="item.route"
+                        [queryParams]="item.query"
+                        [title]="item.title"
+                        routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                        #permRla="routerLinkActive"
+                        [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
+                        [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'"
+                        class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
+                      >
+                        <app-icon [name]="item.icon" size="sm" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                        <span class="truncate" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+              }
+            } @empty {
+              <p class="px-3 py-2 text-[12px] leading-5 text-white/70 m-0">
+                {{ permissionsLoading() ? 'Loading your modules...' : 'No modules are assigned to your role yet.' }}
+              </p>
+            }
+
+            <ng-container *ngTemplateOutlet="navLink; context: { $implicit: profileNav }" />
+          } @else if (isAspirant()) {
             @for (item of aspirantNav; track item.key) {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isAspirantProfilePending() }" />
             }
@@ -109,16 +192,18 @@ import {
               <ng-container *ngTemplateOutlet="navLink; context: { $implicit: item, pending: item.key === 'profile' && isProfilePending() }" />
             }
           }
-
         </nav>
       </div>
 
-      <!-- Bottom: Rajasthan Fort Heritage Illustration -->
-      <div class="mt-auto shrink-0 w-full px-0 pt-4 pb-3 pointer-events-none opacity-90 flex justify-center items-end overflow-hidden">
+      <!-- Bottom: Fixed Rajasthan Fort Heritage Illustration with Smooth Gradient Mask -->
+      <div
+        class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 w-full flex flex-col justify-end items-center overflow-hidden"
+        style="height: 120px; background: linear-gradient(to top, rgba(74, 6, 38, 1) 0%, rgba(74, 6, 38, 0.96) 40%, rgba(74, 6, 38, 0.7) 70%, rgba(74, 6, 38, 0) 100%);"
+      >
         <img
           src="/sidebar-fort-transparent.png?v=3"
           alt="Rajasthan Heritage"
-          class="w-full h-28 object-bottom select-none"
+          class="w-full h-28 object-bottom select-none opacity-90"
         />
       </div>
 
@@ -126,49 +211,72 @@ import {
 
     <!-- One link: icon, label and (for Profile) the "Pending" badge -->
     <ng-template #navLink let-item let-pending="pending">
-      <a
-        [routerLink]="item.link"
-        [class.!bg-[#F2DACE]]="isActive(item.key)"
-        [class.!text-[#7C0E44]]="isActive(item.key)"
-        [class.font-bold]="isActive(item.key)"
-        [class.shadow-xs]="isActive(item.key)"
-        [class.active-link]="isActive(item.key)"
-        [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-        class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
-      >
-        <div class="flex items-center gap-2.5 min-w-0">
-          <app-icon
-            [name]="item.icon"
-            [stroke]="item.stroke ?? 1.75"
-            class="transition-colors"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
-            [class.text-white/80]="!isActive(item.key)"
-            [class.group-hover:text-white]="!isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-          />
-          <span
-            class="tracking-tight min-w-0"
-            [class.font-medium]="item.bold"
-            [class.!text-[#7C0E44]]="isActive(item.key)"
-            [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
-          >{{ item.label }}</span>
-        </div>
-        @if (pending) {
-          <span
-            class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none font-semibold shadow-2xs"
-            [class.bg-white/90]="isActive(item.key)"
-            [class.text-[#B85B18]]="isActive(item.key)"
-            [class.border]="isActive(item.key)"
-            [class.border-[#B85B18]/30]="isActive(item.key)"
-            [class.bg-white/20]="!isActive(item.key)"
-            [class.text-white]="!isActive(item.key)"
-            [class.border-white/30]="!isActive(item.key)"
-          >
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
-            Pending
-          </span>
-        }
-      </a>
+      @if (item.external || item.link.startsWith('http')) {
+        <a
+          [href]="item.link"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+          [attr.aria-label]="item.label + ' (opens in a new tab)'"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <app-icon
+              [name]="item.icon"
+              [stroke]="item.stroke ?? 1.75"
+              class="transition-colors text-white/80 group-hover:text-white"
+            />
+            <span
+              class="tracking-tight min-w-0"
+              [class.font-medium]="item.bold"
+            >{{ item.label }}</span>
+          </div>
+          <app-icon name="external-link" size="xs" class="text-white/60 group-hover:text-white shrink-0 ml-1.5" />
+        </a>
+      } @else {
+        <a
+          [routerLink]="item.link"
+          [class.!bg-[#F2DACE]]="isActive(item.key)"
+          [class.!text-[#7C0E44]]="isActive(item.key)"
+          [class.font-bold]="isActive(item.key)"
+          [class.shadow-xs]="isActive(item.key)"
+          [class.active-link]="isActive(item.key)"
+          [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+          class="flex items-center justify-between px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
+        >
+          <div class="flex items-center gap-2.5 min-w-0">
+            <app-icon
+              [name]="item.icon"
+              [stroke]="item.stroke ?? 1.75"
+              class="transition-colors"
+              [class.!text-[#7C0E44]]="isActive(item.key)"
+              [class.text-white/80]="!isActive(item.key)"
+              [class.group-hover:text-white]="!isActive(item.key)"
+              [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            />
+            <span
+              class="tracking-tight min-w-0"
+              [class.font-medium]="item.bold"
+              [class.!text-[#7C0E44]]="isActive(item.key)"
+              [style.color]="isActive(item.key) ? '#7C0E44' : '#FFFFFF'"
+            >{{ item.label }}</span>
+          </div>
+          @if (pending) {
+            <span
+              class="px-2 py-0.5 rounded-full text-[11px] leading-tight shrink-0 inline-flex items-center gap-1.5 transition-all select-none font-semibold shadow-2xs"
+              [class.bg-white/90]="isActive(item.key)"
+              [class.text-[#B85B18]]="isActive(item.key)"
+              [class.border]="isActive(item.key)"
+              [class.border-[#B85B18]/30]="isActive(item.key)"
+              [class.bg-white/20]="!isActive(item.key)"
+              [class.text-white]="!isActive(item.key)"
+              [class.border-white/30]="!isActive(item.key)"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-600 shrink-0 animate-pulse"></span>
+              Pending
+            </span>
+          }
+        </a>
+      }
     </ng-template>
 
     <!-- A collapsible section (Master, User Management) -->
@@ -227,6 +335,28 @@ export class SidebarComponent {
 
   readonly currentUser = this.authService.currentUser;
 
+  // ---- Permission-driven navigation (real sign-in) ----
+  private readonly tableAccess = inject(TableAccessService);
+  /** With real (RajSSO) sign-in the sidebar shows only what GET /auth/permissions allows. */
+  readonly permissionDriven = computed(() => !this.authService.isMockAuth() && !!this.currentUser());
+  readonly navGroups = this.tableAccess.navGroups;
+  readonly permissionsLoading = this.tableAccess.loading;
+  protected readonly profileNav = PROFILE_NAV;
+  /** Groups the user collapsed; all groups start open. */
+  private readonly collapsedGroups = signal<ReadonlySet<string>>(new Set());
+
+  isGroupOpen(label: string): boolean {
+    return !this.collapsedGroups().has(label);
+  }
+
+  toggleGroup(label: string): void {
+    this.collapsedGroups.update(set => {
+      const next = new Set(set);
+      next.has(label) ? next.delete(label) : next.add(label);
+      return next;
+    });
+  }
+
   readonly isAspirant = computed(() => this.currentUser()?.role === 'aspirant' || this.permissions.hasRole('aspirant'));
   readonly isAspirantProfilePending = computed(() => {
     if (this.aspirantPortal.isProfileComplete()) return false;
@@ -273,7 +403,13 @@ export class SidebarComponent {
     toggle: () => this.toggleUserManagement()
   };
 
-  readonly currentUrl = signal<string>(this.router.url);
+  readonly currentUrl = signal<string>(
+    this.router.url && this.router.url !== '/'
+      ? this.router.url
+      : (typeof window !== 'undefined' && window.location?.pathname && window.location.pathname !== '/'
+        ? window.location.pathname
+        : (this.router.url || ''))
+  );
 
   constructor() {
     this.router.events
@@ -287,12 +423,38 @@ export class SidebarComponent {
   }
 
   private cleanUrl(): string {
-    const raw = this.currentUrl() || this.router.url || '';
+    const browserPath = typeof window !== 'undefined' ? window.location?.pathname : '';
+    const raw = this.currentUrl() || this.router.url || browserPath || '';
     return raw.split('?')[0].split('#')[0];
   }
 
+  readonly activeContextItem = computed<NavItem | null>(() => {
+    const key = this.activeKey();
+    if (key === 'terms-and-conditions') {
+      return TERMS_AND_CONDITIONS_NAV;
+    }
+    if (key === 'help-support') {
+      return HELP_SUPPORT_NAV;
+    }
+    if (key === 'privacy-policy') {
+      return PRIVACY_POLICY_NAV;
+    }
+    return null;
+  });
+
   readonly activeKey = computed<string>(() => {
     const url = this.cleanUrl();
+
+    // Legal & Support routes
+    if (url === '/terms-and-conditions' || url.startsWith('/terms-and-conditions/')) {
+      return 'terms-and-conditions';
+    }
+    if (url === '/help-support' || url.startsWith('/help-support/')) {
+      return 'help-support';
+    }
+    if (url === '/privacy-policy' || url.startsWith('/privacy-policy/')) {
+      return 'privacy-policy';
+    }
 
     // 0. Aspirant Portal routes
     if (url === '/training-calendar' || url.startsWith('/training-calendar')) {
@@ -312,6 +474,9 @@ export class SidebarComponent {
       url.startsWith('/otr/') ||
       url === '/dashboard'
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'profile';
     }
 
@@ -323,6 +488,9 @@ export class SidebarComponent {
       url.startsWith('/tenders/') ||
       url.startsWith('/eoi')
     ) {
+      if (this.isSuperAdmin() && this.currentUrl().includes('dynamic-form-builder')) {
+        return 'admin-dynamic-form-builder';
+      }
       return 'active-schemes';
     }
 
@@ -435,6 +603,9 @@ export class SidebarComponent {
     }
 
     // 11. Dept Admin routes
+    if (url.startsWith('/admin/empanelment-order') || url.startsWith('/admin/empanelment-orders')) {
+      return 'dept-empanelment-order';
+    }
     if (url.startsWith('/admin/eoi-view') || url.startsWith('/admin/responses') || url.startsWith('/admin/review')) {
       return 'dept-eoi-view';
     }

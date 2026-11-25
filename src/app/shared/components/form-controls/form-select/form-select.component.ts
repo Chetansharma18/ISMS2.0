@@ -6,12 +6,18 @@ import {
   signal,
   ElementRef,
   HostListener,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  ViewChild,
+  Injector,
+  afterNextRender,
+  inject,
+  OnDestroy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../icon/icon.component';
 import { ButtonComponent } from '../../button/button.component';
+import { OverlayService, ConnectedOverlayRef } from '../../../services/overlay.service';
 
 /** One choice of a select: the value it stores and the text it shows. */
 export interface SelectItem {
@@ -30,8 +36,12 @@ export interface SelectItem {
       <!-- Label Row -->
       @if (label) {
         <div class="flex items-center justify-between mb-1 font-sans">
-          <label [for]="id" class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none">
-            {{ label }}
+          <label
+            (click)="onLabelClick($event)"
+            class="text-xs sm:text-[12.5px] font-medium leading-[18px] text-[#25212A] select-none inline-flex items-center gap-1"
+            [class.cursor-default]="disableLabelClick"
+          >
+            <span>{{ label }}</span>
             @if (required) {
               <span class="text-rose-600 font-bold ml-0.5">*</span>
             }
@@ -41,9 +51,11 @@ export interface SelectItem {
 
       <!-- Select Button / Display Box -->
       <button
+        #trigger
         [id]="id"
         type="button"
         (click)="toggleDropdown()"
+        (blur)="onBlur($event)"
         [disabled]="disabled"
         class="w-full h-[35px] flex items-center justify-between px-2.5 text-xs sm:text-[13px] leading-[20px] rounded-[4px] border transition-all duration-150 text-left bg-white font-sans cursor-pointer"
         [class.border-theme]="!error"
@@ -62,30 +74,68 @@ export interface SelectItem {
           {{ selectedLabel() || placeholder }}
         </span>
 
-        <app-icon
-          name="chevron-down"
-          [stroke]="2"
-          class="text-muted transition-transform duration-200 ml-2 shrink-0"
-          [class.rotate-180]="isOpen()"
-        />
+        <div class="flex items-center gap-1 shrink-0 ml-2">
+          @if (clearable && !disabled && (multiple ? selectedValues().length > 0 : !!value)) {
+            <span
+              role="button"
+              tabindex="0"
+              class="text-slate-400 hover:text-slate-600 cursor-pointer p-0.5 rounded transition-colors inline-flex items-center justify-center"
+              (click)="clearSelection($event)"
+              (keydown.enter)="clearSelection($event)"
+              (keydown.space)="clearSelection($event)"
+              title="Clear selection"
+              aria-label="Clear selection"
+            >
+              <app-icon name="close" size="xs" [stroke]="2.5" />
+            </span>
+          }
+
+          <app-icon
+            name="chevron-down"
+            [stroke]="2"
+            class="text-muted transition-transform duration-200"
+            [class.rotate-180]="isOpen()"
+          />
+        </div>
       </button>
 
       <!-- Dropdown Popup Menu with Outside-Click Detector -->
       @if (isOpen()) {
         <div
-          class="absolute left-0 right-0 top-full mt-1 z-50 bg-white rounded-[4px] border border-theme shadow-[0_8px_24px_rgba(31,41,51,0.12)] overflow-hidden font-sans"
+          #panel
+          class="bg-white rounded-[6px] border border-theme shadow-[0_12px_32px_rgba(31,41,51,0.16)] overflow-hidden font-sans"
           role="listbox"
         >
           <!-- Search input for large lists -->
           @if (shouldShowSearch()) {
             <div class="p-2 border-b border-theme bg-surface-muted flex items-center gap-2">
-              <input
-                type="text"
-                [(ngModel)]="searchQuery"
-                placeholder="Search options..."
-                class="w-full h-[32px] px-2.5 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
-                (click)="$event.stopPropagation()"
-              />
+              <div class="relative flex-1 flex items-center">
+                <input
+                  #searchInput
+                  type="text"
+                  [ngModel]="searchQuery()"
+                  (ngModelChange)="searchQuery.set($event)"
+                  placeholder="Search options..."
+                  class="w-full h-[32px] pl-2.5 pr-8 text-[13px] rounded-[4px] border border-theme focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary bg-white text-primary"
+                  (click)="$event.stopPropagation()"
+                />
+                @if (searchQuery()) {
+                  <button
+                    appButton
+                    variant="ghost"
+                    size="xs"
+                    iconOnly
+                    type="button"
+                    class="form-select-search-clear absolute right-1.5 top-1/2 -translate-y-1/2"
+                    style="height: 22px !important; min-height: 22px !important; width: 22px !important; padding: 0 !important; border: none !important; background-color: transparent !important; box-shadow: none !important;"
+                    aria-label="Clear search"
+                    title="Clear search"
+                    (click)="clearSearch($event, searchInput)"
+                  >
+                    <app-icon name="close" size="xs" [stroke]="2" />
+                  </button>
+                }
+              </div>
               @if (multiple) {
                 <button
                   appButton
@@ -137,7 +187,7 @@ export interface SelectItem {
               </li>
             } @empty {
               <li class="px-3 py-3 text-center text-[12px] text-muted">
-                No matching options found
+                No results found
               </li>
             }
           </ul>
@@ -150,7 +200,7 @@ export interface SelectItem {
                 appButton
                 size="sm"
                 type="button"
-                (click)="isOpen.set(false)"
+                (click)="closeDropdown()"
               >
                 Done
               </button>
@@ -186,9 +236,16 @@ export interface SelectItem {
     }
   `]
 })
-export class FormSelectComponent {
+export class FormSelectComponent implements OnDestroy {
   private static nextId = 0;
   readonly id = `form-select-${++FormSelectComponent.nextId}`;
+
+  @ViewChild('trigger') triggerElement?: ElementRef<HTMLButtonElement>;
+  @ViewChild('panel') panelElement?: ElementRef<HTMLElement>;
+
+  private overlayService = inject(OverlayService);
+  private injector = inject(Injector);
+  private overlayRef: ConnectedOverlayRef | null = null;
 
   @Input() label: string = '';
   @Input() value: string = '';
@@ -201,14 +258,19 @@ export class FormSelectComponent {
   @Input() placeholder: string = 'Please select';
   @Input() required: boolean = false;
   @Input() disabled: boolean = false;
+  @Input() clearable: boolean = false;
+  @Input() direction: 'down' | 'up' | 'auto' = 'auto';
   @Input() hint?: string;
   @Input() error?: string;
+  @Input() disableLabelClick: boolean = false;
 
   @Output() valueChange = new EventEmitter<string>();
   @Output() valuesChange = new EventEmitter<string[]>();
+  @Output() blur = new EventEmitter<FocusEvent | void>();
 
   isOpen = signal<boolean>(false);
-  searchQuery = '';
+  readonly openDirection = signal<'up' | 'down'>('down');
+  searchQuery = signal<string>('');
 
   constructor(private elementRef: ElementRef) { }
 
@@ -255,14 +317,108 @@ export class FormSelectComponent {
 
   filteredEntries(): SelectItem[] {
     const list = this.entries();
-    const q = this.searchQuery.trim().toLowerCase();
+    const q = this.searchQuery().trim().toLowerCase();
     return q ? list.filter(item => item.label.toLowerCase().includes(q)) : list;
   }
 
   toggleDropdown(): void {
     if (!this.disabled) {
-      this.isOpen.update(v => !v);
-      this.searchQuery = '';
+      const willOpen = !this.isOpen();
+      this.searchQuery.set('');
+      if (willOpen) {
+        this.isOpen.set(true);
+        this.updateDirection();
+        afterNextRender(() => {
+          const panel = this.panelElement?.nativeElement;
+          const trigger = this.triggerElement?.nativeElement;
+          if (panel && trigger) {
+            this.overlayRef = this.overlayService.attachConnectedOverlay(
+              trigger,
+              panel,
+              { preferredMaxHeight: 280, gap: 4 },
+              () => this.closeDropdown()
+            );
+          }
+        }, { injector: this.injector });
+      } else {
+        this.closeDropdown();
+      }
+    }
+  }
+
+  closeDropdown(): void {
+    if (!this.isOpen()) return;
+    this.isOpen.set(false);
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
+    this.blur.emit();
+  }
+
+  ngOnDestroy(): void {
+    const ref = this.overlayRef;
+    this.overlayRef = null;
+    if (ref) {
+      ref.close();
+    }
+  }
+
+  onLabelClick(event: MouseEvent): void {
+    if (this.disableLabelClick) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  onBlur(event: FocusEvent): void {
+    if (!this.isOpen()) {
+      this.blur.emit(event);
+    }
+  }
+
+  updateDirection(): void {
+    if (this.direction !== 'auto') {
+      this.openDirection.set(this.direction);
+      return;
+    }
+    if (typeof window === 'undefined') {
+      this.openDirection.set('down');
+      return;
+    }
+    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    this.openDirection.set(spaceBelow < 300 && spaceAbove > spaceBelow ? 'up' : 'down');
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onWindowChange(): void {
+    if (this.isOpen()) {
+      this.updateDirection();
+    }
+  }
+
+  clearSelection(event: Event): void {
+    event.stopPropagation();
+    this.value = '';
+    this.valueChange.emit('');
+    if (this.multiple) {
+      this.values = [];
+      this.valuesChange.emit([]);
+    }
+  }
+
+  clearSearch(event?: Event, searchInput?: HTMLInputElement): void {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
+    this.searchQuery.set('');
+    if (searchInput) {
+      searchInput.focus();
     }
   }
 
@@ -275,7 +431,7 @@ export class FormSelectComponent {
     if (!this.multiple) {
       this.value = option.value;
       this.valueChange.emit(option.value);
-      this.isOpen.set(false);
+      this.closeDropdown(); // closes the portaled panel and emits blur
       return;
     }
 
@@ -322,8 +478,13 @@ export class FormSelectComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.elementRef.nativeElement.contains(event.target)) {
-      this.isOpen.set(false);
+    const target = event.target as Node;
+    const inHost = this.elementRef.nativeElement.contains(target);
+    const inPanel = this.panelElement?.nativeElement?.contains(target);
+    if (!inHost && !inPanel) {
+      if (this.isOpen()) {
+        this.closeDropdown();
+      }
     }
   }
 }

@@ -6,7 +6,10 @@ export interface AppEnvironment {
   api: {
     /** Sent as the `x-client` header on every API request. */
     clientId: string;
-    /** Sent as the `x-api-key` header when not empty. Public: it identifies the client, it is not a secret. */
+    /**
+     * Sent as the `x-api-key` header on every API request; the backend requires it, so it must not be empty
+     * (a unit test checks every environment file). Public: it identifies the client, it is not a secret.
+     */
     apiKey: string;
     /** Send cookies (HttpOnly session cookies) with API requests. */
     withCredentials: boolean;

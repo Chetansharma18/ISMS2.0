@@ -1,13 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  HostListener,
-  computed,
-  inject,
-  signal
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -16,818 +7,597 @@ import {
   DropdownComponent,
   IconComponent,
   InputDirective,
+  MasterFilterBarComponent,
   PageHeaderComponent,
   PageShellComponent,
   SwitchComponent,
   TableColumn,
   TableComponent
 } from '../../shared';
+import type { MasterFilterConfig } from '../../shared/components/master-crud/master-crud.types';
+import type { DropdownItem } from '../../shared/components/dropdown/dropdown.component';
+import { API_ENDPOINTS } from '../../core/config/api.config';
+import { HttpService } from '../../core/http/http.service';
+import type { RoleTablePermission, UserRoleMasterItem } from '../../core/models/admin-masters.model';
+import { toTablePermissionRequest, toUserRoleItem } from '../../core/models/role.normalizer';
+import { TableAccessService } from '../../core/permissions/table-access.service';
+import { TABLE_SCREENS } from '../../core/permissions/table-screens';
+import { humanizeTableName } from '../../core/permissions/permitted-tables.util';
 import { DataEngineService } from '../../core/services/data-engine.service';
-import { PermissionMasterItem, UserRoleMasterItem } from '../../core/models/admin-masters.model';
+import { NotificationService } from '../../core/services/notification.service';
+import {
+  GrantableTable,
+  PermissionRow,
+  filterPermissionRows,
+  toGrantableTables,
+  toPermissionRows
+} from './role-permissions.util';
 
-export type { PermissionMasterItem };
+type Access = Pick<RoleTablePermission, 'get' | 'post' | 'put' | 'delete'>;
+type AccessKey = keyof Access;
 
-export const SYSTEM_MODULE_PAGES: string[] = [
-  'EOI Configuration',
-  'Two step verification',
-  'EOI Category Master',
-  'Scheme Master',
-  'Scheme Category Master',
-  'Sector Master',
-  'Course Master',
-  'District & Block Master',
-  'Designation Master',
-  'Doc Master',
-  'Remark Master',
-  'Grading Master',
-  'User Management',
-  'Blacklisted Users',
-  'Role Management',
-  'Batch Approval & Scrutiny',
-  'Camera CCTV Live Monitoring',
-  'Grievance Redressal',
-  'Payment & Financial Reports',
-  'Candidate / Aspirant Database'
+const ACCESS_OPTIONS: { key: AccessKey; label: string }[] = [
+  { key: 'get', label: 'View' },
+  { key: 'post', label: 'Add' },
+  { key: 'put', label: 'Edit' },
+  { key: 'delete', label: 'Delete' }
 ];
 
-interface AddPermissionForm {
-  roleType: string;
-  models: string[];
-  canView: boolean;
-  canEdit: boolean;
-  canDelete: boolean;
+interface PermissionForm extends Access {
+  roleId: string;
+  tables: string[];
+  status: boolean;
+  enableInMenu: boolean;
+  menuCallingName: string;
 }
 
-interface EditPermissionForm {
-  id: string;
-  sNo: number;
-  roleType: string;
-  moduleName: string;
-  canView: boolean;
-  canEdit: boolean;
-  canDelete: boolean;
-  status: 'Active' | 'Inactive';
-}
+const emptyForm = (roleId = ''): PermissionForm => ({
+  roleId,
+  tables: [],
+  get: true,
+  post: false,
+  put: false,
+  delete: false,
+  status: true,
+  enableInMenu: false,
+  menuCallingName: ''
+});
 
+/**
+ * Role Permissions (backend RolePermissions, managed through `/api/roles`):
+ * - rows: every role's table grants, from GET /api/roles (each role lists its permissions);
+ * - add / edit: POST /api/roles/{roleId}/permissions (adds or updates by table, other tables are kept);
+ * - the access ticks, the menu fields and the Active switch save at once with the same call;
+ * - remove: DELETE /api/roles/{roleId}/permissions/{permissionId}.
+ * The tables to grant come from GET /api/tablelist. A change to the signed-in user's own role shows in their sidebar
+ * after the permissions reload (next sign-in, role switch, or when the cache expires).
+ */
 @Component({
   selector: 'app-permission-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, PageHeaderComponent, TableComponent, ActionModalComponent, ButtonComponent, DropdownComponent, IconComponent, InputDirective, PageShellComponent, SwitchComponent],
+  imports: [
+    FormsModule,
+    ActionModalComponent,
+    ButtonComponent,
+    DropdownComponent,
+    IconComponent,
+    InputDirective,
+    PageHeaderComponent,
+    PageShellComponent,
+    SwitchComponent,
+    TableComponent,
+    MasterFilterBarComponent
+  ],
   template: `
     <app-page-shell>
-      
-      <!-- Page Header -->
       <app-page-header
-        title="Permission Management"
-        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Permission Management' }]"
-        [searchable]="true"
-        searchPlaceholder="Search by role type or model..."
-        [(searchQuery)]="searchQuery"
+        title="Role Permissions"
+        subtitle="Grant roles access (View, Add, Edit, Delete) to backend tables and choose their menu links"
+        [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Role Permissions' }]"
       >
-        <!-- Role Filter Dropdown -->
-        <select
-          appInput
-          size="sm"
-          aria-label="Filter by role"
-          [ngModel]="selectedRoleFilter()"
-          (ngModelChange)="selectedRoleFilter.set($event)"
-          class="w-auto whitespace-nowrap shrink-0"
-        >
-          <option value="all">All Roles</option>
-          @for (role of activeRoleOptions(); track role) {
-            <option [value]="role">{{ role }}</option>
-          }
-        </select>
-
-        <!-- Add Permission Button -->
-        <button
-          appButton
-          size="sm"
-          type="button"
-          (click)="openAddModal()"
-          class="shrink-0"
-        >
-          <app-icon name="plus" size="sm" />
-          <span>Add Permission</span>
-        </button>
+        @if (canAdd()) {
+          <button appButton size="sm" type="button" class="shrink-0" (click)="openAdd()">
+            <app-icon name="plus" size="sm" />
+            <span>Add Permission</span>
+          </button>
+        }
       </app-page-header>
 
-      <!-- Permissions Table -->
+      <!-- The masters' shared filter bar: search, grant status and role -->
+      <app-master-filter-bar
+        [(searchQuery)]="searchQuery"
+        searchPlaceholder="Search by role, table or menu name..."
+        [(status)]="statusFilter"
+        [filters]="filterConfigs()"
+        [(filterValues)]="filterValues"
+        [totalCount]="rows().length"
+        [filteredCount]="visibleRows().length"
+        itemUnit="permissions"
+        (resetFilters)="resetFilters()"
+      />
+
       <app-table
         [columns]="columns"
-        [data]="filteredItems()"
+        [data]="visibleRows()"
+        [loading]="loading()"
         [pagination]="true"
         [pageSize]="10"
         itemUnit="permissions"
-        emptyMessage="No permissions found. Click '+ Add Permission' to assign permissions."
-        [customTemplates]="{
-          permissions: permissionsTemplate,
-          action: actionTemplate
-        }"
-      >
-      </app-table>
+        [rowClass]="rowClass"
+        emptyMessage="No permissions found. Use Add Permission to grant a role access to a table."
+        [customTemplates]="{ access: accessTpl, menu: menuTpl, action: actionTpl }"
+      />
 
-      <!-- Permissions Column Template: Interactive View, Edit, Delete Checkboxes -->
-      <ng-template #permissionsTemplate let-item>
-        <div class="flex items-center gap-5 select-none py-1">
-          <!-- View Checkbox -->
-          <label
-            class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold transition-colors"
-            [class.text-emerald-700]="item.canView"
-            [class.text-slate-600]="!item.canView"
-            title="Toggle View Permission"
-          >
-            <input
-              type="checkbox"
-              [checked]="item.canView"
-              (change)="togglePermission(item, 'canView', $event)"
-              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-            />
-            <span>View</span>
-          </label>
-
-          <!-- Edit Checkbox -->
-          <label
-            class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold transition-colors"
-            [class.text-amber-700]="item.canEdit"
-            [class.text-slate-600]="!item.canEdit"
-            title="Toggle Edit Permission"
-          >
-            <input
-              type="checkbox"
-              [checked]="item.canEdit"
-              (change)="togglePermission(item, 'canEdit', $event)"
-              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-            />
-            <span>Edit</span>
-          </label>
-
-          <!-- Delete Checkbox -->
-          <label
-            class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold transition-colors"
-            [class.text-rose-700]="item.canDelete"
-            [class.text-slate-600]="!item.canDelete"
-            title="Toggle Delete Permission"
-          >
-            <input
-              type="checkbox"
-              [checked]="item.canDelete"
-              (change)="togglePermission(item, 'canDelete', $event)"
-              class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-            />
-            <span>Delete</span>
-          </label>
+      <!-- Access ticks: each change is saved at once -->
+      <ng-template #accessTpl let-row>
+        <div class="flex items-center gap-4 select-none py-1">
+          @for (opt of accessOptions; track opt.key) {
+            <label class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700" [class.cursor-pointer]="canEdit()">
+              <input
+                type="checkbox"
+                class="h-4 w-4 cursor-pointer accent-primary"
+                [checked]="row[opt.key]"
+                [disabled]="!canEdit() || saving()"
+                (change)="toggleAccess(row, opt.key, $event)"
+              />
+              <span>{{ opt.label }}</span>
+            </label>
+          }
         </div>
       </ng-template>
 
-      <!-- Action Column Template: View, Edit, Status Toggle -->
-      <ng-template #actionTemplate let-item>
-        <div class="flex items-center justify-center whitespace-nowrap">
-          <!-- View Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            type="button"
-            (click)="$event.stopPropagation(); openViewModal(item)"
-            title="View Details"
-          >
-            <app-icon name="eye" size="sm" />
-            <span>View</span>
-          </button>
+      <ng-template #menuTpl let-row>
+        @if (row.enableInMenu) {
+          <span class="inline-flex items-center gap-1.5 text-[13px] text-slate-800">
+            <app-icon name="list" size="sm" class="text-slate-400" />
+            {{ row.menuCallingName || row.tableLabel }}
+          </span>
+        } @else {
+          <span class="text-xs text-slate-400">Not in menu</span>
+        }
+      </ng-template>
 
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
-
-          <!-- Edit Button -->
-          <button
-            appButton
-            variant="ghost"
-            size="sm"
-            type="button"
-            (click)="$event.stopPropagation(); openEditModal(item)"
-            title="Edit"
-          >
-            <app-icon name="edit" size="sm" />
-            <span>Edit</span>
-          </button>
-
-          <div class="h-3.5 w-[1px] bg-slate-300 shrink-0 mx-2"></div>
-
-          <!-- Active / Inactive Toggle -->
-          <div class="inline-flex items-center gap-1.5" title="Toggle Status" (click)="$event.stopPropagation()">
-            <app-switch
-              [checked]="item.status !== 'Inactive'"
-              label="Toggle Active Status"
-              (toggled)="toggleStatus(item)"
-            />
-            <span
-              class="text-[12px] font-semibold select-none cursor-pointer"
-              [ngClass]="item.status === 'Inactive' ? 'text-slate-500' : 'text-emerald-700'"
-              (click)="toggleStatus(item)"
+      <ng-template #actionTpl let-row>
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+          @if (canEdit()) {
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              title="Edit"
+              aria-label="Edit"
+              (click)="$event.stopPropagation(); openEdit(row)"
             >
-              {{ item.status === 'Inactive' ? 'Inactive' : 'Active' }}
-            </span>
-          </div>
+              <app-icon name="edit" size="sm" />
+            </button>
+          }
+          @if (canRemove()) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              title="Remove"
+              aria-label="Remove"
+              (click)="$event.stopPropagation(); remove(row)"
+            >
+              <app-icon name="trash" size="sm" />
+            </button>
+          }
+          @if (canEdit()) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <div
+              class="inline-flex items-center"
+              [title]="row.status ? 'Status: Active (Click to deactivate)' : 'Status: Inactive (Click to activate)'"
+              (click)="$event.stopPropagation()"
+            >
+              <app-switch
+                [checked]="row.status"
+                [label]="row.status ? 'Active' : 'Inactive'"
+                [disabled]="saving()"
+                (toggled)="toggleStatus(row)"
+              />
+            </div>
+          }
         </div>
       </ng-template>
 
-      <!-- Modal: Add Permission -->
+      <!-- Add / edit -->
       <app-action-modal
-        [isOpen]="showAddModal()"
+        [isOpen]="modalOpen()"
+        [title]="editing() ? 'Edit Permission' : 'Add Permission'"
+        [description]="editing() ? 'Change what this role may do on the table and how it appears in the menu.' : 'Grant a role access to one or more tables.'"
         [showCloseButton]="true"
         [closeOnBackdrop]="false"
         [reverseButtons]="true"
         [showAccentBar]="false"
-        primaryLabel="Save Permissions"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[580px]"
-        (primaryAction)="submitAdd()"
-        (secondaryAction)="closeAddModal()"
-        (close)="closeAddModal()"
+        [disablePrimary]="saving()"
+        [primaryLabel]="saving() ? 'Saving...' : 'Save'"
+        secondaryLabel=""
+        maxWidthClass="max-w-[560px]"
+        (primaryAction)="submit()"
+        (secondaryAction)="closeModal()"
+        (close)="closeModal()"
       >
-        <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Add Permission
-        </h2>
-
-        <div class="mt-4 font-sans text-[13px] space-y-4 transition-all duration-200">
-          <!-- 1. Role Type -->
+        <div class="mt-4 space-y-4 text-[13px]">
           <div>
-            <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-            <select
-              appInput
-              [(ngModel)]="addForm.roleType"
-              class="w-full"
-              [invalid]="submitted() && !addForm.roleType"
-            >
-              <option value="" disabled selected>Select Role Type</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role">{{ role }}</option>
-              }
-            </select>
-            @if (submitted() && !addForm.roleType) {
-              <div class="text-xs text-red-500 mt-1 font-medium">Role Type is required</div>
-            }
-          </div>
-
-          <!-- 2. Model Dropdown (Multiple Selection with Search) -->
-          <div class="relative model-dropdown-container">
-            <div class="flex items-center justify-between mb-1">
-              <label class="block text-slate-700 font-medium">Model (Pages)*</label>
-              <span class="text-xs text-slate-500">
-                {{ addForm.models.length }} selected
-              </span>
-            </div>
-
-            <!-- Multi-select with search; the list opens in the page flow so the modal card stretches -->
+            <label class="block mb-1 font-medium text-slate-700" for="perm-role">Role*</label>
             <app-dropdown
-              multiple
-              [searchable]="true"
-              searchPlaceholder="Search pages / models..."
-              emptyText="No pages / models match search"
-              placeholder="Select Model / Pages"
-              selectAllLabel="Select All Pages / Models"
-              [options]="availableModels"
-              [values]="addForm.models"
-              [summary]="getSelectedModelsLabel()"
-              [invalid]="submitted() && addForm.models.length === 0"
-              (optionToggled)="toggleModelOption($event)"
-              (selectAllToggled)="toggleAllModels()"
+              inputId="perm-role"
+              class="w-full"
+              placeholder="Select role"
+              [options]="roleOptions()"
+              [disabled]="!!editing()"
+              [invalid]="submitted() && !form.roleId"
+              [(value)]="form.roleId"
             />
-
-            @if (submitted() && addForm.models.length === 0) {
-              <div class="text-xs text-red-500 mt-1 font-medium">Please select at least one page / model</div>
+            @if (submitted() && !form.roleId) {
+              <p class="m-0 mt-1 text-xs font-medium text-rose-700">Select a role.</p>
             }
           </div>
 
-          <!-- 3. Permissions (Tick boxes for Edit, View, Delete) -->
           <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-slate-700 font-medium">Permissions*</label>
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                type="button"
-                (click)="toggleAllAddPermissions()"
-              >
-                {{ (addForm.canView && addForm.canEdit && addForm.canDelete) ? 'Deselect All' : 'Select All' }}
-              </button>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="font-medium text-slate-700">{{ editing() ? 'Table' : 'Tables*' }}</label>
+              @if (!editing()) {
+                <span class="text-xs text-slate-500">{{ form.tables.length }} selected</span>
+              }
             </div>
-
-            <div class="p-3 border rounded-lg bg-slate-50/70 flex flex-wrap items-center gap-6"
-                 [class.border-red-500]="submitted() && !addForm.canView && !addForm.canEdit && !addForm.canDelete"
-                 [class.border-slate-200]="!(submitted() && !addForm.canView && !addForm.canEdit && !addForm.canDelete)">
-              <!-- View Checkbox -->
-              <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="addForm.canView"
-                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                />
-                <span>View</span>
-              </label>
-
-              <!-- Edit Checkbox -->
-              <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="addForm.canEdit"
-                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                />
-                <span>Edit</span>
-              </label>
-
-              <!-- Delete Checkbox -->
-              <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="addForm.canDelete"
-                  class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                />
-                <span>Delete</span>
-              </label>
-            </div>
-
-            @if (submitted() && !addForm.canView && !addForm.canEdit && !addForm.canDelete) {
-              <div class="text-xs text-red-500 mt-1 font-medium">Please select at least one permission</div>
+            @if (editing(); as row) {
+              <p class="m-0 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 font-medium text-slate-800">
+                {{ row.tableLabel }} <span class="text-xs text-slate-500">({{ row.tableName }})</span>
+              </p>
+            } @else {
+              <app-dropdown
+                multiple
+                [searchable]="true"
+                searchPlaceholder="Search tables..."
+                emptyText="No table matches"
+                placeholder="Select tables"
+                selectAllLabel="Select all tables"
+                [options]="tableOptions()"
+                [(values)]="form.tables"
+                [invalid]="submitted() && form.tables.length === 0"
+              />
+              @if (submitted() && form.tables.length === 0) {
+                <p class="m-0 mt-1 text-xs font-medium text-rose-700">Select at least one table.</p>
+              } @else if (form.tables.length > 0 && alreadyGranted().length > 0) {
+                <p class="m-0 mt-1 text-xs text-slate-500">
+                  Already granted to this role, will be updated: {{ alreadyGranted().join(', ') }}
+                </p>
+              }
             }
           </div>
+
+          <div>
+            <label class="block mb-1.5 font-medium text-slate-700">Access*</label>
+            <div
+              class="flex flex-wrap items-center gap-6 rounded-lg border bg-slate-50/70 p-3"
+              [class.border-rose-500]="submitted() && !hasAccess()"
+              [class.border-slate-200]="!(submitted() && !hasAccess())"
+            >
+              @for (opt of accessOptions; track opt.key) {
+                <label class="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-slate-700">
+                  <input type="checkbox" class="h-4 w-4 cursor-pointer accent-primary" [(ngModel)]="form[opt.key]" />
+                  <span>{{ opt.label }}</span>
+                </label>
+              }
+            </div>
+            @if (submitted() && !hasAccess()) {
+              <p class="m-0 mt-1 text-xs font-medium text-rose-700">Tick at least one access right.</p>
+            } @else if (form.enableInMenu && !form.get) {
+              <p class="m-0 mt-1 text-xs text-amber-700">A menu link needs View access to open the screen.</p>
+            }
+          </div>
+
+          <div class="rounded-lg border border-slate-200 p-3 space-y-3">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="m-0 font-medium text-slate-800">Show in menu</p>
+                <p class="m-0 text-xs text-slate-500">Adds a sidebar link for this role.</p>
+              </div>
+              <app-switch [checked]="form.enableInMenu" label="Show in menu" (toggled)="form.enableInMenu = $event" />
+            </div>
+            @if (form.enableInMenu) {
+              @if (editing() || form.tables.length <= 1) {
+                <div>
+                  <label class="block mb-1 font-medium text-slate-700" for="perm-menu-name">Menu name</label>
+                  <input
+                    appInput
+                    id="perm-menu-name"
+                    class="w-full"
+                    maxlength="150"
+                    [placeholder]="menuNamePlaceholder()"
+                    [(ngModel)]="form.menuCallingName"
+                  />
+                  <p class="m-0 mt-1 text-xs text-slate-500">Leave empty to use the table name.</p>
+                </div>
+              } @else {
+                <p class="m-0 text-xs text-slate-500">Each table uses its table name. Edit a row to give it its own menu name.</p>
+              }
+            }
+          </div>
+
+          @if (editing()) {
+            <div class="flex items-center justify-between gap-3">
+              <span class="font-medium text-slate-700">Active</span>
+              <app-switch [checked]="form.status" label="Active" (toggled)="form.status = $event" />
+            </div>
+          }
         </div>
       </app-action-modal>
-
-      <!-- Modal: Edit Permission -->
-      <app-action-modal
-        [isOpen]="showEditModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="false"
-        [reverseButtons]="true"
-        [showAccentBar]="false"
-        primaryLabel="Save Changes"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[500px]"
-        (primaryAction)="submitEdit()"
-        (secondaryAction)="closeEditModal()"
-        (close)="closeEditModal()"
-      >
-        <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Edit Permission
-        </h2>
-
-        @if (editForm; as ef) {
-          <div class="mt-4 font-sans text-[13px] space-y-4">
-            <!-- Role Type -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Role Type</label>
-              <select
-                appInput
-                [(ngModel)]="ef.roleType"
-                class="w-full"
-              >
-                @for (role of activeRoleOptions(); track role) {
-                  <option [value]="role">{{ role }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Model (Page) -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Model (Page)</label>
-              <select
-                appInput
-                [(ngModel)]="ef.moduleName"
-                class="w-full"
-              >
-                @for (m of availableModels; track m) {
-                  <option [value]="m">{{ m }}</option>
-                }
-              </select>
-            </div>
-
-            <!-- Permissions Checkboxes -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1.5">Permissions</label>
-              <div class="p-3 border border-slate-200 rounded-lg bg-slate-50/70 flex flex-wrap items-center gap-6">
-                <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="ef.canView"
-                    class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                  />
-                  <span>View</span>
-                </label>
-
-                <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="ef.canEdit"
-                    class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                  />
-                  <span>Edit</span>
-                </label>
-
-                <label class="inline-flex items-center gap-2 cursor-pointer select-none text-xs font-semibold text-slate-700 hover:text-brand">
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="ef.canDelete"
-                    class="w-4 h-4 rounded text-primary border-slate-300 focus:ring-primary accent-primary cursor-pointer"
-                  />
-                  <span>Delete</span>
-                </label>
-              </div>
-            </div>
-
-            <!-- Status Toggle -->
-            <div>
-              <label class="block text-slate-700 font-medium mb-1">Status</label>
-              <select
-                appInput
-                [(ngModel)]="ef.status"
-                class="w-full"
-              >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-        }
-      </app-action-modal>
-
-      <!-- Modal: View Permission Details -->
-      <app-action-modal
-        [isOpen]="showViewModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        primaryLabel=""
-        secondaryLabel="Close"
-        maxWidthClass="max-w-[480px]"
-        (secondaryAction)="closeViewModal()"
-        (close)="closeViewModal()"
-      >
-        <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-          Permission Details
-        </h2>
-
-        @if (selectedViewItem(); as viewItem) {
-          <div class="mt-4 font-sans text-[13px] space-y-3.5 divide-y divide-slate-100">
-            <div class="pt-2.5 flex flex-col gap-1 first:pt-0">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Role Type</span>
-              <span class="text-sm font-semibold text-slate-800">{{ viewItem.roleType }}</span>
-            </div>
-
-            <div class="pt-2.5 flex flex-col gap-1">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Model (Page)</span>
-              <span class="text-sm font-medium text-slate-800">{{ viewItem.moduleName }}</span>
-            </div>
-
-            <div class="pt-2.5 flex flex-col gap-1.5">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Permissions</span>
-              <div class="flex items-center gap-2.5 pt-0.5">
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canView ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  View
-                </span>
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canEdit ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  Edit
-                </span>
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold select-none border"
-                  [ngClass]="viewItem.canDelete ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-100 text-slate-400 border-slate-200 line-through'"
-                >
-                  Delete
-                </span>
-              </div>
-            </div>
-
-            <div class="pt-3 flex items-center justify-between">
-              <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border select-none"
-                [ngClass]="viewItem.status === 'Inactive' ? 'bg-slate-50 text-slate-600 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'"
-              >
-                {{ viewItem.status === 'Inactive' ? 'Inactive' : 'Active' }}
-              </span>
-            </div>
-          </div>
-        }
-      </app-action-modal>
-
     </app-page-shell>
   `
 })
 export class PermissionMasterComponent {
-  private dataEngine = inject(DataEngineService);
-  private destroyRef = inject(DestroyRef);
+  private readonly http = inject(HttpService);
+  private readonly dataEngine = inject(DataEngineService);
+  private readonly tableAccess = inject(TableAccessService);
+  private readonly notifications = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  private permRepo = this.dataEngine.for<PermissionMasterItem>('PERMISSIONS');
-  private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES');
+  private readonly roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES', { normalizer: item => toUserRoleItem(item) });
 
-  items = signal<PermissionMasterItem[]>([]);
-  userRoles = signal<UserRoleMasterItem[]>([]);
+  protected readonly accessOptions = ACCESS_OPTIONS;
 
-  searchQuery = signal<string>('');
-  selectedRoleFilter = signal<string>('all');
+  readonly roles = signal<UserRoleMasterItem[]>([]);
+  readonly tables = signal<GrantableTable[]>([]);
+  readonly loading = signal(true);
+  readonly saving = signal(false);
+  readonly searchQuery = signal('');
+  /** Filter bar: 'ALL', 'Active' or 'Inactive' (the grant's Active switch). */
+  readonly statusFilter = signal('ALL');
+  /** Filter bar dropdowns; `role` holds a role name. */
+  readonly filterValues = signal<Record<string, string>>({});
+  readonly filterConfigs = computed<MasterFilterConfig[]>(() => [
+    { key: 'role', label: 'Role', placeholder: 'All Roles', options: this.roles().map(r => r.roleTypeName) }
+  ]);
+  /** The role chosen in the filter bar, as a role id ('all' when none). */
+  readonly roleFilter = computed(() => {
+    const name = this.filterValues()['role'];
+    return (name && this.roles().find(r => r.roleTypeName === name)?.id) || 'all';
+  });
 
-  showAddModal = signal<boolean>(false);
-  showEditModal = signal<boolean>(false);
-  showViewModal = signal<boolean>(false);
+  readonly modalOpen = signal(false);
+  readonly editing = signal<PermissionRow | null>(null);
+  readonly submitted = signal(false);
+  form: PermissionForm = emptyForm();
 
-  selectedViewItem = signal<PermissionMasterItem | null>(null);
-  submitted = signal<boolean>(false);
+  readonly rows = computed(() => toPermissionRows(this.roles()));
+  readonly visibleRows = computed(() => {
+    const status = this.statusFilter();
+    return filterPermissionRows(this.rows(), this.roleFilter(), this.searchQuery()).filter(
+      row => status === 'ALL' || (status === 'Active' ? row.status : !row.status)
+    );
+  });
 
-  isModelDropdownOpen = signal<boolean>(false);
-  modelSearchText = signal<string>('');
+  resetFilters(): void {
+    this.searchQuery.set('');
+    this.statusFilter.set('ALL');
+    this.filterValues.set({});
+  }
 
-  readonly availableModels = SYSTEM_MODULE_PAGES;
+  /** Roles for the dialog's role dropdown (value: role id). */
+  readonly roleOptions = computed<DropdownItem[]>(() =>
+    this.roles().map(role => ({
+      value: String(role.id),
+      label: `${role.roleTypeName}${role.status === 'Inactive' ? ' (inactive)' : ''}`
+    }))
+  );
 
-  addForm: AddPermissionForm = {
-    roleType: '',
-    models: [],
-    canView: true,
-    canEdit: false,
-    canDelete: false
-  };
+  /** Tables to choose from: the table list, plus any table a role already has a grant on. */
+  readonly tableOptions = computed<DropdownItem[]>(() => {
+    const byName = new Map(this.tables().map(t => [t.tableName.toLowerCase(), t]));
+    for (const row of this.rows()) {
+      if (!byName.has(row.tableName.toLowerCase())) {
+        byName.set(row.tableName.toLowerCase(), { tableName: row.tableName, label: row.tableLabel, description: '' });
+      }
+    }
+    return [...byName.values()]
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map(t => ({ value: t.tableName, label: t.label }));
+  });
 
-  editForm: EditPermissionForm | null = null;
+  // Buttons follow the signed-in user's own rights on the RolePermissions table.
+  readonly canAdd = computed(() => this.tableAccess.can('RolePermissions', 'POST'));
+  readonly canEdit = computed(() => this.tableAccess.can('RolePermissions', 'PUT') || this.tableAccess.can('RolePermissions', 'POST'));
+  readonly canRemove = computed(() => this.tableAccess.can('RolePermissions', 'DELETE'));
 
-  readonly columns: TableColumn<PermissionMasterItem>[] = [
+  readonly columns: TableColumn<PermissionRow>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-    { key: 'roleType', label: 'Role Type', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[160px]' },
-    { key: 'moduleName', label: 'Model', cellClass: 'whitespace-nowrap font-medium text-slate-700 min-w-[220px]' },
-    { key: 'permissions', label: 'Permissions', type: 'custom', cellClass: 'min-w-[260px]' },
-    { key: 'action', label: 'Action', align: 'center', type: 'custom', width: 'min-w-[210px]' }
+    { key: 'roleName', label: 'Role', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[140px]' },
+    { key: 'tableLabel', label: 'Table', cellClass: 'whitespace-nowrap font-medium text-slate-700 min-w-[180px]' },
+    { key: 'access', label: 'Access', type: 'custom', cellClass: 'min-w-[260px]' },
+    { key: 'menu', label: 'Menu', type: 'custom', cellClass: 'min-w-[160px]' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'min-w-[260px]' }
   ];
 
+  protected readonly rowClass = (row: PermissionRow): string => (row.status ? 'bg-white' : 'opacity-60 !bg-slate-100/70');
+
   constructor() {
-    this.permRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
-      const hasOldData = list.some(
-        i => i.id === 'perm-1' || i.id === 'perm-2' || i.id === 'perm-3' || i.roleType === 'Role1'
-      );
-      if (hasOldData) {
-        list.forEach(i => this.permRepo.delete(i.id).subscribe());
-        this.items.set([]);
-      } else {
-        this.items.set(list);
-      }
-    });
-
-    this.roleRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(roles => {
-      this.userRoles.set(roles);
-    });
+    this.loadRoles();
+    this.loadTables();
   }
 
-  readonly activeRoleOptions = computed(() => {
-    const roles = this.userRoles()
-      .filter(r => r.status !== 'Inactive')
-      .map(r => r.roleTypeName)
-      .filter(Boolean);
-    const unique = Array.from(new Set(roles));
-    return unique.length > 0
-      ? unique
-      : ['Super Admin', 'Department Officer', 'Scrutiny Officer', 'Training Partner'];
-  });
-
-  readonly filteredAvailableModels = computed(() => {
-    const q = this.modelSearchText().toLowerCase().trim();
-    if (!q) return this.availableModels;
-    return this.availableModels.filter(m => m.toLowerCase().includes(q));
-  });
-
-  readonly filteredItems = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    const roleFilter = this.selectedRoleFilter();
-    let result = this.items();
-
-    if (roleFilter !== 'all') {
-      result = result.filter(item => item.roleType === roleFilter);
-    }
-
-    if (q) {
-      result = result.filter(item =>
-        (item.roleType && item.roleType.toLowerCase().includes(q)) ||
-        (item.moduleName && item.moduleName.toLowerCase().includes(q))
-      );
-    }
-
-    return result;
-  });
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (!target) return;
-    if (!target.closest('.model-dropdown-container')) {
-      this.isModelDropdownOpen.set(false);
-    }
+  protected hasAccess(): boolean {
+    return this.form.get || this.form.post || this.form.put || this.form.delete;
   }
 
-  toggleModelDropdown(event?: Event): void {
-    if (event) event.stopPropagation();
-    this.isModelDropdownOpen.update(v => !v);
+  /** Tables picked in the add dialog that the chosen role already has (they are updated, not duplicated). */
+  protected alreadyGranted(): string[] {
+    const role = this.roles().find(r => r.id === this.form.roleId);
+    const granted = new Set((role?.tablePermissions ?? []).map(p => p.tableName.toLowerCase()));
+    return this.form.tables.filter(t => granted.has(t.toLowerCase())).map(humanizeTableName);
   }
 
-  isModelSelected(model: string): boolean {
-    return this.addForm.models.includes(model);
+  protected menuNamePlaceholder(): string {
+    const table = this.editing()?.tableName ?? this.form.tables[0];
+    return table ? humanizeTableName(table) : 'Menu name';
   }
 
-  toggleModelOption(model: string): void {
-    if (this.isModelSelected(model)) {
-      this.addForm.models = this.addForm.models.filter(m => m !== model);
-    } else {
-      this.addForm.models = [...this.addForm.models, model];
-    }
-  }
-
-  isAllModelsSelected(): boolean {
-    return this.availableModels.length > 0 && this.availableModels.every(m => this.addForm.models.includes(m));
-  }
-
-  toggleAllModels(): void {
-    if (this.isAllModelsSelected()) {
-      this.addForm.models = [];
-    } else {
-      this.addForm.models = [...this.availableModels];
-    }
-  }
-
-  getSelectedModelsLabel(): string {
-    if (this.addForm.models.length === 0) {
-      return 'Select Model / Pages';
-    }
-    if (this.isAllModelsSelected()) {
-      return `All Pages / Models (${this.availableModels.length} selected)`;
-    }
-    if (this.addForm.models.length <= 2) {
-      return this.addForm.models.join(', ');
-    }
-    return `${this.addForm.models.length} models selected`;
-  }
-
-  toggleAllAddPermissions(): void {
-    const allChecked = this.addForm.canView && this.addForm.canEdit && this.addForm.canDelete;
-    if (allChecked) {
-      this.addForm.canView = false;
-      this.addForm.canEdit = false;
-      this.addForm.canDelete = false;
-    } else {
-      this.addForm.canView = true;
-      this.addForm.canEdit = true;
-      this.addForm.canDelete = true;
-    }
-  }
-
-  togglePermission(item: PermissionMasterItem, type: 'canView' | 'canEdit' | 'canDelete', event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const updated: PermissionMasterItem = {
-      ...item,
-      [type]: input.checked
-    };
-    this.items.update(list => list.map(i => (i.id === item.id ? updated : i)));
-    this.permRepo.update(item.id, updated).subscribe();
-  }
-
-  toggleStatus(item: PermissionMasterItem): void {
-    const newStatus = item.status === 'Inactive' ? 'Active' : 'Inactive';
-    const updated: PermissionMasterItem = { ...item, status: newStatus };
-    this.items.update(list => list.map(i => (i.id === item.id ? updated : i)));
-    this.permRepo.update(item.id, updated).subscribe();
-  }
-
-  openAddModal(): void {
-    this.addForm = {
-      roleType: this.activeRoleOptions()[0] || 'Super Admin',
-      models: [],
-      canView: true,
-      canEdit: false,
-      canDelete: false
-    };
-    this.modelSearchText.set('');
-    this.isModelDropdownOpen.set(false);
+  openAdd(): void {
+    const filtered = this.roleFilter() !== 'all' ? String(this.roleFilter()) : '';
+    this.form = emptyForm(filtered);
+    this.editing.set(null);
     this.submitted.set(false);
-    this.showAddModal.set(true);
+    this.modalOpen.set(true);
   }
 
-  closeAddModal(): void {
-    this.showAddModal.set(false);
+  openEdit(row: PermissionRow): void {
+    this.form = {
+      roleId: String(row.roleId),
+      tables: [row.tableName],
+      get: row.get,
+      post: row.post,
+      put: row.put,
+      delete: row.delete,
+      status: row.status,
+      enableInMenu: row.enableInMenu,
+      menuCallingName: row.menuCallingName ?? ''
+    };
+    this.editing.set(row);
     this.submitted.set(false);
-    this.isModelDropdownOpen.set(false);
+    this.modalOpen.set(true);
   }
 
-  submitAdd(): void {
+  closeModal(): void {
+    if (this.saving()) return;
+    this.modalOpen.set(false);
+    this.editing.set(null);
+  }
+
+  submit(): void {
     this.submitted.set(true);
-    if (!this.addForm.roleType || this.addForm.models.length === 0) {
+    if (!this.form.roleId || this.form.tables.length === 0 || !this.hasAccess()) return;
+
+    const single = this.form.tables.length === 1;
+    const permissions = this.form.tables.map(tableName =>
+      toTablePermissionRequest({
+        tableName,
+        status: this.editing() ? this.form.status : true,
+        get: this.form.get,
+        post: this.form.post,
+        put: this.form.put,
+        delete: this.form.delete,
+        enableInMenu: this.form.enableInMenu,
+        menuCallingName: this.form.enableInMenu && single ? this.form.menuCallingName : null
+      })
+    );
+    const message = permissions.length === 1 ? 'Permission saved.' : `${permissions.length} permissions saved.`;
+    this.save(this.form.roleId, permissions, () => {
+      this.modalOpen.set(false);
+      this.editing.set(null);
+      this.notifications.success(message);
+    });
+  }
+
+  toggleAccess(row: PermissionRow, key: AccessKey, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const next = { ...row, [key]: checked };
+    if (!next.get && !next.post && !next.put && !next.delete) {
+      (event.target as HTMLInputElement).checked = true;
+      this.notifications.warning('A permission needs at least one access right. Use Remove to take the table away.');
       return;
     }
+    this.save(String(row.roleId), [toTablePermissionRequest(next)]);
+  }
 
-    const role = this.addForm.roleType;
-    const canView = this.addForm.canView;
-    const canEdit = this.addForm.canEdit;
-    const canDelete = this.addForm.canDelete;
+  toggleStatus(row: PermissionRow): void {
+    this.save(String(row.roleId), [toTablePermissionRequest({ ...row, status: !row.status })]);
+  }
 
-    let list = [...this.items()];
+  remove(row: PermissionRow): void {
+    if (!confirm(`Remove the ${row.tableLabel} permission from ${row.roleName}?`)) return;
+    this.saving.set(true);
+    this.http.call<unknown>(API_ENDPOINTS.ROLE_PERMISSIONS.REMOVE, { id: `${row.roleId}/${row.id}` }).subscribe({
+      next: res => {
+        this.saving.set(false);
+        this.applyRole(row.roleId, res);
+        this.syncOwnPermissions();
+        this.notifications.success('Permission removed.');
+      },
+      error: () => this.saving.set(false)
+    });
+  }
 
-    for (const model of this.addForm.models) {
-      const existingIdx = list.findIndex(
-        i => (i.roleType || '').toLowerCase() === role.toLowerCase() && (i.moduleName || '').toLowerCase() === model.toLowerCase()
-      );
+  // ---- internals ----
 
-      if (existingIdx >= 0) {
-        const updated: PermissionMasterItem = {
-          ...list[existingIdx],
-          canView,
-          canEdit,
-          canDelete,
-          status: 'Active'
-        };
-        list[existingIdx] = updated;
-        this.permRepo.update(updated.id, updated).subscribe();
-      } else {
-        const newItem: PermissionMasterItem = {
-          id: 'perm-' + Date.now() + '-' + Math.floor(Math.random() * 100000),
-          sNo: 1,
-          roleType: role,
-          moduleName: model,
-          canView,
-          canEdit,
-          canDelete,
-          status: 'Active'
-        };
-        // Prepend new item to the top so it is immediately visible on Page 1!
-        list = [newItem, ...list];
-        this.permRepo.create(newItem).subscribe();
+  private loadRoles(): void {
+    this.loading.set(true);
+    this.roleRepo
+      .getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: roles => {
+          this.roles.set(roles);
+          this.loading.set(false);
+        },
+        error: () => this.loading.set(false)
+      });
+  }
+
+  /** The grantable tables (GET /api/tablelist). Without access to it, the screens' tables and existing grants are offered. */
+  private loadTables(): void {
+    const fallback = (): GrantableTable[] =>
+      toGrantableTables([...Object.keys(TABLE_SCREENS), ...this.tableAccess.tables().map(t => t.tableName)].map(tableName => ({ tableName })));
+    this.http
+      .call<unknown>(API_ENDPOINTS.TABLE_LIST.LIST, { flags: { skipErrorToast: true } })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          const tables = toGrantableTables(res);
+          this.tables.set(tables.length > 0 ? tables : fallback());
+        },
+        error: () => this.tables.set(fallback())
+      });
+  }
+
+  /** POST /api/roles/{roleId}/permissions; the answer is the updated role, which replaces the one shown. */
+  private save(roleId: string, permissions: Record<string, unknown>[], done?: () => void): void {
+    if (!/^\d+$/.test(roleId)) {
+      this.notifications.error('This role is not stored on the server, so its permissions cannot be changed.');
+      return;
+    }
+    this.saving.set(true);
+    this.http.call<unknown>(API_ENDPOINTS.ROLE_PERMISSIONS.ASSIGN, { id: roleId, body: { permissions } }).subscribe({
+      next: res => {
+        this.saving.set(false);
+        this.applyRole(Number(roleId), res);
+        this.syncOwnPermissions();
+        done?.();
+      },
+      // The error toast is shown by the HTTP layer; reload so the ticks show what is really stored.
+      error: () => {
+        this.saving.set(false);
+        this.loadRoles();
       }
-    }
-
-    // Re-index all sNo numbers cleanly from 1 to N
-    list.forEach((item, index) => {
-      item.sNo = index + 1;
-    });
-
-    // Update signal immediately so table renders the new permissions right away
-    this.items.set(list);
-
-    // If role filter is active and different from added role, switch filter so new items are visible
-    if (this.selectedRoleFilter() !== 'all' && this.selectedRoleFilter() !== role) {
-      this.selectedRoleFilter.set(role);
-    }
-    // Clear search box so it doesn't accidentally hide the newly added items
-    this.searchQuery.set('');
-
-    this.closeAddModal();
-  }
-
-  openEditModal(item: PermissionMasterItem): void {
-    this.editForm = {
-      id: item.id,
-      sNo: item.sNo,
-      roleType: item.roleType,
-      moduleName: item.moduleName,
-      canView: !!item.canView,
-      canEdit: !!item.canEdit,
-      canDelete: !!item.canDelete,
-      status: item.status || 'Active'
-    };
-    this.showEditModal.set(true);
-  }
-
-  closeEditModal(): void {
-    this.showEditModal.set(false);
-    this.editForm = null;
-  }
-
-  submitEdit(): void {
-    if (!this.editForm) return;
-
-    const updated: PermissionMasterItem = {
-      id: this.editForm.id,
-      sNo: this.editForm.sNo,
-      roleType: this.editForm.roleType,
-      moduleName: this.editForm.moduleName,
-      canView: this.editForm.canView,
-      canEdit: this.editForm.canEdit,
-      canDelete: this.editForm.canDelete,
-      status: this.editForm.status
-    };
-
-    this.permRepo.update(this.editForm.id, updated).subscribe(saved => {
-      this.items.update(list => list.map(i => (i.id === saved.id ? saved : i)));
-      this.closeEditModal();
     });
   }
 
-  openViewModal(item: PermissionMasterItem): void {
-    this.selectedViewItem.set(item);
-    this.showViewModal.set(true);
+  /**
+   * Reloads the signed-in user's own permissions (GET /auth/permissions) after a change, so the sidebar, menu names and
+   * buttons follow at once when the changed role is the one in use. The backend scopes the answer to the active role,
+   * so a change to another role leaves this user's menu as it is. Other signed-in users pick changes up on their next
+   * reload of the permissions (sign-in, role switch, or when their cache expires).
+   */
+  private syncOwnPermissions(): void {
+    this.tableAccess.refresh();
   }
 
-  closeViewModal(): void {
-    this.showViewModal.set(false);
-    this.selectedViewItem.set(null);
+  /** Puts the updated role from a permissions response in place (reloads everything when the answer is not a role). */
+  private applyRole(roleId: number, response: unknown): void {
+    const raw = response && typeof response === 'object' ? (response as Record<string, unknown>) : null;
+    const body = raw && raw['id'] === undefined && raw['data'] ? raw['data'] : raw;
+    const updated = body && (body as Record<string, unknown>)['id'] !== undefined ? toUserRoleItem(body) : null;
+    if (!updated || Number(updated.id) !== roleId) {
+      this.loadRoles();
+      return;
+    }
+    this.roles.update(list => list.map(r => (Number(r.id) === roleId ? { ...updated, sNo: r.sNo } : r)));
   }
 }

@@ -50,9 +50,16 @@ type ApprovedTpRow = SanctionTableRow & { released: boolean };
     <ng-template #actionTemplate let-row>
       @if (row.released) {
         <div class="flex items-center justify-center gap-2">
-          <button appButton variant="outline" size="sm" (click)="viewIpa(row)" title="Open the e-signed IPA">
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            (click)="viewIpa(row)"
+            title="Open the e-signed IPA"
+            aria-label="View IPA"
+          >
             <app-icon name="eye" size="sm" />
-            <span>View IPA</span>
           </button>
           <button appButton size="sm" (click)="allocateTarget(row)">Allocate Additional Target</button>
         </div>

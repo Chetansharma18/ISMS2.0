@@ -16,7 +16,9 @@ export class ApiError extends Error {
     /** Correlation id from the response header or body, to quote when reporting a problem. */
     readonly correlationId?: string,
     /** The method and URL of the failed request. */
-    readonly request?: { method: string; url: string }
+    readonly request?: { method: string; url: string },
+    /** Per-field validation errors when the backend names the field (`errors: [{ field, message, code }]`). */
+    readonly fieldErrors: ApiFieldError[] = []
   ) {
     super(message);
     this.name = 'ApiError';
@@ -71,9 +73,43 @@ type ErrorBody = {
   correlationId?: unknown;
 };
 
-/** Flattens `errors` sent as a list of strings or as ASP.NET-style `{ field: [messages] }`. */
+/** One validation failure the backend tied to a field. */
+export interface ApiFieldError {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+/**
+ * Field errors sent as `[{ field, message, code }]` (FluentValidation style) or as ASP.NET-style
+ * `{ field: [messages] }`. Entries without a field name are left out.
+ */
+export function collectFieldErrors(errors: unknown): ApiFieldError[] {
+  if (Array.isArray(errors)) {
+    return errors.flatMap(e => {
+      if (!e || typeof e !== 'object') return [];
+      const item = e as Record<string, unknown>;
+      const field = text(item['field']) ?? text(item['propertyName']);
+      const message = text(item['message']) ?? text(item['errorMessage']);
+      return field && message ? [{ field, message, code: text(item['code']) ?? text(item['errorCode']) }] : [];
+    });
+  }
+  if (errors && typeof errors === 'object') {
+    return Object.entries(errors as Record<string, unknown>).flatMap(([field, v]) =>
+      (Array.isArray(v) ? v : [v]).filter((m): m is string => typeof m === 'string' && !!m.trim()).map(message => ({ field, message }))
+    );
+  }
+  return [];
+}
+
+/** Flattens `errors` sent as a list of strings, a list of `{ message }` objects or ASP.NET-style `{ field: [messages] }`. */
 function collectErrors(errors: unknown): string[] {
-  if (Array.isArray(errors)) return errors.filter((e): e is string => typeof e === 'string');
+  if (Array.isArray(errors)) {
+    return errors.flatMap(e =>
+      typeof e === 'string' ? [e] : e && typeof e === 'object' && typeof (e as { message?: unknown }).message === 'string'
+        ? [(e as { message: string }).message] : []
+    );
+  }
   if (errors && typeof errors === 'object') {
     return Object.values(errors as Record<string, unknown>).flatMap(v =>
       Array.isArray(v) ? v.filter((e): e is string => typeof e === 'string') : typeof v === 'string' ? [v] : []
@@ -100,7 +136,9 @@ export function toApiError(error: unknown, request?: { method: string; url: stri
       (rawText && rawText.length <= 200 && !rawText.startsWith('<') ? rawText : undefined) ??
       defaultErrorMessage(error.status);
     const correlationId = error.headers?.get('X-Correlation-ID') ?? text(body?.correlationId);
-    return new ApiError(error.status, message, text(body?.code), errors, correlationId ?? undefined, request);
+    return new ApiError(
+      error.status, message, text(body?.code), errors, correlationId ?? undefined, request, collectFieldErrors(body?.errors)
+    );
   }
 
   if (error instanceof Error && error.name === 'TimeoutError') {

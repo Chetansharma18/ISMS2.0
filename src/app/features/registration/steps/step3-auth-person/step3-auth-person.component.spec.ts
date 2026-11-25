@@ -118,17 +118,79 @@ describe('Step3AuthPersonComponent - Heading-wise Grouping & Dynamic Identity Ve
     expect(s3Updated.aadhaarNo).toBe('987654321012');
   });
 
-  it('validates required fields only after submission is attempted', () => {
+  it('validates required fields after submission or when touched on blur (Bug 3)', () => {
     expect(component.getFieldError('firstName')).toBeUndefined();
     expect(component.getFieldError('mobileNo')).toBeUndefined();
     expect(component.getFieldError('emailId')).toBeUndefined();
 
+    // Blur on firstName marks touched and shows required
+    component.markTouched('firstName');
+    fixture.detectChanges();
+    expect(component.getFieldError('firstName')).toBe('Authorized Person First Name is required');
+    expect(component.getFieldError('mobileNo')).toBeUndefined();
+
+    // Blur on mobileNo marks touched and shows required
+    component.markTouched('mobileNo');
+    fixture.detectChanges();
+    expect(component.getFieldError('mobileNo')).toBe('Mobile Number is required');
+
+    // On submission, all required fields show
     validationService.markStepSubmitted(2);
     fixture.detectChanges();
 
-    expect(component.getFieldError('firstName')).toBe('Authorized Person First Name is required');
-    expect(component.getFieldError('mobileNo')).toBe('Mobile Number is required');
     expect(component.getFieldError('emailId')).toBe('Email Address is required');
+  });
+
+  it('validates format errors on input for mobile, email, and identity documents (Bug 2 & 3)', () => {
+    // Mobile format
+    formService.updateStep3({ mobileNo: '12345' });
+    fixture.detectChanges();
+    expect(component.getFieldError('mobileNo')).toBe('Invalid 10-digit Mobile Number');
+
+    formService.updateStep3({ mobileNo: '9876543210' });
+    fixture.detectChanges();
+    expect(component.getFieldError('mobileNo')).toBeUndefined();
+
+    // Email format (Bug 3)
+    formService.updateStep3({ emailId: 'invalid-email' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
+
+    formService.updateStep3({ emailId: '86rnvhgxchgnb@gfhkj.cc' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
+
+    formService.updateStep3({ emailId: 'dfghgj' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBe('Invalid Email Address format');
+
+    formService.updateStep3({ emailId: 'person@example.com' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBeUndefined();
+
+    formService.updateStep3({ emailId: 'contact@skilltech.org' });
+    fixture.detectChanges();
+    expect(component.getFieldError('emailId')).toBeUndefined();
+
+    // PAN Card format (Bug 2)
+    component.onDocTypeChange('PAN Card');
+    component.onDocNumberChange('INVALID123');
+    fixture.detectChanges();
+    expect(component.getFieldError('identityDocNumber')).toBe('Invalid PAN format (e.g. ABCDE1234F)');
+
+    component.onDocNumberChange('ABCDE1234F');
+    fixture.detectChanges();
+    expect(component.getFieldError('identityDocNumber')).toBeUndefined();
+
+    // Aadhaar format
+    component.onDocTypeChange('Aadhaar Card');
+    component.onDocNumberChange('123');
+    fixture.detectChanges();
+    expect(component.getFieldError('identityDocNumber')).toBe('Invalid 12-digit Aadhaar Number');
+
+    component.onDocNumberChange('123456789012');
+    fixture.detectChanges();
+    expect(component.getFieldError('identityDocNumber')).toBeUndefined();
   });
 
   it('populates existing user authorized person details correctly', () => {

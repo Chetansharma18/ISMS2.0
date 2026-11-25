@@ -1,7 +1,7 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HostelItem } from './batch-form.util';
-import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
+import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../shared';
 
 // Default change detection: the parent pushes/splices hostelList in place.
 // app-table is OnPush and only refreshes on a new array, so the grid is fed a shallow copy (`rows`) that is
@@ -9,7 +9,7 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
 @Component({
   selector: 'app-batch-hostel-table',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, TableComponent, DropdownComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-2.5">
@@ -68,18 +68,13 @@ import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableCompo
 
       <!-- Type -->
       <ng-template #typeTpl let-hostel let-i="index">
-        <select
-          appInput
+        <app-dropdown
           size="sm"
-          [(ngModel)]="hostel.type"
-          [name]="'hostel_type_' + i"
+          [options]="hostelTypeOptions"
+          [(value)]="hostel.type"
+          placeholder="Select Type"
           class="w-full"
-        >
-          <option value="Boys">Boys</option>
-          <option value="Girls">Girls</option>
-          <option value="Co-ed">Co-ed</option>
-          <option value="Not Applicable">Not Applicable</option>
-        </select>
+        />
       </ng-template>
 
       <!-- Capacity -->
@@ -121,6 +116,8 @@ export class BatchHostelTableComponent {
 
   readonly addHostel = output<void>();
   readonly removeHostel = output<number>();
+
+  readonly hostelTypeOptions = ['Boys', 'Girls', 'Co-ed', 'Not Applicable'];
 
   /** Bumped after each add/remove so `rows` becomes a new array even though the parent mutates its own. */
   private readonly version = signal(0);

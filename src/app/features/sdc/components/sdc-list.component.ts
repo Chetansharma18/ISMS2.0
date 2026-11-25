@@ -18,6 +18,7 @@ import {
   IconComponent,
   InputDirective,
   PageShellComponent,
+  DropdownComponent,
   TableColumn
 } from '../../../shared';
 import { FilterTabsComponent } from '../../../shared';
@@ -34,8 +35,8 @@ import { FilterTabsComponent } from '../../../shared';
     TableComponent,
     ButtonComponent,
     IconComponent,
-    InputDirective,
     PageShellComponent,
+    DropdownComponent,
     CenterHeadAssignModalComponent
   ],
   template: `
@@ -47,7 +48,7 @@ import { FilterTabsComponent } from '../../../shared';
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'SDC Management' }]"
           [searchable]="true"
           [(searchQuery)]="searchQuery"
-          searchPlaceholder="Search TP name, SDC, code, sector, district..."
+          searchPlaceholder="Search TP, SDC, code, sector, district..."
         ></app-page-header>
 
         <!-- Success Alert Notification -->
@@ -66,63 +67,49 @@ import { FilterTabsComponent } from '../../../shared';
           
           <app-filter-tabs [options]="filterOptions()" [value]="activeFilter()" (valueChange)="setFilter($event)" />
 
-          <div class="text-xs text-slate-500 font-medium hidden sm:block">
-            Showing {{ filteredSdcs().length }} {{ filteredSdcs().length === 1 ? 'center' : 'centers' }}
-          </div>
-
         </div>
 
         <!-- Admin Advanced Filter Bar (TP filter, Scheme filter, District filter, and Search) -->
         @if (isAdmin()) {
-          <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
+          <div class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
             
             <!-- Filter: TP Name -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[200px] max-w-[280px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">TP Name:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedTp()"
-                (ngModelChange)="selectedTp.set($event)"
-                class="max-w-50"
-              >
-                <option value="ALL">All Training Partners ({{ tpList().length }})</option>
-                @for (tp of tpList(); track tp) {
-                  <option [value]="tp">{{ tp }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="tpDropdownOptions()"
+                [value]="selectedTp()"
+                (valueChange)="selectedTp.set($event)"
+                placeholder="All Training Partners"
+              />
             </div>
 
             <!-- Filter: Scheme -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[170px] max-w-[260px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedScheme()"
-                (ngModelChange)="selectedScheme.set($event)"
-              >
-                <option value="ALL">All Schemes</option>
-                @for (sch of schemeList(); track sch) {
-                  <option [value]="sch">{{ sch }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="schemeDropdownOptions()"
+                [value]="selectedScheme()"
+                (valueChange)="selectedScheme.set($event)"
+                placeholder="All Schemes"
+              />
             </div>
 
             <!-- Filter: District -->
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 min-w-[150px] max-w-[220px]">
               <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">District:</label>
-              <select
-                appInput
+              <app-dropdown
                 size="sm"
-                [ngModel]="selectedDistrict()"
-                (ngModelChange)="selectedDistrict.set($event)"
-              >
-                <option value="ALL">All Districts</option>
-                @for (dst of districtList(); track dst) {
-                  <option [value]="dst">{{ dst }}</option>
-                }
-              </select>
+                class="flex-1"
+                [options]="districtDropdownOptions()"
+                [value]="selectedDistrict()"
+                (valueChange)="selectedDistrict.set($event)"
+                placeholder="All Districts"
+              />
             </div>
 
             <!-- Reset filters -->
@@ -238,60 +225,56 @@ import { FilterTabsComponent } from '../../../shared';
 
         <!-- Template: Actions (View Details in the exact same vertical column line) -->
         <ng-template #actionsTemplate let-sdc>
-          <div class="flex items-center justify-center gap-3 whitespace-nowrap py-2 px-1">
-            
-            <!-- Slot 1 (fixed width, training partner only): '+ Create Batch', or 'Edit' when the department returned the SDC.
-                 The department only views an SDC here; it decides on the details screen. -->
+          <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap py-1">
+            <!-- Training Partner Actions: '+ Create Batch', or 'Edit' when returned -->
             @if (!isAdmin()) {
-            <div class="w-36 flex justify-center shrink-0">
-              <!-- If the center is APPROVED, show "+ Create Batch" -->
               @if (sdc.status === 'APPROVED' || sdc.status === 'Approved') {
                 <button
                   appButton
+                  variant="ghost"
                   size="sm"
-                  block
+                  iconOnly
                   type="button"
                   [disabled]="batchLimitReached(sdc)"
                   (click)="createBatch(sdc)"
                   [title]="batchLimitReached(sdc) ? 'All batches of this center are registered' : 'Create Batch'"
+                  aria-label="Create Batch"
                 >
                   <app-icon name="plus" size="sm" />
-                  <span>Create Batch</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               }
 
-              <!-- Edit: only when the department returned the SDC for corrections -->
               @if (sdc.status === 'RETURNED_TO_TP') {
                 <button
                   appButton
+                  variant="ghost"
                   size="sm"
-                  block
+                  iconOnly
                   type="button"
                   (click)="editSdc(sdc)"
-                  title="Edit the SDC details the department asked to correct"
+                  title="Edit SDC Details"
+                  aria-label="Edit SDC Details"
                 >
                   <app-icon name="edit" size="sm" />
-                  <span>Edit</span>
                 </button>
+                <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
               }
-
-            </div>
             }
 
-            <!-- View Details button (same fixed width, always in the same vertical line) -->
+            <!-- View Details button -->
             <button
               appButton
-              variant="outline"
+              variant="ghost"
               size="sm"
-              class="w-24 shrink-0"
+              iconOnly
               type="button"
               (click)="viewDetails(sdc)"
               title="View Center Details"
+              aria-label="View Center Details"
             >
               <app-icon name="eye" size="sm" />
-              <span>View</span>
             </button>
-
           </div>
         </ng-template>
 
@@ -345,7 +328,7 @@ export class SdcListComponent {
         { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
         { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[160px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-24' }
       ];
     } else {
       return [
@@ -359,7 +342,7 @@ export class SdcListComponent {
         { key: 'batches', label: 'Batches Registered', align: 'center', type: 'custom', width: 'w-32' },
         { key: 'status', label: 'Status', align: 'center', type: 'custom', width: 'min-w-[140px]' },
         { key: 'centerHead', label: 'Center Head', align: 'center', type: 'custom', width: 'min-w-[190px]' },
-        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[300px]' }
+        { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-32 min-w-[110px]' }
       ];
     }
   });
@@ -370,15 +353,30 @@ export class SdcListComponent {
     return Array.from(new Set(list.map(s => s.tpName).filter(Boolean)));
   });
 
+  readonly tpDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Training Partners' },
+    ...this.tpList().map(tp => ({ value: tp, label: tp }))
+  ]);
+
   readonly schemeList = computed(() => {
     const list = this.sdcService.sdcs();
     return Array.from(new Set(list.map(s => s.scheme).filter(Boolean)));
   });
 
+  readonly schemeDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Schemes' },
+    ...this.schemeList().map(s => ({ value: s, label: s }))
+  ]);
+
   readonly districtList = computed(() => {
     const list = this.sdcService.sdcs();
     return Array.from(new Set(list.map(s => s.district).filter(Boolean)));
   });
+
+  readonly districtDropdownOptions = computed(() => [
+    { value: 'ALL', label: 'All Districts' },
+    ...this.districtList().map(d => ({ value: d, label: d }))
+  ]);
 
   readonly hasActiveFilters = computed(() => {
     return (

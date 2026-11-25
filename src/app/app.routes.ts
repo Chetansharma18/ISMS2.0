@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
 
 export const routes: Routes = [
   {
@@ -76,8 +77,8 @@ export const routes: Routes = [
   {
     path: 'tender-status',
     loadComponent: () =>
-      import('./features/tenders/tender-status.component').then(
-        (m) => m.TenderStatusComponent
+      import('./features/tenders/eoi-status/eoi-status.component').then(
+        (m) => m.EoiStatusComponent
       )
   },
   {
@@ -85,6 +86,37 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/payment-history/payment-history.component').then(
         (m) => m.PaymentHistoryComponent
+      )
+  },
+  {
+    path: 'privacy-policy',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'terms-and-conditions',
+    canActivate: [
+      () => {
+        if (typeof window !== 'undefined') {
+          window.location.replace(EXTERNAL_LEGAL_URL);
+        }
+        return false;
+      }
+    ],
+    children: []
+  },
+  {
+    path: 'help-support',
+    loadComponent: () =>
+      import('./features/help-support/help-support.component').then(
+        (m) => m.HelpSupportComponent
       )
   },
   {
@@ -145,6 +177,17 @@ export const routes: Routes = [
       import('./features/eoi/pages/department-eoi-view/department-eoi-view.component').then(
         (m) => m.DepartmentEoiViewComponent
       )
+  },
+  {
+    path: 'admin/empanelment-order',
+    loadComponent: () =>
+      import('./features/eoi/pages/empanelment-orders/empanelment-orders.component').then(
+        (m) => m.EmpanelmentOrdersPageComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-orders',
+    redirectTo: 'admin/empanelment-order'
   },
   {
     path: 'admin/sanction-orders',
@@ -224,6 +267,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/eoi/pages/scrutiny-desk/scrutiny-desk.component').then(
         (m) => m.ScrutinyDeskComponent
+      )
+  },
+  {
+    path: 'admin/result-orders/:eoiId/:orderId',
+    loadComponent: () =>
+      import('./features/eoi/pages/result-order-editor/result-order-editor.component').then(
+        (m) => m.ResultOrderEditorComponent
       )
   },
   {
@@ -341,6 +391,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/master/annexure',
+    loadComponent: () =>
+      import('./features/admin-master/annexure-master.component').then(
+        (m) => m.AnnexureMasterComponent
+      )
+  },
+  {
     path: 'admin/master/remark',
     loadComponent: () =>
       import('./features/admin-master/remark-master.component').then(
@@ -359,6 +416,38 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/user-management/user-management.component').then(
         (m) => m.UserManagementComponent
+      )
+  },
+  {
+    // Backend users (/api/users) with their profile details and roles.
+    path: 'admin/users',
+    loadComponent: () =>
+      import('./features/users/users-page.component').then(
+        (m) => m.UsersPageComponent
+      )
+  },
+  {
+    // Department users (backend /api/department-users): SSO ID -> role, designation, schemes, districts, blocks.
+    path: 'admin/department-users',
+    loadComponent: () =>
+      import('./features/department-users/department-users-page.component').then(
+        (m) => m.DepartmentUsersPageComponent
+      )
+  },
+  {
+    // Which user holds which role (backend UserRoles); assign and revoke roles.
+    path: 'admin/user-roles',
+    loadComponent: () =>
+      import('./features/users/user-roles-page.component').then(
+        (m) => m.UserRolesPageComponent
+      )
+  },
+  {
+    // A permitted backend table that has no dedicated screen yet (linked from the permission-driven sidebar).
+    path: 'module/:tableName',
+    loadComponent: () =>
+      import('./features/modules/table-module-page.component').then(
+        (m) => m.TableModulePageComponent
       )
   },
   {

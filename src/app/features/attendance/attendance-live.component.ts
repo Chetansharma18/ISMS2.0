@@ -107,7 +107,7 @@ function noteOf(mark: AttendanceMark | undefined): string {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-x-3.5 gap-y-2.5 items-end">
           <div class="lg:col-span-3">
-            <app-form-input label="Session Date" type="date" [value]="date()" (valueChange)="onDate($event)"></app-form-input>
+            <app-form-input label="Session Date" type="date" [min]="minSessionDate()" [max]="maxSessionDate()" [value]="date()" (valueChange)="onDate($event)"></app-form-input>
           </div>
           <div class="lg:col-span-5 pb-0.5">
             <app-filter-tabs [options]="slotTabs()" [value]="slot()" (valueChange)="onSlot($event)" />
@@ -228,6 +228,13 @@ export class AttendanceLiveComponent implements OnInit {
   protected readonly batch = computed(() => this.batchService.getBatchById(this.batchId()));
   protected readonly device = computed(() => this.attendance.deviceOf(this.batchId()));
   private readonly today = toIsoDate(new Date());
+
+  protected readonly minSessionDate = computed(() => this.batch()?.startDate ?? '');
+  protected readonly maxSessionDate = computed(() => {
+    const b = this.batch();
+    if (b?.endDate && b.endDate < this.today) return b.endDate;
+    return this.today;
+  });
 
   protected readonly date = signal<string>('');
   protected readonly slot = signal<AttendanceSlot>('START');

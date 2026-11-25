@@ -15,6 +15,7 @@
  *   header-search / header-button-size  see HEADER_RULES below (page title bars look identical)
  *   button-style, raw-icon-font          see FILE_RULES below
  *   page-frame   a routed screen outside <app-page-shell> / <app-list-page> / <app-document-page> / <app-master-crud-page>
+ *   raw-http     fetch / XMLHttpRequest / HttpBackend outside the HTTP layer (misses x-api-key) -> HttpService
  *
  * Existing violations are recorded per file in tools/ui-guard-baseline.json. The check fails when a
  * file has MORE violations than its baseline (or a new file has any). Migrating a screen lowers its
@@ -56,7 +57,9 @@ const KIT_PREFIXES = [
   'shared/components/form-controls/',
   'shared/components/loader/',
   'shared/components/status-badge/',
+  'shared/components/master-filter-bar/',
   'shared/components/empty-state/',
+  'shared/components/detail-view/',
   'shared/components/toast-outlet/'
 ];
 
@@ -121,6 +124,37 @@ const FILE_RULES = {
  */
 const PAGE_FRAME = /<app-(?:page-shell|list-page|document-page|master-crud-page)\b/;
 const PAGE_FRAME_RULE = 'page-frame';
+
+/**
+ * raw-http  a request that skips the app's HttpClient (fetch, XMLHttpRequest, HttpBackend, sendBeacon).
+ * Such a request misses the interceptors, so the backend rejects it without x-api-key / x-client.
+ * Use HttpService / DataEngineService. Checked in every .ts file (services and utils too), except the HTTP layer.
+ */
+const RAW_HTTP_RULE = 'raw-http';
+const RAW_HTTP = /\bfetch\s*\(|\bnew\s+XMLHttpRequest\b|\bHttpBackend\b|\bsendBeacon\s*\(/g;
+const RAW_HTTP_EXEMPT = ['core/http/', 'core/config/'];
+
+function* walkAllTs(dir) {
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) yield* walkAllTs(full);
+    else if (name.endsWith('.ts') && !name.endsWith('.spec.ts')) yield full;
+  }
+}
+
+function scanRawHttp(result) {
+  for (const file of walkAllTs(appDir)) {
+    const rel = relative(appDir, file).split(sep).join('/');
+    if (RAW_HTTP_EXEMPT.some(prefix => rel.startsWith(prefix))) continue;
+    const text = readFileSync(file, 'utf8');
+    let count = 0;
+    for (const match of text.matchAll(RAW_HTTP)) {
+      const lastLine = text.slice(Math.max(0, match.index - 240), match.index).split('\n').slice(-5).join('\n');
+      if (!lastLine.includes(ALLOW)) count++;
+    }
+    if (count > 0) (result[rel] ??= {})[RAW_HTTP_RULE] = count;
+  }
+}
 
 /** Files that app.routes.ts loads: every `import('./features/...')`, as a path relative to src/app. */
 function routedFiles() {
@@ -199,12 +233,15 @@ function scan() {
       (result[rel] ??= {})[PAGE_FRAME_RULE] = 1;
     }
   }
+  scanRawHttp(result);
   return result;
 }
 
 function total(map) {
   const sums = Object.fromEntries(
-    [...Object.keys(RULES), ...Object.keys(HEADER_RULES), ...Object.keys(FILE_RULES), PAGE_FRAME_RULE].map(rule => [rule, 0])
+    [...Object.keys(RULES), ...Object.keys(HEADER_RULES), ...Object.keys(FILE_RULES), PAGE_FRAME_RULE, RAW_HTTP_RULE].map(
+      rule => [rule, 0]
+    )
   );
   for (const rules of Object.values(map)) for (const [rule, n] of Object.entries(rules)) sums[rule] += n;
   return sums;
@@ -256,6 +293,7 @@ if (problems.length > 0) {
       '\n  header-*        page title bar: <app-page-header [searchable]="true">, header buttons size="sm"' +
       '\n  button-style    no colour / border / padding classes on appButton: use variant and size' +
       '\n  page-frame      a routed screen must sit in app-page-shell / app-list-page / app-document-page / app-master-crud-page' +
+      '\n  raw-http        fetch / XMLHttpRequest / HttpBackend skip the interceptors (no x-api-key): use HttpService' +
       '\nStarting a new page?  npm run new:page -- list <feature>/<name> "Title"' +
       '\nFor a deliberate exception add  <!-- ui-guard-allow: reason -->  on the line above it' +
       '\n(whole screen: a  // ui-guard-allow: page-frame - reason  comment at the top of the file).'

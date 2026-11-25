@@ -4,6 +4,7 @@ import { map, switchMap, take } from 'rxjs/operators';
 import { ShortfallRequest, ShortfallResponse, SubmittedTender } from '../../../core/models/tender.model';
 import { DataEngineService } from '../../../core/services/data-engine.service';
 import { StorageService } from '../../../core/services/storage.service';
+import { formatDateMedium } from '../../../shared/utils/date.util';
 import { ApplicationActivityLog, ApplicantResponse, ApplicantAppeal } from './eoi-state.models';
 import { EoiStateService } from './eoi-state.service';
 
@@ -98,6 +99,7 @@ export class ShortfallBridgeService {
           ? application.activityLog
           : [];
 
+        const isApproved = tender.submittedStatus === 'Approved' || tender.submittedStatus === 'Accepted';
         const appealActivity: ApplicationActivityLog = {
           id: `ACT-${Date.now()}`,
           timestamp: appeal.submittedOn,
@@ -105,7 +107,9 @@ export class ShortfallBridgeService {
           title: 'Appeal Request Submitted',
           actor: application?.authorizedSignatory?.name || 'Applicant',
           actorRole: 'Applicant / TP',
-          description: `Applicant submitted an appeal request against rejection. Remarks: "${appeal.reply}"`,
+          description: isApproved
+            ? `Applicant submitted an appeal request against approved proposal terms. Remarks: "${appeal.reply}"`
+            : `Applicant submitted an appeal request against rejection. Remarks: "${appeal.reply}"`,
           badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
           meta: { remarks: appeal.reply }
         };
@@ -113,12 +117,12 @@ export class ShortfallBridgeService {
         const originalDisqualification = application?.scrutinyDetails?.disqualificationReason
           || tender.rejectionReason
           || application?.scrutinyDetails?.remarks
-          || 'Technical qualification criteria not met.';
+          || (isApproved ? 'Approved proposal terms' : 'Technical qualification criteria not met.');
 
         return this.eoiState.updateScrutinyDecision(targetId, {
           status: 'REVERTED',
           remarks: originalDisqualification,
-          disqualificationReason: originalDisqualification,
+          disqualificationReason: isApproved ? undefined : originalDisqualification,
           appeal: {
             submittedOn: appeal.submittedOn,
             reply: appeal.reply,
@@ -146,7 +150,11 @@ export class ShortfallBridgeService {
               status: 'Rejected' as const,
               rejectionReason: remarks
             } : undefined;
-            return this.tenderRepo.update(tender.id, { appeal: updatedAppeal }).pipe(map(() => true));
+            return this.tenderRepo.update(tender.id, {
+              submittedStatus: 'Rejected',
+              rejectionReason: remarks,
+              appeal: updatedAppeal
+            }).pipe(map(() => true));
           })
         );
       })
@@ -163,27 +171,27 @@ export class ShortfallBridgeService {
         const history: ApplicationActivityLog[] = application?.activityLog?.length
           ? application.activityLog
           : [
-              {
-                id: `ACT-${Date.now()}-0`,
-                timestamp: application?.submissionDate || '08/09/2026 14:30 PM',
-                action: 'SUBMITTED',
-                title: 'EOI Proposal Submitted',
-                actor: application?.authorizedSignatory?.name || 'Applicant',
-                actorRole: 'Applicant / TP',
-                description: `Proposal submitted under ${application?.schemeName || tender.schemeTitle}.`
-              }
-            ];
+            {
+              id: `ACT-${Date.now()}-0`,
+              timestamp: application?.submissionDate || '08/09/2026 14:30 PM',
+              action: 'SUBMITTED',
+              title: 'EOI Proposal Submitted',
+              actor: application?.authorizedSignatory?.name || 'Applicant',
+              actorRole: 'Applicant / TP',
+              description: `Proposal submitted under ${application?.schemeName || tender.schemeTitle}.`
+            }
+          ];
 
         const uploaded = response.uploads.map(u => u.requiredDoc);
         const resubmitted: ApplicationActivityLog = {
           id: `ACT-${Date.now()}`,
           timestamp: response.respondedOn,
           action: 'RESUBMITTED',
-          title: 'Applicant Responded to Appeal Response / Shortfall',
+          title: 'Applicant Responded to Department Appeal Request',
           actor: `${application?.authorizedSignatory?.name || 'Applicant'} (Authorized Signatory)`,
           actorRole: 'Applicant / TP',
           description:
-            `Response to the shortfall request raised on ${notice.raisedOn} submitted with ${uploaded.length} document(s).` +
+            `Response to the department appeal request raised on ${notice.raisedOn} submitted with ${uploaded.length} document(s).` +
             (response.remarks ? ` Remarks: "${response.remarks}"` : ''),
           badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
           meta: { documents: uploaded, officeOrderRef: notice.officeOrderRef, remarks: response.remarks }
@@ -193,7 +201,7 @@ export class ShortfallBridgeService {
           id: `DOC-RESUB-${Date.now()}-${i}`,
           title: u.requiredDoc,
           fileSize: u.fileSize || '1.5 MB',
-          category: 'Appeal / Shortfall Uploaded Document',
+          category: 'Appeal Uploaded Document',
           verified: true
         }));
 
@@ -295,7 +303,7 @@ export class ShortfallBridgeService {
             id: `DOC-RESUB-${Date.now()}-${i}`,
             title: u.requiredDoc,
             fileSize: u.fileSize || '1.5 MB',
-            category: 'Appeal / Shortfall Uploaded Document',
+            category: 'Appeal Uploaded Document',
             verified: true
           }));
 
@@ -363,8 +371,17 @@ export class ShortfallBridgeService {
               status: (status === 'APPROVED' ? 'Accepted' : 'Rejected') as 'Accepted' | 'Rejected',
               rejectionReason: status === 'REJECTED' ? (remarks || 'Appeal rejected after review.') : undefined
             } : undefined;
+            const now = new Date();
+            const decDate = formatDateMedium(now, '-');
+            const d = new Date(now);
+            d.setDate(d.getDate() + 7);
+            const appDeadline = formatDateMedium(d, '-');
+
             return this.tenderRepo.update(tender.id, {
               submittedStatus: newStatus,
+              decisionDate: decDate,
+              appealDeadline: appDeadline,
+              scrutinyRemarks: status === 'APPROVED' ? remarks : tender.scrutinyRemarks,
               rejectionReason: status === 'REJECTED' ? (remarks || tender.rejectionReason) : undefined,
               appeal: updatedAppeal
             }).pipe(map(() => true));

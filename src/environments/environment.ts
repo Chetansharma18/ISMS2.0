@@ -9,8 +9,8 @@ export const environment: AppEnvironment = {
   apiUrl: '/api',
   api: {
     clientId: 'web',
-    // Value of the `x-api-key` header. Leave empty to not send it. Identifies the client only: anything in the
-    // browser bundle is public, so it must never be treated as a secret.
+    // Mandatory `x-api-key` header: the backend rejects API requests without it (MISSING_API_KEY). Identifies the
+    // client only: anything in the browser bundle is public, so it must never be treated as a secret.
     apiKey: 'isms-secret-api-key-2026',
     withCredentials: true,
     timeoutMs: 30000

@@ -1,15 +1,27 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, input, output } from '@angular/core';
-import { ButtonComponent } from '../button/button.component';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  input,
+  output
+} from '@angular/core';
 import { IconComponent } from '../icon/icon.component';
+import { ModalService } from '../../services/modal.service';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 const WIDTH: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-4xl',
-  '2xl': 'max-w-5xl'
+  xs: 'max-w-[360px]',
+  sm: 'max-w-[400px]',
+  md: 'max-w-[560px]',
+  lg: 'max-w-[720px]',
+  xl: 'max-w-[960px]',
+  '2xl': 'max-w-[1200px]',
+  full: 'max-w-full'
 };
 
 let nextId = 0;
@@ -34,56 +46,71 @@ let nextId = 0;
   selector: 'app-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonComponent, IconComponent],
+  imports: [IconComponent],
   host: {
     '[attr.title]': 'null'
   },
   template: `
     <div
-      class="fixed inset-0 z-50 flex justify-center p-3 sm:p-4 md:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
-      style="background: rgba(10, 20, 40, 0.5); backdrop-filter: blur(4px);"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      style="background: rgba(10, 20, 40, 0.45); backdrop-filter: blur(3px);"
       (click)="onBackdrop($event)"
     >
       <div
-        class="w-full bg-white rounded-xl border border-[#EADCE2] shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
+        [class.overflow-visible]="!scrollBody()"
+        [class.overflow-hidden]="scrollBody()"
+        [class.max-h-[90vh]]="scrollBody()"
+        style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
         [class]="widthClass()"
         role="dialog"
         aria-modal="true"
         [attr.aria-labelledby]="title() ? titleId : null"
         (click)="$event.stopPropagation()"
       >
-        <div class="h-1.5 w-full bg-[#7C0E44] shrink-0 print:hidden"></div>
+        <!-- Top Right Close Button -->
+        @if (showClose()) {
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+            title="Close"
+            aria-label="Close"
+          >
+            <app-icon name="close" [stroke]="2.5" />
+          </button>
+        }
 
-        @if (title() || showClose()) {
-          <div class="px-5 sm:px-6 pt-5 pb-4 border-b border-[#EADCE2] flex items-start justify-between gap-3 shrink-0">
-            <div class="min-w-0">
-              @if (title()) {
-                <h2 [id]="titleId" class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">{{ title() }}</h2>
-              }
-              @if (subtitle()) {
-                <p class="text-xs text-[#625663] m-0 mt-0.5">{{ subtitle() }}</p>
-              }
-            </div>
-            @if (showClose()) {
-              <button appButton variant="ghost" size="sm" iconOnly aria-label="Close" title="Close" (click)="close.emit()">
-                <app-icon name="close" />
-              </button>
+        <!-- Header -->
+        @if (title()) {
+          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-2 shrink-0 pr-12">
+            <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              {{ title() }}
+            </h2>
+            @if (subtitle()) {
+              <p class="m-0 mt-1 text-[#625663] font-normal leading-relaxed text-xs">
+                {{ subtitle() }}
+              </p>
             }
           </div>
         }
 
-        <div class="px-5 sm:px-6 py-5 flex-1 min-h-0" [class.overflow-auto]="scrollBody()">
+        <!-- Body -->
+        <div class="px-4 sm:px-7 py-4" [class.flex-1]="scrollBody()" [class.min-h-0]="scrollBody()" [class.overflow-auto]="scrollBody()" [class.overflow-visible]="!scrollBody()">
           <ng-content />
         </div>
 
-        <div class="px-5 sm:px-6 py-4 border-t border-[#EADCE2] bg-[#FCF8FA] flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
+        <!-- Footer -->
+        <div class="px-4 sm:px-7 pb-5 sm:pb-7 pt-2 bg-white flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
           <ng-content select="[modalFooter]" />
         </div>
       </div>
     </div>
   `
 })
-export class ModalComponent {
+export class ModalComponent implements OnInit, OnDestroy {
+  private readonly modalService = inject(ModalService);
+
   readonly title = input('');
   readonly subtitle = input('');
   readonly size = input<ModalSize>('md');
@@ -91,13 +118,21 @@ export class ModalComponent {
   readonly widthOverride = input('');
   readonly showClose = input(true);
   readonly closeOnBackdrop = input(true);
-  /** Turn off when the body manages its own scrolling. */
-  readonly scrollBody = input(true);
+  /** Turn off when the body manages its own scrolling or contains overlay dropdowns. */
+  readonly scrollBody = input(false);
 
   readonly close = output<void>();
 
   protected readonly titleId = `app-modal-title-${++nextId}`;
   protected readonly widthClass = computed(() => this.widthOverride() || WIDTH[this.size()]);
+
+  ngOnInit(): void {
+    this.modalService.registerModalOpen();
+  }
+
+  ngOnDestroy(): void {
+    this.modalService.registerModalClose();
+  }
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {

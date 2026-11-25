@@ -18,8 +18,8 @@ import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } f
     <button
       type="button"
       role="switch"
-      class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
-      [class]="checked() ? 'bg-navy hover:bg-navy-dark' : 'bg-slate-300 hover:bg-slate-400'"
+      class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
+      [class]="checked() ? (color() === 'navy' ? 'bg-navy hover:bg-navy-dark' : 'bg-emerald-600 hover:bg-emerald-700') : 'bg-slate-300 hover:bg-slate-400'"
       [attr.aria-checked]="checked()"
       [attr.aria-label]="label()"
       [disabled]="disabled()"
@@ -36,6 +36,7 @@ import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } f
 export class SwitchComponent {
   readonly checked = input(false, { transform: booleanAttribute });
   readonly disabled = input(false, { transform: booleanAttribute });
+  readonly color = input<'emerald' | 'navy'>('emerald');
   /** Read out by screen readers, for example "Active status". */
   readonly label = input('Toggle');
 

@@ -23,6 +23,7 @@ const CONFIG: MasterCrudConfig<SectorMasterItem> = {
   itemUnit: 'sectors',
   columns: COLUMNS,
   hasStatus: true,
+  hideViewAction: true,
   modalWidthClass: 'max-w-[500px]',
   fields: [
     { key: 'sectorName', label: 'Sector Name', type: 'text', required: true, maxLength: 100, placeholder: 'Enter sector name (e.g. Aerospace and Aviation)', colSpan: 3 },

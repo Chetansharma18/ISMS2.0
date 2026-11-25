@@ -25,15 +25,15 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
           <h2 id="decision-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">
             @if (applicant()?.appeal) {
               @if (applicant()?.appeal?.status === 'Accepted') {
-                Appeal Accepted
+                Appeal Approved
               } @else if (applicant()?.appeal?.status === 'Rejected') {
                 Appeal Rejected
               } @else {
-                Appeal Request
+                Appeal Pending Review
               }
             } @else {
               @switch (applicant()?.status) {
-                @case ('REVERTED') { Appeal Accepted }
+                @case ('REVERTED') { Appeal Approved }
                 @case ('REJECTED') { Rejected }
                 @default { Approved }
               }

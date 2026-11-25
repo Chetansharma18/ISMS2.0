@@ -2,8 +2,11 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, compute
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { EoiStateService, Scheme } from '../../services/eoi-state.service';
 import { AuthService, AssignedRole, UserRole } from '../../../../core/auth/auth.service';
+import { HttpService } from '../../../../core/http/http.service';
+import { API_ENDPOINTS } from '../../../../core/config/api.config';
+import { ApiError } from '../../../../core/http/api-error';
+import { EoiResponsesRow, filterResponsesRows, responsesRowsFrom } from './department-eoi-view.util';
 import { PermissionService } from '../../../../core/permissions/permission.service';
 import {
   ButtonComponent,
@@ -30,12 +33,12 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
       title="EOI Responses"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'EOI Responses' }]"
       [(searchQuery)]="searchQuery"
-      searchPlaceholder="Search Scheme Name, Ref No, Category..."
+      searchPlaceholder="Search Scheme, Ref No, Category..."
       [columns]="schemeColumns"
       [data]="filteredSchemes()"
       [pagination]="true"
       [pageSize]="10"
-      emptyMessage="No schemes match your search query."
+      [emptyMessage]="loading() ? 'Loading EOIs...' : searchQuery() ? 'No EOIs match your search query.' : 'No EOIs to review. EOIs appear here once you are on their committee.'"
       [customTemplates]="{
         schemeTitle: schemeTitleTemplate,
         responseCount: responseCountTemplate,
@@ -66,21 +69,40 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
           <span class="text-slate-500 text-[11px] ml-1">EOIs</span>
         </ng-template>
 
-        <!-- Custom Action Template: Changed button text to 'View' with guaranteed white text -->
+        @if (loadError()) {
+          <p beforeTable class="m-0 p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs font-medium text-rose-700" role="alert">{{ loadError() }}</p>
+        }
+
+        <!-- Custom Action Template: Icon-only with tooltips. The backend decides when submissions unlock. -->
         <ng-template #actionTemplate let-scheme>
-          @if (scheme.status === 'Closed') {
-            <a appButton size="sm" [routerLink]="['/admin/responses', scheme.id]">
-              <span>View</span>
+          @if (!scheme.isLocked) {
+            <a
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              [routerLink]="['/admin/responses', scheme.id]"
+              title="View Submissions"
+              aria-label="View Submissions"
+            >
+              <app-icon name="eye" size="sm" />
             </a>
           } @else {
             <div class="relative group inline-block">
-              <button appButton variant="outline" size="sm" disabled title="Submissions unlock upon Date of closing">
-                <app-icon name="lock" size="xs" [stroke]="2" class="text-slate-400" />
-                <span>View</span>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                disabled
+                [title]="scheme.lockReason"
+                [attr.aria-label]="scheme.lockReason"
+              >
+                <app-icon name="lock" size="sm" [stroke]="2" class="text-slate-400" />
               </button>
               <!-- Tooltip positioned right-aligned so it never causes horizontal scrollbar on hover -->
               <div class="absolute bottom-full right-0 mb-1.5 hidden group-hover:block bg-slate-800 text-white text-[10.5px] rounded px-2.5 py-1 whitespace-nowrap z-30 shadow-md font-normal pointer-events-none">
-                Submissions unlock upon Date of closing
+                {{ scheme.lockReason }}
               </div>
             </div>
           }
@@ -90,45 +112,26 @@ import { DeptAdminOtpModalComponent } from '../../../../core/auth/components/dep
   `
 })
 export class DepartmentEoiViewComponent implements OnInit {
-  private eoiStateService = inject(EoiStateService);
+  private http = inject(HttpService);
   private authService = inject(AuthService);
   private permissions = inject(PermissionService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  schemes = signal<Scheme[]>([]);
+  /** EOIs the signed-in user may review (committee seat or EoiResponses permission), from GET /api/eoi/responses. */
+  readonly schemes = signal<EoiResponsesRow[]>([]);
+  readonly loading = signal<boolean>(false);
+  readonly loadError = signal<string>('');
   readonly searchQuery = signal<string>('');
   showOtpModal = signal<boolean>(false);
   currentSsoId = signal<string>('dept_admin');
 
-  readonly filteredSchemes = computed(() => {
-    const q = this.searchQuery().toLowerCase().trim();
-    if (!q) return this.schemes();
-    return this.schemes().filter(s =>
-      (s.schemeTitle && s.schemeTitle.toLowerCase().includes(q)) ||
-      (s.refNo && s.refNo.toLowerCase().includes(q)) ||
-      (s.category && s.category.toLowerCase().includes(q)) ||
-      (s.status && s.status.toLowerCase().includes(q))
-    );
-  });
+  readonly filteredSchemes = computed(() => filterResponsesRows(this.schemes(), this.searchQuery()));
 
-  readonly schemeColumns: TableColumn<Scheme>[] = [
+  readonly schemeColumns: TableColumn<EoiResponsesRow>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-14' },
     { key: 'schemeTitle', label: 'EOI Ref No. & Scheme Name', type: 'custom' },
-    {
-      key: 'category',
-      label: 'Category',
-      align: 'center',
-      cellClass: 'whitespace-nowrap font-normal text-slate-700',
-      format: (val) => {
-        if (!val || val === 'NA' || val === '-') return '-';
-        const cleaned = val.replace(/^Category\s+[I|V|X|0-9]+:\s*/i, '').trim();
-        if (cleaned.toUpperCase() === 'RAJKVIK') return 'Rajvik';
-        if (cleaned.toUpperCase() === 'SAMARTH') return 'Samarth';
-        if (cleaned.toUpperCase() === 'SAKSHM' || cleaned.toUpperCase() === 'SAKSHAM') return 'Saksham';
-        return cleaned || '-';
-      }
-    },
+    { key: 'category', label: 'Category', align: 'center', cellClass: 'font-normal text-slate-700' },
     { key: 'dateOfOpening', label: 'Date of Publishing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'dateOfClosing', label: 'Date of Closing', align: 'center', cellClass: 'whitespace-nowrap font-normal text-slate-700' },
     { key: 'status', label: 'Status', align: 'center', type: 'status' },
@@ -146,9 +149,26 @@ export class DepartmentEoiViewComponent implements OnInit {
       this.showOtpModal.set(true);
     }
 
-    this.eoiStateService.getSchemes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(data => {
-      this.schemes.set(data);
-    });
+    this.loadSchemes();
+  }
+
+  private loadSchemes(): void {
+    this.loading.set(true);
+    this.loadError.set('');
+    this.http
+      .call<unknown>(API_ENDPOINTS.EOI_RESPONSES.LIST, { params: { page: 1, pageSize: 100 }, flags: { skipErrorToast: true } })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: res => {
+          this.schemes.set(responsesRowsFrom(res));
+          this.loading.set(false);
+        },
+        error: (error: unknown) => {
+          this.schemes.set([]);
+          this.loading.set(false);
+          this.loadError.set(error instanceof ApiError ? error.message : 'The EOIs could not be loaded. Please try again.');
+        }
+      });
   }
 
   onOtpVerified(otp: string): void {

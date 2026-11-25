@@ -11,6 +11,8 @@ import { categoryLabel } from '../../eoi/pages/sanction-order-list/sanction-orde
 import { downloadAspirantsCsv } from '../utils/aspirant-csv.util';
 import {
   ButtonComponent,
+  DropdownComponent,
+  DropdownOption,
   FilterTabsComponent,
   IconComponent,
   InputDirective,
@@ -56,7 +58,7 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
   selector: 'app-aspirant-list',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, FilterTabsComponent, ListPageComponent, ButtonComponent, IconComponent, InputDirective, ModalComponent],
+  imports: [FormsModule, FilterTabsComponent, ListPageComponent, ButtonComponent, IconComponent, ModalComponent, DropdownComponent],
   template: `
     <app-list-page
       title="Aspirants Management"
@@ -99,33 +101,39 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
         </div>
       }
 
-      <div beforeTable class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs">
-        <div class="flex items-center gap-1.5">
+      <div beforeTable class="bg-slate-50 border border-border rounded-lg p-2.5 flex flex-wrap items-center gap-2.5 text-xs shadow-2xs relative z-10">
+        <div class="flex items-center gap-1.5 min-w-[200px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Center:</label>
-          <select appInput size="sm" [ngModel]="selectedSdc()" (ngModelChange)="selectedSdc.set($event)" class="max-w-[220px]">
-            <option value="ALL">All Centers ({{ sdcOptions().length }})</option>
-            @for (s of sdcOptions(); track s.code) {
-              <option [value]="s.code">{{ s.name }}</option>
-            }
-          </select>
+          <app-dropdown
+            size="sm"
+            class="flex-1 min-w-[180px] max-w-[240px]"
+            [options]="centerDropdownOptions()"
+            [value]="selectedSdc()"
+            (valueChange)="selectedSdc.set($event)"
+            placeholder="Select Center"
+          />
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 min-w-[200px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Batch:</label>
-          <select appInput size="sm" [ngModel]="selectedBatch()" (ngModelChange)="selectedBatch.set($event)" class="max-w-[220px]">
-            <option value="ALL">All Batches ({{ batchOptions().length }})</option>
-            @for (b of batchOptions(); track b.code) {
-              <option [value]="b.code">{{ b.code }} - {{ b.course }}</option>
-            }
-          </select>
+          <app-dropdown
+            size="sm"
+            class="flex-1 min-w-[180px] max-w-[240px]"
+            [options]="batchDropdownOptions()"
+            [value]="selectedBatch()"
+            (valueChange)="selectedBatch.set($event)"
+            placeholder="Select Batch"
+          />
         </div>
-        <div class="flex items-center gap-1.5">
+        <div class="flex items-center gap-1.5 min-w-[180px]">
           <label class="font-semibold text-slate-700 whitespace-nowrap text-[11px] uppercase tracking-wider">Scheme:</label>
-          <select appInput size="sm" [ngModel]="selectedScheme()" (ngModelChange)="selectedScheme.set($event)">
-            <option value="ALL">All Schemes</option>
-            @for (s of schemeOptions(); track s) {
-              <option [value]="s">{{ s }}</option>
-            }
-          </select>
+          <app-dropdown
+            size="sm"
+            class="flex-1 min-w-[160px]"
+            [options]="schemeDropdownOptions()"
+            [value]="selectedScheme()"
+            (valueChange)="selectedScheme.set($event)"
+            placeholder="Select Scheme"
+          />
         </div>
         @if (hasActiveFilters()) {
           <button appButton variant="danger" size="sm" type="button" (click)="resetFilters()" class="ml-auto">Reset Filters</button>
@@ -201,25 +209,49 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
       </ng-template>
 
       <ng-template #actionsTemplate let-a>
-        <div class="flex items-center justify-center py-2 px-1 whitespace-nowrap">
-          <button appButton variant="outline" size="sm" class="w-24 shrink-0" type="button" (click)="viewDetails(a)" title="View aspirant details">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 py-1 whitespace-nowrap">
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="viewDetails(a)"
+            title="View Details"
+            aria-label="View Details"
+          >
             <app-icon name="eye" size="sm" />
-            <span>View</span>
           </button>
-          <!-- Drop an active student, or register a replacement for one who has dropped. One fixed slot keeps the rows in line. -->
-          <div class="w-28 shrink-0 ml-2">
-            @if (canDrop(a)) {
-              <button appButton variant="outline" size="sm" block type="button" (click)="askToDrop(a)" title="Drop this student from the batch">
-                <app-icon name="close" size="sm" />
-                <span>Drop</span>
-              </button>
-            } @else if (canReplace(a)) {
-              <button appButton variant="primary" size="sm" block type="button" (click)="registerReplacement(a)" title="Register a student in the seat this student left">
-                <app-icon name="plus" size="sm" />
-                <span>Replace</span>
-              </button>
-            }
-          </div>
+
+          @if (canDrop(a)) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="askToDrop(a)"
+              title="Drop student from batch"
+              aria-label="Drop student"
+            >
+              <app-icon name="close" size="sm" class="text-rose-600" />
+            </button>
+          } @else if (canReplace(a)) {
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="registerReplacement(a)"
+              title="Register replacement student"
+              aria-label="Register replacement"
+            >
+              <app-icon name="plus" size="sm" />
+            </button>
+          }
         </div>
       </ng-template>
 
@@ -240,12 +272,14 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
             </p>
             <div>
               <label for="drop-reason" class="block mb-1 font-semibold text-slate-700">Reason for dropping <span class="text-rose-500">*</span></label>
-              <select id="drop-reason" appInput [ngModel]="dropReason()" (ngModelChange)="dropReason.set($event)">
-                <option value="">Select a reason</option>
-                @for (reason of dropReasons; track reason) {
-                  <option [value]="reason">{{ reason }}</option>
-                }
-              </select>
+              <app-dropdown
+                inputId="drop-reason"
+                [options]="dropReasons"
+                [value]="dropReason()"
+                (valueChange)="dropReason.set($event)"
+                placeholder="Select a reason"
+                class="w-full"
+              />
             </div>
           </div>
           <ng-container modalFooter>
@@ -283,7 +317,7 @@ export class AspirantListComponent {
     { key: 'scheme', label: 'Scheme & Category', type: 'custom', width: 'min-w-[140px]' },
     { key: 'enrollmentDate', label: 'Enrolled On', align: 'center', cellClass: 'whitespace-nowrap tabular-nums font-normal text-slate-800 text-[13px]', width: 'w-28' },
     { key: 'status', label: 'Status', type: 'custom', width: 'min-w-[110px]' },
-    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'min-w-[260px]' }
+    { key: 'actions', label: 'Actions', align: 'center', type: 'custom', width: 'w-28 min-w-[90px]' }
   ];
 
   readonly sdcOptions = computed(() => {
@@ -302,7 +336,22 @@ export class AspirantListComponent {
       .map(b => ({ code: b.batchCode, course: b.courseName }));
   });
 
-  readonly schemeOptions = computed(() => Array.from(new Set(this.aspirantService.aspirants().map(a => a.scheme).filter(Boolean))));
+  readonly schemeOptions = computed(() => Array.from(new Set(this.aspirantService.aspirants().map(a => a.scheme).filter((s): s is string => !!s))));
+
+  readonly centerDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Centers', value: 'ALL' },
+    ...this.sdcOptions().map(s => ({ label: s.name, value: s.code }))
+  ]);
+
+  readonly batchDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Batches', value: 'ALL' },
+    ...this.batchOptions().map(b => ({ label: `${b.code} - ${b.course}`, value: b.code }))
+  ]);
+
+  readonly schemeDropdownOptions = computed<DropdownOption[]>(() => [
+    { label: 'All Schemes', value: 'ALL' },
+    ...this.schemeOptions().map(s => ({ label: s, value: s }))
+  ]);
 
   readonly statusTabs = computed(() => {
     const list = this.aspirantService.aspirants();
@@ -318,7 +367,7 @@ export class AspirantListComponent {
   });
 
   readonly hasActiveFilters = computed(
-    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.activeStatus() !== 'ALL' || this.searchQuery().trim() !== ''
+    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.searchQuery().trim() !== ''
   );
 
   readonly filteredAspirants = computed(() => {
@@ -342,7 +391,6 @@ export class AspirantListComponent {
   });
 
   resetFilters(): void {
-    this.activeStatus.set('ALL');
     this.selectedSdc.set('ALL');
     this.selectedBatch.set('ALL');
     this.selectedScheme.set('ALL');

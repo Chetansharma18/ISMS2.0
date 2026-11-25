@@ -205,8 +205,26 @@ export function getStep1PersonalFields(
       required: true,
       requiredMessage: 'Date of birth is mandatory',
       colSpan: 1,
+      max: new Date().toISOString().split('T')[0],
+      validator: (val: any) => {
+        if (!val) return null;
+        const selected = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected > today) {
+          return 'Date of Birth cannot be in the future.';
+        }
+        return null;
+      },
       onChange: (val, field, model) => {
-        model.age = calculateAgeFromDob(val);
+        const selected = val ? new Date(val) : null;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (selected && selected > today) {
+          model.age = 0;
+        } else {
+          model.age = calculateAgeFromDob(val);
+        }
         if (onDobChange) onDobChange(val, model);
       }
     },

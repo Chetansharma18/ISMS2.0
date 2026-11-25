@@ -12,7 +12,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, comput
   selector: 'app-otp-input',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex items-center justify-between gap-1 sm:gap-1.5', '(paste)': 'onPaste($event)' },
+  host: { class: 'flex w-full min-w-0 items-center justify-between gap-1 sm:gap-1.5', '(paste)': 'onPaste($event)' },
   template: `
     @for (digit of digits(); track $index; let i = $index) {
       <input
@@ -28,7 +28,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, comput
         (input)="onInput($event, i)"
         (keydown)="onKeydown($event, i)"
         (focus)="selectAll($event)"
-        class="w-10 h-12 sm:w-12 sm:h-13 text-center text-xl font-bold text-navy bg-white border rounded-xl outline-none transition-all shadow-2xs select-none focus:border-navy focus:ring-2 focus:ring-navy/15 disabled:opacity-50"
+        class="flex-1 min-w-0 max-w-12 h-12 sm:h-13 text-center text-xl font-bold text-navy bg-white border rounded-xl outline-none transition-all shadow-2xs select-none focus:border-navy focus:ring-2 focus:ring-navy/15 disabled:opacity-50"
         [class.border-rose-400]="invalid()"
         [class.border-navy]="digit !== '' && !invalid()"
         [class.border-slate-300]="digit === '' && !invalid()"

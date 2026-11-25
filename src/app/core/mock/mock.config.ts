@@ -29,7 +29,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
   persistInStorage: environment.enableMockPersistence ?? true,
   storagePrefix: 'isms_mock_db_',
   resources: {
-    SCHEMES: true,
+    SCHEMES: false,
     EOI: true,
     USERS: true,
     SDC: true,
@@ -38,7 +38,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     IPA: true,
     MASTERS: true,
     GRIEVANCES: true,
-    REGISTRATION: true,
+    OTR: false,
     AUTH: true,
     ADMIN_GRIEVANCES: true,
     SUBMITTED_TENDERS: true,

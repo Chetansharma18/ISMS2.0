@@ -1,685 +1,643 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, WritableSignal, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of, switchMap } from 'rxjs';
+import { Observable, catchError, forkJoin, of, switchMap } from 'rxjs';
 import { OtrFormService } from '../../../registration/services/otr-form.service';
-import { formatDateMedium, formatDateTime, formatInr } from '../../../../shared/utils';
+import { OtrRegistrationService } from '../../../registration/services/otr-registration.service';
+import { OtrDocument, OtrFormDef, OtrRecords, OtrStepValues } from '../../../registration/models/otr-api.model';
+import { documentsFrom, formSteps, initialStepValues, stepFields } from '../../../registration/otr-form.util';
+import { Step1OrgDetails, OfficerInCharge, Step3AuthorizedPerson, Step4BankDetails } from '../../../registration/models/otr-form.model';
+import { StorageService } from '../../../../core/services/storage.service';
+import { formatDateTime, formatInr } from '../../../../shared/utils';
 import { StepperStep } from '../../../../shared/components/stepper/stepper.component';
+import { EoiApplyService } from './eoi-apply.service';
+import { EoiAnswerValue, EoiApplication, EoiApplyDocument, EoiCustomField, EoiPaymentFee } from './eoi-apply.model';
 import {
-  Step1OrgDetails,
-  OfficerInCharge,
-  Step3AuthorizedPerson,
-  Step4BankDetails,
-  FileDoc
-} from '../../../registration/models/otr-form.model';
-import { SubmittedTender, SubmittedTenderDoc, createSampleDocs } from '../../../../core/models/tender.model';
-import { DataEngineService } from '../../../../core/services/data-engine.service';
-import { EoiDraftService } from '../../../../core/services/eoi-draft.service';
-import { ApplicantResponse, DossierDocument, EoiStateService } from '../../services/eoi-state.service';
-import { EoiDocumentItem, createInitialEoiDocuments } from './scheme-form.model';
+  NoticeHeader,
+  PaymentReturn,
+  answerErrors,
+  errorText,
+  initialAnswers,
+  noticeHeader,
+  paymentModeText,
+  paymentReturnFrom,
+  pendingBeforeFees,
+  postToGateway,
+  splitApplyDocuments,
+  toWizardDocuments
+} from './eoi-apply.util';
+import { EoiDocumentItem } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
-import { DocumentViewerService } from '../../../../core/services/document-viewer.service';
-import {
-  countUploaded,
-  emdPaymentModeLabel,
-  filterDocsByCategory,
-  formatFileSize,
-  formatOfficeAddress,
-  formatRegisteredAddress,
-  formatResidenceAddress,
-  numberToIndianWords,
-  parseFeeAmount,
-  procPaymentModeLabel
-} from './scheme-form.util';
+import { numberToIndianWords } from './scheme-form.util';
 
-/** How long the processing-fee success screen stays up before Step 2 opens by itself. */
+/** How long the processing-fee success screen stays up before the EMD step opens by itself. */
 const PROC_FEE_SUCCESS_REDIRECT_MS = 2500;
 
-/** How long the payment + submission success screen stays up before the receipts page opens. */
+/** How long the submission success screen stays up before the receipts page opens. */
 const SUBMISSION_SUCCESS_REDIRECT_MS = 3000;
 
+/** A payment RPP has not settled yet is checked again every 30 seconds, for up to 10 minutes. */
+const PENDING_RECHECK_MS = 30_000;
+const PENDING_RECHECKS = 20;
+
+/** The backend's message for a payment the bank has not confirmed yet. */
+const isAwaitingBank = (message: string) => /awaiting confirmation/i.test(message);
+
+/** The declaration is ticked before the applicant leaves for the payment gateway; it is sent with Submit. */
+const DECLARATION_KEY = (applicationId: number) => `eoi-apply-declaration-${applicationId}`;
+
 /**
- * Component-scoped state and actions shared by the EOI application wizard
- * (provided by SchemeFormComponent and injected by the step components).
+ * Component-scoped state and actions of the Apply for EOI wizard (provided by SchemeFormComponent and injected by
+ * the step components). Everything comes from the applicant's application on the backend (`/api/eoi/apply`):
+ * profile (copied from the OTR), answers, documents, the RPP fee payments and the submission.
  */
 @Injectable()
 export class SchemeFormState {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private otrFormService = inject(OtrFormService);
-  private receipts = inject(SchemeFormReceiptsService);
-  private docViewer = inject(DocumentViewerService);
-
-  private draftStore = inject(EoiDraftService);
-  private draftRestored = false;
-  private schemeQueryParams: Record<string, string> = {};
-  /** True once the application has been submitted; a submitted application is no longer a draft. */
-  private readonly submitted = signal<boolean>(false);
-
-  readonly otrData = this.otrFormService.formData;
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly otrFormService = inject(OtrFormService);
+  private readonly receipts = inject(SchemeFormReceiptsService);
+  private readonly storage = inject(StorageService);
+  private readonly api = inject(EoiApplyService);
+  private readonly otrApi = inject(OtrRegistrationService);
+  private readonly destroyRef = inject(DestroyRef);
 
   currentStep = signal<number>(1);
 
-  schemeTitle = signal<string>('Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)');
-  schemeRefNo = signal<string>('RSLDC/EOI/MMKVY Cat I II III/2026-27/01');
-  schemeName = signal<string>('MMKVY');
-  schemeCode = signal<string>('MMKVY');
-  schemeCategory = signal<string>('ALL');
-  schemeEoiCategory = signal<string>('General');
-  schemeDatePublished = signal<string>('15/09/2026');
-  schemeClosingDate = signal<string>('30/11/2026');
-  schemeEmdFee = signal<string>('₹50,000');
-  schemeProcessFee = signal<string>('₹2,000');
-  schemeDescription = signal<string>(
-    'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
-  );
+  // ---- Backend application -------------------------------------------------------------------
 
-  readonly wizardSteps: StepperStep[] = [
+  /** The applicant's application for this EOI, as the backend last returned it. */
+  readonly application = signal<EoiApplication | null>(null);
+  readonly loading = signal<boolean>(false);
+  /** Why the application could not be opened (no EOI id, OTR not submitted, EOI closed ...). */
+  readonly loadError = signal<string>('');
+  /** OTR form definition, used to show the profile copied from the OTR. Null when it could not be read. */
+  readonly otrForm = signal<OtrFormDef | null>(null);
+
+  /** True once the backend has the application as submitted. */
+  readonly submitted = computed(() => !!this.application() && this.application()!.status !== 'Draft');
+
+  /** Scheme strip values from the EOI the application belongs to. */
+  readonly header = computed<NoticeHeader | null>(() => {
+    const app = this.application();
+    return app ? noticeHeader(app.notice) : null;
+  });
+
+  readonly schemeTitle = computed(() => this.header()?.title ?? '');
+  readonly schemeRefNo = signal<string>('');
+  readonly schemeName = computed(() => this.header()?.schemeName ?? '');
+  readonly schemeCategory = computed(() => this.header()?.schemeCategory ?? '');
+  readonly schemeEoiCategory = computed(() => this.header()?.eoiCategory ?? '');
+  readonly schemeDatePublished = computed(() => this.header()?.publishedDate ?? '');
+  readonly schemeClosingDate = computed(() => this.header()?.closingDate ?? '');
+  readonly schemeEmdFee = computed(() => this.header()?.emdFee ?? '');
+  readonly schemeProcessFee = computed(() => this.header()?.processFee ?? '');
+  readonly schemeDescription = computed(() => this.header()?.description ?? '');
+
+  // ---- Questions (Configure EOI custom fields) --------------------------------------------------
+
+  readonly schemeCustomFields = computed<EoiCustomField[]>(() => this.application()?.customFields ?? []);
+  readonly hasCustomFields = computed(() => this.schemeCustomFields().length > 0);
+  readonly customFieldAnswers = signal<Record<string, EoiAnswerValue>>({});
+  /** The backend's messages for the questions, by field key (`_form` for a general message). */
+  readonly customFieldErrors = signal<Record<string, string>>({});
+  readonly savingAnswers = signal<boolean>(false);
+
+  // ---- Profile (OTR copy) ---------------------------------------------------------------------
+
+  readonly profileRecords = computed<OtrRecords>(() => (this.application()?.profile ?? {}) as OtrRecords);
+
+  readonly profileValues = computed<Record<string, OtrStepValues>>(() => {
+    const form = this.otrForm();
+    const records = this.profileRecords();
+    if (!form) return {};
+    return Object.fromEntries(formSteps(form).map(step => [step.key, initialStepValues(step, records[step.key])]));
+  });
+
+  readonly profileDocuments = computed<Record<string, OtrDocument>>(() => {
+    const form = this.otrForm();
+    return form ? documentsFrom(form, this.profileRecords()) : {};
+  });
+
+  /** The OTR in the shape the printed receipts use. */
+  editableStep1: Step1OrgDetails = structuredClone(this.otrFormService.formData().step1);
+  editableStep2: OfficerInCharge[] = structuredClone(this.otrFormService.formData().step2);
+  editableStep3: Step3AuthorizedPerson = structuredClone(this.otrFormService.formData().step3);
+  editableStep4: Step4BankDetails = structuredClone(this.otrFormService.formData().step4);
+  /** Kept for the read-only profile section components. */
+  readonly isEditingStep2 = signal<boolean>(false);
+
+  // ---- Documents ------------------------------------------------------------------------------
+
+  readonly applyDocuments = computed(() => splitApplyDocuments(this.application()?.documents ?? []));
+  /** The application's documents in the shape the receipts use. */
+  readonly eoiDocuments = computed<EoiDocumentItem[]>(() => toWizardDocuments(this.application()?.documents ?? []));
+  readonly busyDocIds = signal<ReadonlySet<number>>(new Set());
+  readonly docErrors = signal<Record<number, string>>({});
+
+  /** What the backend still needs before the fee steps (profile, questions, mandatory documents). */
+  readonly pendingBeforeFees = computed(() => pendingBeforeFees(this.application()));
+
+  /** Statutory declaration on the preview step: the applicant ticks it; it is sent with Submit Application. */
+  readonly declarationAgreed = signal<boolean>(false);
+
+  // ---- Wizard steps ---------------------------------------------------------------------------
+
+  readonly stepIndexProfile = 1;
+  readonly stepIndexCustomFields = computed(() => (this.hasCustomFields() ? 2 : -1));
+  readonly stepIndexDocuments = computed(() => (this.hasCustomFields() ? 3 : 2));
+  readonly stepIndexPreview = computed(() => (this.hasCustomFields() ? 4 : 3));
+  readonly stepIndexProcFee = computed(() => (this.hasCustomFields() ? 5 : 4));
+  readonly stepIndexEmd = computed(() => (this.hasCustomFields() ? 6 : 5));
+  readonly stepIndexReceipts = computed(() => (this.hasCustomFields() ? 7 : 6));
+
+  readonly wizardSteps = computed<StepperStep[]>(() => [
     { label: 'Registration Profile' },
+    ...(this.hasCustomFields() ? [{ label: 'Scheme Proposal Details' }] : []),
     { label: 'Upload Documents' },
     { label: 'Complete Preview' },
     { label: 'Processing Fee' },
     { label: 'EMD Payment' },
     { label: 'Submission Receipt' }
-  ];
+  ]);
 
-  /** Step 4 (Processing Fee) is done once the fee is paid; Step 5 is done once submitted; the final step is done once reached. */
   readonly completedWizardSteps = computed(() => {
     const done: number[] = [];
-    if (this.procFeePaid()) done.push(4);
-    if (this.submitted()) done.push(5);
-    if (this.currentStep() === this.wizardSteps.length) done.push(this.wizardSteps.length);
+    if (this.procFeePaid()) done.push(this.stepIndexProcFee());
+    if (this.submitted()) done.push(this.stepIndexEmd(), this.stepIndexReceipts());
     return done;
   });
 
-  // Step 1: Processing Fee State & Payment Methods
-  procFeePaid = signal<boolean>(false);
-  isProcPaying = signal<boolean>(false);
-  showProcFeeSuccessModal = signal<boolean>(false);
-  procFeeDate = signal<string>('04 Oct 2026, 08:35 PM');
-  procPaymentMethod = signal<'upi' | 'card' | 'netbanking' | 'e-gras'>('upi');
-  upiOption = signal<'id' | 'qr'>('id');
-  upiId = signal<string>('skills.enterprise@okaxis');
-  upiVerified = signal<boolean>(true);
-  cardData = { number: '4532 8901 2345 6789', name: 'AUTHORIZED SIGNATORY', expiry: '08/29', cvv: '782' };
-  selectedBank = signal<string>('sbi');
+  // ---- Fees (RPP) -----------------------------------------------------------------------------
 
-  // Step 5: EMD Payment Mode & Inputs
-  paymentMethod = signal<'upi' | 'card' | 'netbanking' | 'e-gras' | 'exemption'>('upi');
-  emdUpiId = signal<string>('treasury.corp@okhdfcbank');
-  emdCardData = { number: '5241 6800 1192 4001', name: 'AUTHORIZED SIGNATORY', expiry: '11/28', cvv: '439' };
-  emdSelectedBank = signal<string>('sbi');
-  isPaymentProcessing = signal<boolean>(false);
-  showEmdSuccessModal = signal<boolean>(false);
-  /** EOI Submission Reference Number issued when the application is submitted. */
-  readonly eoiApplicationId = signal<string>('ISMS-EOI-2026-9842');
-  /** Payment reference numbers returned by the payment gateway. */
-  readonly procPaymentRef = 'CIN-SBI-9912081';
-  readonly emdPaymentRef = computed(() => (this.paymentMethod() === 'exemption' ? 'Exempted' : 'CIN-SBI-9912082'));
+  readonly processFee = computed<EoiPaymentFee | null>(() => this.application()?.processFee ?? null);
+  readonly emd = computed(() => this.application()?.emd ?? null);
+
+  /** Paid, or not payable for this EOI. */
+  readonly procFeePaid = computed(() => !!this.processFee()?.done);
+  readonly procFeeRequired = computed(() => !!this.processFee()?.required);
+  readonly emdRequired = computed(() => !!this.emd()?.required);
+  readonly emdExempted = computed(() => this.emd()?.mode === 'Exempted');
+  readonly emdPaid = computed(() => this.emd()?.mode === 'Paid');
+  readonly emdExemptionEligible = computed(() => !!this.emd()?.exemptionEligible);
+
+  /** Redirecting to the gateway, confirming a payment or submitting. */
+  readonly isProcPaying = signal<boolean>(false);
+  readonly isPaymentProcessing = signal<boolean>(false);
+  /** The backend's message for the fee step being shown. */
+  readonly procFeeError = signal<string>('');
+  readonly emdError = signal<string>('');
+  readonly showProcFeeSuccessModal = signal<boolean>(false);
+  readonly showEmdSuccessModal = signal<boolean>(false);
   readonly copiedRef = signal<boolean>(false);
-  submissionTimestamp = signal<string>('04 Oct 2026, 08:35 PM');
 
-  // Number & Currency Dynamic Computations
-  readonly numericProcessFee = computed(() => parseFeeAmount(this.schemeProcessFee(), 2000));
-
-  readonly numericEmdFee = computed(() => parseFeeAmount(this.schemeEmdFee(), 50000));
-
-  readonly totalPayableAmount = computed(() => {
-    return this.numericProcessFee() + this.numericEmdFee();
-  });
-
+  readonly numericProcessFee = computed(() => this.processFee()?.amount ?? this.header()?.processFeeAmount ?? 0);
+  readonly numericEmdFee = computed(() => this.emd()?.amount ?? this.header()?.emdAmount ?? 0);
+  readonly totalPayableAmount = computed(() => this.numericProcessFee() + (this.emdExempted() ? 0 : this.numericEmdFee()));
   readonly formattedProcessFee = computed(() => formatInr(this.numericProcessFee(), { fractionDigits: 2 }));
-
   readonly formattedEmdFee = computed(() => formatInr(this.numericEmdFee(), { fractionDigits: 2 }));
-
   readonly formattedTotalFee = computed(() => formatInr(this.totalPayableAmount(), { fractionDigits: 2 }));
+  readonly processFeeInWords = computed(() => numberToIndianWords(this.numericProcessFee()));
+  readonly emdFeeInWords = computed(() => numberToIndianWords(this.numericEmdFee()));
 
-  readonly processFeeInWords = computed(() => {
-    return this.numberToIndianWords(this.numericProcessFee());
-  });
-
-  readonly emdFeeInWords = computed(() => {
-    return this.numberToIndianWords(this.numericEmdFee());
-  });
-
-  readonly totalFeeInWords = computed(() => {
-    return this.numberToIndianWords(this.totalPayableAmount());
-  });
-
-  get selectedProcPaymentModeLabel(): string {
-    return procPaymentModeLabel(this.procPaymentMethod());
-  }
-
-  get emdPaymentModeLabel(): string {
-    return emdPaymentModeLabel(this.paymentMethod());
-  }
-
-  // Step 2: OTR Data Models
-  editableStep1: Step1OrgDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step1));
-  editableStep2: OfficerInCharge[] = JSON.parse(JSON.stringify(this.otrFormService.formData().step2));
-  editableStep3: Step3AuthorizedPerson = JSON.parse(JSON.stringify(this.otrFormService.formData().step3));
-  editableStep4: Step4BankDetails = JSON.parse(JSON.stringify(this.otrFormService.formData().step4));
-
-  // Step 2: Registration Profile View / Edit Mode (Disabled by default, unlock via Edit button)
-  isEditingStep2 = signal<boolean>(false);
-
-  // Step 4: Inline Registration Profile Editing in Complete Preview
-  isEditingOtrInPreview = signal<boolean>(false);
-
-  // Step 3: Documents Tab Filter
-  selectedDocTab = signal<'all' | 'mandatory' | 'annexure' | 'remaining'>('all');
-
-  /** 16 Proposal Documents strictly matching Screenshot */
-  eoiDocuments = signal<EoiDocumentItem[]>(createInitialEoiDocuments());
-
-  readonly mandatoryDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'mandatory'));
-  readonly annexureDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'annexure'));
-  readonly remainingDocs = computed(() => filterDocsByCategory(this.eoiDocuments(), 'remaining'));
-
-  readonly mandatoryAttachedCount = computed(() => countUploaded(this.mandatoryDocs()));
-  readonly annexureAttachedCount = computed(() => countUploaded(this.annexureDocs()));
-  readonly remainingAttachedCount = computed(() => countUploaded(this.remainingDocs()));
-
-  readonly filteredDocuments = computed(() => filterDocsByCategory(this.eoiDocuments(), this.selectedDocTab()));
-
-  readonly attachedDocsCount = computed(() => countUploaded(this.eoiDocuments()));
-
-  /** Statutory declaration on the preview step: the applicant must tick it themselves. */
-  declarationAgreed = signal<boolean>(false);
-
-  // Document Viewer Modal State
-  isViewerOpen = signal<boolean>(false);
-  activeViewerDoc = signal<FileDoc | null>(null);
-  activeViewerTitle = signal<string>('');
-
-  get registeredAddressText(): string {
-    return formatRegisteredAddress(this.editableStep1);
-  }
-
-  get officeAddressText(): string {
-    return formatOfficeAddress(this.editableStep1);
-  }
-
-  get residenceAddressText(): string {
-    return formatResidenceAddress(this.editableStep3);
-  }
-
-  numberToIndianWords(num: number): string {
-    return numberToIndianWords(num);
-  }
+  /** Receipt values, all from the backend. */
+  readonly eoiApplicationId = computed(() => this.application()?.applicationNo ?? '');
+  readonly procPaymentRef = computed(() => this.processFee()?.prn ?? '-');
+  readonly procFeeDate = computed(() => formatDateTime(this.processFee()?.paidAt) || '-');
+  readonly emdPaymentRef = computed(() => (this.emdExempted() ? 'Exempted' : this.emd()?.prn ?? '-'));
+  readonly emdPaidDate = computed(() => (this.emdExempted() ? '-' : formatDateTime(this.emd()?.paidAt) || '-'));
+  readonly submissionTimestamp = computed(() => formatDateTime(this.application()?.submittedAt) || '-');
 
   constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.recheckTimer) clearTimeout(this.recheckTimer);
+    });
+    // Opened from the EOI detail page with ?eoiId=<id>. RPP's return adds payment / prn / result.
     this.route.queryParams.pipe(takeUntilDestroyed()).subscribe(params => {
       if (params['refNo']) this.schemeRefNo.set(params['refNo']);
-      this.schemeQueryParams = Object.fromEntries(
-        Object.entries(params).filter(([, v]) => typeof v === 'string')
-      ) as Record<string, string>;
-      if (params['title']) this.schemeTitle.set(params['title']);
-      if (params['schemeName']) this.schemeName.set(params['schemeName']);
-      if (params['code']) this.schemeCode.set(params['code']);
-      if (params['category']) this.schemeCategory.set(params['category']);
-      if (params['schemeCategory']) this.schemeCategory.set(params['schemeCategory']);
-      if (params['eoiCategory']) this.schemeEoiCategory.set(params['eoiCategory']);
-      if (params['datePublished']) this.schemeDatePublished.set(params['datePublished']);
-      if (params['closingDate']) this.schemeClosingDate.set(params['closingDate']);
-      if (params['emdFee']) this.schemeEmdFee.set(params['emdFee']);
-      if (params['processFee']) this.schemeProcessFee.set(params['processFee']);
-      if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
-      if (params['refNo'] && !this.draftRestored) {
-        this.draftRestored = true;
-        this.restoreDraft(params['refNo']);
+      const eoiId = Number(params['eoiId']);
+      const returned = paymentReturnFrom(params);
+      if (Number.isInteger(eoiId) && eoiId > 0) {
+        if (this.application()?.notice.id !== eoiId) this.openApplication(eoiId, returned);
+        else if (returned) this.handlePaymentReturn(returned);
+      } else if (returned) {
+        this.loadError.set(returned.message || 'The payment response could not be matched to an application. Open your application again from Apply for EOI.');
+      } else {
+        this.loadError.set('Open the EOI from Apply for EOI and choose "Apply for EOI" to start your application.');
       }
-    });
-
-    // Keep a draft up to date as the applicant fills their application,
-    // so the Active Schemes page can flag this application as pending.
-    effect(() => {
-      const paid = this.procFeePaid();
-      const step = this.currentStep();
-      const docs = this.eoiDocuments();
-      const refNo = this.schemeRefNo();
-      const procFeeDate = this.procFeeDate();
-      if (this.submitted() || step >= this.wizardSteps.length) return;
-      this.draftStore.save({
-        refNo,
-        schemeName: this.schemeName(),
-        queryParams: this.schemeQueryParams,
-        step: Math.max(step, 1),
-        procFeePaid: paid,
-        procFeeDate,
-        documents: docs
-          .filter(d => d.status === 'uploaded' || !!d.comment?.trim())
-          .map(d => ({
-            id: d.id,
-            fileName: d.fileName,
-            fileSize: d.fileSize,
-            uploadedDate: d.uploadedDate,
-            comment: d.comment
-          })),
-        updatedAt: new Date().toISOString()
-      });
     });
   }
 
-  /** Reopens an application that was left unfinished: fee status, uploaded documents and the step. */
-  private restoreDraft(refNo: string): void {
-    const draft = this.draftStore.get(refNo);
-    if (!draft) return;
-    this.procFeePaid.set(draft.procFeePaid);
-    this.procFeeDate.set(draft.procFeeDate);
-    this.eoiDocuments.update(docs =>
-      docs.map(doc => {
-        const saved = draft.documents.find(d => d.id === doc.id);
-        return saved
-          ? { ...doc, ...saved, status: saved.fileName ? ('uploaded' as const) : doc.status }
-          : doc;
-      })
+  /** Starts or resumes the application, and reads the OTR form definition the profile is shown with. */
+  openApplication(eoiId: number, returned: PaymentReturn | null = null): void {
+    this.loading.set(true);
+    this.loadError.set('');
+    const otrForm$: Observable<OtrFormDef | null> = this.otrApi.load().pipe(
+      switchMap(({ form }) => of(form)),
+      catchError(() => of(null))
     );
-    this.currentStep.set(Math.min(Math.max(draft.step, 1), this.wizardSteps.length - 1));
+    forkJoin({ app: this.api.start(eoiId), form: otrForm$ })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ app, form }) => {
+          this.otrForm.set(form);
+          this.applyServerApplication(app);
+          this.customFieldAnswers.set(initialAnswers(app.customFields ?? [], app.dynamicAnswers));
+          this.declarationAgreed.set(app.declarationAccepted || this.storage.getSessionItem<boolean>(DECLARATION_KEY(app.id)) === true);
+          this.syncProfileModels();
+          this.loading.set(false);
+          this.currentStep.set(this.resumeStep(app));
+          if (returned) this.handlePaymentReturn(returned);
+        },
+        error: (error: unknown) => {
+          this.loading.set(false);
+          this.loadError.set(errorText(error, 'Your application could not be opened. Please try again.'));
+        }
+      });
+  }
+
+  /** Where a reopened application continues: receipts once submitted, the EMD step once the fee is paid. */
+  private resumeStep(app: EoiApplication): number {
+    if (app.status !== 'Draft') return this.stepIndexReceipts();
+    if (app.processFee.done && app.processFee.required && pendingBeforeFees(app).length === 0) return this.stepIndexEmd();
+    return 1;
+  }
+
+  /** Keeps the backend's latest copy of the application (every apply call answers with it). */
+  private applyServerApplication(app: EoiApplication): void {
+    this.application.set(app);
+    this.schemeRefNo.set(app.notice.refNo);
+  }
+
+  /** The printed receipts read the profile from the OTR models filled by the OTR service. */
+  private syncProfileModels(): void {
+    const data = this.otrFormService.formData();
+    this.editableStep1 = structuredClone(data.step1);
+    this.editableStep2 = structuredClone(data.step2);
+    this.editableStep3 = structuredClone(data.step3);
+    this.editableStep4 = structuredClone(data.step4);
   }
 
   goToStep(step: number): void {
-    if (step < 1 || step > this.wizardSteps.length) return;
+    if (step < 1 || step > this.wizardSteps().length) return;
     this.currentStep.set(step);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  setUpiHandle(handle: string): void {
-    const currentBase = (this.upiId() || 'skills').split('@')[0];
-    this.upiId.set(`${currentBase}${handle}`);
-    this.upiVerified.set(true);
-  }
-
-  verifyUpi(): void {
-    this.upiVerified.set(true);
-  }
-
-  payProcessingFeeAndProceed(): void {
-    this.isProcPaying.set(true);
-    setTimeout(() => {
-      this.isProcPaying.set(false);
-      this.procFeePaid.set(true);
-      this.procFeeDate.set(formatDateTime(new Date()));
-      this.showProcFeeSuccessModal.set(true);
-      // The success screen carries the applicant on to Step 5 (EMD Payment) by itself.
-      setTimeout(() => {
-        this.showProcFeeSuccessModal.set(false);
-        this.goToStep(5);
-      }, PROC_FEE_SUCCESS_REDIRECT_MS);
-    }, 600);
-  }
-
-  saveStep2Changes(): void {
-    this.otrFormService.updateStep1(this.editableStep1);
-    this.otrFormService.updateStep2(this.editableStep2);
-    this.otrFormService.updateStep3(this.editableStep3);
-    this.otrFormService.updateStep4(this.editableStep4);
-  }
-
-  toggleStep2Edit(): void {
-    if (this.isEditingStep2()) {
-      this.saveStep2Changes();
-      this.isEditingStep2.set(false);
-    } else {
-      this.isEditingStep2.set(true);
-    }
-  }
-
+  /** The profile is locked to the OTR, so leaving the step saves nothing. */
   saveAndProceedToDocuments(): void {
-    this.saveStep2Changes();
-    this.isEditingStep2.set(false);
-    this.goToStep(2);
+    this.goToStep(this.hasCustomFields() ? this.stepIndexCustomFields() : this.stepIndexDocuments());
   }
 
-  saveAndProceedToStep3(): void {
-    this.saveAndProceedToDocuments();
+  // ---- Step: Scheme Proposal Details ---------------------------------------------------------
+
+  updateCustomAnswer(fieldKey: string, value: EoiAnswerValue): void {
+    this.customFieldAnswers.update(curr => ({ ...curr, [fieldKey]: value }));
+    if (this.customFieldErrors()[fieldKey]) {
+      this.customFieldErrors.update(curr => {
+        const next = { ...curr };
+        delete next[fieldKey];
+        return next;
+      });
+    }
   }
 
-  togglePreviewOtrEdit(): void {
-    if (this.isEditingOtrInPreview()) {
-      // Save changes back to OTR form service state
-      this.otrFormService.updateStep1(this.editableStep1);
-      this.otrFormService.updateStep2(this.editableStep2);
-      this.otrFormService.updateStep3(this.editableStep3);
-      this.otrFormService.updateStep4(this.editableStep4);
-      this.isEditingOtrInPreview.set(false);
+  /** Saves the answers; the backend checks them and every mandatory question, then the wizard moves on. */
+  saveAnswersAndProceed(): void {
+    const app = this.application();
+    if (!app || this.savingAnswers()) return;
+    this.savingAnswers.set(true);
+    this.customFieldErrors.set({});
+    this.api
+      .saveAnswers(app.id, this.customFieldAnswers(), true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: saved => {
+          this.savingAnswers.set(false);
+          this.applyServerApplication(saved);
+          this.goToStep(this.stepIndexDocuments());
+        },
+        error: (error: unknown) => {
+          this.savingAnswers.set(false);
+          const byField = answerErrors(error);
+          this.customFieldErrors.set(
+            Object.keys(byField).length ? byField : { _form: errorText(error, 'Your answers could not be saved. Please try again.') }
+          );
+        }
+      });
+  }
+
+  // ---- Step: Upload Documents ----------------------------------------------------------------
+
+  uploadApplyDocument(doc: EoiApplyDocument, file: File): void {
+    this.runDocumentCall(doc, app => this.api.uploadDocument(app.id, doc.requiredDocumentId as number, file));
+  }
+
+  removeApplyDocument(doc: EoiApplyDocument): void {
+    this.runDocumentCall(doc, app => this.api.deleteDocument(app.id, doc.requiredDocumentId as number));
+  }
+
+  /** Saves the comment when the applicant leaves the field (only when it changed). */
+  saveApplyComment(doc: EoiApplyDocument, comment: string): void {
+    const next = comment.trim();
+    if (next === (doc.comment ?? '').trim()) return;
+    this.runDocumentCall(doc, app => this.api.setComment(app.id, doc.requiredDocumentId as number, next));
+  }
+
+  viewApplyDocument(doc: EoiApplyDocument): void {
+    const app = this.application();
+    if (!app || doc.documentId === null) return;
+    this.api
+      .documentBlob(app.id, doc.documentId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: blob => this.openBlob(blob),
+        error: (error: unknown) => this.setDocError(doc, errorText(error, 'The document could not be opened.'))
+      });
+  }
+
+  /** A document uploaded in the OTR, shown on the profile step. */
+  viewProfileDocument(fieldKey: string): void {
+    const form = this.otrForm();
+    const field = form ? formSteps(form).flatMap(stepFields).find(f => f.key === fieldKey) : undefined;
+    if (!field?.documentType) return;
+    this.otrApi
+      .documentBlob(field.documentType)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: blob => this.openBlob(blob), error: () => undefined });
+  }
+
+  isDocBusy(doc: EoiApplyDocument): boolean {
+    return doc.requiredDocumentId !== null && this.busyDocIds().has(doc.requiredDocumentId);
+  }
+
+  private runDocumentCall(doc: EoiApplyDocument, call: (app: EoiApplication) => Observable<EoiApplication>): void {
+    const app = this.application();
+    const id = doc.requiredDocumentId;
+    if (!app || id === null || this.busyDocIds().has(id)) return;
+    this.busyDocIds.update(s => new Set(s).add(id));
+    this.setDocError(doc, '');
+    const done = () =>
+      this.busyDocIds.update(s => {
+        const next = new Set(s);
+        next.delete(id);
+        return next;
+      });
+    call(app)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: saved => {
+          done();
+          this.applyServerApplication(saved);
+        },
+        error: (error: unknown) => {
+          done();
+          this.setDocError(doc, errorText(error, 'The document could not be saved. Please try again.'));
+        }
+      });
+  }
+
+  private setDocError(doc: EoiApplyDocument, message: string): void {
+    const id = doc.requiredDocumentId;
+    if (id === null) return;
+    this.docErrors.update(curr => {
+      const next = { ...curr };
+      if (message) next[id] = message;
+      else delete next[id];
+      return next;
+    });
+  }
+
+  // ---- Step: Processing Fee (RPP) ------------------------------------------------------------
+
+  /** Pays the processing fee on RPP (the browser leaves for the gateway), or moves on when none is payable. */
+  payProcessingFeeAndProceed(): void {
+    const app = this.application();
+    if (!app || this.isProcPaying()) return;
+    if (this.procFeePaid()) {
+      this.goToStep(this.stepIndexEmd());
+      return;
+    }
+    this.procFeeError.set('');
+    this.redirectToGateway(app, 'process-fee', this.isProcPaying, this.procFeeError);
+  }
+
+  /**
+   * Records a processing fee payment made on RPP. Without a PRN the backend finds the payment made for this
+   * application (and asks RPP for its status when the gateway's return was not processed).
+   */
+  confirmProcessFee(prn: string | null = null): void {
+    const app = this.application();
+    if (!app || this.isProcPaying()) return;
+    this.isProcPaying.set(true);
+    this.procFeeError.set('');
+    this.api
+      .confirmProcessFee(app.id, prn)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: saved => {
+          this.isProcPaying.set(false);
+          this.applyServerApplication(saved);
+          this.showProcFeeSuccessModal.set(true);
+          setTimeout(() => {
+            this.showProcFeeSuccessModal.set(false);
+            this.goToStep(this.stepIndexEmd());
+          }, PROC_FEE_SUCCESS_REDIRECT_MS);
+        },
+        error: (error: unknown) => {
+          this.isProcPaying.set(false);
+          const message = errorText(error, 'The processing fee payment could not be confirmed.');
+          this.procFeeError.set(message);
+          if (isAwaitingBank(message)) this.scheduleRecheck(() => this.confirmProcessFee(prn));
+        }
+      });
+  }
+
+  /** How many times a payment the bank has not confirmed yet is checked again automatically. */
+  private recheckCount = 0;
+  private recheckTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** RPP takes up to 10 minutes to settle a payment: check again every 30 s, for up to 10 minutes. */
+  private scheduleRecheck(check: () => void): void {
+    if (this.recheckTimer || this.recheckCount >= PENDING_RECHECKS) return;
+    this.recheckCount++;
+    this.recheckTimer = setTimeout(() => {
+      this.recheckTimer = null;
+      check();
+    }, PENDING_RECHECK_MS);
+  }
+
+  // ---- Step: EMD (RPP / MSME exemption) and Submit -------------------------------------------
+
+  /** Pays the EMD on RPP (the browser leaves for the gateway). */
+  payEmd(): void {
+    const app = this.application();
+    if (!app || this.isPaymentProcessing()) return;
+    if (this.emdPaid() || !this.emdRequired()) {
+      this.submitApplication();
+      return;
+    }
+    this.emdError.set('');
+    const go = () => this.redirectToGateway(app, 'emd', this.isPaymentProcessing, this.emdError);
+    // A claimed exemption is withdrawn first, so the backend accepts the payment.
+    if (this.emdExempted()) {
+      this.isPaymentProcessing.set(true);
+      this.api.setEmd(app.id, 'none').pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: saved => {
+          this.applyServerApplication(saved);
+          this.isPaymentProcessing.set(false);
+          go();
+        },
+        error: (error: unknown) => {
+          this.isPaymentProcessing.set(false);
+          this.emdError.set(errorText(error, 'The EMD could not be updated.'));
+        }
+      });
     } else {
-      this.isEditingOtrInPreview.set(true);
+      go();
     }
   }
 
-  onFileSelected(event: Event, doc: EoiDocumentItem): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const fileSize = formatFileSize(file.size);
-      const uploadedDate = formatDateMedium(new Date(), '-');
-      this.eoiDocuments.update(docs => docs.map(d => d.id === doc.id ? {
-        ...d,
-        fileName: file.name,
-        fileSize,
-        uploadedDate,
-        status: 'uploaded'
-      } : d));
-      input.value = '';
-    }
+  /** Records the EMD payment made on RPP, then submits the application. */
+  confirmEmd(prn: string | null = null): void {
+    this.runEmdThenSubmit(app => this.api.setEmd(app.id, 'payment', prn), 'The EMD payment could not be confirmed.', () => this.confirmEmd(prn));
   }
 
-  attachAllSampleDocs(): void {
-    this.eoiDocuments.update(docs => docs.map((doc, idx) => ({
-      ...doc,
-      status: 'uploaded',
-      fileName: `Scan_Annexure_${doc.id}_Signed.pdf`,
-      fileSize: `${(1.2 + (idx % 3) * 0.8).toFixed(1)} MB`,
-      uploadedDate: '04-Oct-2026'
-    })));
+  /** Claims the MSME / Udyam exemption (the backend checks the Udyam number in the profile), then submits. */
+  claimExemptionAndSubmit(): void {
+    this.runEmdThenSubmit(app => this.api.setEmd(app.id, 'exemption'), 'The EMD exemption could not be applied.');
   }
 
-  replaceOtrDoc(event: Event, type: 'regCert' | 'panCard' | 'gstCert' | 'msmeCert' | 'authLetter' | 'authIdProof' | 'bankDoc'): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const file = input.files[0];
-      const fileSize = formatFileSize(file.size);
-      const docObj: FileDoc = {
-        fileName: file.name,
-        fileSize,
-        uploadDate: '04/10/2026',
-        status: 'uploaded'
-      };
-
-      if (type === 'regCert') this.editableStep1.registrationCertDoc = docObj;
-      if (type === 'panCard') this.editableStep1.panCardDoc = docObj;
-      if (type === 'gstCert') this.editableStep1.gstCertDoc = docObj;
-      if (type === 'msmeCert') this.editableStep1.msmeCertDoc = docObj;
-      if (type === 'authLetter') this.editableStep3.authorizationLetterDoc = docObj;
-      if (type === 'authIdProof') this.editableStep3.idProofDoc = docObj;
-      if (type === 'bankDoc') this.editableStep4.cancelledChequeDoc = docObj;
-
-      input.value = '';
-    }
-  }
-
-  removeOtrDoc(type: 'regCert' | 'panCard' | 'gstCert' | 'msmeCert' | 'authLetter' | 'authIdProof' | 'bankDoc'): void {
-    if (type === 'regCert') this.editableStep1.registrationCertDoc = null;
-    if (type === 'panCard') this.editableStep1.panCardDoc = null;
-    if (type === 'gstCert') this.editableStep1.gstCertDoc = null;
-    if (type === 'msmeCert') this.editableStep1.msmeCertDoc = null;
-    if (type === 'authLetter') this.editableStep3.authorizationLetterDoc = null;
-    if (type === 'authIdProof') this.editableStep3.idProofDoc = null;
-    if (type === 'bankDoc') this.editableStep4.cancelledChequeDoc = null;
-  }
-
-  removeSchemeDoc(doc: EoiDocumentItem): void {
-    this.eoiDocuments.update(docs =>
-      docs.map(d => (d.id === doc.id ? { ...d, status: 'pending' as const, fileName: '', fileSize: '', uploadedDate: '' } : d))
-    );
-  }
-
-  updateDocComment(docId: number, comment: string, trim = false): void {
-    const nextValue = trim ? comment.trim() : comment;
-    this.eoiDocuments.update(docs =>
-      docs.map(d => (d.id === docId ? { ...d, comment: nextValue || undefined } : d))
-    );
-  }
-
-  replaceOicDoc(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0] && this.editableStep2[index]) {
-      const file = input.files[0];
-      const fileSize = formatFileSize(file.size);
-      this.editableStep2[index].appointmentLetterDoc = {
-        fileName: file.name,
-        fileSize,
-        uploadDate: '04/10/2026',
-        status: 'uploaded'
-      };
-      input.value = '';
-    }
-  }
-
-  viewDoc(fileName: string, title: string, fileSize: string = '1.2 MB'): void {
-    this.docViewer.openDocument({
-      fileName,
-      fileSize,
-      uploadDate: '04/10/2026',
-      status: 'uploaded'
-    }, title);
-  }
-
-  closeViewer(): void {
-    this.isViewerOpen.set(false);
-    this.activeViewerDoc.set(null);
-  }
-
-  triggerEmdPayment(): void {
+  /** POST .../submit with the declaration; the backend checks that the application is complete. */
+  submitApplication(): void {
+    const app = this.application();
+    if (!app || this.isPaymentProcessing()) return;
+    this.emdError.set('');
     this.isPaymentProcessing.set(true);
-    setTimeout(() => {
+    this.submit(app);
+  }
+
+  private runEmdThenSubmit(call: (app: EoiApplication) => Observable<EoiApplication>, fallback: string, recheck?: () => void): void {
+    const app = this.application();
+    if (!app || this.isPaymentProcessing()) return;
+    this.isPaymentProcessing.set(true);
+    this.emdError.set('');
+    call(app)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: saved => {
+          this.applyServerApplication(saved);
+          this.submit(saved);
+        },
+        error: (error: unknown) => {
+          this.isPaymentProcessing.set(false);
+          const message = errorText(error, fallback);
+          this.emdError.set(message);
+          if (recheck && isAwaitingBank(message)) this.scheduleRecheck(recheck);
+        }
+      });
+  }
+
+  private submit(app: EoiApplication): void {
+    if (!this.declarationAgreed()) {
       this.isPaymentProcessing.set(false);
-      const now = new Date();
-      this.submissionTimestamp.set(formatDateTime(now));
-      this.recordSubmittedTender(now);
-      this.submitted.set(true);
-      this.draftStore.clear(this.schemeRefNo());
-      this.showEmdSuccessModal.set(true);
-      // The combined payment + submission screen cannot be dismissed: it opens the receipts page by itself.
-      setTimeout(() => this.closeSuccessModalAndGoToStep6(), SUBMISSION_SUCCESS_REDIRECT_MS);
-    }, 800);
+      this.emdError.set('Accept the declaration on the Complete Preview step, then submit your application.');
+      return;
+    }
+    this.api
+      .submit(app.id, true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: saved => {
+          this.isPaymentProcessing.set(false);
+          this.applyServerApplication(saved);
+          this.storage.removeSessionItem(DECLARATION_KEY(app.id));
+          this.showEmdSuccessModal.set(true);
+          setTimeout(() => this.closeSuccessModalAndGoToStep6(), SUBMISSION_SUCCESS_REDIRECT_MS);
+        },
+        error: (error: unknown) => {
+          this.isPaymentProcessing.set(false);
+          this.emdError.set(errorText(error, 'Your application could not be submitted. Please try again.'));
+        }
+      });
   }
 
   closeSuccessModalAndGoToStep6(): void {
     this.showEmdSuccessModal.set(false);
-    this.goToStep(6);
+    this.goToStep(this.stepIndexReceipts());
   }
 
-  downloadAllReceipts(): void {
-    this.downloadAcknowledgmentReceipt();
-    setTimeout(() => this.downloadEmdReceipt(), 300);
-    setTimeout(() => this.downloadProcessingFeeReceipt(), 600);
-  }
+  // ---- RPP --------------------------------------------------------------------------------------
 
-  copyRef(): void {
-    const id = this.eoiApplicationId();
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(id).catch(() => {
-        this.fallbackCopyText(id);
+  /** POST .../payments/{fee}/initiate, then posts the returned form to RPP. RPP returns to the wizard. */
+  private redirectToGateway(app: EoiApplication, fee: 'process-fee' | 'emd', busy: WritableSignal<boolean>, error: WritableSignal<string>): void {
+    busy.set(true);
+    // The declaration must survive the round trip through the gateway.
+    if (this.declarationAgreed()) this.storage.setSessionItem(DECLARATION_KEY(app.id), true);
+    this.api
+      .initiatePayment(app.id, fee)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: payment => postToGateway(payment.targetUrl, payment.formFields),
+        error: (e: unknown) => {
+          busy.set(false);
+          error.set(errorText(e, 'The payment could not be started. Please try again.'));
+        }
       });
-    } else {
-      this.fallbackCopyText(id);
-    }
-    this.copiedRef.set(true);
-    setTimeout(() => this.copiedRef.set(false), 3000);
   }
 
-  private fallbackCopyText(text: string): void {
-    try {
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
-    } catch {
-      // ignore
-    }
-  }
-
-  private readonly tenderRepo = inject(DataEngineService).for<SubmittedTender>('SUBMITTED_TENDERS');
-  private readonly eoiStateService = inject(EoiStateService);
-
-  private recordSubmittedTender(now: Date): void {
-    const appRef = this.eoiApplicationId();
-    const appliedDateStr = formatDateMedium(now, '-');
-    const sampleDocs = createSampleDocs();
-    const currentDocs = this.eoiDocuments();
-
-    const submittedDocs: SubmittedTenderDoc[] = currentDocs.map((doc, idx) => {
-      const sample = sampleDocs[idx];
-      const category: SubmittedTenderDoc['category'] =
-        doc.category === 'mandatory' ? 'mandatory' : doc.category === 'annexure' ? 'annexure' : 'supporting';
-      return {
-        id: doc.id,
-        name: doc.name,
-        category,
-        fileName: doc.fileName || sample?.fileName || `Document_${doc.id}.pdf`,
-        fileSize: doc.fileSize || sample?.fileSize || '1.2 MB',
-        status: doc.status === 'uploaded' ? 'uploaded' : sample?.status || 'pending',
-        comment: doc.comment?.trim() || undefined
-      };
+  /** The wizard was reopened by RPP's return: record the fee (or show why it failed) and clean the URL. */
+  private handlePaymentReturn(returned: PaymentReturn): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { payment: null, prn: null, result: null, message: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
     });
-
-    const newSubmission: SubmittedTender = {
-      id: `t-${Date.now()}`,
-      appRef: this.eoiApplicationId(),
-      appliedDate: appliedDateStr,
-      closingDate: this.schemeClosingDate() || '30-Nov-2026',
-      schemeTitle: this.schemeTitle(),
-      schemeName: this.schemeName(),
-      schemeCategory: this.schemeCategory() || 'ALL',
-      department: 'Rajasthan Skill and Livelihoods Development Corporation (RSLDC)',
-      emdAmount: this.paymentMethod() === 'exemption' ? '₹ 0 (Exempted)' : this.formattedEmdFee(),
-      processingFee: this.formattedProcessFee(),
-      transactionRef: this.procPaymentRef,
-      emdTransactionRef: this.emdPaymentRef(),
-      submittedStatus: 'Submitted',
-      eoiStatus: 'Under Review',
-      editCount: 0,
-      maxEdits: 3,
-      orgDetails: this.editableStep1,
-      signatoryDetails: this.editableStep3,
-      officers: this.editableStep2,
-      bankDetails: this.editableStep4,
-      documents: submittedDocs
-    };
-    // Idempotent: only create the submission once per application reference.
-    this.tenderRepo
-      .getAll()
-      .pipe(switchMap(list => (list.some(t => t.appRef === appRef) ? of(null) : this.tenderRepo.create(newSubmission))))
-      .subscribe();
-
-    // Also register the submitted application on the Department side (EoiStateService)
-    // so Department officers immediately see all uploaded supporting documents & applicant comments.
-    const dossierDocs: DossierDocument[] = currentDocs
-      .filter(doc => doc.status === 'uploaded' || !!doc.comment?.trim())
-      .map(doc => ({
-        id: `doc-${doc.id}`,
-        title: doc.name,
-        fileSize: doc.fileSize ? `${doc.fileSize}` : '1.2 MB PDF',
-        category:
-          doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
-        verified: doc.status === 'uploaded',
-        comment: doc.comment?.trim() || undefined
-      }));
-
-    const uploadedDocuments: DossierDocument[] =
-      dossierDocs.length > 0
-        ? dossierDocs
-        : submittedDocs.map(doc => ({
-            id: `doc-${doc.id}`,
-            title: doc.name,
-            fileSize: doc.fileSize,
-            category:
-              doc.category === 'mandatory' ? 'Statutory' : doc.category === 'annexure' ? 'Annexures' : 'Supporting',
-            verified: true,
-            comment: doc.comment
-          }));
-
-    const refLower = (this.schemeRefNo() || '').toLowerCase();
-    const nameLower = (this.schemeName() || '').toLowerCase();
-    const schemeId =
-      refLower.includes('samarth') || nameLower.includes('samarth')
-        ? 'SAMARTH-02'
-        : refLower.includes('saksham') || nameLower.includes('saksham')
-          ? 'SAKSHAM-03'
-          : 'MMKVY-01';
-
-    const deptResponse: ApplicantResponse = {
-      id: appRef,
-      anonymousLabel: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
-      actualLegalName: this.editableStep1.fullName || this.editableStep1.shortName || 'Applicant Organisation',
-      regNumber: this.editableStep1.registrationNumber || appRef,
-      schemeId,
-      schemeName: this.schemeName(),
-      eoiRefNo: this.schemeRefNo(),
-      submissionDate: formatDateTime(now),
-      status: 'UNDER_SCRUTINY',
-      statusDisplay: 'Under Review',
-      emdFee: this.paymentMethod() === 'exemption' ? 0 : this.numericEmdFee(),
-      emdStatus: 'PAID',
-      processingFee: this.numericProcessFee(),
-      processingFeeStatus: 'PAID',
-      organisation: {
-        legalName: this.editableStep1.fullName,
-        tradeName: this.editableStep1.shortName || this.editableStep1.fullName,
-        entityType: this.editableStep1.natureOfEntity || 'Private Limited Company',
-        registrationNumber: this.editableStep1.registrationNumber,
-        dateOfRegistration: this.editableStep1.dateOfRegistration,
-        stateOfRegistration: this.editableStep1.stateOfLegalReg || 'Rajasthan',
-        panNumber: this.editableStep1.companyPan,
-        gstin: this.editableStep1.gstin || 'Not Applicable',
-        turnover: this.editableStep1.turnOver || '₹ 12.50 Cr (Avg. 3 FY)',
-        registeredAddress: this.registeredAddressText,
-        operationalAddress: this.officeAddressText,
-        website: this.editableStep1.website || '',
-        email: this.editableStep1.emailId,
-        contactNumber: this.editableStep1.contactNo
-      },
-      authorizedSignatory: {
-        name: this.editableStep3.name,
-        designation: this.editableStep3.designation,
-        email: this.editableStep3.emailId,
-        contactNumber: this.editableStep3.mobileNo,
-        residenceAddress: this.residenceAddressText,
-        state: this.editableStep3.state || 'Rajasthan',
-        pan: this.editableStep3.pan,
-        aadhaarNo: this.editableStep3.aadhaarNo,
-        typeIdProof: this.editableStep3.identityDocType || 'PAN Card',
-        idNo: this.editableStep3.identityDocNumber || this.editableStep3.pan,
-        bhamashahNo: this.editableStep3.bhamashahNo || 'N/A',
-        voterIdNo: this.editableStep3.voterIdNo || 'N/A',
-        passportNo: this.editableStep3.passportNo || 'N/A',
-        serviceTaxNo: 'N/A'
-      },
-      bankDetails: {
-        bankName: this.editableStep4.bankName,
-        branchName: this.editableStep4.branchName,
-        accountHolderName: this.editableStep4.accountHolderName,
-        accountNumber: this.editableStep4.accountNo,
-        ifscCode: this.editableStep4.ifscCode,
-        accountType: this.editableStep4.accountType || 'Current Account'
-      },
-      trainingCentres: [],
-      financialYears: this.editableStep1.financialYears || [],
-      placementTrackRecord: [],
-      annualActionPlan: [],
-      uploadedDocuments
-    };
-
-    this.eoiStateService.submitApplicantResponse(deptResponse);
+    const ok = returned.result === 'success' || returned.result === 'pending' || returned.result === 'unknown';
+    if (returned.fee === 'process-fee') {
+      this.goToStep(this.stepIndexProcFee());
+      if (this.procFeePaid()) return;
+      if (ok) this.confirmProcessFee(returned.prn);
+      else this.procFeeError.set(returned.message || `The payment was ${returned.result}. You can try again.`);
+    } else if (returned.fee === 'emd') {
+      this.goToStep(this.stepIndexEmd());
+      if (this.submitted()) {
+        this.goToStep(this.stepIndexReceipts());
+        return;
+      }
+      if (this.emdPaid()) this.submitApplication();
+      else if (ok) this.confirmEmd(returned.prn);
+      else this.emdError.set(returned.message || `The payment was ${returned.result}. You can try again.`);
+    }
   }
 
-  goToTenderStatus(): void {
-    this.showEmdSuccessModal.set(false);
-    this.router.navigate(['/tender-status']);
-  }
+  // ---- Receipts ---------------------------------------------------------------------------------
 
-  printReceipt(): void {
-    window.print();
-  }
-  /** Snapshot of the values printed on the generated receipts. */
   private receiptData(): SchemeReceiptData {
+    const pf = this.processFee();
+    const emd = this.emd();
     return {
+      applicationNo: this.eoiApplicationId(),
       schemeTitle: this.schemeTitle(),
       schemeName: this.schemeName(),
       schemeRefNo: this.schemeRefNo(),
       submissionTimestamp: this.submissionTimestamp(),
+      processFeeRequired: this.procFeeRequired(),
       procFeeDate: this.procFeeDate(),
-      procPaymentModeLabel: this.selectedProcPaymentModeLabel,
+      procFeePrn: pf?.prn ?? '-',
+      procFeeTxnId: pf?.rppTxnId ?? '-',
+      procPaymentModeLabel: paymentModeText(pf),
       numericProcessFee: this.numericProcessFee(),
       formattedProcessFee: this.formattedProcessFee(),
       processFeeInWords: this.processFeeInWords(),
-      emdExempted: this.paymentMethod() === 'exemption',
+      emdRequired: this.emdRequired(),
+      emdExempted: this.emdExempted(),
+      udyamNumber: emd?.udyamNumber ?? '',
+      emdPrn: emd?.prn ?? '-',
+      emdTxnId: emd?.rppTxnId ?? '-',
+      emdPaidDate: this.emdPaidDate(),
+      emdPaymentModeLabel: paymentModeText(emd),
       numericEmdFee: this.numericEmdFee(),
       formattedEmdFee: this.formattedEmdFee(),
       emdFeeInWords: this.emdFeeInWords(),
@@ -704,5 +662,38 @@ export class SchemeFormState {
 
   downloadProposalApplication(): void {
     this.receipts.downloadProposalApplication(this.receiptData());
+  }
+
+  downloadAllReceipts(): void {
+    this.downloadAcknowledgmentReceipt();
+    if (this.emdRequired()) setTimeout(() => this.downloadEmdReceipt(), 300);
+    if (this.procFeeRequired()) setTimeout(() => this.downloadProcessingFeeReceipt(), 600);
+  }
+
+  copyRef(): void {
+    const id = this.eoiApplicationId();
+    void navigator?.clipboard?.writeText(id).catch(() => undefined);
+    this.copiedRef.set(true);
+    setTimeout(() => this.copiedRef.set(false), 3000);
+  }
+
+  goToTenderStatus(): void {
+    this.showEmdSuccessModal.set(false);
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    if (returnUrl) void this.router.navigateByUrl(returnUrl);
+    else {
+      const id = this.application()?.id;
+      void this.router.navigate(['/tender-status'], id ? { queryParams: { applicationId: id } } : {});
+    }
+  }
+
+  printReceipt(): void {
+    window.print();
+  }
+
+  private openBlob(blob: Blob): void {
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener');
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
   }
 }

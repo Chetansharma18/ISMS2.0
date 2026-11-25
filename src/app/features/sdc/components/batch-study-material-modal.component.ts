@@ -217,10 +217,6 @@ interface MaterialRow {
             </app-form-section>
           }
         </div>
-
-        <ng-container modalFooter>
-          <button appButton variant="outline" type="button" (click)="closed.emit()">Close</button>
-        </ng-container>
       </app-modal>
     }
 

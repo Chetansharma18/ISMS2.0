@@ -1,518 +1,611 @@
 // ui-guard-allow: page-frame - the registration wizard has its own stepper layout
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ApiError } from '../../core/http/api-error';
+import { NotificationService } from '../../core/services/notification.service';
+import {
+  ActionModalComponent,
+  ButtonComponent,
+  EmptyStateComponent,
+  IconComponent,
+  LoaderComponent,
+  StepperComponent,
+  StepperStep
+} from '../../shared';
+import {
+  OTR_GENERAL_ERRORS,
+  OtrErrorMap,
+  OtrFieldDef,
+  OtrFormDef,
+  OtrRecords,
+  OtrSectionDef,
+  OtrStepDef,
+  OtrStepValues,
+  OtrValue
+} from './models/otr-api.model';
+import {
+  currentStepNumber,
+  documentsFrom,
+  firstStepWithErrors,
+  formSteps,
+  initialStepValues,
+  isFieldVisible,
+  isSubmitted,
+  mapFieldErrors,
+  referenceNumber,
+  savedStepNumbers,
+  setStepValue,
+  stepFields,
+  toStepPayload
+} from './otr-form.util';
+import { OtrFieldComponent } from './parts/otr-field.component';
+import { OtrReviewComponent } from './parts/otr-review.component';
 import { OtrFormService } from './services/otr-form.service';
-import { OtrValidationService } from './services/otr-validation.service';
 import { OtrPdfService } from './services/otr-pdf.service';
+import { OtrRegistrationService } from './services/otr-registration.service';
 
-import { Step1OrgDetailsComponent } from './steps/step1-org-details/step1-org-details.component';
-import { Step3AuthPersonComponent } from './steps/step3-auth-person/step3-auth-person.component';
-import { Step4BankDetailsComponent } from './steps/step4-bank-details/step4-bank-details.component';
-import { Step5PreviewComponent } from './steps/step5-preview/step5-preview.component';
-import { ActionModalComponent } from '../../shared/components/action-modal/action-modal.component';
-import { AuthService } from '../../core/auth/auth.service';
-import { ButtonComponent, IconComponent } from '../../shared';
-
-export interface StepMeta {
-  number: number;
-  label: string;
+interface SectionView {
+  section: OtrSectionDef;
+  /** Group heading, shown above the first section of a group. */
+  groupTitle?: string;
+  fields: OtrFieldDef[];
 }
 
+type SavingState = 'next' | 'draft' | 'submit' | null;
+
+/**
+ * Organization Registration (One Time Registration). The steps, fields, labels, required markers and sections
+ * come from the backend (GET /otr/form), each step is saved to its own endpoint and every check is the backend's:
+ * its messages are shown under the fields they belong to. Dropdown lists and show / hide rules are display
+ * settings (otr-step-layout.ts).
+ */
 @Component({
   selector: 'app-registration-shell',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
-    Step1OrgDetailsComponent,
-    Step3AuthPersonComponent,
-    Step4BankDetailsComponent,
-    Step5PreviewComponent,
     ActionModalComponent,
     ButtonComponent,
-    IconComponent
+    EmptyStateComponent,
+    IconComponent,
+    LoaderComponent,
+    StepperComponent,
+    OtrFieldComponent,
+    OtrReviewComponent
   ],
   template: `
-    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-navy selection:text-white font-sans" >
-
-      <!-- ====================================================================
-           Main Content Area
-           ==================================================================== -->
+    <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#7C0E44] selection:text-white">
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
-        <!-- 1. Top Header Row (Back Button, Page Title, Mandatory Indicator, Subtitle) -->
         <div class="mb-5 space-y-3">
-          <!-- Back button -->
           <div>
             <button appButton variant="outline" size="sm" type="button" (click)="goBack()">
               <app-icon name="back" />
               <span>Back</span>
             </button>
           </div>
-
-          <!-- Title and Subtitle Row -->
-          <div>
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#172554] tracking-tight m-0">
-              Organization Registration
-            </h1>
-          </div>
-
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-            @if (activeStep() === 1) {
-              Please provide your organisation details to complete the registration process.
-            } @else if (activeStep() === 2) {
-              Please provide the required details to complete the registration process.
-            } @else if (activeStep() === 3) {
-              Please provide the required details to complete the registration process.
-            } @else {
-              Review all the details before submitting your registration.
-            }
-          </p>
-        </div>
-
-        <!-- 2. Step Progress Indicator (Card with 4 Evenly Distributed Steps) -->
-        <nav aria-label="Registration Steps" class="bg-white rounded-xl border border-slate-200/90 shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4.5 mb-5 overflow-x-auto no-scrollbar">
-          <div class="flex items-center justify-between w-full min-w-135 sm:min-w-0">
-            @for (step of steps; track step.number; let last = $last) {
-              <!-- Step Item Button -->
-              <button
-                appButton
-                variant="ghost"
-                type="button"
-                (click)="goToStep(step.number)"
-                class="gap-2 sm:gap-2.5 shrink-0 text-left"
-              >
-                <!-- Number Badge / Checkmark -->
-                <span
-                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors shadow-2xs"
-                  [style.background-color]="(activeStep() === step.number || isStepCompleted(step.number)) ? 'var(--color-primary, #7C0E44)' : '#ffffff'"
-                  [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'"
-                  [style.border]="(activeStep() === step.number || isStepCompleted(step.number)) ? '2px solid var(--color-primary, #7C0E44)' : '2px solid #cbd5e1'"
-                >
-                  @if (isStepCompleted(step.number) && activeStep() !== step.number) {
-                    <app-icon name="check" [stroke]="3" class="text-white" />
-                  } @else {
-                    <span [style.color]="(activeStep() === step.number || isStepCompleted(step.number)) ? '#ffffff' : '#64748b'" style="font-weight: 700; font-size: 13px;">
-                      {{ step.number }}
-                    </span>
-                  }
-                </span>
-
-                <!-- Step Label -->
-                <span
-                  class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
-                  [class.font-extrabold]="activeStep() === step.number"
-                  [class.text-navy]="activeStep() === step.number"
-                  [class.text-slate-800]="isStepCompleted(step.number) && activeStep() !== step.number"
-                  [class.font-semibold]="activeStep() !== step.number"
-                  [class.text-slate-600]="!isStepCompleted(step.number) && activeStep() !== step.number"
-                >
-                  {{ step.label }}
-                </span>
-              </button>
-
-              <!-- Connector Line -->
-              @if (!last) {
-                <div
-                  class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
-                  [class.bg-navy]="isStepCompleted(step.number)"
-                  [class.bg-slate-200]="!isStepCompleted(step.number)"
-                ></div>
-              }
-            }
-          </div>
-        </nav>
-
-        <!-- 3. Main Form Card Container -->
-        <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
-
-          <!-- Step 1 Container: Organization Details -->
-          <div [class.hidden]="activeStep() !== 1" class="space-y-6">
-            <!-- Step 1 Card Header -->
-            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
-              <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  Organisation Details
-                </h2>
-                <p class="text-xs text-slate-500 m-0 mt-0.5">
-                  Step 1 of the application
-                </p>
-              </div>
-              <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
-              </span>
-            </div>
-            <app-step1-org-details></app-step1-org-details>
-          </div>
-
-          <!-- Step 2 Container: Authorized Person Details -->
-          <div [class.hidden]="activeStep() !== 2" class="space-y-6">
-            <!-- Step 2 Card Header -->
-            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
-              <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  Authorized Person Details
-                </h2>
-                <p class="text-xs text-slate-500 m-0 mt-0.5">
-                  Step 2 of the application
-                </p>
-              </div>
-              <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
-              </span>
-            </div>
-            <app-step3-auth-person></app-step3-auth-person>
-          </div>
-
-          <!-- Step 3 Container: Organisation Bank Details -->
-          <div [class.hidden]="activeStep() !== 3" class="space-y-6">
-            <!-- Step 3 Card Header -->
-            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
-              <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  Organisation Bank Details
-                </h2>
-                <p class="text-xs text-slate-500 m-0 mt-0.5">
-                  Step 3 of the application
-                </p>
-              </div>
-              <span class="text-xs text-slate-500 font-medium shrink-0">
-                Required fields marked <span class="text-[#DC2626] font-bold">*</span>
-              </span>
-            </div>
-            <app-step4-bank-details></app-step4-bank-details>
-          </div>
-
-          <!-- Step 4 Container: Preview & Submit -->
-          <div [class.hidden]="activeStep() !== 4" class="space-y-6">
-            <!-- Step 4 Card Header -->
-            <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
-              <div class="min-w-0">
-                <h2 class="text-lg sm:text-[19px] font-bold text-[#1E3A5F] m-0 leading-tight">
-                  Review &amp; Submit
-                </h2>
-                <p class="text-xs text-slate-500 m-0 mt-0.5">
-                  Step 4 of the application
-                </p>
-              </div>
-            </div>
-            <app-step5-preview (editStep)="goToStep($event)"></app-step5-preview>
-          </div>
-
-          <!-- 4. Form Action Buttons (Per Step Navigation) -->
-          <div class="pt-4 border-t border-[#E8EEF5] flex flex-col sm:flex-row items-center justify-between gap-3">
-            <!-- Left Side: Previous Button (Steps 2, 3, 4) / Back to Profile (Step 1) -->
-            <div>
-              @if (activeStep() === 1) {
-                <button appButton variant="outline" size="lg" type="button" (click)="goBack()">
-                  <app-icon name="chevron-left" />
-                  <span>Back to Profile</span>
-                </button>
-              } @else if (activeStep() > 1) {
-                <button appButton variant="outline" size="lg" type="button" (click)="previousStep()">
-                  <app-icon name="chevron-left" />
-                  <span>Previous</span>
-                </button>
-              }
-            </div>
-
-            <!-- Right Side: Action Buttons -->
-            <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
-              <!-- STEP 1 NAVIGATION: [Next Step ->] -->
-              @if (activeStep() === 1) {
-                <button appButton size="lg" type="button" (click)="nextStep()">
-                  <span>Next Step</span>
-                  <app-icon name="chevron-right" />
-                </button>
-              }
-
-              <!-- STEP 2 NAVIGATION: [Previous (left)] [Save as Draft] [Next Step ->] -->
-              @if (activeStep() === 2) {
-              
-
-                <button appButton size="lg" type="button" (click)="nextStep()">
-                  <span>Next Step</span>
-                  <app-icon name="chevron-right" />
-                </button>
-              }
-
-              <!-- STEP 3 NAVIGATION: [Previous (left)] [Next Step ->] -->
-              @if (activeStep() === 3) {
-                <button appButton size="lg" type="button" (click)="nextStep()">
-                  <span>Next Step</span>
-                  <app-icon name="chevron-right" />
-                </button>
-              }
-
-              <!-- STEP 4 NAVIGATION: [Previous (left)] [Download PDF] [Save as Draft] [Submit Application] -->
-              @if (activeStep() === 4) {
-                <button appButton variant="outline" size="lg" type="button" (click)="downloadOtrPdf()" title="Download complete details in PDF">
-                  <app-icon name="document-download" [stroke]="2" />
-                  <span>Download PDF</span>
-                </button>
-
-                @if (isAlreadySubmitted()) {
-                  <button appButton size="lg" type="button" (click)="backToProfile()">
-                    <span>Back to Profile</span>
-                  </button>
-                } @else {
-                  <button appButton size="lg" type="button" (click)="submitApplication()">
-                    <span>Register</span>
-                  </button>
+          <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
+            {{ form()?.title ?? 'Organization Registration' }}
+          </h1>
+          @if (form(); as f) {
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
+              @if (readOnly()) {
+                Your registration has been submitted.
+                @if (referenceNo(); as ref) {
+                  Reference number: <span class="font-semibold text-navy tabular-nums">{{ ref }}</span>
                 }
+              } @else if (activeStepDef()?.kind === 'review') {
+                Review all the details before submitting your registration.
+              } @else {
+                {{ f.description }}
               }
-            </div>
-          </div>
-
+            </p>
+          }
         </div>
 
-      </main>
-
-      <!-- ====================================================================
-           Floating Feedback Toast
-           ==================================================================== -->
-      @if (validationService.toast(); as toast) {
-        <div class="fixed top-20 right-4 sm:right-8 z-50 max-w-md w-full animate-in fade-in slide-in-from-top-3 duration-300 pointer-events-auto">
-          <div
-            class="p-4 rounded-xl shadow-xl border flex items-start gap-3 backdrop-blur-md"
-            [class.bg-emerald-900/95]="toast.type === 'success'"
-            [class.border-emerald-500/50]="toast.type === 'success'"
-            [class.text-emerald-50]="toast.type === 'success'"
-            [class.bg-rose-600]="toast.type === 'error' || toast.type === 'warning'"
-            [class.border-rose-700]="toast.type === 'error' || toast.type === 'warning'"
-            [class.text-white]="toast.type === 'error' || toast.type === 'warning'"
-            [class.bg-navy]="toast.type === 'info'"
-            [class.border-[#1b4b73]]="toast.type === 'info'"
-            [class.text-white]="toast.type === 'info'"
-          >
-            <div class="shrink-0 mt-0.5">
-              @if (toast.type === 'success') {
-                <app-icon name="check" size="lg" [stroke]="2.5" class="text-emerald-400" />
-              } @else if (toast.type === 'error' || toast.type === 'warning') {
-                <div class="w-5 h-5 rounded-full bg-white flex items-center justify-center shrink-0 shadow-xs">
-                  <app-icon name="close" size="sm" [stroke]="3" class="text-rose-600" />
-                </div>
-              } @else {
-                <app-icon name="info-circle" size="lg" [stroke]="2.5" class="text-white" />
-              }
-            </div>
-
-            <div class="flex-1 text-xs sm:text-sm font-medium leading-snug text-white">
-              {{ toast.message }}
-            </div>
-
-            <button
-              appButton
-              variant="inverse"
-              size="xs"
-              iconOnly
-              type="button"
-              (click)="validationService.clearToast()"
-              aria-label="Dismiss notification"
-            >
-              <app-icon name="close" [stroke]="2" />
+        @if (loading()) {
+          <app-loader text="Loading registration form..." />
+        } @else if (loadError(); as message) {
+          <app-empty-state title="Registration form could not be loaded" [description]="message" icon="error" />
+          <div class="flex justify-center mt-4">
+            <button appButton type="button" (click)="load()">
+              <app-icon name="refresh" />
+              <span>Try again</span>
             </button>
           </div>
-        </div>
-      }
+        } @else if (form(); as f) {
+          <div class="mb-5">
+            <app-stepper
+              variant="wizard"
+              ariaLabel="Registration steps"
+              [steps]="stepperSteps()"
+              [currentStep]="activeStep()"
+              [completedSteps]="completedSteps()"
+              (stepClick)="goToStep($event)"
+            />
+          </div>
 
-      <!-- ====================================================================
-           5. Submission Success Popup (Clean, Minimal, Professional)
-           ==================================================================== -->
+          @if (activeStepDef(); as step) {
+            <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
+              <div class="pb-3.5 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
+                <div class="min-w-0">
+                  <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0 leading-tight">{{ step.title }}</h2>
+                  <p class="text-xs text-slate-500 m-0 mt-0.5">{{ step.subtitle }}</p>
+                </div>
+                @if (step.kind === 'form' && !readOnly()) {
+                  <span class="text-xs text-slate-500 font-medium shrink-0">
+                    Required fields marked <span class="text-[#DC2626] font-bold">*</span>
+                  </span>
+                }
+              </div>
+
+              @if (step.kind === 'form') {
+                @for (view of sectionViews(); track view.section.key) {
+                  <section class="space-y-4">
+                    @if (view.groupTitle) {
+                      <div class="pb-2 border-b border-[#E8EEF5]">
+                        <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">{{ view.groupTitle }}</h3>
+                      </div>
+                      <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">{{ view.section.title }}</h4>
+                    } @else if (view.section.group) {
+                      <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">{{ view.section.title }}</h4>
+                    } @else {
+                      <div class="pb-2 border-b border-[#E8EEF5]">
+                        <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">{{ view.section.title }}</h3>
+                      </div>
+                    }
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+                      @for (field of view.fields; track field.key) {
+                        <div [class.md:col-span-2]="(field.colSpan ?? 1) > 1">
+                          <app-otr-field
+                            [field]="field"
+                            [values]="activeValues()"
+                            [error]="activeErrors()[field.key]"
+                            [document]="documents()[field.key]"
+                            [disabled]="readOnly() || saving() !== null"
+                            [uploading]="uploadingField() === field.key"
+                            (valueChange)="onValueChange(step, field.key, $event)"
+                            (fileSelected)="uploadDocument(field, $event)"
+                            (fileRemoved)="removeDocument(field)"
+                            (fileViewed)="viewDocument(field)"
+                          />
+                        </div>
+                      }
+                    </div>
+                  </section>
+                }
+              } @else {
+                <app-otr-review
+                  [form]="f"
+                  [values]="values()"
+                  [documents]="documents()"
+                  [errors]="errors()"
+                  [declaration]="step.declaration"
+                  [accepted]="declarationAccepted()"
+                  [declarationError]="generalErrors()['declarationAccepted']"
+                  [readOnly]="readOnly()"
+                  (editStep)="goToStep($event)"
+                  (viewDocument)="viewDocumentByKey($event)"
+                  (acceptedChange)="onDeclarationChange($event)"
+                />
+              }
+
+              <div class="pt-4 border-t border-[#E8EEF5] flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div>
+                  @if (activeStep() === 1) {
+                    <button appButton variant="outline" size="lg" type="button" (click)="leave()">
+                      <app-icon name="chevron-left" />
+                      <span>Back to Profile</span>
+                    </button>
+                  } @else {
+                    <button appButton variant="outline" size="lg" type="button" [disabled]="saving() !== null" (click)="previousStep()">
+                      <app-icon name="chevron-left" />
+                      <span>Previous</span>
+                    </button>
+                  }
+                </div>
+
+                <div class="flex items-center gap-2.5 sm:gap-3 ml-auto justify-end">
+                  @if (step.kind === 'form') {
+                    @if (!readOnly()) {
+                      <button appButton variant="outline" size="lg" type="button" [disabled]="saving() !== null" (click)="saveDraft()">
+                        <span>{{ saving() === 'draft' ? 'Saving...' : 'Save' }}</span>
+                      </button>
+                    }
+                    <button appButton size="lg" type="button" [disabled]="saving() !== null" (click)="nextStep()">
+                      <span>{{ saving() === 'next' ? 'Saving...' : 'Next Step' }}</span>
+                      <app-icon name="chevron-right" />
+                    </button>
+                  } @else {
+                    <button appButton variant="outline" size="lg" type="button" (click)="downloadPdf()" title="Download complete details in PDF">
+                      <app-icon name="document-download" [stroke]="2" />
+                      <span>Download PDF</span>
+                    </button>
+                    @if (readOnly()) {
+                      <button appButton size="lg" type="button" (click)="leave()">
+                        <span>Back to Profile</span>
+                      </button>
+                    } @else {
+                      <button appButton size="lg" type="button" [disabled]="saving() !== null" (click)="submit()">
+                        <span>{{ saving() === 'submit' ? 'Submitting...' : 'Register' }}</span>
+                      </button>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </main>
+
       <app-action-modal
-        [isOpen]="!!submittedRegId()"
-        title="Profile created successfully."
+        [isOpen]="submittedOpen()"
+        title="Registration submitted successfully."
         [showCloseButton]="true"
         maxWidthClass="max-w-md"
         primaryLabel="Download PDF"
         secondaryLabel="OK"
-        (primaryAction)="downloadOtrPdf()"
-        (secondaryAction)="navigateToExistingUserProfile()"
-        (close)="navigateToExistingUserProfile()"
+        (primaryAction)="downloadPdf()"
+        (secondaryAction)="finish()"
+        (close)="finish()"
       >
-        <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 tabular-nums">
-          USER ID: <span class="font-bold text-navy">{{ submittedRegId() }}</span>
-        </p>
+        @if (referenceNo(); as ref) {
+          <p class="text-xs sm:text-sm text-slate-600 mt-2 mb-0 tabular-nums">
+            Reference number: <span class="font-bold text-navy">{{ ref }}</span>
+          </p>
+        }
       </app-action-modal>
-
     </div>
   `
 })
-export class RegistrationShellComponent {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private authService = inject(AuthService);
-  otrFormService = inject(OtrFormService);
-  validationService = inject(OtrValidationService);
-  private pdfService = inject(OtrPdfService);
-  private destroyRef = inject(DestroyRef);
+export class RegistrationShellComponent implements OnInit {
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly api = inject(OtrRegistrationService);
+  private readonly legacy = inject(OtrFormService);
+  private readonly pdf = inject(OtrPdfService);
+  private readonly notifications = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly activeStep = signal<number>(1);
-  readonly submittedRegId = signal<string | null>(null);
-  readonly step1CompRef = viewChild<Step1OrgDetailsComponent>('step1Comp');
+  readonly form = this.api.form;
+  readonly records = this.api.records;
 
-  readonly isAlreadySubmitted = computed(() => {
-    const data = this.otrFormService.formData();
-    return data.status === 'Submitted' || this.submittedRegId() !== null;
+  readonly loading = signal(true);
+  readonly loadError = signal<string | null>(null);
+  readonly activeStep = signal(1);
+  /** The user's answers per step key, as edited on screen (saved to the backend step by step). */
+  readonly values = signal<Record<string, OtrStepValues>>({});
+  /** The backend's validation messages per step and field. */
+  readonly errors = signal<OtrErrorMap>({});
+  readonly saving = signal<SavingState>(null);
+  readonly uploadingField = signal<string | null>(null);
+  readonly declarationAccepted = signal(false);
+  readonly submittedOpen = signal(false);
+
+  readonly readOnly = computed(() => isSubmitted(this.records()));
+  readonly referenceNo = computed(() => referenceNumber(this.records()));
+  readonly documents = computed(() => {
+    const form = this.form();
+    return form ? documentsFrom(form, this.records()) : {};
+  });
+  readonly stepperSteps = computed<StepperStep[]>(() => (this.form()?.steps ?? []).map(s => ({ label: s.title })));
+  readonly completedSteps = computed(() => {
+    const form = this.form();
+    if (!form) return [];
+    const saved = savedStepNumbers(form, this.records());
+    return this.readOnly() ? [...saved, form.steps[form.steps.length - 1].number] : saved;
+  });
+  readonly activeStepDef = computed(() => this.form()?.steps.find(s => s.number === this.activeStep()));
+  readonly activeValues = computed(() => {
+    const step = this.activeStepDef();
+    return step ? this.values()[step.key] ?? {} : {};
+  });
+  readonly activeErrors = computed(() => {
+    const step = this.activeStepDef();
+    return step ? this.errors()[step.key] ?? {} : {};
+  });
+  readonly generalErrors = computed(() => this.errors()[OTR_GENERAL_ERRORS] ?? {});
+
+  /** The sections of the active step with their visible fields. */
+  readonly sectionViews = computed<SectionView[]>(() => {
+    const step = this.activeStepDef();
+    if (!step || step.kind !== 'form') return [];
+    const values = this.activeValues();
+    let lastGroup: string | undefined;
+    return step.sections.flatMap(section => {
+      const fields = section.fields.filter(f => isFieldVisible(f, values));
+      const groupTitle = section.group && section.group !== lastGroup ? section.group : undefined;
+      lastGroup = section.group;
+      return fields.length ? [{ section, groupTitle, fields }] : [];
+    });
   });
 
-  constructor() {
-    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
-      const step = parseInt(params['step'], 10);
-      if (step >= 1 && step <= 4) {
-        this.activeStep.set(step);
-      }
-    });
+  ngOnInit(): void {
+    this.load();
   }
 
-  readonly steps: StepMeta[] = [
-    { number: 1, label: 'Organisation Details' },
-    { number: 2, label: 'Authorized Person' },
-    { number: 3, label: 'Organisation Bank Details' },
-    { number: 4, label: 'Preview & Submit' }
-  ];
+  load(): void {
+    this.loading.set(true);
+    this.loadError.set(null);
+    this.api
+      .load()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ form, records }) => {
+          this.values.set(this.valuesFrom(form, records));
+          this.declarationAccepted.set(isSubmitted(records));
+          this.errors.set({});
+          this.activeStep.set(this.startStep(form, records));
+          this.loading.set(false);
+        },
+        error: (error: unknown) => {
+          this.loadError.set(this.loadErrorMessage(error));
+          this.loading.set(false);
+        }
+      });
+  }
 
-  isStepCompleted(stepNumber: number): boolean {
-    const data = this.otrFormService.formData();
-    const isSubmitted = data.status === 'Submitted' || this.submittedRegId() !== null;
-    if (isSubmitted) {
-      return true;
+  onValueChange(step: OtrStepDef, key: string, value: OtrValue): void {
+    this.values.update(all => ({ ...all, [step.key]: setStepValue(step, all[step.key] ?? {}, key, value) }));
+    this.clearError(step.key, key);
+  }
+
+  onDeclarationChange(accepted: boolean): void {
+    this.declarationAccepted.set(accepted);
+    this.clearError(OTR_GENERAL_ERRORS, 'declarationAccepted');
+  }
+
+  /** Stepper click: back at any time; forward saves the current step and stops at the first unsaved step. */
+  goToStep(target: number): void {
+    const current = this.activeStep();
+    if (target === current || this.saving() !== null) return;
+    if (target < current || this.readOnly()) {
+      this.show(target);
+      return;
     }
-    if (stepNumber === 4) {
-      return false;
-    }
-    return this.validationService.isStepValid(stepNumber, data);
-  }
-
-  isStepError(stepNumber: number): boolean {
-    if (stepNumber === 4) {
-      return false;
-    }
-    const isSubmitted = this.validationService.submittedSteps().has(stepNumber);
-    if (!isSubmitted) return false;
-    return !this.isStepCompleted(stepNumber);
-  }
-
-  canSubmit(): boolean {
-    const data = this.otrFormService.formData();
-    return [1, 2, 3].every(s => this.validationService.isStepValid(s, data));
-  }
-
-  goToStep(stepNumber: number): void {
-    if (stepNumber < 1 || stepNumber > 4) return;
-    this.activeStep.set(stepNumber);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.saveAndAdvance(target);
   }
 
   nextStep(): void {
-    const current = this.activeStep();
-
-    if (current === 1) {
-      this.validationService.markStepSubmitted(1);
-      const errors = this.validationService.validateStep1(this.otrFormService.step1());
-      if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with * in Organisation Details', 'error', 1);
-        return;
-      }
-    }
-
-    if (current < 4) {
-      this.activeStep.set(current + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    this.goToStep(this.activeStep() + 1);
   }
 
   previousStep(): void {
-    const current = this.activeStep();
-    if (current > 1) {
-      this.activeStep.set(current - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    if (this.activeStep() > 1) this.show(this.activeStep() - 1);
   }
 
+  /** Saves the step and stays on it. */
   saveDraft(): void {
-    this.otrFormService.saveDraft();
-    this.validationService.showToast('Registration progress saved as draft successfully!', 'info');
+    const step = this.activeStepDef();
+    if (!step || step.kind !== 'form') return;
+    this.saveStep(step, 'draft', () => this.notifications.success(`${step.title} saved.`));
   }
 
-  submitApplication(): void {
-    const data = this.otrFormService.formData();
-
-    for (let s = 1; s <= 3; s++) {
-      this.validationService.markStepSubmitted(s);
-      const errors = this.validationService.getStepErrors(s, data);
-      if (errors.length > 0) {
-        this.validationService.showToast('Please fill all mandatory fields marked with *', 'error', s);
-        this.goToStep(s);
-        return;
-      }
-    }
-
-    const regId = this.otrFormService.submitForm();
-    this.submittedRegId.set(regId);
-    this.validationService.showToast(`Application successfully submitted! Ref: ${regId}`, 'success');
-
-    // Automatically download filled profile PDF
-    try {
-      this.downloadOtrPdf();
-    } catch (e) {
-      console.warn('Auto download error:', e);
-    }
-  }
-
-  copyRegId(): void {
-    const regId = this.submittedRegId();
-    if (regId && navigator.clipboard) {
-      navigator.clipboard.writeText(regId).then(() => {
-        this.validationService.showToast('Registration ID copied to clipboard!', 'info');
+  submit(): void {
+    if (this.saving() !== null) return;
+    this.saving.set('submit');
+    this.api
+      .submit(this.declarationAccepted())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saving.set(null);
+          this.errors.set({});
+          this.submittedOpen.set(true);
+        },
+        error: (error: unknown) => {
+          this.saving.set(null);
+          const form = this.form();
+          if (form && error instanceof ApiError && error.fieldErrors.length > 0) {
+            const errors = mapFieldErrors(error.fieldErrors, form);
+            this.errors.set(errors);
+            const step = firstStepWithErrors(form, errors);
+            this.notifications.error(
+              step
+                ? `Some details need correcting before you can register. Start with "${step.title}".`
+                : Object.values(errors[OTR_GENERAL_ERRORS] ?? {})[0] ?? error.message
+            );
+            return;
+          }
+          this.notifyFailure(error);
+        }
       });
-    }
   }
 
-  printAcknowledgement(): void {
-    this.pdfService.printOtrProfile(this.otrFormService.formData(), this.submittedRegId());
+  uploadDocument(field: OtrFieldDef, file: File): void {
+    const step = this.activeStepDef();
+    if (!step || !field.documentType) return;
+    this.uploadingField.set(field.key);
+    this.api
+      .uploadDocument(field.key, field.documentType, file)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.uploadingField.set(null);
+          this.clearError(step.key, field.key);
+        },
+        error: (error: unknown) => {
+          this.uploadingField.set(null);
+          this.setFieldError(step.key, field.key, this.fieldMessage(error, field.key));
+        }
+      });
   }
 
-  downloadOtrPdf(): void {
-    this.pdfService.generateOtrPdf(this.otrFormService.formData(), this.submittedRegId());
+  removeDocument(field: OtrFieldDef): void {
+    const step = this.activeStepDef();
+    if (!step || !field.documentType) return;
+    this.uploadingField.set(field.key);
+    this.api
+      .deleteDocument(field.key, field.documentType)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.uploadingField.set(null),
+        error: (error: unknown) => {
+          this.uploadingField.set(null);
+          this.setFieldError(step.key, field.key, this.fieldMessage(error, field.key));
+        }
+      });
+  }
+
+  viewDocument(field: OtrFieldDef): void {
+    if (!field.documentType) return;
+    this.api
+      .documentBlob(field.documentType)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: blob => {
+          const url = URL.createObjectURL(blob);
+          window.open(url, '_blank', 'noopener');
+          setTimeout(() => URL.revokeObjectURL(url), 60_000);
+        },
+        error: (error: unknown) => this.notifyFailure(error)
+      });
+  }
+
+  /** "View" on the review step, which only knows the field key. */
+  viewDocumentByKey(fieldKey: string): void {
+    const form = this.form();
+    const field = form ? formSteps(form).flatMap(stepFields).find(f => f.key === fieldKey) : undefined;
+    if (field) this.viewDocument(field);
+  }
+
+  downloadPdf(): void {
+    this.pdf.generateOtrPdf(this.legacy.formData(), this.referenceNo());
   }
 
   goBack(): void {
-    if (this.activeStep() > 1) {
+    if (this.activeStep() > 1 && !this.loading() && !this.loadError()) {
       this.previousStep();
     } else {
-      this.router.navigate(['/profile']);
+      this.leave();
     }
   }
 
-  backToProfile(): void {
-    this.router.navigate(['/profile']);
+  leave(): void {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    void (returnUrl ? this.router.navigateByUrl(returnUrl) : this.router.navigate(['/profile']));
   }
 
-  navigateToExistingUserProfile(): void {
-    const data = this.otrFormService.formData();
-    const orgName = data.step1.fullName?.trim() || data.step1.shortName?.trim() || 'Approved Citizen (TP)';
-
-    this.otrFormService.setExistingUserData(data);
-
-    // Transition session to existing_user persona with complete profile status
-    this.authService.login({
-      id: orgName,
-      ssoId: 'new_user',
-      label: orgName,
-      subLabel: 'Registered TP/PIA',
-      role: 'existing_user',
-      isProfileComplete: true
-    }, null);
-
-    this.submittedRegId.set(null);
-    this.router.navigate(['/tenders']);
+  finish(): void {
+    this.submittedOpen.set(false);
+    void this.router.navigate(['/profile']);
   }
 
-  navigateToHome(): void {
-    this.submittedRegId.set(null);
-    this.router.navigate(['/']);
+  // ------------------------------------------------------------------ internals
+
+  private saveAndAdvance(target: number): void {
+    const step = this.activeStepDef();
+    if (!step || step.kind !== 'form') {
+      this.show(target);
+      return;
+    }
+    this.saveStep(step, 'next', () => {
+      // Never move past a step the backend holds no saved record for.
+      const form = this.form();
+      this.show(form ? Math.min(target, currentStepNumber(form, this.records())) : target);
+    });
+  }
+
+  private saveStep(step: OtrStepDef, state: 'next' | 'draft', done: () => void): void {
+    if (this.saving() !== null) return;
+    this.saving.set(state);
+    const payload = toStepPayload(step, this.values()[step.key] ?? {}, this.api.lookups());
+    this.api
+      .saveStep(step.key, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: record => {
+          this.saving.set(null);
+          // Show what the backend stored (trimmed, upper-cased PAN / IFSC, copied office address).
+          this.values.update(all => ({ ...all, [step.key]: initialStepValues(step, record) }));
+          this.errors.update(all => {
+            const next = { ...all };
+            delete next[step.key];
+            return next;
+          });
+          done();
+        },
+        error: (error: unknown) => {
+          this.saving.set(null);
+          const form = this.form();
+          if (form && error instanceof ApiError && error.fieldErrors.length > 0) {
+            const mapped = mapFieldErrors(error.fieldErrors, form, step.key);
+            this.errors.update(all => ({ ...all, [step.key]: mapped[step.key] ?? {} }));
+            const general = Object.values(mapped[OTR_GENERAL_ERRORS] ?? {});
+            const count = Object.keys(mapped[step.key] ?? {}).length;
+            this.notifications.error(
+              count > 0 ? `Please correct the highlighted fields in ${step.title}.` : general[0] ?? error.message
+            );
+            this.scrollToTop();
+            return;
+          }
+          this.notifyFailure(error);
+        }
+      });
+  }
+
+  private show(stepNumber: number): void {
+    this.activeStep.set(stepNumber);
+    this.scrollToTop();
+  }
+
+  private scrollToTop(): void {
+    if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {
+        /* not available (tests) */
+      }
+    }
+  }
+
+  private valuesFrom(form: OtrFormDef, records: OtrRecords): Record<string, OtrStepValues> {
+    const values: Record<string, OtrStepValues> = {};
+    for (const step of formSteps(form)) values[step.key] = initialStepValues(step, records[step.key]);
+    return values;
+  }
+
+  /** Submitted: the review. Otherwise the step asked for in ?step= when reachable, else the first unsaved step. */
+  private startStep(form: OtrFormDef, records: OtrRecords): number {
+    const last = form.steps[form.steps.length - 1]?.number ?? 1;
+    if (isSubmitted(records)) return last;
+    const current = currentStepNumber(form, records);
+    const asked = Number.parseInt(this.route.snapshot.queryParamMap.get('step') ?? '', 10);
+    return Number.isInteger(asked) && asked >= 1 && asked <= current ? asked : current;
+  }
+
+  private clearError(stepKey: string, fieldKey: string): void {
+    if (!this.errors()[stepKey]?.[fieldKey]) return;
+    this.errors.update(all => {
+      const step = { ...(all[stepKey] ?? {}) };
+      delete step[fieldKey];
+      return { ...all, [stepKey]: step };
+    });
+  }
+
+  private setFieldError(stepKey: string, fieldKey: string, message: string): void {
+    this.errors.update(all => ({ ...all, [stepKey]: { ...(all[stepKey] ?? {}), [fieldKey]: message } }));
+  }
+
+  /** The backend's message for one field (document errors are plain messages). */
+  private fieldMessage(error: unknown, fieldKey: string): string {
+    if (error instanceof ApiError) {
+      return error.fieldErrors.find(e => e.field.toLowerCase() === fieldKey.toLowerCase())?.message ?? error.message;
+    }
+    return 'The document could not be saved. Please try again.';
+  }
+
+  private notifyFailure(error: unknown): void {
+    const message = error instanceof ApiError ? error.message : 'Something went wrong. Please try again.';
+    this.notifications.error(message);
+  }
+
+  private loadErrorMessage(error: unknown): string {
+    if (error instanceof ApiError) {
+      if (error.isForbidden) return 'Your role does not have access to Organization Registration.';
+      return error.message;
+    }
+    return 'Please try again.';
   }
 }

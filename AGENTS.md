@@ -53,6 +53,7 @@ The full list, recipes and examples are in `PROJECT_ARCHITECTURE_AND_WORKFLOW_GU
 - Wrap a routed screen in your own `div` with padding and background. Use a page frame.
 - Import the `shared` barrel in the app shell files (`app.component`, header, footer, sidebar, auth modals): import the kit file directly. It keeps the first bundle small.
 - Call `localStorage` / `sessionStorage` directly (use `StorageService`) or compare role strings (use `PermissionService`).
+- Call the backend with `fetch`, `XMLHttpRequest` or `HttpBackend`. Use `HttpService` / `DataEngineService` (endpoints in `api.config.ts`): only HttpClient calls get the mandatory `x-api-key` / `x-client` headers. The guard checks this (`raw-http`).
 - Add a dependency, or change `package.json`, without agreeing it with the team.
 
 A deliberate exception needs a reason on the line above it: `<!-- ui-guard-allow: reason -->`

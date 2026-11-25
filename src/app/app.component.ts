@@ -1,19 +1,22 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DOCUMENT } from '@angular/common';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import { fromEvent } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
-import { FooterComponent } from './core/layout/footer/footer.component';
 import { SidebarComponent } from './core/layout/sidebar/sidebar.component';
 import { AuthService } from './core/auth/auth.service';
 import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-modal/sso-redirect-modal.component';
 import { SsoLoginStepsModalComponent } from './core/auth/components/sso-login-steps-modal/sso-login-steps-modal.component';
 import { SsoLoginFlowService } from './core/auth/sso-login-flow.service';
+import { TableAccessService } from './core/permissions/table-access.service';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
 import { BackdropComponent } from './shared/components/backdrop/backdrop.component';
+import { ActionModalComponent } from './shared/components/action-modal/action-modal.component';
+import { ConnectivityService } from './core/services/connectivity.service';
 
 @Component({
   selector: 'app-root',
@@ -22,14 +25,14 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
     CommonModule,
     RouterOutlet,
     HeaderComponent,
-    FooterComponent,
     SidebarComponent,
     SsoRedirectModalComponent,
     SsoLoginStepsModalComponent,
     ToastOutletComponent,
     ButtonComponent,
     IconComponent,
-    BackdropComponent
+    BackdropComponent,
+    ActionModalComponent
   ],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FFFFFF;">
@@ -44,14 +47,15 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
       <!-- Sign-in steps after the return from RajSSO (role choice, OTP / PIN); renders nothing when idle -->
       <app-sso-login-steps-modal />
 
-
-      <!-- Main Portal Header (Always visible across all pages) -->
-      <app-header
-        [isSticky]="false"
-        class="shrink-0 relative z-50"
-        (loginClicked)="onLoginClick()"
-        (toggleMobileMenu)="toggleMobileSidebar()"
-      ></app-header>
+      <!-- Main Portal Header (Always visible across all pages except standalone pages) -->
+      @if (showHeader()) {
+        <app-header
+          [isSticky]="true"
+          class="shrink-0 sticky top-0 z-50"
+          (loginClicked)="onLoginClick()"
+          (toggleMobileMenu)="toggleMobileSidebar()"
+        ></app-header>
+      }
 
       <!-- Main Content Area: Flex layout with Fixed Sidebar when logged in -->
       @if (showSidebar()) {
@@ -100,40 +104,75 @@ import { BackdropComponent } from './shared/components/backdrop/backdrop.compone
       } @else {
         <main 
           class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
-          [style.background-color]="isLandingRoute() ? '#070e18' : '#FFFFFF'"
+          [style.background-color]="isLandingRoute() && !authService.currentUser() ? '#070e18' : '#FFFFFF'"
         >
           <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>
           </div>
-          <!-- Main Portal Footer (Displayed on landing page) -->
-          @if (showFooter()) {
-            <app-footer class="shrink-0"></app-footer>
-          }
         </main>
       }
+
+      <!-- Global Offline Alert Modal (Centrally blocks the entire application) -->
+      <app-action-modal
+        [isOpen]="!connectivityService.isOnline()"
+        title="No Internet Connection"
+        description="Please enable your internet connection and try again."
+        [showCloseButton]="false"
+        [closeOnBackdrop]="false"
+        maxWidthClass="max-w-md"
+        primaryLabel=""
+        secondaryLabel=""
+      ></app-action-modal>
     </div>
   `
 })
 export class AppComponent {
   authService = inject(AuthService);
+  connectivityService = inject(ConnectivityService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 
-  isLandingRoute = signal<boolean>(true);
-  isSsoRoute = signal<boolean>(false);
+  private getInitialRoute(): { isLanding: boolean; isSso: boolean; isHelpSupport: boolean } {
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const cleanPath = window.location.pathname.split('?')[0].split('#')[0];
+      const isLanding = cleanPath === '/' || cleanPath === '';
+      const isSso = cleanPath.includes('/sso-login');
+      const isHelpSupport = cleanPath === '/help-support' || cleanPath.startsWith('/help-support/');
+      return { isLanding, isSso, isHelpSupport };
+    }
+    return { isLanding: false, isSso: false, isHelpSupport: false };
+  }
+
+  isLandingRoute = signal<boolean>(this.getInitialRoute().isLanding);
+  isSsoRoute = signal<boolean>(this.getInitialRoute().isSso);
+  isHelpSupportRoute = signal<boolean>(this.getInitialRoute().isHelpSupport);
   isMobileSidebarOpen = signal<boolean>(false);
 
-  readonly showFooter = () => {
-    return this.isLandingRoute();
+  readonly showHeader = () => {
+    return !this.isHelpSupportRoute();
   };
 
   readonly showSidebar = () => {
-    return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute();
+    return !!this.authService.currentUser() && !this.isLandingRoute() && !this.isSsoRoute() && !this.isHelpSupportRoute();
   };
 
   constructor() {
     // RajSSO sends the user back through the backend with ?verifylogin=...; finish the sign-in from here.
-    inject(SsoLoginFlowService).handleReturn();
+    const ssoReturn = inject(SsoLoginFlowService).handleReturn();
+
+    // Already signed in (reload): use the tab's cached permissions; reload them only when the cache is old.
+    // Changes in between arrive through permissionsSyncInterceptor (version header or 403).
+    const tableAccess = inject(TableAccessService);
+    if (!ssoReturn && this.authService.currentUser()) {
+      tableAccess.refreshIfStale();
+    }
+    const doc = inject(DOCUMENT);
+    fromEvent(doc, 'visibilitychange')
+      .pipe(
+        filter(() => doc.visibilityState === 'visible' && !!this.authService.currentUser()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => tableAccess.refreshIfStale());
 
     this.router.events
       .pipe(
@@ -144,10 +183,21 @@ export class AppComponent {
         const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
         const isLanding = cleanUrl === '/' || cleanUrl === '';
         const isSso = cleanUrl.includes('/sso-login');
+        const isHelpSupport = cleanUrl === '/help-support' || cleanUrl.startsWith('/help-support/');
 
         this.isLandingRoute.set(isLanding);
         this.isSsoRoute.set(isSso);
+        this.isHelpSupportRoute.set(isHelpSupport);
         this.isMobileSidebarOpen.set(false);
+
+        // Reset scroll position on route change so new pages open at the top
+        if (typeof document !== 'undefined') {
+          const scrollMains = document.querySelectorAll('main');
+          scrollMains.forEach(el => {
+            el.scrollTop = 0;
+          });
+          window.scrollTo(0, 0);
+        }
       });
   }
 

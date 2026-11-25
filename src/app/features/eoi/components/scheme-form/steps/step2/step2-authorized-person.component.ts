@@ -1,11 +1,68 @@
 import { Component, inject } from '@angular/core';
 import { SchemeFormState } from '../../scheme-form.state';
-import { OtrFormService } from '../../../../../registration/services/otr-form.service';
-import { DESIGNATIONS_MASTER, STATES_MASTER } from '../../../../../registration/models/otr-form.model';
+import {
+  DESIGNATIONS_MASTER,
+  STATES_MASTER,
+  IDENTITY_DOCUMENT_TYPES
+} from '../../../../../registration/models/otr-form.model';
 import { FormInputComponent } from '../../../../../../shared/components/form-controls/form-input/form-input.component';
 import { FormSelectComponent } from '../../../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
+
+interface DocConfig {
+  label: string;
+  placeholder: string;
+  type: 'text' | 'tel';
+  uppercase: boolean;
+  maxLength: number;
+}
+
+const DOC_CONFIGS: Record<string, DocConfig> = {
+  'Aadhaar Card': {
+    label: 'Aadhaar Number',
+    placeholder: 'Enter Aadhaar number',
+    type: 'tel',
+    uppercase: false,
+    maxLength: 12
+  },
+  'PAN Card': {
+    label: 'PAN Number',
+    placeholder: 'Enter PAN number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 10
+  },
+  'Voter ID Card': {
+    label: 'Voter ID Number',
+    placeholder: 'Enter Voter ID number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 20
+  },
+  'Jan Aadhaar Card': {
+    label: 'Jan Aadhaar Number',
+    placeholder: 'Enter Jan Aadhaar number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 16
+  },
+  'Passport': {
+    label: 'Passport Number',
+    placeholder: 'Enter passport number',
+    type: 'text',
+    uppercase: true,
+    maxLength: 8
+  }
+};
+
+const DEFAULT_DOC_CONFIG: DocConfig = {
+  label: 'Document Number',
+  placeholder: 'Enter document number',
+  type: 'text',
+  uppercase: false,
+  maxLength: 50
+};
 
 /**
  * Step 2: Authorized Signatory Details and Verification Documents
@@ -27,7 +84,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
       <div class="bg-white px-5 py-3.5 border-b border-[#EADCE2] flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5 min-w-0">
           <span class="w-6 h-6 rounded-full bg-[#7C0E44] text-white flex items-center justify-center text-xs font-bold shrink-0">2</span>
-          <h2 class="text-base sm:text-[17px] font-bold text-[#7C0E44] m-0">Authorized Signatory Details</h2>
+          <h2 class="text-base sm:text-[17px] font-bold text-[#7C0E44] m-0">Authorized Person Details</h2>
         </div>
         <span class="text-xs text-slate-500 tabular-nums font-semibold truncate">Designated Signatory</span>
       </div>
@@ -78,50 +135,29 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 [disabled]="!state.isEditingStep2()"
               ></app-form-select>
             </div>
-
-            <!-- Date of Birth -->
-            <div>
-              <app-form-input
-                label="Date of Birth"
-                type="date"
-                [value]="state.editableStep3.dob"
-                (valueChange)="onDobChange($event)"
-                [required]="true"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-
-            <!-- Age -->
-            <div>
-              <app-form-input
-                label="Age"
-                [value]="state.editableStep3.age ? state.editableStep3.age : 'Auto-calculated'"
-                [disabled]="true"
-              ></app-form-input>
-            </div>
           </div>
         </div>
 
         <!-- Divider -->
         <div class="pt-1 border-t border-[#EADCE2]"></div>
 
-        <!-- 2. Contact & Statutory Identifiers -->
+        <!-- 2. Contact Information -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
             <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
-              Contact &amp; Statutory Identifiers
+              Contact Information
             </h3>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
             <!-- Mobile -->
             <div>
               <app-form-input
-                label="Mobile No."
+                label="Mobile Number"
                 type="tel"
                 [value]="state.editableStep3.mobileNo"
                 (valueChange)="state.editableStep3.mobileNo = $event"
-                placeholder="Enter mobile number"
+                placeholder="10-digit mobile number"
                 [required]="true"
                 [maxLength]="10"
                 [disabled]="!state.isEditingStep2()"
@@ -141,100 +177,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
               ></app-form-input>
             </div>
 
-            <!-- PAN -->
-            <div>
-              <app-form-input
-                label="PAN"
-                [value]="state.editableStep3.pan"
-                (valueChange)="state.editableStep3.pan = $event"
-                placeholder="Enter PAN number"
-                [required]="true"
-                [uppercase]="true"
-                [maxLength]="10"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-
-            <!-- Aadhaar -->
-            <div>
-              <app-form-input
-                label="Aadhaar No."
-                type="tel"
-                [value]="state.editableStep3.aadhaarNo"
-                (valueChange)="state.editableStep3.aadhaarNo = $event"
-                placeholder="Enter Aadhaar number"
-                [required]="true"
-                [maxLength]="12"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-          </div>
-
-          <!-- Optional Identifiers (3 equal columns) -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
-            <div>
-              <app-form-input
-                label="Bhamashah No. (Optional)"
-                [value]="state.editableStep3.bhamashahNo"
-                (valueChange)="state.editableStep3.bhamashahNo = $event"
-                placeholder="Enter Bhamashah number"
-                [maxLength]="20"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-
-            <div>
-              <app-form-input
-                label="Voter ID No. (Optional)"
-                [value]="state.editableStep3.voterIdNo"
-                (valueChange)="state.editableStep3.voterIdNo = $event"
-                placeholder="Enter voter ID number"
-                [uppercase]="true"
-                [maxLength]="20"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-
-            <div>
-              <app-form-input
-                label="Passport No. (Optional)"
-                [value]="state.editableStep3.passportNo"
-                (valueChange)="state.editableStep3.passportNo = $event"
-                placeholder="Enter passport number"
-                [uppercase]="true"
-                [maxLength]="8"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-input>
-            </div>
-          </div>
-        </div>
-
-        <!-- Divider -->
-        <div class="pt-1 border-t border-[#EADCE2]"></div>
-
-        <!-- 3. Residential Address -->
-        <div class="space-y-4">
-          <div class="pb-2 border-b border-[#EADCE2]">
-            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
-              Residential Address
-            </h3>
-          </div>
-
-          <!-- Residential Address textarea -->
-          <div>
-            <app-form-textarea
-              label="Residential Address"
-              [value]="state.editableStep3.residenceAddress"
-              (valueChange)="state.editableStep3.residenceAddress = $event"
-              placeholder="Enter house/flat no., street, locality, city, PIN code"
-              [rows]="2"
-              [maxLength]="500"
-              [disabled]="!state.isEditingStep2()"
-            ></app-form-textarea>
-          </div>
-
-          <!-- State -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4 sm:gap-y-4.5">
+            <!-- State -->
             <div>
               <app-form-select
                 label="State"
@@ -245,22 +188,90 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 [disabled]="!state.isEditingStep2()"
               ></app-form-select>
             </div>
+
+            <!-- Residential Address -->
+            <div class="col-span-1 md:col-span-3">
+              <app-form-textarea
+                label="Residential Address"
+                [value]="state.editableStep3.residenceAddress"
+                (valueChange)="state.editableStep3.residenceAddress = $event"
+                placeholder="Enter house/flat no., street, locality, city, PIN code"
+                [rows]="2"
+                [maxLength]="500"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-textarea>
+            </div>
           </div>
         </div>
 
         <!-- Divider -->
         <div class="pt-1 border-t border-[#EADCE2]"></div>
 
-        <!-- 4. Signatory Verification Documents -->
+        <!-- 3. Identity Verification -->
         <div class="space-y-4">
           <div class="pb-2 border-b border-[#EADCE2]">
             <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
-              Signatory Verification Documents
+              Identity Verification
             </h3>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+            <!-- Identity Document Type -->
             <div>
+              <app-form-select
+                label="Identity Document Type"
+                [value]="selectedDocType"
+                (valueChange)="onDocTypeChange($event)"
+                [options]="identityDocTypes"
+                placeholder="Select identity document"
+                [required]="true"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-select>
+            </div>
+
+            <!-- Corresponding Document Number -->
+            <div>
+              <app-form-input
+                [label]="currentDocConfig.label"
+                [type]="currentDocConfig.type"
+                [value]="currentDocNumber"
+                (valueChange)="onDocNumberChange($event)"
+                [placeholder]="currentDocConfig.placeholder"
+                [required]="true"
+                [uppercase]="currentDocConfig.uppercase"
+                [maxLength]="currentDocConfig.maxLength"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-input>
+            </div>
+
+            <!-- Upload Identity Document -->
+            <div class="col-span-1">
+              <app-form-file-upload
+                label="Upload Identity Document"
+                [dropzoneStyle]="true"
+                [uploadPrompt]="'Upload ' + (selectedDocType || 'Identity Document')"
+                [fileDoc]="state.editableStep3.idProofDoc"
+                (fileChange)="state.editableStep3.idProofDoc = $event"
+                [required]="true"
+                [disabled]="!state.isEditingStep2()"
+              ></app-form-file-upload>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="pt-1 border-t border-[#EADCE2]"></div>
+
+        <!-- 4. Authorization Documents -->
+        <div class="space-y-4">
+          <div class="pb-2 border-b border-[#EADCE2]">
+            <h3 class="text-[16px] font-semibold text-[#7C0E44] tracking-tight m-0">
+              Authorization Documents
+            </h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+            <div class="col-span-1">
               <app-form-file-upload
                 label="Authorization Letter / Board Resolution"
                 [dropzoneStyle]="true"
@@ -268,18 +279,6 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 [fileDoc]="state.editableStep3.authorizationLetterDoc"
                 (fileChange)="state.editableStep3.authorizationLetterDoc = $event"
                 [required]="true"
-                [disabled]="!state.isEditingStep2()"
-              ></app-form-file-upload>
-            </div>
-
-            <div>
-              <app-form-file-upload
-                label="Authorized Person Identity Proof"
-                [dropzoneStyle]="true"
-                uploadPrompt="Upload Identity Proof Document"
-                [fileDoc]="state.editableStep3.idProofDoc"
-                (fileChange)="state.editableStep3.idProofDoc = $event"
-                [required]="false"
                 [disabled]="!state.isEditingStep2()"
               ></app-form-file-upload>
             </div>
@@ -402,10 +401,10 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
 export class Step2AuthorizedPersonComponent {
   protected readonly state = inject(SchemeFormState);
   protected readonly isReadOnly = true;
-  private readonly otrFormService = inject(OtrFormService);
 
   protected readonly designations = DESIGNATIONS_MASTER;
   protected readonly states = STATES_MASTER;
+  protected readonly identityDocTypes = IDENTITY_DOCUMENT_TYPES;
 
   /** First name: stored value when present, otherwise the first word of the full name. */
   protected get firstName(): string {
@@ -429,15 +428,56 @@ export class Step2AuthorizedPersonComponent {
     this.applyName(this.firstName, value);
   }
 
-  protected onDobChange(value: string): void {
-    this.state.editableStep3.dob = value;
-    this.state.editableStep3.age = this.otrFormService.calculateAgeFromDob(value);
-  }
-
   private applyName(first: string, last: string): void {
     const p = this.state.editableStep3;
     p.firstName = first;
     p.lastName = last;
     p.name = [first.trim(), last.trim()].filter(Boolean).join(' ');
   }
+
+  protected get selectedDocType(): string {
+    const p = this.state.editableStep3;
+    if (p.identityDocType) return p.identityDocType;
+    if (p.aadhaarNo) return 'Aadhaar Card';
+    if (p.pan) return 'PAN Card';
+    if (p.voterIdNo) return 'Voter ID Card';
+    if (p.bhamashahNo) return 'Jan Aadhaar Card';
+    if (p.passportNo) return 'Passport';
+    return 'Aadhaar Card';
+  }
+
+  protected get currentDocConfig(): DocConfig {
+    return DOC_CONFIGS[this.selectedDocType] || DEFAULT_DOC_CONFIG;
+  }
+
+  protected get currentDocNumber(): string {
+    const p = this.state.editableStep3;
+    if (p.identityDocNumber) return p.identityDocNumber;
+    switch (this.selectedDocType) {
+      case 'Aadhaar Card': return p.aadhaarNo || '';
+      case 'PAN Card': return p.pan || '';
+      case 'Voter ID Card': return p.voterIdNo || '';
+      case 'Jan Aadhaar Card': return p.bhamashahNo || '';
+      case 'Passport': return p.passportNo || '';
+      default: return p.identityDocNumber || '';
+    }
+  }
+
+  protected onDocTypeChange(type: string): void {
+    const p = this.state.editableStep3;
+    p.identityDocType = type;
+  }
+
+  protected onDocNumberChange(num: string): void {
+    const p = this.state.editableStep3;
+    p.identityDocNumber = num;
+    switch (this.selectedDocType) {
+      case 'Aadhaar Card': p.aadhaarNo = num; break;
+      case 'PAN Card': p.pan = num; break;
+      case 'Voter ID Card': p.voterIdNo = num; break;
+      case 'Jan Aadhaar Card': p.bhamashahNo = num; break;
+      case 'Passport': p.passportNo = num; break;
+    }
+  }
 }
+

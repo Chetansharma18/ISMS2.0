@@ -1,32 +1,44 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { ButtonComponent, InputDirective, TableColumn, TableComponent } from '../../../../../shared';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ButtonComponent, IconComponent, InputDirective, TableColumn, TableComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
-import { EoiDocumentItem } from '../scheme-form.model';
-import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from './step3-document-rules';
+import { EoiApplyDocument } from '../eoi-apply.model';
+import { acceptOf, formatBytes, formatsOf } from '../eoi-apply.util';
 
-/** Step 2: upload the supporting documents and optional per-document comments. */
+/**
+ * Upload Documents: the required documents and annexures configured on the EOI. Each file goes to
+ * POST /eoi/apply/applications/{id}/documents/{requiredDocumentId}; the backend checks its type and size
+ * (from Doc Master / Annexure Master) and answers with the updated application.
+ */
 @Component({
   selector: 'app-step3-upload-documents',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, InputDirective, TableComponent],
+  imports: [ButtonComponent, IconComponent, InputDirective, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-4 font-sans">
+    <div class="space-y-6">
 
-      <div class="flex items-center justify-end">
-        <span class="text-xs font-medium text-[#625663]">
-          {{ state.attachedDocsCount() }} / {{ state.eoiDocuments().length }} uploaded
-        </span>
-      </div>
+      @if (state.applyDocuments().supporting.length === 0 && state.applyDocuments().annexures.length === 0) {
+        <p class="p-4 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-xs text-slate-500 text-center m-0">
+          No documents are required for this EOI.
+        </p>
+      }
 
-      <app-table
-        [columns]="documentColumns"
-        [data]="state.eoiDocuments()"
-        [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
-      >
-      </app-table>
+      @if (state.applyDocuments().supporting.length > 0) {
+        <app-table
+          [columns]="documentColumns"
+          [data]="state.applyDocuments().supporting"
+          [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
+        />
+      }
+
+      @if (state.applyDocuments().annexures.length > 0) {
+        <app-table
+          [columns]="annexureColumns"
+          [data]="state.applyDocuments().annexures"
+          [customTemplates]="{ name: nameTemplate, comment: commentTemplate, action: actionTemplate }"
+        />
+      }
 
       <ng-template #nameTemplate let-doc>
         <div class="py-1 min-w-0">
@@ -34,15 +46,16 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
             {{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }
           </div>
           <div class="text-[11.5px] text-slate-500 mt-0.5">
-            Supported: {{ formatLabel }} &nbsp;|&nbsp; Max size: {{ maxSizeMb }} MB
+            Supported: {{ formats(doc) }} &nbsp;|&nbsp; Max size: {{ doc.maxFileSizeMb }} MB
           </div>
-          @if (doc.status === 'uploaded' && doc.fileName) {
-            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium block mt-1 truncate max-w-[320px]" title="{{ doc.fileName }} ({{ doc.fileSize }})">
-              {{ doc.fileName }} ({{ doc.fileSize }})
+          @if (doc.file; as file) {
+            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[320px]" [title]="file.fileName">
+              <app-icon name="check-circle" size="xs" class="shrink-0" />
+              <span class="truncate">{{ file.fileName }} ({{ size(file.sizeBytes) }})</span>
             </span>
           }
-          @if (errors()[doc.id]) {
-            <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ errors()[doc.id] }}</p>
+          @if (errorOf(doc); as message) {
+            <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ message }}</p>
           }
         </div>
       </ng-template>
@@ -55,93 +68,76 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
           maxlength="500"
           placeholder="Add comment..."
           [attr.aria-label]="'Comment for ' + doc.name"
-          [ngModel]="doc.comment ?? ''"
-          (ngModelChange)="state.updateDocComment(doc.id, $event)"
-          (blur)="state.updateDocComment(doc.id, doc.comment ?? '', true)"
+          [value]="doc.comment ?? ''"
+          [disabled]="state.isDocBusy(doc)"
+          (blur)="state.saveApplyComment(doc, $any($event.target).value)"
           class="w-full"
         />
       </ng-template>
 
       <ng-template #actionTemplate let-doc>
         <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
-          @if (doc.status === 'pending') {
-            <button appButton size="sm" (click)="uploadInput.click()">Upload</button>
-            <input #uploadInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
+          <input #fileInput type="file" class="hidden" [accept]="accept(doc)" (change)="onFileChange($event, doc)" />
+          @if (!doc.file) {
+            <button appButton size="sm" [loading]="state.isDocBusy(doc)" [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()">Upload</button>
           } @else {
-            <button appButton variant="outline" size="sm" (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)">View</button>
-            <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
-            <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-            <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
+            <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewApplyDocument(doc)" title="View Document" aria-label="View Document">
+              <app-icon name="eye" size="sm" />
+            </button>
+            <button appButton variant="secondary" size="sm" [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()">Replace</button>
+            <button appButton variant="danger" size="sm" [disabled]="state.isDocBusy(doc)" (click)="state.removeApplyDocument(doc)">Remove</button>
           }
         </div>
       </ng-template>
 
-      <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(1)">
-          &larr; Back to Registration Profile
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.hasCustomFields() ? state.stepIndexCustomFields() : state.stepIndexProfile)">
+          &larr; {{ state.hasCustomFields() ? 'Back to Scheme Proposal Details' : 'Back to Registration Profile' }}
         </button>
-
-        <button appButton size="lg" (click)="state.goToStep(3)">
-          Proceed to Complete Preview &rarr;
+        <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">
+          Proceed to Preview &rarr;
         </button>
       </div>
-
     </div>
   `
 })
 export class Step3UploadDocumentsComponent {
   protected readonly state = inject(SchemeFormState);
 
-  protected readonly accept = DOC_ACCEPT;
-  protected readonly formatLabel = DOC_FORMAT_LABEL;
-  protected readonly maxSizeMb = DOC_MAX_SIZE_MB;
-
-  protected readonly documentColumns: TableColumn<EoiDocumentItem>[] = [
-    { key: 'id', label: 'S. No.', align: 'center', width: 'w-14' },
+  protected readonly documentColumns: TableColumn<EoiApplyDocument>[] = [
+    { key: '$index', label: 'S. No.', align: 'center', width: 'w-14' },
     { key: 'name', label: 'Supporting Document', type: 'custom', width: 'min-w-[240px]' },
     { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[200px] w-[250px]' },
     { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-[270px] whitespace-nowrap' }
   ];
 
-  /** Inline validation messages keyed by document id. */
-  protected readonly errors = signal<Record<number, string>>({});
+  protected readonly annexureColumns: TableColumn<EoiApplyDocument>[] = [
+    { key: '$index', label: 'S. No.', align: 'center', width: 'w-14' },
+    { key: 'name', label: 'Annexure Name', type: 'custom', width: 'min-w-[240px]' },
+    { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[200px] w-[250px]' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-[270px] whitespace-nowrap' }
+  ];
 
-  /** Validates the picked file (type and size), then delegates to the shared upload handler. */
-  protected onFileChange(event: Event, doc: EoiDocumentItem): void {
+  protected accept(doc: EoiApplyDocument): string {
+    return acceptOf(doc);
+  }
+
+  protected formats(doc: EoiApplyDocument): string {
+    return formatsOf(doc);
+  }
+
+  protected size(bytes: number): string {
+    return formatBytes(bytes);
+  }
+
+  protected errorOf(doc: EoiApplyDocument): string {
+    return doc.requiredDocumentId === null ? '' : this.state.docErrors()[doc.requiredDocumentId] ?? '';
+  }
+
+  protected onFileChange(event: Event, doc: EoiApplyDocument): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    const error = validateDocFile(file);
-    if (error) {
-      this.setError(doc.id, error);
-      input.value = '';
-      return;
-    }
-
-    this.setError(doc.id, null);
-    this.state.onFileSelected(event, doc);
-  }
-
-  /** Clears the attached file; the list is re-emitted because the state handler mutates in place. */
-  protected onRemove(doc: EoiDocumentItem): void {
-    this.state.removeSchemeDoc(doc);
-    this.state.eoiDocuments.update(docs => [...docs]);
-    this.setError(doc.id, null);
-  }
-
-  private setError(id: number, message: string | null): void {
-    this.errors.update(current => {
-      const next = { ...current };
-      if (message) {
-        next[id] = message;
-      } else {
-        delete next[id];
-      }
-      return next;
-    });
+    input.value = '';
+    if (file) this.state.uploadApplyDocument(doc, file);
   }
 }

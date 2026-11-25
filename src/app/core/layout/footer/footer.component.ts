@@ -10,16 +10,18 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ButtonComponent, IconComponent],
+  imports: [CommonModule, RouterModule, ButtonComponent, IconComponent],
   host: {
     class: 'block w-full bg-[#070e18]'
   },
@@ -415,41 +417,42 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
 
                   <li>
                     <!-- ui-guard-allow: footer links are text-like, zero padding -->
-                    <button
+                    <a
                       appButton
                       variant="inverse"
-                      type="button"
-                      (click)="downloadSamplePdf('Privacy_Policy.pdf', 'Privacy Policy')"
+                      [href]="externalLegalUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="Download Privacy Policy document">
+                      aria-label="View Privacy Policy (opens in a new tab)">
                       Privacy Policy
-                    </button>
+                    </a>
                   </li>
 
                   <li>
                     <!-- ui-guard-allow: footer links are text-like, zero padding -->
-                    <button
+                    <a
                       appButton
                       variant="inverse"
-                      type="button"
-                      (click)="downloadSamplePdf('Terms_and_Conditions.pdf', 'Terms & Conditions')"
+                      [href]="externalLegalUrl"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="Download Terms & Conditions document">
+                      aria-label="View Terms & Conditions (opens in a new tab)">
                       Terms &amp; Conditions
-                    </button>
+                    </a>
                   </li>
 
                   <li>
                     <!-- ui-guard-allow: footer links are text-like, zero padding -->
-                    <button
+                    <a
                       appButton
                       variant="inverse"
-                      type="button"
-                      (click)="downloadSamplePdf('Help_and_Support.pdf', 'Help & Support')"
+                      routerLink="/help-support"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="Help & Support documentation">
+                      aria-label="View Help & Support">
                       Help &amp; Support
-                    </button>
+                    </a>
                   </li>
 
                
@@ -605,6 +608,7 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
   private userManualService = inject(UserManualPdfService);
   
   helplineGlobal = HELPLINE_GLOBAL;
+  readonly externalLegalUrl = EXTERNAL_LEGAL_URL;
 
   @ViewChild('footerRef') footerRef?: ElementRef<HTMLElement>;
 
@@ -629,7 +633,7 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
     if (!isPlatformBrowser(this.platformId)) return;
 
     const el = this.footerRef?.nativeElement;
-    if (el) {
+    if (el && typeof IntersectionObserver !== 'undefined') {
       this.observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
@@ -665,52 +669,6 @@ export class FooterComponent implements AfterViewInit, OnDestroy {
       console.error('Failed to generate user manual PDF:', err);
     } finally {
       this.isGeneratingManual.set(false);
-    }
-  }
-
-  async downloadSamplePdf(fileName: string, title: string): Promise<void> {
-    try {
-      const { jsPDF } = await import('jspdf');
-      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      // Header
-      doc.setFillColor(11, 53, 88);
-      doc.rect(10, 10, 190, 20, 'F');
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(255, 255, 255);
-      doc.text('GOVERNMENT OF RAJASTHAN', 105, 18, { align: 'center' });
-      doc.setFontSize(8.5);
-      doc.setTextColor(245, 158, 11);
-      doc.text('RAJASTHAN SKILL AND LIVELIHOODS DEVELOPMENT CORPORATION (RSLDC)', 105, 24, { align: 'center' });
-
-      // Title
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(13);
-      doc.setTextColor(11, 53, 88);
-      doc.text(title.toUpperCase(), 105, 42, { align: 'center' });
-
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8.5);
-      doc.setTextColor(71, 85, 105);
-      doc.text('Integrated Scheme Management System (ISMS 2.0) - Statutory Document', 105, 48, { align: 'center' });
-
-      doc.setDrawColor(203, 213, 225);
-      doc.line(15, 52, 195, 52);
-
-      // Body text
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(30, 41, 59);
-      const text = `This is the official ${title} documentation for ISMS 2.0 (Integrated Scheme Management System), published by Rajasthan Skill and Livelihoods Development Corporation (RSLDC).\n\n` +
-        `All operations conducted on the portal comply with Rajasthan Transparency in Public Procurement (RTPP) Act and Government of Rajasthan digital security guidelines.\n\n` +
-        `For questions regarding this document or portal compliance, please reach out to the RSLDC Helpdesk at 0141-2716091 or email isms-support@rajasthan.gov.in.`;
-      
-      const splitText = doc.splitTextToSize(text, 180);
-      doc.text(splitText, 15, 62);
-
-      doc.save(fileName);
-    } catch {
-      // fallback
     }
   }
 }

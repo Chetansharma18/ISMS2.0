@@ -25,40 +25,45 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
           </tr>
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Scheme Category</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().schemeCategory || scheme().category || 'ALL' }}</td>
+            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().schemeCategory || scheme().category || '-' }}</td>
           </tr>
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Category</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiCategory || 'General' }}</td>
+            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiCategory || '-' }}</td>
           </tr>
           <tr class="hover:bg-slate-50/50 transition-colors">
             <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Publication Date</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().datePublished }}</td>
+            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().datePublished || '-' }}</td>
           </tr>
           <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Last Date of EOI Submission</td>
-            <td class="px-4 py-2.5 font-bold text-red-600">{{ scheme().closingDate }}</td>
+            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Date of Closing</td>
+            <td class="px-4 py-2.5 font-bold text-red-600">{{ scheme().closingDate || '-' }}</td>
           </tr>
-          @if (scheme().eoiDuration) {
+          <tr class="hover:bg-slate-50/50 transition-colors">
+            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Duration</td>
+            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiDuration || '-' }}</td>
+          </tr>
+          @if (scheme().isFeeExempted) {
             <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Duration</td>
-              <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiDuration }}</td>
+              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD / Process Fees</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">Exempted</td>
+            </tr>
+          } @else {
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD Amount</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">
+                <span>{{ formattedEmdFee() }}</span>
+                <span class="text-slate-500 font-normal text-xs ml-1.5">(Refundable)</span>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Process Fees</td>
+              <td class="px-4 py-2.5 font-semibold text-slate-900">
+                <span>{{ formattedProcessFee() }}</span>
+                <span class="text-slate-500 font-normal text-xs ml-1.5">(Non-Refundable)</span>
+              </td>
             </tr>
           }
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD Fee</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">
-              <span>{{ formattedEmdFee() }}</span>
-              <span class="text-slate-500 font-normal text-xs ml-1.5">(Refundable)</span>
-            </td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Processing Fee</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">
-              <span>{{ formattedProcessFee() }}</span>
-              <span class="text-slate-500 font-normal text-xs ml-1.5">(Non-Refundable)</span>
-            </td>
-          </tr>
         </tbody>
       </table>
     </div>
@@ -67,6 +72,6 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
 export class SchemeDetailSummaryComponent {
   readonly scheme = input.required<SchemeTender>();
 
-  readonly formattedEmdFee = computed(() => formatFeeDisplay(this.scheme().emdFee, '₹ 50,000'));
-  readonly formattedProcessFee = computed(() => formatFeeDisplay(this.scheme().processFee, '₹ 2,000'));
+  readonly formattedEmdFee = computed(() => formatFeeDisplay(this.scheme().emdFee, '-'));
+  readonly formattedProcessFee = computed(() => formatFeeDisplay(this.scheme().processFee, '-'));
 }

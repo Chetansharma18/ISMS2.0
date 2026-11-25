@@ -147,7 +147,7 @@ import { FormFileUploadComponent } from '../../../../../../shared/components/for
                 (fileChange)="state.editableStep4.cancelledChequeDoc = $event"
                 [required]="true"
                 accept=".pdf,.jpg,.jpeg,.png"
-                [maxSizeMb]="5"
+                [maxSizeMb]="25"
                 [disabled]="!state.isEditingStep2()"
               ></app-form-file-upload>
             </div>

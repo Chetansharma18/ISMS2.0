@@ -22,17 +22,17 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
       [reverseButtons]="true"
       [showAccentBar]="false"
       [primaryLabel]="editing() ? 'Save Changes' : 'Submit'"
-      secondaryLabel="Cancel"
-      maxWidthClass="max-w-[780px]"
+      secondaryLabel=""
+      size="xl"
       (primaryAction)="save.emit()"
       (secondaryAction)="cancelled.emit()"
       (close)="cancelled.emit()"
     >
-      <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+      <h2 class="m-0 text-[#7C0E44] text-[18px] font-semibold leading-6 tracking-tight">
         {{ editing() ? 'Edit User' : 'Add New User' }}
       </h2>
 
-      <div class="mt-4 font-sans text-[13px] max-h-[75vh] overflow-y-auto pr-1">
+      <div class="mt-4 font-sans text-[13px]">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3.5">
 
           <!-- ROW 1 (Col 1: SSO ID*, Col 2: Role Type*) -->
@@ -54,20 +54,13 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
 
           <div>
             <label class="block text-slate-700 font-medium mb-1">Role Type*</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.roleType"
+              [options]="activeRoleOptions()"
+              [(value)]="f.roleType"
+              placeholder="Select Role Type"
               [invalid]="isSubmitted && !f.roleType"
-              class="w-full"
-            >
-              <option value="" disabled selected>Select Role Type</option>
-              @for (role of activeRoleOptions(); track role) {
-                <option [value]="role" [disabled]="isRoleDisabled(role)">
-                  {{ role }}{{ isRoleDisabled(role) ? ' (Disabled)' : '' }}
-                </option>
-              }
-            </select>
+            />
             @if (isSubmitted && !f.roleType) {
               <div class="text-xs text-red-500 mt-0.5 font-medium">Role Type is required</div>
             }
@@ -132,6 +125,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="10"
               placeholder="10-digit mobile number"
               [(ngModel)]="f.mobileNo"
+              (keydown)="filterNumericKey($event)"
+              (input)="onMobileInput($event)"
               [invalid]="isSubmitted && !f.mobileNo"
               class="w-full"
             />
@@ -147,6 +142,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               appInput
               size="sm"
               type="date"
+              [max]="maxDateOfBirth"
               [(ngModel)]="f.dateOfBirth"
               class="w-full"
             />
@@ -161,6 +157,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="12"
               placeholder="12-digit Aadhaar number"
               [(ngModel)]="f.aadhaarId"
+              (keydown)="filterNumericKey($event)"
+              (input)="onAadhaarInput($event)"
               class="w-full tabular-nums"
             />
           </div>
@@ -168,17 +166,12 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <!-- ROW 5 (Col 1: Designation, Col 2: Scheme Name) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">Designation</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.designation"
-              class="w-full"
-            >
-              <option value="" disabled>Select Designation</option>
-              @for (desig of activeDesignationOptions(); track desig) {
-                <option [value]="desig">{{ desig }}</option>
-              }
-            </select>
+              [options]="activeDesignationOptions()"
+              [(value)]="f.designation"
+              placeholder="Select Designation"
+            />
           </div>
 
           <div>
@@ -200,33 +193,24 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
           <!-- ROW 6 (Col 1: District, Col 2: Block Name) -->
           <div>
             <label class="block text-slate-700 font-medium mb-1">District</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.district"
-              (ngModelChange)="onDistrictChange($event)"
-              class="w-full"
-            >
-              <option value="All Districts">All Districts</option>
-              @for (district of activeDistrictOptions(); track district) {
-                <option [value]="district">{{ district }}</option>
-              }
-            </select>
+              [options]="activeDistrictOptions()"
+              [value]="f.district || 'All Districts'"
+              (valueChange)="f.district = $event; onDistrictChange($event)"
+              placeholder="All Districts"
+            />
           </div>
 
           <div>
             <label class="block text-slate-700 font-medium mb-1">Block Name</label>
-            <select
-              appInput
+            <app-dropdown
               size="sm"
-              [(ngModel)]="f.blockName"
-              class="w-full"
-            >
-              <option value="All Blocks">All Blocks</option>
-              @for (block of activeBlockOptions(); track block) {
-                <option [value]="block">{{ block }}</option>
-              }
-            </select>
+              [options]="activeBlockOptions()"
+              [value]="f.blockName || 'All Blocks'"
+              (valueChange)="f.blockName = $event"
+              placeholder="All Blocks"
+            />
           </div>
 
         </div>
@@ -251,6 +235,34 @@ export class UserFormModalComponent {
 
   readonly save = output<void>();
   readonly cancelled = output<void>();
+
+  readonly maxDateOfBirth = new Date().toISOString().split('T')[0];
+
+  filterNumericKey(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'
+    ];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 10);
+    input.value = cleaned;
+    this.formData().mobileNo = cleaned;
+  }
+
+  onAadhaarInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 12);
+    input.value = cleaned;
+    this.formData().aadhaarId = cleaned;
+  }
 
   isRoleDisabled(role: string): boolean {
     const r = (role || '').trim().toLowerCase();
@@ -386,7 +398,7 @@ export class UserFormModalComponent {
     if (items && items.length > 0) {
       if (currentDistrict && currentDistrict !== 'All Districts') {
         const matching = items
-          .filter(i => i.districtName.toLowerCase() === currentDistrict.toLowerCase())
+          .filter(i => (i.districtName ?? '').toLowerCase() === currentDistrict.toLowerCase())
           .map(i => i.blockName)
           .filter(Boolean);
         if (matching.length > 0) {

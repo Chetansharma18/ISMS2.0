@@ -15,12 +15,13 @@ import { roleTypeLabel } from '../user-management.util';
       [showCloseButton]="true"
       [closeOnBackdrop]="true"
       [showAccentBar]="false"
-      secondaryLabel="Close"
-      maxWidthClass="max-w-[580px]"
+      primaryLabel=""
+      secondaryLabel=""
+      size="md"
       (secondaryAction)="closed.emit()"
       (close)="closed.emit()"
     >
-      <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+      <h2 class="m-0 text-[#7C0E44] text-[18px] font-semibold leading-6 tracking-tight">
         User Details - {{ user()?.username }}
       </h2>
       @if (user(); as u) {

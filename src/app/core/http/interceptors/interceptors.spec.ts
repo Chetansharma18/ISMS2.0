@@ -56,6 +56,28 @@ describe('API interceptor chain', () => {
     await other;
   });
 
+  it('adds x-api-key and x-client to every form of backend URL, also from raw HttpClient calls', async () => {
+    const client = TestBed.inject(HttpClient);
+    const urls = ['/api/anything', 'api/no-leading-slash', `${window.location.origin}/api/absolute`, '/API/upper-case'];
+    for (const url of urls) {
+      const call = firstValueFrom(client.get(url));
+      const req = backend.expectOne(url);
+      expect(req.request.headers.get('x-api-key'), url).toBe('test-key');
+      expect(req.request.headers.get('x-client'), url).toBe('web');
+      req.flush({});
+      await call;
+    }
+  });
+
+  it('keeps headers a caller set itself', async () => {
+    const call = firstValueFrom(TestBed.inject(HttpClient).get('/api/x', { headers: { 'x-client': 'mobile' } }));
+    const req = backend.expectOne('/api/x');
+    expect(req.request.headers.get('x-client')).toBe('mobile');
+    expect(req.request.headers.get('x-api-key')).toBe('test-key');
+    req.flush({});
+    await call;
+  });
+
   it('sends the bearer token when one is stored', async () => {
     TestBed.inject(TokenService).setAccessToken('abc');
     const done = firstValueFrom(http.call(API_ENDPOINTS.USERS.GET, { id: 7 }));
@@ -96,6 +118,30 @@ describe('API interceptor chain', () => {
     replay.flush({ ok: true });
 
     expect(await call).toEqual({ ok: true });
+  });
+
+  it('refreshes and replays when an endpoint answers 400 "access token is required" (expired session)', async () => {
+    const call = firstValueFrom(http.call<{ success: boolean }>(API_ENDPOINTS.AUTH.SWITCH_ROLE, { body: { roleId: 2 } }));
+    backend
+      .expectOne(buildApiUrl('/auth/switch-role'))
+      .flush(
+        { success: false, requires2FA: false, message: 'Valid access token is required to switch roles.' },
+        { status: 400, statusText: 'Bad Request' }
+      );
+
+    backend.expectOne(buildApiUrl('/auth/refresh-token')).flush({ success: true });
+
+    const replay = backend.expectOne(buildApiUrl('/auth/switch-role'));
+    expect(replay.request.body).toEqual({ roleId: 2 });
+    replay.flush({ success: true });
+    expect(await call).toEqual({ success: true });
+  });
+
+  it('does not refresh on an ordinary 400', async () => {
+    const call = firstValueFrom(http.call(API_ENDPOINTS.SECTORS.ADD, { body: {}, flags: { skipErrorToast: true } }));
+    backend.expectOne(buildApiUrl('/master/sectors')).flush({ message: 'Sector Name is required.' }, { status: 400, statusText: 'Bad Request' });
+    await expect(call).rejects.toMatchObject({ status: 400 });
+    backend.expectNone(buildApiUrl('/auth/refresh-token'));
   });
 
   it('signs out when the refresh fails', async () => {

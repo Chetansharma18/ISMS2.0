@@ -14,25 +14,34 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
+import { SsoLoginFlowService } from '../../auth/sso-login-flow.service';
+import { humanizeRoleName, landingRouteFor } from '../../auth/sso-session.util';
 import { PermissionService } from '../../permissions/permission.service';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { HeaderNotificationComponent } from './header-notification.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ClickOutsideDirective, HeaderNotificationComponent, ButtonComponent, IconComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ClickOutsideDirective,
+    HeaderNotificationComponent,
+    ButtonComponent,
+    IconComponent,
+    ActionModalComponent
+  ],
   host: {
-    class: 'block w-full relative z-50'
+    class: 'block w-full sticky top-0 z-50'
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#EADCE2] box-border relative z-50 select-none"
-      [class.sticky]="isSticky"
-      [class.top-0]="isSticky"
+      class="w-full bg-white border-b border-[#EADCE2] box-border sticky top-0 z-50 select-none shadow-2xs"
       role="banner"
     >
       <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
@@ -55,7 +64,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </button>
           }
 
-          <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+          <a [routerLink]="homeRoute()" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
           <!-- Logos Group -->
           <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -234,7 +243,52 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
                       }
                     }
 
+                    <!-- SWITCH ROLE (real sign-in): the user's backend roles; switching may ask for 2FA again -->
+                    @if (sessionSwitchRoles().length > 1) {
+                      <div class="my-1 border-t border-[#EADCE2]"></div>
+
+                      <div class="px-3 pt-1 pb-0.5 text-[10.5px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                        <app-icon name="switch-horizontal" size="sm" [stroke]="2" class="text-[#7C0E44]" />
+                        <span>Switch Role</span>
+                      </div>
+
+                      @for (role of sessionSwitchRoles(); track role.id) {
+                        <button
+                          appButton
+                          size="sm"
+                          block
+                          [variant]="role.id === activeSessionRoleId() ? 'secondary' : 'ghost'"
+                          type="button"
+                          (click)="onSwitchSessionRole(role.id)"
+                          class="justify-between"
+                          [attr.aria-current]="role.id === activeSessionRoleId() ? 'true' : null"
+                        >
+                          <span class="truncate">{{ roleLabel(role.name) }}</span>
+                          @if (role.id === activeSessionRoleId()) {
+                            <app-icon name="check" />
+                          }
+                        </button>
+                      }
+                    }
+
                     <div class="my-1 border-t border-[#EADCE2]"></div>
+
+                    <!-- Back to SSO (real sign-in): return to the RajSSO portal, staying signed in to ISMS -->
+                    @if (canGoBackToSso()) {
+                      <button
+                        appButton
+                        variant="ghost"
+                        size="sm"
+                        block
+                        type="button"
+                        (click)="onBackToSso()"
+                        class="justify-start"
+                        role="menuitem"
+                      >
+                        <app-icon name="external-link" />
+                        <span>Back to SSO</span>
+                      </button>
+                    }
 
                     <!-- Sign Out -->
                     <button
@@ -265,7 +319,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- User Icon -->
               <app-icon name="user" />
 
-              <span>Login</span>
+              <span>Login with SSO</span>
 
               <!-- Right Arrow Icon -->
               <app-icon name="forward" />
@@ -275,6 +329,23 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         </div>
 
       </div>
+
+      <!-- Sign Out Confirmation Modal -->
+      <app-action-modal
+        [isOpen]="showLogoutConfirmModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        title="Sign Out Confirmation"
+        description="Are you sure you want to sign out of the ISMS 2.0 portal?"
+        primaryLabel="Sign Out"
+        primaryVariant="danger"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[440px]"
+        (primaryAction)="confirmLogout()"
+        (secondaryAction)="cancelLogout()"
+        (close)="cancelLogout()"
+      />
     </header>
   `,
   styles: [`
@@ -308,6 +379,12 @@ export class HeaderComponent {
   readonly assignedRoles = this.authService.assignedRoles;
   readonly canSwitchRole = this.authService.canSwitchRole;
   readonly activeRoleLabel = this.authService.activeRoleLabel;
+
+  /** Emblem logo link: the signed-in role's landing page (same as after sign-in), the portal home otherwise. */
+  readonly homeRoute = computed(() => {
+    const user = this.currentUser();
+    return user ? landingRouteFor(user.role).path : '/';
+  });
 
   readonly displayName = computed(() => {
     const u = this.currentUser();
@@ -382,13 +459,48 @@ export class HeaderComponent {
     this.loginClicked.emit();
   }
 
+  readonly showLogoutConfirmModal = signal<boolean>(false);
+
   onLogout(): void {
     this.dropdownOpen.set(false);
+    this.showLogoutConfirmModal.set(true);
+  }
+
+  confirmLogout(): void {
+    this.showLogoutConfirmModal.set(false);
     this.authService.logout();
+  }
+
+  cancelLogout(): void {
+    this.showLogoutConfirmModal.set(false);
+  }
+
+  canGoBackToSso(): boolean {
+    return this.authService.canGoBackToSso();
+  }
+
+  onBackToSso(): void {
+    this.dropdownOpen.set(false);
+    this.authService.backToSso();
   }
 
   onSelectRole(roleId: AssignedRole['id']): void {
     this.dropdownOpen.set(false);
     this.authService.switchActiveRole(roleId);
+  }
+
+  // ---- Real sign-in: switch the backend session to another role (may ask for 2FA) ----
+  private readonly loginFlow = inject(SsoLoginFlowService);
+  readonly sessionSwitchRoles = this.authService.switchableSessionRoles;
+  readonly activeSessionRoleId = computed(() => this.authService.sessionRoles().activeRoleId);
+
+  protected roleLabel(name: string): string {
+    return humanizeRoleName(name);
+  }
+
+  onSwitchSessionRole(roleId: number): void {
+    this.dropdownOpen.set(false);
+    if (roleId === this.activeSessionRoleId()) return;
+    this.loginFlow.switchRole(roleId);
   }
 }

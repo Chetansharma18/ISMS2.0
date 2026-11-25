@@ -47,10 +47,13 @@ function render(setup: (host: HostComponent) => void = () => undefined) {
 }
 
 const root = (fixture: ComponentFixture<HostComponent>) => fixture.nativeElement as HTMLElement;
+const portalRoot = () => document.getElementById('isms-overlay-portal') || document.body;
 const trigger = (fixture: ComponentFixture<HostComponent>) =>
   root(fixture).querySelector('[role="combobox"]') as HTMLButtonElement;
-const optionEls = (fixture: ComponentFixture<HostComponent>) =>
-  Array.from(root(fixture).querySelectorAll('[role="option"]')) as HTMLElement[];
+const optionEls = (_fixture?: ComponentFixture<HostComponent>) =>
+  Array.from(portalRoot().querySelectorAll('[role="option"]')) as HTMLElement[];
+const listbox = (_fixture?: ComponentFixture<HostComponent>) =>
+  portalRoot().querySelector('[role="listbox"]');
 const press = (fixture: ComponentFixture<HostComponent>, key: string, target: HTMLElement = trigger(fixture)) => {
   target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
   fixture.detectChanges();
@@ -61,6 +64,11 @@ const open = (fixture: ComponentFixture<HostComponent>) => {
 };
 
 describe('DropdownComponent', () => {
+  afterEach(() => {
+    const portal = document.getElementById('isms-overlay-portal');
+    if (portal) portal.innerHTML = '';
+  });
+
   it('shows the placeholder and the combobox attributes while closed', () => {
     const fixture = render();
     const button = trigger(fixture);
@@ -68,7 +76,7 @@ describe('DropdownComponent', () => {
     expect(button.id).toBe('field');
     expect(button.getAttribute('aria-haspopup')).toBe('listbox');
     expect(button.getAttribute('aria-expanded')).toBe('false');
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('opens a listbox of options and closes it after choosing in single mode', () => {
@@ -76,7 +84,7 @@ describe('DropdownComponent', () => {
     open(fixture);
 
     expect(trigger(fixture).getAttribute('aria-expanded')).toBe('true');
-    expect(root(fixture).querySelector('[role="listbox"]')).not.toBeNull();
+    expect(listbox(fixture)).not.toBeNull();
     expect(optionEls(fixture).map(o => o.textContent?.trim())).toEqual(['Alpha', 'Beta', 'Gamma']);
 
     optionEls(fixture)[1].click();
@@ -84,7 +92,7 @@ describe('DropdownComponent', () => {
 
     expect(fixture.componentInstance.value).toBe('Beta');
     expect(trigger(fixture).textContent).toContain('Beta');
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('marks the chosen option with aria-selected', () => {
@@ -117,12 +125,12 @@ describe('DropdownComponent', () => {
     const fixture = render();
     open(fixture);
     press(fixture, 'Escape');
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
 
     open(fixture);
     (root(fixture).querySelector('#outside') as HTMLElement).click();
     fixture.detectChanges();
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('keeps the list open on a click inside it in multi mode', () => {
@@ -130,13 +138,13 @@ describe('DropdownComponent', () => {
     open(fixture);
     optionEls(fixture)[0].click();
     fixture.detectChanges();
-    expect(root(fixture).querySelector('[role="listbox"]')).not.toBeNull();
+    expect(listbox(fixture)).not.toBeNull();
   });
 
   it('moves with the arrow keys and picks with Enter', () => {
     const fixture = render();
     press(fixture, 'ArrowDown');
-    expect(root(fixture).querySelector('[role="listbox"]')).not.toBeNull();
+    expect(listbox(fixture)).not.toBeNull();
 
     press(fixture, 'ArrowDown');
     press(fixture, 'ArrowDown');
@@ -144,7 +152,7 @@ describe('DropdownComponent', () => {
 
     press(fixture, 'Enter');
     expect(fixture.componentInstance.value).toBe('Beta');
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('toggles with Space in multi mode and skips disabled options', () => {
@@ -166,7 +174,7 @@ describe('DropdownComponent', () => {
   it('ticks several options in multi mode and summarises them', () => {
     const fixture = render(host => (host.multiple = true));
     open(fixture);
-    expect(root(fixture).querySelectorAll('input[type="checkbox"]').length).toBe(3);
+    expect(portalRoot().querySelectorAll('input[type="checkbox"]').length).toBe(3);
 
     optionEls(fixture)[0].click();
     fixture.detectChanges();
@@ -187,7 +195,7 @@ describe('DropdownComponent', () => {
   it('filters the options with the search box', () => {
     const fixture = render(host => (host.searchable = true));
     open(fixture);
-    const box = root(fixture).querySelector('input[type="text"]') as HTMLInputElement;
+    const box = portalRoot().querySelector('input[type="text"]') as HTMLInputElement;
     box.value = 'ga';
     box.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
@@ -197,7 +205,7 @@ describe('DropdownComponent', () => {
     box.dispatchEvent(new Event('input', { bubbles: true }));
     fixture.detectChanges();
     expect(optionEls(fixture).length).toBe(0);
-    expect(root(fixture).textContent).toContain('No matching options');
+    expect(portalRoot().textContent).toContain('No matching options');
   });
 
   it('adds a "Select all" row that ticks every enabled option', () => {
@@ -227,7 +235,7 @@ describe('DropdownComponent', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.otherClicks).toBe(1);
     expect(fixture.componentInstance.value).toBe('');
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('shows the "Other" label on the trigger once it is chosen', () => {
@@ -242,7 +250,7 @@ describe('DropdownComponent', () => {
     const fixture = render(host => (host.disabled = true));
     expect(trigger(fixture).disabled).toBe(true);
     open(fixture);
-    expect(root(fixture).querySelector('[role="listbox"]')).toBeNull();
+    expect(listbox(fixture)).toBeNull();
   });
 
   it('clears the selection with the clear button', () => {

@@ -8,10 +8,12 @@ import { MockDatabaseService, asRecord } from '../mock/mock-database.service';
 import { isMockEnabled, MOCK_CONFIG } from '../mock/mock.config';
 import { CrudAction, EndpointDef, getEndpointForDataKey } from '../config/api.config';
 import { PaginatedResponse, QueryOptions } from '../models/common.model';
+import { MASTER_ADAPTERS } from '../models/master-adapters';
 
 export interface ResourceRepositoryOptions<T> {
   idKey?: string;
-  normalizer?: (item: unknown) => T;
+  /** Called with each record (and its position in a list). */
+  normalizer?: (item: unknown, index?: number) => T;
 }
 
 export interface ResourceRepository<T> {
@@ -46,14 +48,21 @@ export class DataEngineService {
    */
   for<T = any>(dataKey: string, options: ResourceRepositoryOptions<T> = {}): ResourceRepository<T> {
     const idKey = options.idKey || 'id';
-    const normalizer = options.normalizer || ((item: unknown) => item as T);
+    const custom = options.normalizer || ((item: unknown) => item as T);
+    // API mode: the resource's adapter (core/models/master-adapters) turns backend records into screen rows and
+    // screen payloads into request bodies, so every caller of the resource sees the same shape.
+    const adapter = isMockEnabled(dataKey) ? undefined : MASTER_ADAPTERS[dataKey];
+    const normalizer = adapter
+      ? (item: unknown, index?: number) => custom(adapter.fromApi(item, typeof index === 'number' ? index : 0))
+      : custom;
+    const body = (payload: Partial<T>): Partial<T> => (adapter ? (adapter.toApi(payload) as Partial<T>) : payload);
 
     return {
       list: (queryOpts?: QueryOptions) => this.list<T>(dataKey, queryOpts, { idKey, normalizer }),
       getAll: (filter?: Record<string, unknown>) => this.getAll<T>(dataKey, filter, { idKey, normalizer }),
       getById: (id: string | number) => this.getById<T>(dataKey, id, { idKey, normalizer }),
-      create: (payload: Partial<T>) => this.create<T>(dataKey, payload, { idKey, normalizer }),
-      update: (id: string | number, patch: Partial<T>) => this.update<T>(dataKey, id, patch, { idKey, normalizer }),
+      create: (payload: Partial<T>) => this.create<T>(dataKey, body(payload), { idKey, normalizer }),
+      update: (id: string | number, patch: Partial<T>) => this.update<T>(dataKey, id, body(patch), { idKey, normalizer }),
       delete: (id: string | number) => this.delete(dataKey, id, { idKey })
     };
   }

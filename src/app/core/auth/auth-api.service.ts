@@ -51,6 +51,24 @@ export class AuthApiService {
     });
   }
 
+  /**
+   * Starts a role switch for the signed-in user. On success the backend has already ended the current session and
+   * returns a fresh login token for the new role (`loginCallbackToken`, also set as a cookie for web), which
+   * `verifyLoginToken` exchanges: the sign-in steps after RajSSO then run again (2FA when the new role needs it).
+   */
+  switchRole(roleId: number): Observable<LoginStepResponse> {
+    return this.http.call<LoginStepResponse>(API_ENDPOINTS.AUTH.SWITCH_ROLE, {
+      body: { roleId, client: this.client },
+      flags: { skipErrorToast: true }
+    });
+  }
+
+  /**
+   * True between a successful switch-role and the end of the new sign-in steps. The old session no longer exists then,
+   * so a 401 from a background call must not try a refresh or send the user to the sign-in page (auth interceptor).
+   */
+  sessionPaused = false;
+
   /** Sends the OTP of the pending second-factor challenge to the user's registered mobile. */
   sendOtp(): Observable<unknown> {
     return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SEND_OTP, {
@@ -67,11 +85,15 @@ export class AuthApiService {
     });
   }
 
-  /** Sets or changes the signed-in user's security PIN (used for PIN sign-in). */
-  setPin(pin: string): Observable<{ success?: boolean; message?: string }> {
-    return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SET_PIN, {
-      body: { pin },
-      flags: { skipErrorToast: true }
+  /**
+   * Sets or changes the security PIN. With `setupToken` (sign-in, nothing set up yet) it works before the session
+   * exists; without it the signed-in session is used (profile). The backend replaces any earlier PIN.
+   */
+  setPin(pin: string, setupToken?: string | null): Observable<{ success?: boolean; message?: string }> {
+    return this.http.call(API_ENDPOINTS.AUTH.TWO_STEP_SET, {
+      params: { type: 'pin' },
+      body: setupToken ? { pin, setupToken } : { pin },
+      flags: { skipErrorToast: true, skipAuth: !!setupToken }
     });
   }
 

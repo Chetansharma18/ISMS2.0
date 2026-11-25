@@ -41,7 +41,6 @@ export const OFFLINE_REASONS = [
       </div>
 
       <ng-container modalFooter>
-        <button appButton variant="outline" type="button" (click)="closed.emit()">Cancel</button>
         <button appButton type="button" [disabled]="!finalReason()" (click)="confirmed.emit(finalReason())">
           <app-icon name="check" size="sm" />
           <span>Mark Offline</span>

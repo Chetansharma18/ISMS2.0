@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import type { SanctionTableRow } from '../eoi-sanction-editor/eoi-sanction-editor.model';
-import { ButtonComponent, ModalComponent, TableColumn, TableComponent } from '../../../../shared';
+import { ModalComponent, TableColumn, TableComponent } from '../../../../shared';
 
 /** The approved companies of a released sanction order, with the targets sanctioned to each. */
 @Component({
   selector: 'app-sanction-targets-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ModalComponent, TableComponent, ButtonComponent],
+  imports: [ModalComponent, TableComponent],
   template: `
     <app-modal title="Approved TPs" [subtitle]="schemeTitle()" size="2xl" (close)="close.emit()">
       <app-table
@@ -22,10 +22,6 @@ import { ButtonComponent, ModalComponent, TableColumn, TableComponent } from '..
           <span class="min-w-16 text-right">{{ total() }}</span>
         </div>
       }
-
-      <ng-container modalFooter>
-        <button appButton (click)="close.emit()">Close</button>
-      </ng-container>
     </app-modal>
   `
 })

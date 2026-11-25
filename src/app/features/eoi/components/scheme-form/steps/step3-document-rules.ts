@@ -4,7 +4,7 @@ export const DOC_ALLOWED_EXTENSIONS: readonly string[] = ['pdf', 'jpg', 'jpeg', 
 /** Formats shown to the applicant. */
 export const DOC_FORMAT_LABEL = 'PDF, JPG, PNG';
 
-export const DOC_MAX_SIZE_MB = 5;
+export const DOC_MAX_SIZE_MB = 25;
 export const DOC_MAX_SIZE_BYTES = DOC_MAX_SIZE_MB * 1024 * 1024;
 
 /** Value for the file input `accept` attribute. */

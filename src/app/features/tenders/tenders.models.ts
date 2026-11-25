@@ -1,3 +1,5 @@
+import { DynamicFormField } from '../../core/models/admin-masters.model';
+
 export interface EoiDocumentItem {
   sNo: number;
   name: string;
@@ -17,20 +19,37 @@ export interface SchemeTender {
   eoiDescription: string;
   category?: string;
   code?: string;
-  status?: 'Open' | 'Closed';
+  status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
   rfpDocSize?: string;
   sopDocSize?: string;
   preBidDate?: string;
   techBidDate?: string;
   emdFee?: string;
   processFee?: string;
+  emdAmount?: number;
+  processFeeAmount?: number;
+  isFeeExempted?: boolean;
   attachedDocs?: EoiDocumentItem[];
   requiredDocs?: string[];
+  annexures?: string[];
+  publishFields?: DynamicFormField[];
+  uploadFields?: DynamicFormField[];
+  customFields?: DynamicFormField[];
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;
+  updatedAt?: number;
+  publishedAt?: number;
+  createdBy?: string;
+  scheduledDate?: string;
   isActive?: boolean;
   isFrozen?: boolean;
+  isNew?: boolean;
+  /** From the backend: whether Edit is allowed, and why not. */
+  isEditable?: boolean;
+  editDisabledReason?: string | null;
+  /** From the backend list: committee size (approver + members). */
+  committeeCount?: number;
 }
 
 /** A required-information / supporting-document entry for an EOI. */
@@ -82,34 +101,16 @@ export interface EoiFormData {
   processFee: string;
   attachments: EoiAttachment[];
   documents: string[];
+  annexures: string[];
+  publishFields?: DynamicFormField[];
+  uploadFields?: DynamicFormField[];
+  customFields?: DynamicFormField[];
   documentFiles?: Record<number, EoiDocumentUpload>;
+  status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
+  isFeeExempted?: boolean;
 }
 
 /** A scheme / tender as stored by the SCHEMES resource. */
-export interface SchemeTenderItem {
+export interface SchemeTenderItem extends SchemeTender {
   id?: string;
-  sNo: number;
-  refNo: string;
-  schemeName: string;
-  schemeTitle?: string;
-  schemeCategory: string;
-  datePublished: string;
-  closingDate: string;
-  eoiCategory: string;
-  eoiDescription: string;
-  category?: string;
-  code?: string;
-  status?: 'Open' | 'Closed';
-  rfpDocSize?: string;
-  sopDocSize?: string;
-  preBidDate?: string;
-  techBidDate?: string;
-  emdFee?: string;
-  processFee?: string;
-  attachedDocs?: Array<{ sNo: number; name: string; size: string }>;
-  committeeMembers?: string[];
-  committeeApprover?: string;
-  createdAt?: number;
-  isActive?: boolean;
-  isFrozen?: boolean;
 }

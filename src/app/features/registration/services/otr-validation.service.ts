@@ -39,6 +39,10 @@ export class OtrValidationService {
     this.submittedSteps.set(next);
   }
 
+  resetSubmittedSteps(): void {
+    this.submittedSteps.set(new Set<number>());
+  }
+
   /* ==========================================================================
      Step 1: Organization Details Validation (Sub-sections 1 to 4)
      ========================================================================== */
@@ -122,10 +126,10 @@ export class OtrValidationService {
     }
     if (!step1.emailId?.trim()) {
       errors.push('Official Company Email-ID is mandatory.');
-    } else if (!REGEX.EMAIL.test(step1.emailId)) {
+    } else if (!REGEX.EMAIL.test(step1.emailId.trim())) {
       errors.push('Invalid Official Company Email-ID format.');
     }
-    if (step1.website?.trim() && !REGEX.URL.test(step1.website)) {
+    if (step1.website?.trim() && !REGEX.URL.test(step1.website.trim())) {
       errors.push('Invalid Website URL format.');
     }
 
@@ -197,6 +201,10 @@ export class OtrValidationService {
   /* ==========================================================================
      Step 2: Officer In-Charge Directory Validation
      ========================================================================== */
+  validateOfficerInCharge(oicList: OfficerInCharge[]): string[] {
+    return this.validateStep2(oicList);
+  }
+
   validateSingleOic(oic: OfficerInCharge, index: number): string[] {
     const prefix = 'Officer In-Charge: ';
     const errors: string[] = [];
@@ -299,7 +307,7 @@ export class OtrValidationService {
     }
     if (!step3.emailId?.trim()) {
       errors.push('Email Address is mandatory.');
-    } else if (!REGEX.EMAIL.test(step3.emailId)) {
+    } else if (!REGEX.EMAIL.test(step3.emailId.trim())) {
       errors.push('Invalid Email Address format.');
     }
 
@@ -388,15 +396,15 @@ export class OtrValidationService {
     }
     if (!step4.accountNo?.trim()) {
       errors.push('Bank Account Number is mandatory.');
-    } else if (!REGEX.BANK_ACCOUNT.test(step4.accountNo)) {
+    } else if (!REGEX.BANK_ACCOUNT.test(step4.accountNo.trim())) {
       errors.push('Invalid Bank Account Number (Must be 9 to 18 numeric digits).');
     }
     if (!step4.ifscCode?.trim()) {
       errors.push('IFSC Code is mandatory.');
-    } else if (!REGEX.IFSC.test(step4.ifscCode.toUpperCase())) {
+    } else if (!REGEX.IFSC.test(step4.ifscCode.trim().toUpperCase())) {
       errors.push('Invalid IFSC Code (11 alphanumeric characters, 5th character strictly 0, e.g. SBIN0031804).');
     }
-    if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode)) {
+    if (step4.micrCode?.trim() && !REGEX.MICR.test(step4.micrCode.trim())) {
       errors.push('Invalid MICR Code (Must be exactly 9 numeric digits).');
     }
     if (!step4.cancelledChequeDoc || step4.cancelledChequeDoc.status !== 'uploaded') {
@@ -435,5 +443,14 @@ export class OtrValidationService {
       }
     }
     return null;
+  }
+
+  validateAll(formData: OtrFormData): { step1: string[]; step2: string[]; step3: string[]; step4: string[] } {
+    return {
+      step1: this.validateStep1(formData.step1),
+      step2: this.validateStep2(formData.step2),
+      step3: this.validateStep3(formData.step3),
+      step4: this.validateStep4(formData.step4)
+    };
   }
 }

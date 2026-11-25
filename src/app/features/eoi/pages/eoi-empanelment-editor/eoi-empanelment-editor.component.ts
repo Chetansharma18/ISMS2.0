@@ -92,45 +92,11 @@ const DEFAULT_COPY_TO: string[] = [
   template: `
     <app-document-page
       [title]="orderType() === 'rejection' ? 'Official Final Rejection Order' : 'Official Final Empanelment Order'"
-      [badge]="isCurrentOrderSigned() ? 'Released' : 'Draft'"
-      [subtitle]="orderType() === 'rejection' ? 'Review disqualified applicant agencies, rejection grounds, and release the official rejection order.' : 'Review and edit the empanelment order below, then complete committee E-Sign to release.'"
+      [showHeader]="false"
+      [fullWidth]="true"
       [toast]="toastMessage()"
       (back)="goBack()"
     >
-      <!-- Order Type Switcher Tabs -->
-      <div class="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <div class="inline-flex rounded-lg border border-slate-200 bg-slate-100 p-1 gap-1 text-xs">
-          <button
-            appButton
-            [variant]="orderType() === 'empanelment' ? 'primary' : 'outline'"
-            size="xs"
-            (click)="switchOrderType('empanelment')"
-          >
-            <app-icon name="check-circle" size="xs" />
-            <span>Empanelment Order (10 Eligible PIAs)</span>
-            @if (isApprovedSigned()) {
-              <span class="ml-1 px-1.5 py-0.2 rounded text-[10px] bg-emerald-100 text-emerald-800 font-bold">Released</span>
-            }
-          </button>
-          <button
-            appButton
-            [variant]="orderType() === 'rejection' ? 'primary' : 'outline'"
-            size="xs"
-            (click)="switchOrderType('rejection')"
-          >
-            <app-icon name="alert-triangle" size="xs" />
-            <span>Rejection Order (Disqualified Agencies)</span>
-            @if (isRejectionSigned()) {
-              <span class="ml-1 px-1.5 py-0.2 rounded text-[10px] bg-emerald-100 text-emerald-800 font-bold">Released</span>
-            }
-          </button>
-        </div>
-
-        <div class="text-xs text-slate-500 font-medium">
-          Scheme Ref: <strong class="text-slate-800">{{ eoiRefNo() }}</strong>
-        </div>
-      </div>
-
       <!-- Sequential Guard Warning Banner if attempting rejection before approved empanelment -->
       @if (orderType() === 'rejection' && !isApprovedSigned()) {
         <div class="mb-5 p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center gap-2.5">
@@ -214,172 +180,103 @@ const DEFAULT_COPY_TO: string[] = [
         </h1>
       </div>
 
-      <!-- Subject Block (Editable in Draft) -->
-      <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-5 text-xs sm:text-[13px] font-sans">
-        <div class="flex flex-col sm:flex-row sm:items-start gap-2">
+      <!-- Subject & Preamble Flow (Editable transparently, no border boxes) -->
+      <div class="my-5 space-y-4 text-xs sm:text-[13.5px] leading-relaxed font-sans text-slate-900">
+        <div class="flex items-start gap-2">
           <span class="font-bold text-slate-900 shrink-0">Subject:</span>
           @if (!isCurrentOrderSigned()) {
+            <!-- ui-guard-allow: letterhead inline text editor -->
             <textarea
               appInput
-              size="sm"
               rows="2"
-              class="w-full font-medium leading-relaxed text-xs"
+              class="w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-primary focus:bg-white/80 focus:ring-1 focus:ring-primary/20 p-1 rounded font-semibold text-slate-900 text-xs sm:text-[13.5px] leading-relaxed resize-y transition-all outline-hidden"
               [ngModel]="currentSubject"
               (ngModelChange)="currentSubject = $event"
+              placeholder="Enter Subject..."
             ></textarea>
           } @else {
-            <span class="font-semibold text-slate-800 leading-relaxed">{{ currentSubject }}</span>
+            <span class="font-semibold text-slate-900 leading-relaxed">{{ currentSubject }}</span>
           }
         </div>
-      </div>
 
-      <!-- Preamble Section (Editable in Draft) -->
-      <div class="text-xs sm:text-[12.5px] leading-relaxed mb-5 space-y-2.5 font-sans text-slate-800">
-        @if (!isCurrentOrderSigned()) {
-          <div class="space-y-2">
+        <div>
+          @if (!isCurrentOrderSigned()) {
+            <!-- ui-guard-allow: letterhead inline text editor -->
             <textarea
               appInput
-              size="sm"
               rows="2"
-              class="w-full text-xs"
+              class="w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-primary focus:bg-white/80 focus:ring-1 focus:ring-primary/20 p-1 rounded text-slate-800 text-xs sm:text-[13.5px] leading-relaxed resize-y transition-all outline-hidden"
               [ngModel]="currentPreamble1"
               (ngModelChange)="currentPreamble1 = $event"
               placeholder="Preamble paragraph 1..."
             ></textarea>
+          } @else {
+            <p class="m-0 text-justify leading-relaxed">{{ currentPreamble1 }}</p>
+          }
+        </div>
+
+        <div>
+          @if (!isCurrentOrderSigned()) {
+            <!-- ui-guard-allow: letterhead inline text editor -->
             <textarea
               appInput
-              size="sm"
               rows="2"
-              class="w-full text-xs"
+              class="w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-primary focus:bg-white/80 focus:ring-1 focus:ring-primary/20 p-1 rounded text-slate-800 text-xs sm:text-[13.5px] leading-relaxed resize-y transition-all outline-hidden"
               [ngModel]="currentPreamble2"
               (ngModelChange)="currentPreamble2 = $event"
               placeholder="Preamble paragraph 2..."
             ></textarea>
-          </div>
-        } @else {
-          <p class="m-0 text-justify leading-relaxed">{{ currentPreamble1 }}</p>
-          <p class="m-0 text-justify leading-relaxed">{{ currentPreamble2 }}</p>
-        }
+          } @else {
+            <p class="m-0 text-justify leading-relaxed">{{ currentPreamble2 }}</p>
+          }
+        </div>
       </div>
 
       <!-- ========================================== -->
       <!-- VIEW 1: EMPANELLED ELIGIBLE COMPANIES TABLE -->
       <!-- ========================================== -->
       @if (orderType() === 'empanelment') {
-        <div class="mb-6 space-y-2 font-sans">
-          <div class="flex items-center justify-between gap-2">
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 m-0 uppercase tracking-tight">
-              List of Shortlisted &amp; Empaneled Eligible Agencies ({{ tableRows.length }} PIAs):
-            </h3>
-            @if (!isApprovedSigned()) {
-              <button appButton variant="outline" size="xs" (click)="addCompanyRow()">
-                <app-icon name="plus" size="xs" />
-                <span>Add Agency Row</span>
-              </button>
-            }
-          </div>
+        <div class="mb-6 space-y-2.5 font-sans">
+          <p class="text-xs sm:text-[13.5px] font-bold text-slate-900 m-0 tracking-tight">
+            List of empaneled agencies are as following:
+          </p>
 
           <div class="overflow-x-auto border border-slate-300 rounded shadow-2xs">
             <!-- ui-guard-allow: official printed letter table -->
             <table appDocTable class="w-full text-left border-collapse bg-white">
-              <thead class="bg-slate-100 border-b border-slate-300 text-[11.5px] text-slate-800 font-bold uppercase">
+              <thead class="bg-slate-100 border-b border-slate-300 text-[12px] text-slate-900 font-bold">
                 <tr>
-                  <th class="p-2 border-r border-slate-300 text-center w-14">Sr. No</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[150px]">Application ID</th>
-                  <th class="p-2 border-r border-slate-300 min-w-[220px]">Applicant Agency Name</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[130px]">Category</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[110px]">File Status</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[130px]">Category as per marks</th>
-                  @if (!isApprovedSigned()) {
-                    <th class="p-2 text-center w-12">Action</th>
-                  }
+                  <th class="p-2.5 border-r border-slate-300 text-center w-14">Sr. No</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[150px]">Application ID</th>
+                  <th class="p-2.5 border-r border-slate-300 min-w-[220px]">Applicant Agency Name</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[130px]">Category</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[110px]">File Status</th>
+                  <th class="p-2.5 text-center min-w-[130px]">Category as per marks</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 text-xs">
+              <tbody class="divide-y divide-slate-200 text-xs sm:text-[13px]">
                 @for (row of tableRows; track row.sNo; let idx = $index) {
                   <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="p-2 border-r border-slate-200 text-center font-semibold text-slate-600">
+                    <td class="p-2.5 border-r border-slate-200 text-center font-semibold text-slate-700">
                       {{ idx + 1 }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isApprovedSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs font-semibold tabular-nums"
-                          [(ngModel)]="row.applicationId"
-                        />
-                      } @else {
-                        <span class="font-semibold text-slate-900 tabular-nums">{{ row.applicationId }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 text-center font-semibold text-slate-900 tabular-nums">
+                      {{ row.applicationId }}
                     </td>
-                    <td class="p-2 border-r border-slate-200">
-                      @if (!isApprovedSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-xs font-medium text-slate-900"
-                          [(ngModel)]="row.agencyName"
-                          placeholder="Company Name"
-                        />
-                      } @else {
-                        <span class="font-semibold text-slate-900">{{ row.agencyName }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 font-semibold text-slate-900">
+                      {{ row.agencyName }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isApprovedSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs"
-                          [(ngModel)]="row.category"
-                        />
-                      } @else {
-                        <span class="text-slate-700 text-xs">{{ row.category }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 text-center text-slate-700">
+                      {{ row.category }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isApprovedSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs font-bold text-emerald-700"
-                          [(ngModel)]="row.fileStatus"
-                        />
-                      } @else {
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                          {{ row.fileStatus }}
-                        </span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 text-center">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        {{ row.fileStatus }}
+                      </span>
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isApprovedSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs font-bold text-slate-800"
-                          [(ngModel)]="row.marksGrade"
-                        />
-                      } @else {
-                        <span class="font-bold text-slate-900 text-xs">{{ row.marksGrade }}</span>
-                      }
+                    <td class="p-2.5 text-center font-bold text-slate-900">
+                      {{ row.marksGrade }}
                     </td>
-                    @if (!isApprovedSigned()) {
-                      <td class="p-2 text-center">
-                        <button
-                          appButton
-                          variant="ghost"
-                          size="xs"
-                          iconOnly
-                          type="button"
-                          (click)="removeCompanyRow(idx)"
-                          title="Remove agency"
-                          [disabled]="tableRows.length <= 1"
-                        >
-                          <app-icon name="trash" size="xs" class="text-rose-500 hover:text-rose-700" />
-                        </button>
-                      </td>
-                    }
                   </tr>
                 }
               </tbody>
@@ -392,113 +289,47 @@ const DEFAULT_COPY_TO: string[] = [
       <!-- VIEW 2: DISQUALIFIED / REJECTED AGENCIES TABLE -->
       <!-- ============================================== -->
       @if (orderType() === 'rejection') {
-        <div class="mb-6 space-y-2 font-sans">
-          <div class="flex items-center justify-between gap-2">
-            <h3 class="text-xs sm:text-sm font-bold text-slate-900 m-0 uppercase tracking-tight">
-              List of Disqualified / Non-Eligible Applicant Agencies ({{ rejectedTableRows.length }} Agencies):
-            </h3>
-            @if (!isRejectionSigned()) {
-              <button appButton variant="outline" size="xs" (click)="addRejectedRow()">
-                <app-icon name="plus" size="xs" />
-                <span>Add Disqualified Agency</span>
-              </button>
-            }
-          </div>
+        <div class="mb-6 space-y-2.5 font-sans">
+          <p class="text-xs sm:text-[13.5px] font-bold text-slate-900 m-0 tracking-tight">
+            List of disqualified / non-eligible applicant agencies are as following:
+          </p>
 
           <div class="overflow-x-auto border border-slate-300 rounded shadow-2xs">
             <!-- ui-guard-allow: official printed letter table -->
             <table appDocTable class="w-full text-left border-collapse bg-white">
-              <thead class="bg-rose-50/70 border-b border-slate-300 text-[11.5px] text-slate-800 font-bold uppercase">
+              <thead class="bg-rose-50/70 border-b border-slate-300 text-[12px] text-slate-900 font-bold">
                 <tr>
-                  <th class="p-2 border-r border-slate-300 text-center w-14">Sr. No</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[150px]">Application ID</th>
-                  <th class="p-2 border-r border-slate-300 min-w-[220px]">Applicant Agency Name</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[130px]">Category</th>
-                  <th class="p-2 border-r border-slate-300 text-center min-w-[110px]">File Status</th>
-                  <th class="p-2 border-r border-slate-300 min-w-[280px]">Reason for Rejection / Disqualification</th>
-                  @if (!isRejectionSigned()) {
-                    <th class="p-2 text-center w-12">Action</th>
-                  }
+                  <th class="p-2.5 border-r border-slate-300 text-center w-14">Sr. No</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[150px]">Application ID</th>
+                  <th class="p-2.5 border-r border-slate-300 min-w-[220px]">Applicant Agency Name</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[130px]">Category</th>
+                  <th class="p-2.5 border-r border-slate-300 text-center min-w-[110px]">File Status</th>
+                  <th class="p-2.5 min-w-[280px]">Reason for Rejection / Disqualification</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-200 text-xs">
+              <tbody class="divide-y divide-slate-200 text-xs sm:text-[13px]">
                 @for (row of rejectedTableRows; track row.sNo; let idx = $index) {
                   <tr class="hover:bg-slate-50/70 transition-colors">
-                    <td class="p-2 border-r border-slate-200 text-center font-semibold text-slate-600">
+                    <td class="p-2.5 border-r border-slate-200 text-center font-semibold text-slate-700">
                       {{ idx + 1 }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isRejectionSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs font-semibold tabular-nums"
-                          [(ngModel)]="row.applicationId"
-                        />
-                      } @else {
-                        <span class="font-semibold text-slate-900 tabular-nums">{{ row.applicationId }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 text-center font-semibold text-slate-900 tabular-nums">
+                      {{ row.applicationId }}
                     </td>
-                    <td class="p-2 border-r border-slate-200">
-                      @if (!isRejectionSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-xs font-medium text-slate-900"
-                          [(ngModel)]="row.agencyName"
-                          placeholder="Agency Name"
-                        />
-                      } @else {
-                        <span class="font-semibold text-slate-900">{{ row.agencyName }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 font-semibold text-slate-900">
+                      {{ row.agencyName }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      @if (!isRejectionSigned()) {
-                        <input
-                          appInput
-                          size="sm"
-                          class="w-full text-center text-xs"
-                          [(ngModel)]="row.category"
-                        />
-                      } @else {
-                        <span class="text-slate-700 text-xs">{{ row.category || 'General' }}</span>
-                      }
+                    <td class="p-2.5 border-r border-slate-200 text-center text-slate-700">
+                      {{ row.category || 'General' }}
                     </td>
-                    <td class="p-2 border-r border-slate-200 text-center">
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
+                    <td class="p-2.5 border-r border-slate-200 text-center">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-800 border border-rose-200">
                         {{ row.fileStatus }}
                       </span>
                     </td>
-                    <td class="p-2 border-r border-slate-200">
-                      @if (!isRejectionSigned()) {
-                        <textarea
-                          appInput
-                          size="sm"
-                          rows="2"
-                          class="w-full text-xs"
-                          [(ngModel)]="row.reason"
-                          placeholder="Specific rejection grounds..."
-                        ></textarea>
-                      } @else {
-                        <span class="text-slate-800 text-xs leading-relaxed">{{ row.reason }}</span>
-                      }
+                    <td class="p-2.5 text-slate-800 leading-relaxed">
+                      {{ row.reason }}
                     </td>
-                    @if (!isRejectionSigned()) {
-                      <td class="p-2 text-center">
-                        <button
-                          appButton
-                          variant="ghost"
-                          size="xs"
-                          iconOnly
-                          type="button"
-                          (click)="removeRejectedRow(idx)"
-                          title="Remove row"
-                          [disabled]="rejectedTableRows.length <= 1"
-                        >
-                          <app-icon name="trash" size="xs" class="text-rose-500 hover:text-rose-700" />
-                        </button>
-                      </td>
-                    }
                   </tr>
                 }
               </tbody>

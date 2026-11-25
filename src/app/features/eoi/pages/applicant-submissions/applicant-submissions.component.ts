@@ -19,6 +19,7 @@ import {
   ModalComponent,
   TableColumn
 } from '../../../../shared';
+import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 
 @Component({
   selector: 'app-applicant-submissions',
@@ -31,7 +32,8 @@ import {
     ButtonComponent,
     IconComponent,
     ModalComponent,
-    OrderViewerModalComponent
+    OrderViewerModalComponent,
+    LoaderComponent
   ],
   template: `
     <app-list-page
@@ -114,7 +116,7 @@ import {
                 title="Release Rejected Empanelment Order for disqualified applicants"
               >
                 <app-icon name="alert-triangle" size="sm" />
-                <span>Release Rejected Empanelment Order</span>
+                <span>Release Reject Agency Empanelment Order</span>
               </button>
             } @else {
               <!-- Step 3: Both orders released -->
@@ -188,89 +190,62 @@ import {
         size="md"
         (close)="closeUploadExcelModal()"
       >
-        @if (isUploading()) {
-          <!-- 3-4 Second Progress Loader -->
-          <div class="py-10 px-4 text-center space-y-4">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto animate-pulse">
-              <app-icon name="refresh" size="lg" class="animate-spin" />
+        <div class="space-y-4">
+          <!-- Hidden native file input -->
+          <input
+            #fileInput
+            type="file"
+            class="hidden"
+            accept=".xlsx,.xls"
+            (change)="onUploadFileSelected($event)"
+          />
+
+          <!-- Upload Dropzone Area -->
+          <div
+            (click)="fileInput.click()"
+            class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
+          >
+            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+              <app-icon name="upload" size="lg" />
             </div>
-            <div class="space-y-1">
-              <h4 class="text-sm font-bold text-slate-900 m-0">{{ uploadLoadingStatus() }}</h4>
-              <p class="text-xs text-slate-500 m-0">Evaluating records &amp; compiling official empanelment order...</p>
-            </div>
-            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden max-w-xs mx-auto border border-slate-200">
-              <div
-                class="bg-primary h-2 rounded-full transition-all duration-700 ease-out"
-                [style.width.%]="uploadProgressPercent()"
-              ></div>
-            </div>
+            <p class="text-sm font-semibold text-slate-800 mb-1">
+              Click to choose an Excel file
+            </p>
+            <p class="text-xs text-slate-500">
+              Supports .xlsx and .xls formats
+            </p>
           </div>
-        } @else {
-          <div class="space-y-4">
-            <!-- Hidden native file input -->
-            <input
-              #fileInput
-              type="file"
-              class="hidden"
-              accept=".xlsx,.xls"
-              (change)="onUploadFileSelected($event)"
-            />
 
-            <!-- Upload Dropzone Area -->
-            <div
-              (click)="fileInput.click()"
-              class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
-            >
-              <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <app-icon name="upload" size="lg" />
+          <!-- Selected File Display -->
+          @if (selectedUploadFile()) {
+            <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+              <div class="flex items-center gap-2 truncate">
+                <app-icon name="file" size="sm" class="text-primary shrink-0" />
+                <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
+                <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
               </div>
-              <p class="text-sm font-semibold text-slate-800 mb-1">
-                Click to choose an Excel file
-              </p>
-              <p class="text-xs text-slate-500">
-                Supports .xlsx and .xls formats
-              </p>
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                (click)="removeSelectedUploadFile($event)"
+                title="Remove file"
+              >
+                <app-icon name="close" size="xs" />
+              </button>
             </div>
+          }
 
-            <!-- Selected File Display -->
-            @if (selectedUploadFile()) {
-              <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
-                <div class="flex items-center gap-2 truncate">
-                  <app-icon name="file" size="sm" class="text-primary shrink-0" />
-                  <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
-                  <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
-                </div>
-                <button
-                  appButton
-                  variant="ghost"
-                  size="sm"
-                  iconOnly
-                  type="button"
-                  (click)="removeSelectedUploadFile($event)"
-                  title="Remove file"
-                >
-                  <app-icon name="close" size="xs" />
-                </button>
-              </div>
-            }
-
-            <!-- Validation Error Alert -->
-            @if (uploadError()) {
-              <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
-                <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
-                <span>{{ uploadError() }}</span>
-              </div>
-            }
-
-            <!-- Success Alert -->
-            @if (uploadSuccessMessage()) {
-              <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
-                <app-icon name="check-circle" size="xs" />
-                <span>{{ uploadSuccessMessage() }}</span>
-              </div>
-            }
-          </div>
-        }
+          <!-- Validation Error Alert -->
+          @if (uploadError()) {
+            <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+              <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
+              <span>{{ uploadError() }}</span>
+            </div>
+          }
+        </div>
 
         <ng-container modalFooter>
           <button
@@ -278,15 +253,30 @@ import {
             variant="primary"
             size="sm"
             class="w-full sm:w-auto"
-            [disabled]="!selectedUploadFile() || isUploading()"
+            [disabled]="!selectedUploadFile()"
             (click)="submitExcelUpload()"
-            [loading]="isUploading()"
           >
             <app-icon name="upload" size="xs" />
-            <span>{{ isUploading() ? 'Processing...' : 'Submit Upload' }}</span>
+            <span>Submit Upload</span>
           </button>
         </ng-container>
       </app-modal>
+    }
+
+    <!-- Screen-Level Spring/Spinner Loader Overlay (as used in SSO Login) -->
+    <!-- ui-guard-allow: screen-level loading backdrop -->
+    @if (isScreenLoading()) {
+      <div class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-auto text-center border border-slate-200">
+          <app-loader
+            [text]="screenLoadingText()"
+            textClass="text-slate-900 font-bold"
+            [subtext]="screenLoadingSubtext()"
+            color="#800D46"
+            size="lg"
+          />
+        </div>
+      </div>
     }
 
     <!-- Modal for Official Order Viewer with RajKaj Seal & Download -->
@@ -328,14 +318,14 @@ export class ApplicantSubmissionsComponent {
     return this.currentOrder()?.rejectionStatus === 'E_SIGNED';
   });
 
-  // Excel Upload Modal State
+  // Excel Upload & Screen Loader State
   showUploadModal = signal<boolean>(false);
   selectedUploadFile = signal<File | null>(null);
   uploadError = signal<string>('');
   uploadSuccessMessage = signal<string>('');
-  isUploading = signal<boolean>(false);
-  uploadLoadingStatus = signal<string>('Validating evaluation spreadsheet records...');
-  uploadProgressPercent = signal<number>(25);
+  isScreenLoading = signal<boolean>(false);
+  screenLoadingText = signal<string>('Processing Evaluation Spreadsheet...');
+  screenLoadingSubtext = signal<string>('Validating evaluation records & compiling official empanelment order...');
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -358,7 +348,31 @@ export class ApplicantSubmissionsComponent {
     const targetSchemeId = sId === 'ALL' ? 'MMKVY-01' : sId;
     this.empanelmentOrderService.getOrderBySchemeId(targetSchemeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(order => {
       this.currentOrder.set(order || null);
+      if (order) {
+        this.applyOrderToResponses(order);
+      }
     });
+  }
+
+  private applyOrderToResponses(order: EmpanelmentOrder): void {
+    const isApprovedReleased = order.status === 'E_SIGNED';
+    const isRejectedReleased = order.rejectionStatus === 'E_SIGNED';
+
+    const acceptedMap = new Set((order.empanelledAgencies || []).map(a => a.applicationId.toLowerCase()));
+    const rejectedMap = new Set((order.rejectedAgencies || []).map(a => a.applicationId.toLowerCase()));
+
+    this.responses.update(list =>
+      list.map(r => {
+        const idLower = (r.regNumber || r.id).toLowerCase();
+        if (isApprovedReleased && acceptedMap.has(idLower)) {
+          return { ...r, status: 'APPROVED' as const, statusDisplay: 'Approved' };
+        }
+        if (isRejectedReleased && rejectedMap.has(idLower)) {
+          return { ...r, status: 'REJECTED' as const, statusDisplay: 'Rejected' };
+        }
+        return r;
+      })
+    );
   }
 
   loadResponses(sId: string): void {
@@ -446,9 +460,6 @@ export class ApplicantSubmissionsComponent {
     this.selectedUploadFile.set(null);
     this.uploadError.set('');
     this.uploadSuccessMessage.set('');
-    this.isUploading.set(false);
-    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
-    this.uploadProgressPercent.set(25);
     this.showUploadModal.set(true);
   }
 
@@ -457,7 +468,6 @@ export class ApplicantSubmissionsComponent {
     this.selectedUploadFile.set(null);
     this.uploadError.set('');
     this.uploadSuccessMessage.set('');
-    this.isUploading.set(false);
   }
 
   onUploadFileSelected(event: Event): void {
@@ -498,16 +508,18 @@ export class ApplicantSubmissionsComponent {
       return;
     }
 
-    this.isUploading.set(true);
-    this.uploadError.set('');
-    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
-    this.uploadProgressPercent.set(30);
+    // Close the popup immediately and show the screen-level spring/spinner loader!
+    this.showUploadModal.set(false);
+    this.isScreenLoading.set(true);
+    this.screenLoadingText.set('Processing Evaluation Spreadsheet...');
+    this.screenLoadingSubtext.set('Validating evaluation records & compiling official empanelment order...');
 
     try {
       const parsed = await parseEvaluationSpreadsheet(file);
       if (!parsed.isValid && parsed.errors && parsed.errors.length > 0) {
+        this.isScreenLoading.set(false);
+        this.showUploadModal.set(true);
         this.uploadError.set(parsed.errors[0]);
-        this.isUploading.set(false);
         return;
       }
 
@@ -603,7 +615,7 @@ export class ApplicantSubmissionsComponent {
         status: 'DRAFT',
         subject: `Empanelment order against EOI published on 22.01.2026 under MMKVY Category III SAMARTH for FY 2026-2027.`,
         preamble1: `An Expression of Interest (EOI) was published under Mukhya Mantri Kaushal Vikas Karyakram (MMKVY) category III SAMARTH scheme for empanelment of Project Implementing Agencies (PIAs).`,
-        preamble2: `Pursuant to the evaluation and De Novo Assessment process, the following agencies are hereby shortlisted and empaneled under SAMARTH scheme for FY 2026-2027.`,
+        preamble2: `Pursuant to the evaluation and De Novo Assessment process, the following 10 agencies are hereby shortlisted and empaneled under SAMARTH scheme for FY 2026-2027.`,
         issuingAuthority: {
           name: 'Rishav Mandal',
           designation: 'Managing Director, I.A.S.',
@@ -624,34 +636,29 @@ export class ApplicantSubmissionsComponent {
 
       // 3 to 4 Second Loader steps
       setTimeout(() => {
-        this.uploadLoadingStatus.set('Evaluating applicant scores & recommendation outcomes...');
-        this.uploadProgressPercent.set(65);
-      }, 1200);
+        this.screenLoadingText.set('Compiling Official Empanelment Order...');
+        this.screenLoadingSubtext.set('Preparing official letterhead with eligible shortlisted agencies...');
+      }, 1500);
 
       setTimeout(() => {
-        this.uploadLoadingStatus.set('Compiling official Empanelment Order with eligible companies...');
-        this.uploadProgressPercent.set(90);
-      }, 2400);
-
-      setTimeout(() => {
-        this.uploadProgressPercent.set(100);
-        this.isUploading.set(false);
-        this.showUploadModal.set(false);
+        this.isScreenLoading.set(false);
         this.selectedUploadFile.set(null);
+        // Directly open Empanelment order on complete screen!
         this.router.navigate(['/admin/empanelment-order-editor', sId]);
-      }, 3500);
+      }, 3000);
 
     } catch (err: any) {
       console.error('Error uploading evaluation excel:', err);
+      this.isScreenLoading.set(false);
+      this.showUploadModal.set(true);
       this.uploadError.set(err?.message || 'Failed to process Excel file. Please ensure valid OpenXML structure.');
-      this.isUploading.set(false);
     }
   }
 
   /**
    * Downloads evaluation excel file containing all submitted companies for this scheme
-   * with in-cell dropdown data validations for Status ("Approved,Reject") and
-   * Grading (from Super Admin Grading Master), plus a Reason / Remarks column.
+   * with in-cell dropdown data validations for File Status ("Eligible,Not Eligible") and
+   * Category as per marks (from Super Admin Grading Master), plus a Reason / Remarks column.
    */
   async downloadOfflineEvaluationExcel(): Promise<void> {
     const list = this.filteredResponses();
@@ -700,6 +707,7 @@ export class ApplicantSubmissionsComponent {
         sNo: idx + 1,
         refNo: app.regNumber || app.id,
         companyName: app.anonymousLabel || app.actualLegalName,
+        category: 'A1(skilling)',
         status: '',
         grade: '',
         reason: ''
@@ -711,7 +719,7 @@ export class ApplicantSubmissionsComponent {
         eoiRefNo,
         rows,
         gradeOptions,
-        statusOptions: ['Approved', 'Reject']
+        statusOptions: ['Eligible', 'Not Eligible']
       });
     } catch (err) {
       console.error('Error generating Excel file:', err);

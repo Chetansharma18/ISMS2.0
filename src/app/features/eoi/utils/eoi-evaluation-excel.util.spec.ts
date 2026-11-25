@@ -138,8 +138,8 @@ describe('eoi-evaluation-excel.util', () => {
 
       // Check header row height 30 and dropdown symbol in headers
       expect(sheet1Xml).toContain('<row r="1" ht="30" customHeight="1">');
-      expect(sheet1Xml).toContain('Status ▼');
-      expect(sheet1Xml).toContain('Grading ▼');
+      expect(sheet1Xml).toContain('File Status ▼');
+      expect(sheet1Xml).toContain('Category as per marks ▼');
 
       // Check data row height 22
       expect(sheet1Xml).toContain('<row r="2" ht="22" customHeight="1">');
@@ -148,9 +148,9 @@ describe('eoi-evaluation-excel.util', () => {
       // Check frozen pane on row 1
       expect(sheet1Xml).toContain('state="frozen"');
 
-      // Check dynamic validation range calculated for 2 rows (D2:D3, E2:E3)
-      expect(sheet1Xml).toContain('sqref="D2:D3"');
+      // Check dynamic validation range calculated for 2 rows (E2:E3, F2:F3)
       expect(sheet1Xml).toContain('sqref="E2:E3"');
+      expect(sheet1Xml).toContain('sqref="F2:F3"');
 
       // Check stop-style validation and allowBlank
       expect(sheet1Xml).toContain('errorStyle="stop"');
@@ -171,8 +171,8 @@ describe('eoi-evaluation-excel.util', () => {
         schemeTitle: 'Test Scheme',
         eoiRefNo: 'EOI-TEST-02',
         rows: [
-          { sNo: 1, refNo: 'APP-101', companyName: 'Agency One', status: 'Approved', grade: 'A+' },
-          { sNo: 2, refNo: 'APP-102', companyName: 'Agency Two', status: 'Approved', grade: 'A' }
+          { sNo: 1, refNo: 'APP-101', companyName: 'Agency One', category: 'A1(skilling)', status: 'Approved', grade: 'A+' },
+          { sNo: 2, refNo: 'APP-102', companyName: 'Agency Two', category: 'A1(skilling)', status: 'Approved', grade: 'A' }
         ],
         gradeOptions: [
           { grade: 'A+', range: '85 - 100' },
@@ -204,8 +204,8 @@ describe('eoi-evaluation-excel.util', () => {
         schemeTitle: 'Test Scheme',
         eoiRefNo: 'EOI-TEST-03',
         rows: [
-          { sNo: 1, refNo: 'APP-201', companyName: 'Agency Alpha', status: 'Reject', reason: '' }, // Missing reason!
-          { sNo: 2, refNo: 'APP-202', companyName: 'Agency Beta', status: 'Reject', reason: 'Insufficient experience certificates' }
+          { sNo: 1, refNo: 'APP-201', companyName: 'Agency Alpha', category: 'A1(skilling)', status: 'Reject', reason: '' }, // Missing reason!
+          { sNo: 2, refNo: 'APP-202', companyName: 'Agency Beta', category: 'A1(skilling)', status: 'Reject', reason: 'Insufficient experience certificates' }
         ],
         gradeOptions: [{ grade: 'A' }]
       };

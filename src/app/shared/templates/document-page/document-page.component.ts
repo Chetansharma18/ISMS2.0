@@ -25,7 +25,7 @@ import { IconComponent } from '../../components/icon/icon.component';
   imports: [ButtonComponent, IconComponent],
   host: { class: 'block' },
   template: `
-    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-6 px-3 sm:px-6 lg:px-8 print:bg-white print:p-0">
+    <div class="w-full min-h-screen bg-slate-50 text-[#1F2933] font-sans py-4 sm:py-6 px-2 sm:px-4 lg:px-6 print:bg-white print:p-0">
 
       @if (toast()) {
         <div class="fixed top-5 right-5 z-50 px-4 py-3 bg-navy text-white rounded-lg shadow-xl text-xs sm:text-sm font-semibold" role="status">
@@ -33,7 +33,7 @@ import { IconComponent } from '../../components/icon/icon.component';
         </div>
       }
 
-      <div class="w-full max-w-6xl mx-auto space-y-4">
+      <div [class]="fullWidth() ? 'w-full space-y-4' : 'w-full max-w-6xl mx-auto space-y-4'">
 
         <div class="font-sans print:hidden space-y-3">
           <button appButton variant="outline" size="sm" (click)="back.emit()">
@@ -41,18 +41,20 @@ import { IconComponent } from '../../components/icon/icon.component';
             <span>{{ backLabel() }}</span>
           </button>
 
-          <div class="flex items-center gap-3 flex-wrap">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">{{ title() }}</h1>
-            @if (badge()) {
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">{{ badge() }}</span>
+          @if (showHeader()) {
+            <div class="flex items-center gap-3 flex-wrap">
+              <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">{{ title() }}</h1>
+              @if (badge()) {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">{{ badge() }}</span>
+              }
+            </div>
+            @if (subtitle()) {
+              <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">{{ subtitle() }}</p>
             }
-          </div>
-          @if (subtitle()) {
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">{{ subtitle() }}</p>
           }
         </div>
 
-        <div class="document-sheet w-full bg-white p-6 sm:p-10 lg:p-12 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
+        <div class="document-sheet w-full bg-white p-4 sm:p-8 lg:p-12 print:p-0 text-[#111827] font-serif leading-relaxed text-xs sm:text-sm border border-slate-300 shadow-sm rounded-lg print:border-none print:shadow-none">
           <ng-content />
         </div>
 
@@ -70,6 +72,8 @@ export class DocumentPageComponent {
   readonly badge = input('');
   readonly subtitle = input('');
   readonly backLabel = input('Back');
+  readonly showHeader = input(true);
+  readonly fullWidth = input(false);
   /** A short message shown top right, for example "Draft saved." Empty hides it. */
   readonly toast = input('');
 

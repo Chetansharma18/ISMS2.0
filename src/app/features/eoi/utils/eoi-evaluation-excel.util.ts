@@ -4,6 +4,7 @@ export interface EvaluationExcelRow {
   sNo: number;
   refNo: string;
   companyName: string;
+  category?: string;
   status?: string;
   grade?: string;
   reason?: string;
@@ -88,7 +89,7 @@ export const DEFAULT_GRADE_RANGES: Record<string, string> = {
 export const EVALUATION_EXCEL_COLUMNS: ExcelColumnDefinition<EvaluationExcelRow>[] = [
   {
     key: 'sNo',
-    label: 'S. No.',
+    label: 'Sr. No',
     width: 10,
     type: 'number',
     align: 'center',
@@ -97,7 +98,7 @@ export const EVALUATION_EXCEL_COLUMNS: ExcelColumnDefinition<EvaluationExcelRow>
   },
   {
     key: 'refNo',
-    label: 'Ref No / Application ID',
+    label: 'Application ID',
     width: 28,
     type: 'text',
     align: 'left',
@@ -106,7 +107,7 @@ export const EVALUATION_EXCEL_COLUMNS: ExcelColumnDefinition<EvaluationExcelRow>
   },
   {
     key: 'companyName',
-    label: 'Company / Agency Name',
+    label: 'Applicant Agency Name',
     width: 38,
     type: 'text',
     align: 'left',
@@ -114,25 +115,34 @@ export const EVALUATION_EXCEL_COLUMNS: ExcelColumnDefinition<EvaluationExcelRow>
     required: true
   },
   {
+    key: 'category',
+    label: 'Category',
+    width: 20,
+    type: 'text',
+    align: 'center',
+    editable: false,
+    required: false
+  },
+  {
     key: 'status',
-    label: 'Status',
+    label: 'File Status',
     width: 24,
     type: 'dropdown',
     align: 'center',
     editable: true,
     required: true,
-    options: ['Approved', 'Reject'],
+    options: ['Eligible', 'Not Eligible'],
     validationRules: {
       allowBlank: true,
-      errorTitle: 'Invalid Status',
-      errorMessage: 'Please select either Approved or Reject from the dropdown list.',
+      errorTitle: 'Invalid File Status',
+      errorMessage: 'Please select either Eligible or Not Eligible from the dropdown list.',
       promptTitle: 'Status Decision',
-      promptMessage: 'Select Approved or Reject'
+      promptMessage: 'Select Eligible or Not Eligible'
     }
   },
   {
     key: 'grade',
-    label: 'Grading',
+    label: 'Category as per marks',
     width: 26,
     type: 'dropdown',
     align: 'center',
@@ -140,9 +150,9 @@ export const EVALUATION_EXCEL_COLUMNS: ExcelColumnDefinition<EvaluationExcelRow>
     required: false,
     validationRules: {
       allowBlank: true,
-      errorTitle: 'Invalid Grade',
+      errorTitle: 'Invalid Category as per marks',
       errorMessage: 'Please select a valid Grade from the dropdown list.',
-      promptTitle: 'Empanelment Grade',
+      promptTitle: 'Category as per marks',
       promptMessage: 'Select Grade & Range from dropdown'
     }
   },
@@ -196,7 +206,7 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
   const zip = new JSZipModule();
 
   const columns = options.columns || EVALUATION_EXCEL_COLUMNS;
-  const statuses = options.statusOptions?.length ? options.statusOptions : ['Approved', 'Reject'];
+  const statuses = options.statusOptions?.length ? options.statusOptions : ['Eligible', 'Not Eligible'];
 
   const rawGrades = options.gradeOptions?.length
     ? options.gradeOptions
@@ -356,19 +366,40 @@ export async function generateEvaluationExcel(options: EvaluationExcelOptions): 
       gradeVal = match ? match.formatted : row.grade;
     }
 
+    let cellsInRow = '';
+    columns.forEach((col, cIdx) => {
+      const colLetter = getExcelColumnLetter(cIdx);
+      if (col.key === 'sNo') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="3"><v>${sNo}</v></c>`;
+      } else if (col.key === 'refNo') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="2" t="inlineStr"><is><t>${refNo}</t></is></c>`;
+      } else if (col.key === 'companyName') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="2" t="inlineStr"><is><t>${companyName}</t></is></c>`;
+      } else if (col.key === 'category') {
+        const catVal = escapeXml(row.category || 'A1(skilling)');
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="3" t="inlineStr"><is><t>${catVal}</t></is></c>`;
+      } else if (col.key === 'status') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="4" t="inlineStr"><is><t>${statusVal}</t></is></c>`;
+      } else if (col.key === 'grade') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="4" t="inlineStr"><is><t>${escapeXml(gradeVal)}</t></is></c>`;
+      } else if (col.key === 'reason') {
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="2" t="inlineStr"><is><t>${reasonVal}</t></is></c>`;
+      } else {
+        const anyVal = escapeXml((row as any)[col.key] || '');
+        cellsInRow += `<c r="${colLetter}${rowNum}" s="2" t="inlineStr"><is><t>${anyVal}</t></is></c>`;
+      }
+    });
+
     sheetDataXml += `    <row r="${rowNum}" ht="22" customHeight="1">
-      <c r="A${rowNum}" s="3"><v>${sNo}</v></c>
-      <c r="B${rowNum}" s="2" t="inlineStr"><is><t>${refNo}</t></is></c>
-      <c r="C${rowNum}" s="2" t="inlineStr"><is><t>${companyName}</t></is></c>
-      <c r="D${rowNum}" s="4" t="inlineStr"><is><t>${statusVal}</t></is></c>
-      <c r="E${rowNum}" s="4" t="inlineStr"><is><t>${escapeXml(gradeVal)}</t></is></c>
-      <c r="F${rowNum}" s="2" t="inlineStr"><is><t>${reasonVal}</t></is></c>
+      ${cellsInRow}
     </row>\n`;
   });
 
   // Calculate dynamic validation ranges based on actual column positions and exported rows
-  const statusColLetter = getExcelColumnLetter(columns.findIndex(c => c.key === 'status') !== -1 ? columns.findIndex(c => c.key === 'status') : 3);
-  const gradeColLetter = getExcelColumnLetter(columns.findIndex(c => c.key === 'grade') !== -1 ? columns.findIndex(c => c.key === 'grade') : 4);
+  const statusColIdx = columns.findIndex(c => c.key === 'status');
+  const gradeColIdx = columns.findIndex(c => c.key === 'grade');
+  const statusColLetter = getExcelColumnLetter(statusColIdx !== -1 ? statusColIdx : 4);
+  const gradeColLetter = getExcelColumnLetter(gradeColIdx !== -1 ? gradeColIdx : 5);
   const statusSqref = `${statusColLetter}${startRow}:${statusColLetter}${endRow}`;
   const gradeSqref = `${gradeColLetter}${startRow}:${gradeColLetter}${endRow}`;
 
@@ -446,6 +477,7 @@ export interface ParsedEvaluationRow {
   sNo: number;
   refNo: string;
   companyName: string;
+  category?: string;
   status: string;
   grade: string;
   reason: string;
@@ -461,7 +493,7 @@ export interface ParsedEvaluationResult {
   isValid: boolean;
 }
 
-export type EvaluationFieldKey = 'sNo' | 'refNo' | 'companyName' | 'status' | 'grade' | 'reason';
+export type EvaluationFieldKey = 'sNo' | 'refNo' | 'companyName' | 'category' | 'status' | 'grade' | 'reason';
 
 /**
  * Matches an Excel / CSV header string to an internal field key in a case-insensitive manner,
@@ -474,12 +506,13 @@ export function matchHeaderToField(header: string): EvaluationFieldKey | null {
     .trim()
     .toLowerCase();
 
-  if (norm.includes('status')) return 'status';
-  if (norm.includes('grad')) return 'grade';
   if (norm.includes('reason') || norm.includes('remark')) return 'reason';
+  if (norm.includes('category as per marks') || norm.includes('as per marks') || norm.includes('grad')) return 'grade';
+  if (norm === 'category' || (norm.includes('category') && !norm.includes('marks'))) return 'category';
+  if (norm.includes('status') || norm.includes('file status')) return 'status';
   if (norm.includes('ref') || norm.includes('application') || norm.includes('app id')) return 'refNo';
   if (norm.includes('company') || norm.includes('agency') || norm.includes('applicant')) return 'companyName';
-  if (norm.includes('s no') || norm.includes('sno') || norm === 'sn' || norm === 'sl no') return 'sNo';
+  if (norm.includes('s no') || norm.includes('sr no') || norm.includes('sno') || norm === 'sn' || norm === 'sl no') return 'sNo';
 
   return null;
 }
@@ -557,12 +590,13 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
   }
 
   // Fallback positional mapping if header parsing didn't match standard columns
+  if (!colToField['A']) colToField['A'] = 'sNo';
   if (!colToField['B']) colToField['B'] = 'refNo';
   if (!colToField['C']) colToField['C'] = 'companyName';
-  if (!colToField['D']) colToField['D'] = 'status';
-  if (!colToField['E']) colToField['E'] = 'grade';
-  if (!colToField['F']) colToField['F'] = 'reason';
-  if (!colToField['A']) colToField['A'] = 'sNo';
+  if (!colToField['D']) colToField['D'] = 'category';
+  if (!colToField['E']) colToField['E'] = 'status';
+  if (!colToField['F']) colToField['F'] = 'grade';
+  if (!colToField['G']) colToField['G'] = 'reason';
 
   const parsedRows: ParsedEvaluationRow[] = [];
   const errors: string[] = [];
@@ -577,6 +611,7 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
     let sNo = parsedRows.length + 1;
     let refNo = '';
     let companyName = '';
+    let category = '';
     let status = '';
     let grade = '';
     let reason = '';
@@ -602,6 +637,7 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
       if (field === 'sNo') sNo = parseInt(val, 10) || sNo;
       else if (field === 'refNo') refNo = val;
       else if (field === 'companyName') companyName = val;
+      else if (field === 'category') category = val;
       else if (field === 'status') status = val;
       else if (field === 'grade') grade = val;
       else if (field === 'reason') reason = val;
@@ -622,17 +658,17 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
     }
 
     const isApproved =
+      (status.toLowerCase().includes('eligib') && !status.toLowerCase().includes('not')) ||
       status.toLowerCase().includes('approv') ||
-      status.toLowerCase().includes('eligib') ||
       status.toLowerCase() === 'yes';
 
     const isReject =
-      status.toLowerCase().includes('reject') ||
       status.toLowerCase().includes('not eligib') ||
+      status.toLowerCase().includes('reject') ||
       status.toLowerCase() === 'no';
 
     if (!status) {
-      errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Evaluation Status is missing. Please select Approved or Reject.`);
+      errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Evaluation File Status is missing. Please select Eligible or Not Eligible.`);
     } else if (isReject && (!reason || !reason.trim())) {
       errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Reason / Remarks is mandatory for rejected applicants.`);
     }
@@ -646,7 +682,8 @@ export async function parseEvaluationSpreadsheet(file: File): Promise<ParsedEval
       sNo,
       refNo: refNo || `APP-2026-${String(sNo).padStart(3, '0')}`,
       companyName: companyName || `Agency ${sNo}`,
-      status: isApproved ? 'Approved' : 'Reject',
+      category: category || 'A1(skilling)',
+      status: isApproved ? 'Eligible' : 'Not Eligible',
       grade: cleanGrade || (isApproved ? 'A' : '-'),
       reason: reason || (isApproved ? 'Qualified as per technical norms' : ''),
       isApproved
@@ -701,6 +738,7 @@ function parseCsvText(text: string, fileName: string): ParsedEvaluationResult {
     let sNo = parsedRows.length + 1;
     let refNo = '';
     let companyName = '';
+    let category = '';
     let status = '';
     let grade = '';
     let reason = '';
@@ -710,6 +748,7 @@ function parseCsvText(text: string, fileName: string): ParsedEvaluationResult {
       if (field === 'sNo') sNo = parseInt(val, 10) || sNo;
       else if (field === 'refNo') refNo = val;
       else if (field === 'companyName') companyName = val;
+      else if (field === 'category') category = val;
       else if (field === 'status') status = val;
       else if (field === 'grade') grade = val;
       else if (field === 'reason') reason = val;
@@ -728,17 +767,17 @@ function parseCsvText(text: string, fileName: string): ParsedEvaluationResult {
     }
 
     const isApproved =
+      (status.toLowerCase().includes('eligib') && !status.toLowerCase().includes('not')) ||
       status.toLowerCase().includes('approv') ||
-      status.toLowerCase().includes('eligib') ||
       status.toLowerCase() === 'yes';
 
     const isReject =
-      status.toLowerCase().includes('reject') ||
       status.toLowerCase().includes('not eligib') ||
+      status.toLowerCase().includes('reject') ||
       status.toLowerCase() === 'no';
 
     if (!status) {
-      errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Evaluation Status is missing. Please select Approved or Reject.`);
+      errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Evaluation File Status is missing. Please select Eligible or Not Eligible.`);
     } else if (isReject && (!reason || !reason.trim())) {
       errors.push(`Row ${rowNum} (${refNo || 'Applicant'}): Reason / Remarks is mandatory for rejected applicants.`);
     }
@@ -752,7 +791,8 @@ function parseCsvText(text: string, fileName: string): ParsedEvaluationResult {
       sNo,
       refNo: refNo || `APP-2026-${String(sNo).padStart(3, '0')}`,
       companyName: companyName || `Agency ${sNo}`,
-      status: isApproved ? 'Approved' : 'Reject',
+      category: category || 'A1(skilling)',
+      status: isApproved ? 'Eligible' : 'Not Eligible',
       grade: cleanGrade || (isApproved ? 'A' : '-'),
       reason: reason || (isApproved ? 'Qualified as per criteria' : ''),
       isApproved

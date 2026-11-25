@@ -1,10 +1,10 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { isApiUrl } from '../config/api.config';
 import { SKIP_AUTH } from '../http/http-context';
 import { AuthApiService } from './auth-api.service';
+import { SessionExpiryService } from './session-expiry.service';
 import { needsSessionRefresh } from './session-expiry.util';
 import { TokenService } from './token.service';
 
@@ -13,14 +13,14 @@ import { TokenService } from './token.service';
  * - attaches `Authorization: Bearer <token>` when TokenService holds one (cookie sessions need nothing extra);
  * - on a 401 (or a 400/403 saying the access token is missing or expired, see session-expiry.util), refreshes the
  *   session once (parallel failures share one refresh) and replays the request;
- * - when the refresh fails, clears the token and sends the user to the sign-in page.
+ * - when the refresh fails, ends the portal session once (SessionExpiryService): one message, back to the home page.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (!isApiUrl(req.url) || req.context.get(SKIP_AUTH)) return next(req);
 
   const tokens = inject(TokenService);
   const authApi = inject(AuthApiService);
-  const router = inject(Router);
+  const sessionExpiry = inject(SessionExpiryService);
 
   const withToken = (request: HttpRequest<unknown>): HttpRequest<unknown> => {
     const token = tokens.getAccessToken();
@@ -40,7 +40,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       return authApi.refreshOnce().pipe(
         catchError(() => {
           tokens.clear();
-          void router.navigate(['/sso-login']);
+          // Ends the portal session once and sends the user home (Login there opens RajSSO).
+          sessionExpiry.expire();
           return throwError(() => error);
         }),
         switchMap(() => next(withToken(req)))

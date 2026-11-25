@@ -14,7 +14,7 @@ export interface SessionRoles {
   roles: BackendRoleSummary[];
   activeRoleId: number | null;
 }
-import { humanizeRoleName, toPortalRole } from './sso-session.util';
+import { humanizeRoleName, landingRouteFor, toPortalRole } from './sso-session.util';
 
 /** Where a real sign-in lands when the backend menu has no item for the role. */
 const NO_MENU_LANDING = '/profile';
@@ -190,7 +190,14 @@ export class AuthService {
     }
   }
 
+  /** "Login" on the landing page. A user who is still signed in goes straight back into the portal. */
   triggerSsoRedirect(): void {
+    const user = this.currentUser();
+    if (user) {
+      const home = landingRouteFor(user.role);
+      void this.router.navigate([home.path], home.queryParams ? { queryParams: home.queryParams } : {});
+      return;
+    }
     this.isRedirecting.set(true);
   }
 

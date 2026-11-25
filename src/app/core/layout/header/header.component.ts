@@ -130,13 +130,16 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
             </button>
           </div>
 
-          <!-- When Logged In (and on internal portal page): Notification Bell + User Profile Menu & Role Switcher -->
-          @if (currentUser() && !isLandingPage() && !isSsoPage()) {
-            <!-- Thin Vertical Divider between Language & Notifications -->
-            <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
+          <!-- When Logged In: User Profile Menu & Role Switcher (on the landing page too, with "Back to Portal");
+               the notification bell only inside the portal -->
+          @if (currentUser() && !isSsoPage()) {
+            @if (!isLandingPage()) {
+              <!-- Thin Vertical Divider between Language & Notifications -->
+              <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
 
-            <!-- Notification Option (Role-Specific Portal Notifications) -->
-            <app-header-notification></app-header-notification>
+              <!-- Notification Option (Role-Specific Portal Notifications) -->
+              <app-header-notification></app-header-notification>
+            }
 
             <!-- Thin Vertical Divider between Notifications/Language & Username -->
             <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
@@ -199,6 +202,23 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
 
                   <!-- 2. Menu Actions -->
                   <div class="p-1.5 space-y-0.5">
+                    <!-- Back to Portal: on the landing page, returns a signed-in user to their portal home -->
+                    @if (isLandingPage()) {
+                      <a
+                        appButton
+                        variant="primary"
+                        size="sm"
+                        block
+                        [routerLink]="homeRoute()"
+                        (click)="closeDropdown()"
+                        class="justify-start"
+                        role="menuitem"
+                      >
+                        <app-icon name="forward" />
+                        <span>Back to Portal</span>
+                      </a>
+                    }
+
                     <!-- Profile Link -->
                     <a
                       appButton

@@ -186,7 +186,8 @@ export class DepartmentEoiViewComponent implements OnInit {
 
   onOtpCancelled(): void {
     this.showOtpModal.set(false);
-    this.router.navigate(['/sso-login']);
+    // Back to the home page; its Login button opens RajSSO (or the persona picker with mock sign-in).
+    this.router.navigate(['/']);
   }
 
   roleDropdownOpen = signal<boolean>(false);

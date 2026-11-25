@@ -7,6 +7,8 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { API_ENDPOINTS, buildApiUrl } from '../../config/api.config';
 import { TokenService } from '../../auth/token.service';
+import { AuthService, UserPersona } from '../../auth/auth.service';
+import { SESSION_EXPIRED_MESSAGE } from '../../auth/session-expiry.service';
 import { NotificationService } from '../../services/notification.service';
 import { ApiError } from '../api-error';
 import { provideApiHttp } from '../http.providers';
@@ -144,22 +146,43 @@ describe('API interceptor chain', () => {
     backend.expectNone(buildApiUrl('/auth/refresh-token'));
   });
 
-  it('signs out when the refresh fails', async () => {
+  it('signs out once, home, with one message, when the refresh fails for several requests', async () => {
     const router = TestBed.inject(Router);
     const navigated: unknown[] = [];
     router.navigate = ((commands: unknown[]) => {
       navigated.push(commands);
       return Promise.resolve(true);
     }) as Router['navigate'];
+    const auth = TestBed.inject(AuthService);
+    auth.currentUser.set({ id: 'u1', ssoId: 'committee.member.1', role: 'dept_admin' } as unknown as UserPersona);
     TestBed.inject(TokenService).setAccessToken('stale');
 
-    const call = firstValueFrom(http.call(API_ENDPOINTS.USERS.LIST));
-    backend.expectOne(buildApiUrl('/users')).flush(null, { status: 401, statusText: 'Unauthorized' });
+    const first = firstValueFrom(http.call(API_ENDPOINTS.USERS.LIST));
+    const second = firstValueFrom(http.call(API_ENDPOINTS.SECTORS.LIST));
+    backend.expectOne(buildApiUrl('/users')).flush(null, { status: 401, statusText: 'Unauthorized', headers: { 'X-Correlation-ID': 'a' } });
+    backend.expectOne(buildApiUrl('/master/sectors')).flush(null, { status: 401, statusText: 'Unauthorized', headers: { 'X-Correlation-ID': 'b' } });
     backend.expectOne(buildApiUrl('/auth/refresh-token')).flush(null, { status: 401, statusText: 'Unauthorized' });
 
-    await expect(call).rejects.toMatchObject({ status: 401 });
+    await expect(first).rejects.toMatchObject({ status: 401 });
+    await expect(second).rejects.toMatchObject({ status: 401 });
     expect(TestBed.inject(TokenService).getAccessToken()).toBeNull();
-    expect(navigated).toEqual([['/sso-login']]);
+    expect(auth.currentUser()).toBeNull();
+    // Home (Login there opens RajSSO), never the mock persona picker; once, not per request.
+    expect(navigated).toEqual([['/']]);
+    expect(notifications.notifications().filter(n => n.type === 'error')).toHaveLength(0);
+    expect(notifications.notifications().filter(n => n.type === 'warning').map(n => n.message)).toEqual([SESSION_EXPIRED_MESSAGE]);
+  });
+
+  it('does not stack the same error when only the Ref id differs', async () => {
+    const first = firstValueFrom(http.call(API_ENDPOINTS.SECTORS.ADD, { body: {} }));
+    const second = firstValueFrom(http.call(API_ENDPOINTS.SECTORS.ADD, { body: {} }));
+    const reqs = backend.match(buildApiUrl('/master/sectors'));
+    reqs.forEach((r, i) =>
+      r.flush({ message: 'Server error.' }, { status: 500, statusText: 'Error', headers: { 'X-Correlation-ID': `ref-${i}` } })
+    );
+    await expect(first).rejects.toBeInstanceOf(ApiError);
+    await expect(second).rejects.toBeInstanceOf(ApiError);
+    expect(notifications.notifications().filter(n => n.type === 'error')).toHaveLength(1);
   });
 
   it('counts requests in flight', async () => {

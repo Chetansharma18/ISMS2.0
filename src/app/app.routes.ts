@@ -1,5 +1,7 @@
-import { Routes } from '@angular/router';
+import { inject } from '@angular/core';
+import { Router, Routes } from '@angular/router';
 import { EXTERNAL_LEGAL_URL } from './core/layout/sidebar/sidebar-nav.config';
+import { isMockEnabled } from './core/mock/mock.config';
 
 export const routes: Routes = [
   {
@@ -10,7 +12,10 @@ export const routes: Routes = [
       )
   },
   {
+    // The persona picker exists only for mock sign-in. With real sign-in (RajSSO, environment.sso.loginUrl) it
+    // cannot be opened: the URL leads to the home page, whose Login button opens RajSSO.
     path: 'sso-login',
+    canMatch: [() => isMockEnabled('AUTH') || inject(Router).parseUrl('/')],
     loadComponent: () =>
       import('./features/auth/pages/sso-login/sso-login.component').then(
         (m) => m.SsoLoginComponent

@@ -13,7 +13,8 @@ export const authGuard: CanActivateFn = () => {
     return true;
   }
 
-  router.navigate(['/sso-login']);
+  // Signed out: the home page, whose Login button opens RajSSO (or the persona picker with mock sign-in).
+  router.navigate(['/']);
   return false;
 };
 
@@ -27,7 +28,7 @@ export const roleGuard = (allowedRoles: UserRole[]): CanActivateFn => {
     const user = authService.currentUser();
 
     if (!user) {
-      router.navigate(['/sso-login']);
+      router.navigate(['/']);
       return false;
     }
 

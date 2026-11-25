@@ -154,20 +154,6 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ officeAddressDisplay() }}</span>
             </div>
-
-            <!-- Row 6: Financial Standing & Annual Turnover -->
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Declared Annual Turnover</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().turnOver ? '₹ ' + step1().turnOver + ' Lacs' : '-' }}</span>
-            </div>
-            <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Blacklisted Status</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().blackListed || 'No' }}</span>
-            </div>
-            <div class="sm:col-span-2">
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">CA-Certified Turnover Certificate</span>
-              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().turnoverCertDoc?.fileName || '-' }}</span>
-            </div>
           </div>
         }
       </section>

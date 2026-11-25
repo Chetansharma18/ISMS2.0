@@ -78,7 +78,7 @@ export class SchemeFormState {
 
   readonly schemeCustomFields = signal<any[]>([]);
 
-  readonly hasCustomFields = computed(() => this.schemeCustomFields().length > 0);
+  readonly hasCustomFields = computed(() => false);
 
   readonly customFieldAnswers = signal<Record<string, any>>({});
 
@@ -86,36 +86,23 @@ export class SchemeFormState {
     this.customFieldAnswers.update(curr => ({ ...curr, [fieldKey]: value }));
   }
 
-  // Dynamic Step Indices
+  // Fixed Standard 6-Step Indices
   readonly stepIndexProfile = 1;
-  readonly stepIndexCustomFields = computed(() => this.hasCustomFields() ? 2 : -1);
-  readonly stepIndexDocuments = computed(() => this.hasCustomFields() ? 3 : 2);
-  readonly stepIndexPreview = computed(() => this.hasCustomFields() ? 4 : 3);
-  readonly stepIndexProcFee = computed(() => this.hasCustomFields() ? 5 : 4);
-  readonly stepIndexEmd = computed(() => this.hasCustomFields() ? 6 : 5);
-  readonly stepIndexReceipts = computed(() => this.hasCustomFields() ? 7 : 6);
+  readonly stepIndexDocuments = computed(() => 2);
+  readonly stepIndexPreview = computed(() => 3);
+  readonly stepIndexProcFee = computed(() => 4);
+  readonly stepIndexEmd = computed(() => 5);
+  readonly stepIndexReceipts = computed(() => 6);
+  readonly stepIndexCustomFields = computed(() => -1);
 
-  readonly wizardSteps = computed<StepperStep[]>(() => {
-    if (this.hasCustomFields()) {
-      return [
-        { label: 'Registration Profile' },
-        { label: 'Scheme Proposal Details' },
-        { label: 'Upload Documents' },
-        { label: 'Complete Preview' },
-        { label: 'Processing Fee' },
-        { label: 'EMD Payment' },
-        { label: 'Submission Receipt' }
-      ];
-    }
-    return [
-      { label: 'Registration Profile' },
-      { label: 'Upload Documents' },
-      { label: 'Complete Preview' },
-      { label: 'Processing Fee' },
-      { label: 'EMD Payment' },
-      { label: 'Submission Receipt' }
-    ];
-  });
+  readonly wizardSteps = computed<StepperStep[]>(() => [
+    { label: 'Registration Profile' },
+    { label: 'Upload Documents' },
+    { label: 'Complete Preview' },
+    { label: 'Processing Fee' },
+    { label: 'EMD Payment' },
+    { label: 'Submission Receipt' }
+  ]);
 
   /** Dynamic completion indicators matching whether custom fields step is active */
   readonly completedWizardSteps = computed(() => {
@@ -428,7 +415,7 @@ export class SchemeFormState {
   saveAndProceedToDocuments(): void {
     this.saveStep2Changes();
     this.isEditingStep2.set(false);
-    this.goToStep(this.hasCustomFields() ? this.stepIndexCustomFields() : this.stepIndexDocuments());
+    this.goToStep(this.stepIndexDocuments());
   }
 
   saveAndProceedToStep3(): void {

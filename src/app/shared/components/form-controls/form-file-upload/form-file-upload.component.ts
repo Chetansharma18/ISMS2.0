@@ -116,23 +116,29 @@ import { IconComponent } from '../../icon/icon.component';
               <!-- Replace Option -->
               <button
                 appButton
-                variant="secondary"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="triggerFileSelect(fileInput)"
+                title="Replace Document"
+                aria-label="Replace Document"
               >
-                Replace
+                <app-icon name="refresh" size="sm" />
               </button>
 
               <!-- Remove Option -->
               <button
                 appButton
-                variant="danger"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="removeFile(fileInput)"
+                title="Remove Document"
+                aria-label="Remove Document"
               >
-                Remove
+                <app-icon name="trash" size="sm" />
               </button>
             }
           </div>

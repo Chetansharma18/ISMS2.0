@@ -10,7 +10,6 @@ import { SchemeFormState } from './scheme-form.state';
 import { SchemeHeaderCardComponent } from './steps/scheme-header-card.component';
 import { Step1ProcessingFeeComponent } from './steps/step1-processing-fee.component';
 import { Step2OtrProfileComponent } from './steps/step2-otr-profile.component';
-import { StepSchemeCustomFieldsComponent } from './steps/step-scheme-custom-fields.component';
 import { Step3UploadDocumentsComponent } from './steps/step3-upload-documents.component';
 import { Step4CompletePreviewComponent } from './steps/step4-complete-preview.component';
 import { Step5EmdPaymentComponent } from './steps/step5-emd-payment.component';
@@ -30,7 +29,6 @@ export type { EoiDocumentItem } from './scheme-form.model';
     SchemeHeaderCardComponent,
     Step1ProcessingFeeComponent,
     Step2OtrProfileComponent,
-    StepSchemeCustomFieldsComponent,
     Step3UploadDocumentsComponent,
     Step4CompletePreviewComponent,
     Step5EmdPaymentComponent,
@@ -96,17 +94,6 @@ export type { EoiDocumentItem } from './scheme-form.model';
             </p>
           </div>
 
-          @if (state.hasCustomFields()) {
-            @switch (state.currentStep()) {
-              @case (1) { <app-step2-otr-profile /> }
-              @case (2) { <app-step-scheme-custom-fields /> }
-              @case (3) { <app-step3-upload-documents /> }
-              @case (4) { <app-step4-complete-preview /> }
-              @case (5) { <app-step1-processing-fee /> }
-              @case (6) { <app-step5-emd-payment /> }
-              @case (7) { <app-step6-receipts /> }
-            }
-          } @else {
             @switch (state.currentStep()) {
               @case (1) { <app-step2-otr-profile /> }
               @case (2) { <app-step3-upload-documents /> }
@@ -115,7 +102,6 @@ export type { EoiDocumentItem } from './scheme-form.model';
               @case (5) { <app-step5-emd-payment /> }
               @case (6) { <app-step6-receipts /> }
             }
-          }
         </div>
 
       </main>
@@ -229,28 +215,20 @@ export class SchemeFormComponent {
 
   /** One-line description shown under the step title. */
   protected stepSubtitle(): string {
-    const hasCustom = this.state.hasCustomFields();
     const step = this.state.currentStep();
     if (step === 1) {
       return 'Verify the organisation, authorized signatory and bank details that will accompany your EOI application.';
     }
-    if (hasCustom && step === 2) {
-      return 'Provide scheme-specific proposal parameters and technical requirements for this application.';
-    }
-    const docStep = hasCustom ? 3 : 2;
-    const previewStep = hasCustom ? 4 : 3;
-    const procStep = hasCustom ? 5 : 4;
-    const emdStep = hasCustom ? 6 : 5;
-    if (step === docStep) {
+    if (step === 2) {
       return 'Upload the required supporting documents in the supported format and size shown against each one.';
     }
-    if (step === previewStep) {
+    if (step === 3) {
       return 'Please verify the information provided below before proceeding to the processing fee payment.';
     }
-    if (step === procStep) {
+    if (step === 4) {
       return `As per RSLDC EOI guidelines, all applicants must pay the non-refundable processing fee of ${this.state.formattedProcessFee()} before submitting their proposal application.`;
     }
-    if (step === emdStep) {
+    if (step === 5) {
       return 'Pay the refundable Earnest Money Deposit (EMD) to complete your application.';
     }
     return 'Download your receipts and acknowledgement for the submitted application.';

@@ -75,17 +75,21 @@ import { DOC_ACCEPT, DOC_FORMAT_LABEL, DOC_MAX_SIZE_MB, validateDocFile } from '
             <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewDoc(doc.fileName, doc.name, doc.fileSize)" title="View Document" aria-label="View Document">
               <app-icon name="eye" size="sm" />
             </button>
-            <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">Replace</button>
+            <button appButton variant="ghost" size="sm" iconOnly (click)="replaceInput.click()" title="Replace Document" aria-label="Replace Document">
+              <app-icon name="refresh" size="sm" />
+            </button>
             <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
-            <button appButton variant="danger" size="sm" (click)="onRemove(doc)">Remove</button>
+            <button appButton variant="ghost" size="sm" iconOnly (click)="onRemove(doc)" title="Remove Document" aria-label="Remove Document">
+              <app-icon name="trash" size="sm" />
+            </button>
           }
         </div>
       </ng-template>
 
       <!-- Footer Action Bar -->
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.hasCustomFields() ? state.stepIndexCustomFields() : state.stepIndexProfile)">
-          &larr; {{ state.hasCustomFields() ? 'Back to Scheme Proposal Details' : 'Back to Registration Profile' }}
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexProfile)">
+          &larr; Back to Registration Profile
         </button>
 
         <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">

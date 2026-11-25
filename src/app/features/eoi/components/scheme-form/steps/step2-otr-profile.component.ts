@@ -47,7 +47,7 @@ import { Step2BankDetailsComponent } from './step2/step2-bank-details.component'
         </span>
 
         <button appButton size="lg" (click)="state.saveAndProceedToDocuments()">
-          {{ state.hasCustomFields() ? 'Proceed to Scheme Proposal Details \u2192' : 'Proceed to Upload Documents \u2192' }}
+          Proceed to Upload Documents &rarr;
         </button>
       </div>
 

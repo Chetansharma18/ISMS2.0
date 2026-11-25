@@ -20,7 +20,6 @@ import { FormInputComponent } from '../../../../shared/components/form-controls/
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
-import { DocTableDirective, IconComponent, InputDirective } from '../../../../shared';
 
 @Component({
   selector: 'app-step1-org-details',
@@ -32,9 +31,7 @@ import { DocTableDirective, IconComponent, InputDirective } from '../../../../sh
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
-    FormFileUploadComponent,
-    DocTableDirective,
-    InputDirective
+    FormFileUploadComponent
   ],
   template: `
     <div class="w-full space-y-6 font-sans">
@@ -549,117 +546,6 @@ import { DocTableDirective, IconComponent, InputDirective } from '../../../../sh
         }
       </section>
 
-      <!-- Divider -->
-      <div class="border-t border-[#E8EEF5]"></div>
-
-      <!-- ====================================================================
-           5. FINANCIAL STANDING & ANNUAL TURNOVER
-           ==================================================================== -->
-      <section class="space-y-4">
-        <div class="pb-2 border-b border-[#E8EEF5]">
-          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
-            5. Financial Standing &amp; Annual Turnover
-          </h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
-          <!-- Declared Turnover -->
-          <div>
-            <app-form-input
-              label="Declared Annual Turnover (in ₹ Lacs)"
-              [value]="data().turnOver"
-              (valueChange)="update('turnOver', $event)"
-              placeholder="e.g. 1203.35"
-              [required]="false"
-              [disabled]="disabled()"
-              [error]="getFieldError('turnOver')"
-            ></app-form-input>
-          </div>
-
-          <!-- Blacklisted status -->
-          <div>
-            <app-form-select
-              label="Blacklisted by Central / State Department"
-              [value]="data().blackListed"
-              (valueChange)="update('blackListed', $event)"
-              [options]="['No', 'Yes']"
-              placeholder="Select blacklisting status"
-              [required]="false"
-              [disabled]="disabled()"
-              [error]="getFieldError('blackListed')"
-            ></app-form-select>
-          </div>
-
-          <!-- CA-Certified Turnover Certificate upload -->
-          <div class="md:col-span-2">
-            <app-form-file-upload
-              label="CA-Certified Turnover Certificate"
-              [dropzoneStyle]="true"
-              uploadPrompt="Upload CA-certified turnover certificate (with valid UDIN)"
-              [fileDoc]="data().turnoverCertDoc"
-              (fileChange)="updateDoc('turnoverCertDoc', $event)"
-              [required]="false"
-              [disabled]="disabled()"
-              [error]="getFieldError('turnoverCertDoc')"
-            ></app-form-file-upload>
-          </div>
-        </div>
-
-        <!-- Multi-Year Turnover Grid (3 Financial Years) -->
-        @if (data().financialYears && data().financialYears.length > 0) {
-          <div class="pt-2">
-            <span class="text-xs font-semibold text-slate-700 block mb-2">
-              Three Consecutive Fiscal Years Turnover (₹ in Lacs)
-            </span>
-            <div class="overflow-x-auto border border-[#EADCE2] rounded-lg">
-              <!-- ui-guard-allow: financial turnover table -->
-              <table appDocTable class="w-full text-left border-collapse text-xs bg-white">
-                <thead>
-                  <tr class="bg-slate-50 text-slate-800 font-semibold border-b border-[#EADCE2]">
-                    <th class="p-2.5 border-r border-[#EADCE2]">Financial Year</th>
-                    <th class="p-2.5 border-r border-[#EADCE2]">Total Annual Turnover (₹ Lacs)</th>
-                    <th class="p-2.5">Turnover from Skill Training (₹ Lacs)</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-[#EADCE2]">
-                  @for (fy of data().financialYears; track fy.year; let idx = $index) {
-                    <tr>
-                      <td class="p-2.5 font-bold text-slate-800 border-r border-[#EADCE2] bg-slate-50/50 w-36">
-                        {{ fy.year }}
-                      </td>
-                      <td class="p-2 border-r border-[#EADCE2]">
-                        <input
-                          appInput
-                          size="sm"
-                          type="text"
-                          [value]="fy.totalTurnover"
-                          [disabled]="disabled()"
-                          (input)="updateTurnoverYear(idx, 'totalTurnover', $any($event.target).value)"
-                          placeholder="e.g. 450.00"
-                          class="w-full text-xs tabular-nums"
-                        />
-                      </td>
-                      <td class="p-2">
-                        <input
-                          appInput
-                          size="sm"
-                          type="text"
-                          [value]="fy.skillTurnover"
-                          [disabled]="disabled()"
-                          (input)="updateTurnoverYear(idx, 'skillTurnover', $any($event.target).value)"
-                          placeholder="e.g. 210.00"
-                          class="w-full text-xs tabular-nums"
-                        />
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        }
-      </section>
-
     </div>
   `,
   styles: [`
@@ -989,14 +875,6 @@ export class Step1OrgDetailsComponent {
       this.otrFormService.updateStep1({ fullName: value, shortName: this.data().shortName || value });
     } else {
       this.otrFormService.updateStep1({ [field]: value });
-    }
-  }
-
-  updateTurnoverYear(index: number, key: 'totalTurnover' | 'skillTurnover', val: string): void {
-    const years = [...(this.data().financialYears || [])];
-    if (years[index]) {
-      years[index] = { ...years[index], [key]: val };
-      this.otrFormService.updateStep1({ financialYears: years });
     }
   }
 

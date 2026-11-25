@@ -119,20 +119,6 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.officeAddressText }}</span>
           </div>
 
-          <!-- Row 6: Financial Standing & Annual Turnover -->
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Declared Annual Turnover</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.turnOver ? '₹ ' + state.editableStep1.turnOver + ' Lacs' : '-' }}</span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Blacklisted Status</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.blackListed || 'No' }}</span>
-          </div>
-          <div class="sm:col-span-2">
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">CA-Certified Turnover Certificate</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ state.editableStep1.turnoverCertDoc?.fileName || '-' }}</span>
-          </div>
-
           <!-- Uploaded registration documents -->
           @if (state.editableStep1.registrationCertDoc?.status === 'uploaded' || state.editableStep1.panCardDoc?.status === 'uploaded' || state.editableStep1.gstCertDoc?.status === 'uploaded' || state.editableStep1.msmeCertDoc?.status === 'uploaded') {
             <div class="sm:col-span-2 lg:col-span-4 pt-4 border-t border-slate-100 space-y-1.5">
@@ -453,8 +439,16 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             }
             @if (isEditingDocs()) {
               @if (doc.status === 'uploaded') {
-                <button appButton variant="secondary" size="sm" (click)="replaceInput.click()">
-                  Replace
+                <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
+                  (click)="replaceInput.click()"
+                  title="Replace Document"
+                  aria-label="Replace Document"
+                >
+                  <app-icon name="refresh" size="sm" />
                 </button>
                 <input #replaceInput type="file" (change)="onFileChange($event, doc)" class="hidden" [accept]="accept" />
               } @else {

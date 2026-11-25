@@ -43,12 +43,13 @@ describe('EoiEmpanelmentEditorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('initializes with 10 companies by default in draft state', () => {
+  it('initializes with 10 companies by default in draft state for empanelment mode', () => {
     expect(component.tableRows.length).toBe(10);
     expect(component.tableRows[0].agencyName).toBe('Company 1');
     expect(component.tableRows[9].agencyName).toBe('Company 10');
     expect(component.tableRows.every(r => r.fileStatus === 'Eligible')).toBe(true);
-    expect(component.isSigned()).toBe(false);
+    expect(component.isApprovedSigned()).toBe(false);
+    expect(component.isCurrentOrderSigned()).toBe(false);
   });
 
   it('allows adding and removing agency rows', () => {
@@ -60,7 +61,7 @@ describe('EoiEmpanelmentEditorComponent', () => {
     expect(component.tableRows.length).toBe(10);
   });
 
-  it('handles multi-party committee OTP authentication sequentially', () => {
+  it('handles multi-party committee OTP authentication sequentially for empanelment order', () => {
     component.openEsignModal();
     expect(component.showEsign()).toBe(true);
     expect(component.committeeMembers().length).toBe(4);
@@ -76,9 +77,34 @@ describe('EoiEmpanelmentEditorComponent', () => {
     expect(component.allSignatoriesVerified()).toBe(true);
 
     // Release Order
-    component.releaseOrder();
-    expect(component.isSigned()).toBe(true);
+    component.releaseEmpanelmentOrder();
+    expect(component.isApprovedSigned()).toBe(true);
     expect(component.rajKajRefNo()).toContain('RK-EMP-');
     expect(component.showEsign()).toBe(false);
+  });
+
+  it('switches to rejection order mode and releases with confirmation modal (no OTP required)', () => {
+    // Switch to rejection mode
+    component.switchOrderType('rejection');
+    expect(component.orderType()).toBe('rejection');
+    expect(component.rejectedTableRows.length).toBeGreaterThan(0);
+    expect(component.rejectedTableRows[0].fileStatus).toBe('Not Eligible');
+    expect(component.isRejectionSigned()).toBe(false);
+
+    // Attempting release without approved order signed is blocked
+    component.isApprovedSigned.set(false);
+    component.openRejectionConfirmModal();
+    expect(component.showRejectionConfirm()).toBe(false);
+
+    // With approved order signed, open confirmation modal
+    component.isApprovedSigned.set(true);
+    component.openRejectionConfirmModal();
+    expect(component.showRejectionConfirm()).toBe(true);
+
+    // Confirm and release rejection order
+    component.confirmAndReleaseRejectionOrder();
+    expect(component.isRejectionSigned()).toBe(true);
+    expect(component.rejectionRajKajRefNo()).toContain('RK-REJ-');
+    expect(component.showRejectionConfirm()).toBe(false);
   });
 });

@@ -191,7 +191,7 @@ import { DataEngineService } from '../../core/services/data-engine.service';
               }
             }
           </div>
-
+        
           <!-- Add Document from Library -->
           <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
             <span class="text-xs font-bold text-slate-800 block">Add Document from Library</span>

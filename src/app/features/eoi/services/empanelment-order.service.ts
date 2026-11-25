@@ -214,7 +214,11 @@ export class EmpanelmentOrderService {
     let updated: EmpanelmentOrder[];
     if (idx >= 0) {
       updated = [...current];
-      updated[idx] = { ...order, orderDate: order.orderDate || formatDate(new Date()) };
+      updated[idx] = {
+        ...current[idx],
+        ...order,
+        orderDate: order.orderDate || current[idx].orderDate || formatDate(new Date())
+      };
     } else {
       updated = [{ ...order, orderDate: order.orderDate || formatDate(new Date()) }, ...current];
     }

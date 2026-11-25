@@ -503,7 +503,10 @@ export class SidebarComponent {
     }
 
     // 11. Dept Admin routes
-    if (url.startsWith('/admin/empanelment-order') || url.startsWith('/admin/empanelment-orders')) {
+    if (url.startsWith('/admin/empanelment-order-editor')) {
+      return 'dept-eoi-view';
+    }
+    if (url === '/admin/empanelment-order' || url.startsWith('/admin/empanelment-order?') || url.startsWith('/admin/empanelment-orders')) {
       return 'dept-empanelment-order';
     }
     if (url.startsWith('/admin/eoi-view') || url.startsWith('/admin/responses') || url.startsWith('/admin/review')) {

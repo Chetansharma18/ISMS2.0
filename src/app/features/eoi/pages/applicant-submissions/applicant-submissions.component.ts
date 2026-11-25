@@ -7,7 +7,7 @@ import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
-import type { EmpanelmentOrder, EmpanelledAgencyItem } from '../../models/empanelment-order.model';
+import type { EmpanelmentOrder, EmpanelledAgencyItem, RejectedAgencyItem } from '../../models/empanelment-order.model';
 import { EmpanelmentOrderService, DEFAULT_COMMITTEE_MEMBERS } from '../../services/empanelment-order.service';
 import { OrderViewerModalComponent } from '../../components/order-viewer-modal/order-viewer-modal.component';
 import { downloadEvaluationExcelFile, parseEvaluationSpreadsheet, ParsedEvaluationRow } from '../../utils/eoi-evaluation-excel.util';
@@ -90,17 +90,52 @@ import {
               <span>Upload Excel</span>
             </button>
 
-            <!-- Generate Empanelment Order Button -->
-            <button
-              appButton
-              size="sm"
-              class="shrink-0"
-              (click)="navigateToOrderEditor()"
-              title="Generate Empanelment Order"
-            >
-              <app-icon name="clipboard-check" size="sm" />
-              <span>Generate Empanelment Order</span>
-            </button>
+            <!-- Dynamic Empanelment Order Release Flow Button -->
+            @if (!isApprovedOrderReleased()) {
+              <!-- Step 1: Approved Empanelment Order must be released first -->
+              <button
+                appButton
+                size="sm"
+                class="shrink-0"
+                (click)="navigateToOrderEditor('empanelment')"
+                title="Generate Empanelment Order for eligible applicants"
+              >
+                <app-icon name="clipboard-check" size="sm" />
+                <span>Generate Empanelment Order</span>
+              </button>
+            } @else if (!isRejectedOrderReleased()) {
+              <!-- Step 2: Approved Order is released, now release rejected order -->
+              <button
+                appButton
+                variant="danger"
+                size="sm"
+                class="shrink-0"
+                (click)="navigateToOrderEditor('rejection')"
+                title="Release Rejected Empanelment Order for disqualified applicants"
+              >
+                <app-icon name="alert-triangle" size="sm" />
+                <span>Release Rejected Empanelment Order</span>
+              </button>
+            } @else {
+              <!-- Step 3: Both orders released -->
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <app-icon name="check-circle" size="xs" class="text-emerald-600" />
+                  <span>All Orders Released</span>
+                </span>
+                <button
+                  appButton
+                  variant="outline"
+                  size="sm"
+                  class="shrink-0"
+                  (click)="navigateToOrderEditor('empanelment')"
+                  title="View Released Empanelment Orders"
+                >
+                  <app-icon name="eye" size="xs" />
+                  <span>View Orders</span>
+                </button>
+              </div>
+            }
           </div>
 
           <!-- Total Submissions Count -->
@@ -283,6 +318,15 @@ export class ApplicantSubmissionsComponent {
   showOrderViewerModal = signal<boolean>(false);
   selectedViewOrder = signal<EmpanelmentOrder | null>(null);
   selectedViewOrderType = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
+  currentOrder = signal<EmpanelmentOrder | null>(null);
+
+  readonly isApprovedOrderReleased = computed(() => {
+    return this.currentOrder()?.status === 'E_SIGNED';
+  });
+
+  readonly isRejectedOrderReleased = computed(() => {
+    return this.currentOrder()?.rejectionStatus === 'E_SIGNED';
+  });
 
   // Excel Upload Modal State
   showUploadModal = signal<boolean>(false);
@@ -306,6 +350,14 @@ export class ApplicantSubmissionsComponent {
       const sId = params['schemeId'] || 'ALL';
       this.schemeId.set(sId);
       this.loadResponses(sId);
+      this.loadOrderState(sId);
+    });
+  }
+
+  loadOrderState(sId: string): void {
+    const targetSchemeId = sId === 'ALL' ? 'MMKVY-01' : sId;
+    this.empanelmentOrderService.getOrderBySchemeId(targetSchemeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(order => {
+      this.currentOrder.set(order || null);
     });
   }
 
@@ -365,9 +417,17 @@ export class ApplicantSubmissionsComponent {
     );
   }
 
-  navigateToOrderEditor(): void {
+  navigateToOrderEditor(type: 'empanelment' | 'rejection' = 'empanelment'): void {
     const sId = this.schemeId() || 'MMKVY-01';
-    this.router.navigate(['/admin/empanelment-order-editor', sId]);
+    if (type === 'rejection') {
+      if (!this.isApprovedOrderReleased()) {
+        alert('Please release the Approved Empanelment Order first.');
+        return;
+      }
+      this.router.navigate(['/admin/empanelment-order-editor', sId], { queryParams: { type: 'rejection' } });
+    } else {
+      this.router.navigate(['/admin/empanelment-order-editor', sId]);
+    }
   }
 
   onViewEmpanelmentOrder(order: EmpanelmentOrder): void {
@@ -494,7 +554,7 @@ export class ApplicantSubmissionsComponent {
         })
       );
 
-      // Seed / save top 10 eligible companies to EmpanelmentOrderService
+      // Seed / save top 10 eligible companies and rejected companies to EmpanelmentOrderService
       const sId = this.schemeId() || 'MMKVY-01';
       const approvedItems = this.responses().filter(r => r.status === 'APPROVED');
       const empanelledRows: EmpanelledAgencyItem[] = [];
@@ -509,6 +569,28 @@ export class ApplicantSubmissionsComponent {
           fileStatus: 'Eligible',
           marksGrade: app?.evaluationGrade || (i < 2 ? 'A+' : (i < 5 ? 'A' : 'B+'))
         });
+      }
+
+      const rejectedItems = this.responses().filter(r => r.status === 'REJECTED');
+      const rejectedRows: RejectedAgencyItem[] = [];
+      if (rejectedItems.length > 0) {
+        rejectedItems.forEach((rep, idx) => {
+          rejectedRows.push({
+            sNo: idx + 1,
+            applicationId: rep.regNumber || `ISMS-REG-2026-${8835 + idx}`,
+            agencyName: rep.anonymousLabel || rep.actualLegalName || `Disqualified Agency ${idx + 1}`,
+            category: 'A1(skilling)',
+            fileStatus: 'Not Eligible',
+            reason: rep.evaluationRemarks || 'Failed to meet mandatory criteria as per EOI guidelines'
+          });
+        });
+      } else {
+        rejectedRows.push(
+          { sNo: 1, applicationId: 'ISMS-REG-2026-8835', agencyName: 'Universal Skills Pvt Ltd', category: 'A1(skilling)', fileStatus: 'Not Eligible', reason: 'Failed minimum turnover requirement for 3 consecutive fiscal years as per Clause 4.2.' },
+          { sNo: 2, applicationId: 'ISMS-REG-2026-8836', agencyName: 'Apex Educational Trust', category: 'A2(Non-skilling)', fileStatus: 'Not Eligible', reason: 'Non-submission of mandatory CA-certified net worth certificate and GST registration.' },
+          { sNo: 3, applicationId: 'ISMS-REG-2026-8837', agencyName: 'Vanguard Vocational Society', category: 'A1(skilling)', fileStatus: 'Not Eligible', reason: 'Blacklisted / barred by Central/State Department during preceding 2 years.' },
+          { sNo: 4, applicationId: 'ISMS-REG-2026-8838', agencyName: 'SkillTech Training Foundation', category: 'A2(Non-skilling)', fileStatus: 'Not Eligible', reason: 'Inadequate training center infrastructure & failure in physical inspection norms.' }
+        );
       }
 
       this.empanelmentOrderService.saveOrder({
@@ -536,7 +618,7 @@ export class ApplicantSubmissionsComponent {
         ],
         committeeMembers: DEFAULT_COMMITTEE_MEMBERS.map(m => ({ ...m, otpVerified: false, otpSent: false })),
         empanelledAgencies: empanelledRows,
-        rejectedAgencies: [],
+        rejectedAgencies: rejectedRows,
         createdAt: formatDate(new Date())
       });
 

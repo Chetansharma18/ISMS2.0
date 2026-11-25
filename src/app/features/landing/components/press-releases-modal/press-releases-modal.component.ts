@@ -62,8 +62,8 @@ export class PressReleasesModalComponent {
     {
       date: '28 Aug, 2026',
       type: 'Notification',
-      typeColor: 'text-blue-700 border-blue-700/30',
-      typeBg: 'bg-blue-50',
+      typeColor: 'text-[#7C0E44] border-[#7C0E44]/30',
+      typeBg: 'bg-[#F8EDF1]',
       text: 'Expression of Interest (EOI) invited for Empanelment of Training Partners under Mukhya Mantri Kaushal Vikas Yojana (MMKVY) for FY 2026-27 across key economic sectors in Rajasthan.',
       lang: 'en'
     },
@@ -86,8 +86,8 @@ export class PressReleasesModalComponent {
     {
       date: '12 Jun, 2026',
       type: 'Partnership',
-      typeColor: 'text-blue-700 border-blue-700/30',
-      typeBg: 'bg-blue-50',
+      typeColor: 'text-[#7C0E44] border-[#7C0E44]/30',
+      typeBg: 'bg-[#F8EDF1]',
       text: 'RSLDC signs MoU with Sector Skill Councils to enhance industry-aligned certified skill training and placement linkages for youth across Rajasthan.',
       lang: 'en'
     },
@@ -102,8 +102,8 @@ export class PressReleasesModalComponent {
     {
       date: '04 May, 2026',
       type: 'Review',
-      typeColor: 'text-blue-700 border-blue-700/30',
-      typeBg: 'bg-blue-50',
+      typeColor: 'text-[#7C0E44] border-[#7C0E44]/30',
+      typeBg: 'bg-[#F8EDF1]',
       text: 'State Level Skill Development Review Committee approves new batch allocations and biometric attendance device integration for FY 2026-27.',
       lang: 'en'
     },

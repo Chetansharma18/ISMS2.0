@@ -20,7 +20,7 @@ import { IconComponent } from '../icon/icon.component';
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+        class="fixed inset-0 z-[1050] flex items-center justify-center p-3 sm:p-4 sm:py-8 overflow-y-auto"
         style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
         (click)="onBackdropClick($event)"
       >
@@ -28,7 +28,7 @@ import { IconComponent } from '../icon/icon.component';
           class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
           [class.overflow-visible]="!scrollable"
           [class.overflow-hidden]="scrollable"
-          [class.max-h-[90vh]]="scrollable"
+          [class.max-h-[85vh]]="scrollable"
           [ngClass]="maxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"

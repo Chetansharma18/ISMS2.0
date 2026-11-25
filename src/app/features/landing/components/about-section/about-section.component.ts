@@ -10,19 +10,19 @@ import {
   PLATFORM_ID
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { ButtonComponent, IconComponent } from '../../../../shared';
+import { IconComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-about-section',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, ButtonComponent, IconComponent],
+  imports: [CommonModule, IconComponent],
   host: {
     class: 'block w-full bg-white'
   },
   template: `
     <!-- Section Wrapper: 64–80px desktop, 36–44px mobile, plain white background, official government feel -->
-    <section #sectionRef class="w-full bg-white py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#DCE4ED]" aria-labelledby="about-isms-heading">
+    <section #sectionRef class="w-full bg-white py-9 sm:py-12 md:py-16 xl:py-20 border-b border-[#EADCE2]" aria-labelledby="about-isms-heading">
       
       <!-- Centered Container: Max width 1440px with responsive padding (20px mobile) -->
       <div class="w-full max-w-360 mx-auto px-5 sm:px-8 xl:px-12 box-border">
@@ -60,7 +60,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               
               <div class="relative w-full aspect-video bg-[#5E0832] overflow-hidden flex items-center justify-center">
                 
-                <!-- Actual Video Element -->
+                <!-- Actual Video Element (Plays automatically, looped & muted) -->
                 <video 
                   #videoRef
                   class="w-full h-full object-cover object-center transition-opacity duration-300 transform-[translateZ(0)]"
@@ -69,7 +69,8 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
                   playsinline
                   loop
                   muted
-                  preload="none"
+                  autoplay
+                  preload="auto"
                   aria-label="ISMS 2.0 Skill Development Overview Video">
                 </video>
 
@@ -84,47 +85,8 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
                   </div>
                 }
 
-                <!-- Play / Pause Overlay Control (Top Left) -->
-                <div class="absolute top-3 left-3 z-20">
-                  <button 
-                    appButton
-                    variant="secondary"
-                    size="sm"
-                    iconOnly
-                    type="button"
-                    (click)="togglePlayPause()"
-                    [attr.aria-label]="isPlaying() ? 'Pause video' : 'Play video'"
-                    title="{{ isPlaying() ? 'Pause video' : 'Play video' }}">
-                    @if (isPlaying()) {
-                      <app-icon name="pause" solid size="sm" />
-                    } @else {
-                      <app-icon name="play" solid size="sm" class="translate-x-0.5" />
-                    }
-                  </button>
-                </div>
-
-                <!-- Sound Off / Sound On Toggle Control (Top Right) -->
-                <div class="absolute top-3 right-3 z-20">
-                  <button 
-                    appButton
-                    variant="secondary"
-                    size="sm"
-                    type="button"
-                    (click)="toggleSound()"
-                    [attr.aria-label]="isMuted() ? 'Unmute video audio' : 'Mute video audio'"
-                    title="{{ isMuted() ? 'Unmute video audio' : 'Mute video audio' }}">
-                    @if (isMuted()) {
-                      <app-icon name="volume-off" size="sm" [stroke]="2" class="text-[#F28C28]" />
-                      <span>Sound Off</span>
-                    } @else {
-                      <app-icon name="volume-on" size="sm" [stroke]="2" class="text-emerald-400" />
-                      <span>Sound On</span>
-                    }
-                  </button>
-                </div>
-
-                <!-- Video Caption Overlay (Positioned in lower portion, subtle dark navy gradient, 14–18px padding) -->
-                <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#0B2440]/95 via-[#0B2440]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
+                <!-- Video Caption Overlay (Positioned in lower portion, subtle deep burgundy gradient, 14–18px padding) -->
+                <div class="absolute bottom-0 inset-x-0 z-10 pointer-events-none bg-linear-to-t from-[#3D0521]/95 via-[#3D0521]/65 to-transparent pt-7 pb-3.5 px-4 sm:pt-8 sm:pb-4 sm:px-4.5 box-border">
                   <p class="font-sans text-[13px] sm:text-[14px] lg:text-[14.5px] text-white leading-normal sm:leading-relaxed font-normal m-0 drop-shadow-sm">
                     “{{ fullQuote }}”
                   </p>

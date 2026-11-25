@@ -26,7 +26,7 @@ let nextSheetId = 0;
   template: `
     @if (isOpen()) {
       <div
-        class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 font-sans overflow-y-auto print:p-0 print:static print:bg-white print:z-auto"
+        class="fixed inset-0 z-[1050] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 font-sans overflow-y-auto print:p-0 print:static print:bg-white print:z-auto"
       >
         <div
           class="bg-white shadow-2xl border border-slate-300 w-full overflow-hidden flex flex-col max-h-[96vh] print:max-h-none print:shadow-none print:border-none print:rounded-none {{ maxWidthClass() }} {{ panelClass() }}"

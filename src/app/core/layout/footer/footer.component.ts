@@ -2,14 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   signal,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  OnDestroy,
-  inject,
-  PLATFORM_ID
+  inject
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 import { UserManualPdfService } from '../../services/user-manual-pdf.service';
@@ -23,7 +18,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, ButtonComponent, IconComponent],
   host: {
-    class: 'block w-full bg-[#070e18]'
+    class: 'block w-full bg-[#1A020E]'
   },
   styles: [`
     @keyframes scroll {
@@ -35,15 +30,10 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
       }
     }
     .animate-scroll {
-      animation: scroll 28s linear infinite;
+      animation: scroll 26s linear infinite;
       will-change: transform;
       backface-visibility: hidden;
       transform: translate3d(0, 0, 0);
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .animate-scroll {
-        animation: none !important;
-      }
     }
     .mask-fade {
       mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
@@ -62,7 +52,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
       text-decoration: underline;
     }
     .footer-social-btn {
-      color: #12223a !important;
+      color: #5E0832 !important;
       background-color: #ffffff !important;
     }
     .footer-social-btn:hover {
@@ -72,10 +62,10 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
   `],
   template: `
     <footer #footerRef 
-      class="relative w-full font-sans bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
+      class="relative w-full font-sans bg-[#2D0418] text-slate-200 border-t border-[#7C0E44]/40 select-none overflow-hidden" 
       aria-label="Portal Footer">
 
-      <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (FOOTER BACKGROUND.png) - Prominently Visible -->
+      <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (Pure Burgundy & Rose Tones) -->
       <div class="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
         <img 
           src="/footer-images/FOOTER%20BACKGROUND.png" 
@@ -85,7 +75,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
           loading="lazy"
         />
         <!-- Soft gradient overlay keeping the skyline vividly visible while preserving text contrast -->
-        <div class="absolute inset-0 bg-linear-to-b from-[#0c1828]/50 via-transparent to-[#070e18]/65"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-[#2D0418]/50 via-transparent to-[#1A020E]/65"></div>
       </div>
 
       <!-- Foreground Content Layer -->
@@ -175,16 +165,8 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
 
           <!-- Desktop & Tablet View: Accessible Infinite Marquee Carousel (>= 640px) -->
           <div class="hidden sm:block relative max-w-6xl mx-auto">
-            <div
-              class="flex-1 overflow-hidden mask-fade relative cursor-pointer"
-              (mouseenter)="isHovering.set(true)"
-              (mouseleave)="isHovering.set(false)"
-              (touchstart)="isHovering.set(true)"
-              (touchend)="isHovering.set(false)">
-
-              <div
-                class="flex gap-4 sm:gap-5 w-max animate-scroll py-1"
-                [style.animation-play-state]="shouldAnimate() ? 'running' : 'paused'">
+            <div class="flex-1 overflow-hidden mask-fade relative">
+              <div class="flex gap-4 sm:gap-5 w-max animate-scroll py-1">
 
                 <!-- Set 1 (Original) -->
                 <a
@@ -316,30 +298,12 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
               </div>
             </div>
 
-            <!-- Pause / Play Accessibility Button -->
-            <div class="flex justify-center mt-3">
-              <button
-                appButton
-                variant="inverse"
-                size="sm"
-                type="button"
-                (click)="togglePause()"
-                [attr.aria-label]="isPausedManually() ? 'Resume animation' : 'Pause animation'">
-                @if (isPausedManually()) {
-                  <app-icon name="play" solid size="sm" class="text-[#F59E0B]" />
-                  <span>Resume Animation</span>
-                } @else {
-                  <app-icon name="pause" solid size="sm" class="text-slate-300" />
-                  <span>Pause Animation</span>
-                }
-              </button>
-            </div>
           </div>
 
         </div>
 
         <!-- Subtle Section Divider -->
-        <div class="w-full h-px bg-slate-700/50"></div>
+        <div class="w-full h-px bg-[#7C0E44]/40"></div>
 
         <!-- Tier 2: Main Footer Columns -->
         <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 sm:pt-14 sm:pb-10">
@@ -459,12 +423,12 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                 </ul>
 
                 <!-- Dynamic Visitor Counter & Last Updated -->
-                <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-slate-700/50 pt-4 w-fit max-w-full">
+                <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-[#7C0E44]/40 pt-4 w-fit max-w-full">
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-sans">Total Visitors:</span>
                     <span class="text-[0.875rem] text-white font-bold font-sans tabular-nums">042,159</span>
                   </div>
-                  <div class="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#AA5E7A]/60 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-sans">Last Updated:</span>
                     <span class="text-[0.875rem] text-white font-semibold font-sans">8 Oct 2026</span>
@@ -560,7 +524,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                   class="group h-auto p-0 text-left hover:no-underline"
                   aria-label="Download ISMS 2.0 User Manual">
                   <!-- The card look lives on this inner box so the button itself carries only layout classes -->
-                  <div class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-slate-900/70 p-3 whitespace-normal transition-colors group-hover:border-amber-400/60 group-hover:bg-slate-900">
+                  <div class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-[#2D0318]/70 p-3 whitespace-normal transition-colors group-hover:border-amber-400/60 group-hover:bg-[#1A020E]">
                     <!-- Text Details -->
                     <div class="flex flex-col min-w-0">
                       <div class="flex items-center gap-1.5">
@@ -588,7 +552,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
         </div>
 
         <!-- Tier 3: Bottom Copyright Bar -->
-        <div class="border-t border-slate-700/50 bg-[#070e18]">
+        <div class="border-t border-[#7C0E44]/40 bg-[#1A020E]">
           <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
               <div class="text-[0.8125rem] text-slate-400 text-center font-sans">
@@ -603,62 +567,13 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
     </footer>
   `
 })
-export class FooterComponent implements AfterViewInit, OnDestroy {
-  private platformId = inject(PLATFORM_ID);
+export class FooterComponent {
   private userManualService = inject(UserManualPdfService);
-  
+
   helplineGlobal = HELPLINE_GLOBAL;
   readonly externalLegalUrl = EXTERNAL_LEGAL_URL;
 
-  @ViewChild('footerRef') footerRef?: ElementRef<HTMLElement>;
-
-  readonly isHovering = signal(false);
-  readonly isVisible = signal(false);
-  readonly isTabActive = signal(true);
-  readonly isPausedManually = signal(false);
   readonly isGeneratingManual = signal(false);
-
-  private observer?: IntersectionObserver;
-  private visibilityHandler?: () => void;
-
-  readonly shouldAnimate = () => {
-    return this.isVisible() && this.isTabActive() && !this.isHovering() && !this.isPausedManually();
-  };
-
-  togglePause(): void {
-    this.isPausedManually.update((v) => !v);
-  }
-
-  ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const el = this.footerRef?.nativeElement;
-    if (el && typeof IntersectionObserver !== 'undefined') {
-      this.observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            this.isVisible.set(entry.isIntersecting);
-          });
-        },
-        { threshold: 0.05 }
-      );
-      this.observer.observe(el);
-    }
-
-    this.visibilityHandler = () => {
-      this.isTabActive.set(!document.hidden);
-    };
-    document.addEventListener('visibilitychange', this.visibilityHandler);
-  }
-
-  ngOnDestroy(): void {
-    if (this.observer) {
-      this.observer.disconnect();
-    }
-    if (this.visibilityHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityHandler);
-    }
-  }
 
   async downloadUserManual(): Promise<void> {
     if (this.isGeneratingManual()) return;

@@ -7,8 +7,8 @@ import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
-import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
-import { GenerateEmpanelmentOrderModalComponent } from '../../components/generate-empanelment-order-modal/generate-empanelment-order-modal.component';
+import type { EmpanelmentOrder, EmpanelledAgencyItem } from '../../models/empanelment-order.model';
+import { EmpanelmentOrderService, DEFAULT_COMMITTEE_MEMBERS } from '../../services/empanelment-order.service';
 import { OrderViewerModalComponent } from '../../components/order-viewer-modal/order-viewer-modal.component';
 import { downloadEvaluationExcelFile, parseEvaluationSpreadsheet, ParsedEvaluationRow } from '../../utils/eoi-evaluation-excel.util';
 import { formatDate } from '../../../../shared/utils';
@@ -31,7 +31,6 @@ import {
     ButtonComponent,
     IconComponent,
     ModalComponent,
-    GenerateEmpanelmentOrderModalComponent,
     OrderViewerModalComponent
   ],
   template: `
@@ -91,16 +90,16 @@ import {
               <span>Upload Excel</span>
             </button>
 
-            <!-- Generate Implement Order Button -->
+            <!-- Generate Empanelment Order Button -->
             <button
               appButton
               size="sm"
               class="shrink-0"
-              (click)="showGenerateOrderModal.set(true)"
-              title="Generate Implement Order"
+              (click)="navigateToOrderEditor()"
+              title="Generate Empanelment Order"
             >
               <app-icon name="clipboard-check" size="sm" />
-              <span>Generate Implement Order</span>
+              <span>Generate Empanelment Order</span>
             </button>
           </div>
 
@@ -149,107 +148,110 @@ import {
     <!-- Upload Excel Modal -->
     @if (showUploadModal()) {
       <app-modal
-        title="Upload Evaluation Excel"
+        title="Upload Evaluation Spreadsheet"
         subtitle="Upload evaluated spreadsheet (.xlsx, .xls) to update applicant statuses"
         size="md"
         (close)="closeUploadExcelModal()"
       >
-        <div class="space-y-4">
-          <!-- Hidden native file input -->
-          <input
-            #fileInput
-            type="file"
-            class="hidden"
-            accept=".xlsx,.xls"
-            (change)="onUploadFileSelected($event)"
-          />
-
-          <!-- Upload Dropzone Area -->
-          <div
-            (click)="fileInput.click()"
-            class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
-          >
-            <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-              <app-icon name="upload" size="lg" />
+        @if (isUploading()) {
+          <!-- 3-4 Second Progress Loader -->
+          <div class="py-10 px-4 text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto animate-pulse">
+              <app-icon name="refresh" size="lg" class="animate-spin" />
             </div>
-            <p class="text-sm font-semibold text-slate-800 mb-1">
-              Click to choose an Excel file
-            </p>
-            <p class="text-xs text-slate-500">
-              Supports .xlsx and .xls formats
-            </p>
+            <div class="space-y-1">
+              <h4 class="text-sm font-bold text-slate-900 m-0">{{ uploadLoadingStatus() }}</h4>
+              <p class="text-xs text-slate-500 m-0">Evaluating records &amp; compiling official empanelment order...</p>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden max-w-xs mx-auto border border-slate-200">
+              <div
+                class="bg-primary h-2 rounded-full transition-all duration-700 ease-out"
+                [style.width.%]="uploadProgressPercent()"
+              ></div>
+            </div>
           </div>
+        } @else {
+          <div class="space-y-4">
+            <!-- Hidden native file input -->
+            <input
+              #fileInput
+              type="file"
+              class="hidden"
+              accept=".xlsx,.xls"
+              (change)="onUploadFileSelected($event)"
+            />
 
-          <!-- Selected File Display -->
-          @if (selectedUploadFile()) {
-            <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
-              <div class="flex items-center gap-2 truncate">
-                <app-icon name="file" size="sm" class="text-primary shrink-0" />
-                <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
-                <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
+            <!-- Upload Dropzone Area -->
+            <div
+              (click)="fileInput.click()"
+              class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
+            >
+              <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <app-icon name="upload" size="lg" />
               </div>
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="removeSelectedUploadFile($event)"
-                title="Remove file"
-              >
-                <app-icon name="close" size="xs" />
-              </button>
+              <p class="text-sm font-semibold text-slate-800 mb-1">
+                Click to choose an Excel file
+              </p>
+              <p class="text-xs text-slate-500">
+                Supports .xlsx and .xls formats
+              </p>
             </div>
-          }
 
-          <!-- Validation Error Alert -->
-          @if (uploadError()) {
-            <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
-              <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
-              <span>{{ uploadError() }}</span>
-            </div>
-          }
+            <!-- Selected File Display -->
+            @if (selectedUploadFile()) {
+              <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 truncate">
+                  <app-icon name="file" size="sm" class="text-primary shrink-0" />
+                  <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
+                  <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
+                </div>
+                <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
+                  type="button"
+                  (click)="removeSelectedUploadFile($event)"
+                  title="Remove file"
+                >
+                  <app-icon name="close" size="xs" />
+                </button>
+              </div>
+            }
 
-          <!-- Success Alert -->
-          @if (uploadSuccessMessage()) {
-            <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
-              <app-icon name="check-circle" size="xs" />
-              <span>{{ uploadSuccessMessage() }}</span>
-            </div>
-          }
-        </div>
+            <!-- Validation Error Alert -->
+            @if (uploadError()) {
+              <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+                <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
+                <span>{{ uploadError() }}</span>
+              </div>
+            }
+
+            <!-- Success Alert -->
+            @if (uploadSuccessMessage()) {
+              <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+                <app-icon name="check-circle" size="xs" />
+                <span>{{ uploadSuccessMessage() }}</span>
+              </div>
+            }
+          </div>
+        }
 
         <ng-container modalFooter>
-          <button appButton variant="outline" size="sm" (click)="closeUploadExcelModal()" [disabled]="isUploading()">
-            <span>Cancel</span>
-          </button>
           <button
             appButton
             variant="primary"
             size="sm"
+            class="w-full sm:w-auto"
             [disabled]="!selectedUploadFile() || isUploading()"
             (click)="submitExcelUpload()"
             [loading]="isUploading()"
           >
             <app-icon name="upload" size="xs" />
-            <span>{{ isUploading() ? 'Uploading...' : 'Submit Upload' }}</span>
+            <span>{{ isUploading() ? 'Processing...' : 'Submit Upload' }}</span>
           </button>
         </ng-container>
       </app-modal>
-    }
-
-    <!-- Modal for Generating Empanelment & Rejection Orders via Excel upload & Multi-Party E-Sign -->
-    @if (showGenerateOrderModal()) {
-      <app-generate-empanelment-order-modal
-        [schemeId]="schemeId()"
-        [schemeName]="currentSchemeName()"
-        [eoiRefNo]="currentEoiRefNo()"
-        [currentApplicants]="responses()"
-        (close)="showGenerateOrderModal.set(false)"
-        (orderGenerated)="onOrderGenerated($event)"
-        (viewEmpanelmentOrder)="onViewEmpanelmentOrder($event)"
-        (viewRejectionOrder)="onViewRejectionOrder($event)"
-      />
     }
 
     <!-- Modal for Official Order Viewer with RajKaj Seal & Download -->
@@ -265,6 +267,7 @@ import {
 })
 export class ApplicantSubmissionsComponent {
   private eoiStateService = inject(EoiStateService);
+  private empanelmentOrderService = inject(EmpanelmentOrderService);
   private dataEngine = inject(DataEngineService, { optional: true });
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -277,7 +280,6 @@ export class ApplicantSubmissionsComponent {
   isDownloadingAll = signal<boolean>(false);
   downloadType = signal<'zip' | 'pdf'>('zip');
 
-  showGenerateOrderModal = signal<boolean>(false);
   showOrderViewerModal = signal<boolean>(false);
   selectedViewOrder = signal<EmpanelmentOrder | null>(null);
   selectedViewOrderType = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
@@ -288,6 +290,8 @@ export class ApplicantSubmissionsComponent {
   uploadError = signal<string>('');
   uploadSuccessMessage = signal<string>('');
   isUploading = signal<boolean>(false);
+  uploadLoadingStatus = signal<string>('Validating evaluation spreadsheet records...');
+  uploadProgressPercent = signal<number>(25);
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -361,17 +365,20 @@ export class ApplicantSubmissionsComponent {
     );
   }
 
+  navigateToOrderEditor(): void {
+    const sId = this.schemeId() || 'MMKVY-01';
+    this.router.navigate(['/admin/empanelment-order-editor', sId]);
+  }
+
   onViewEmpanelmentOrder(order: EmpanelmentOrder): void {
     this.selectedViewOrder.set(order);
     this.selectedViewOrderType.set('EMPANELMENT');
-    this.showGenerateOrderModal.set(false);
     this.showOrderViewerModal.set(true);
   }
 
   onViewRejectionOrder(order: EmpanelmentOrder): void {
     this.selectedViewOrder.set(order);
     this.selectedViewOrderType.set('REJECTION');
-    this.showGenerateOrderModal.set(false);
     this.showOrderViewerModal.set(true);
   }
 
@@ -380,6 +387,8 @@ export class ApplicantSubmissionsComponent {
     this.uploadError.set('');
     this.uploadSuccessMessage.set('');
     this.isUploading.set(false);
+    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
+    this.uploadProgressPercent.set(25);
     this.showUploadModal.set(true);
   }
 
@@ -431,7 +440,8 @@ export class ApplicantSubmissionsComponent {
 
     this.isUploading.set(true);
     this.uploadError.set('');
-    this.uploadSuccessMessage.set('');
+    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
+    this.uploadProgressPercent.set(30);
 
     try {
       const parsed = await parseEvaluationSpreadsheet(file);
@@ -484,17 +494,74 @@ export class ApplicantSubmissionsComponent {
         })
       );
 
-      this.uploadSuccessMessage.set(
-        `Upload processed successfully: ${parsed.accepted.length} Approved, ${parsed.rejected.length} Rejected.`
-      );
+      // Seed / save top 10 eligible companies to EmpanelmentOrderService
+      const sId = this.schemeId() || 'MMKVY-01';
+      const approvedItems = this.responses().filter(r => r.status === 'APPROVED');
+      const empanelledRows: EmpanelledAgencyItem[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        const app = approvedItems[i];
+        empanelledRows.push({
+          sNo: i + 1,
+          applicationId: app?.regNumber || `ISMS-REG-2026-${8819 + i}`,
+          agencyName: `Company ${i + 1}`,
+          category: 'A1(skilling)',
+          fileStatus: 'Eligible',
+          marksGrade: app?.evaluationGrade || (i < 2 ? 'A+' : (i < 5 ? 'A' : 'B+'))
+        });
+      }
+
+      this.empanelmentOrderService.saveOrder({
+        id: `ORD-${sId}`,
+        schemeId: sId,
+        schemeName: this.currentSchemeName(),
+        eoiRefNo: this.currentEoiRefNo(),
+        fileNo: 'RSLDC/EOI/SAMARTH/2026-27/1709-15',
+        orderDate: formatDate(new Date()),
+        status: 'DRAFT',
+        subject: `Empanelment order against EOI published on 22.01.2026 under MMKVY Category III SAMARTH for FY 2026-2027.`,
+        preamble1: `An Expression of Interest (EOI) was published under Mukhya Mantri Kaushal Vikas Karyakram (MMKVY) category III SAMARTH scheme for empanelment of Project Implementing Agencies (PIAs).`,
+        preamble2: `Pursuant to the evaluation and De Novo Assessment process, the following agencies are hereby shortlisted and empaneled under SAMARTH scheme for FY 2026-2027.`,
+        issuingAuthority: {
+          name: 'Rishav Mandal',
+          designation: 'Managing Director, I.A.S.',
+          department: 'Rajasthan Skill & Livelihoods Development Corporation'
+        },
+        copyToList: [
+          "PS to Hon'ble Minister, DSEE",
+          'PS to Managing Director, RSLDC',
+          'General Manager, RSLDC',
+          'All Concerned Agencies',
+          'Guard File'
+        ],
+        committeeMembers: DEFAULT_COMMITTEE_MEMBERS.map(m => ({ ...m, otpVerified: false, otpSent: false })),
+        empanelledAgencies: empanelledRows,
+        rejectedAgencies: [],
+        createdAt: formatDate(new Date())
+      });
+
+      // 3 to 4 Second Loader steps
+      setTimeout(() => {
+        this.uploadLoadingStatus.set('Evaluating applicant scores & recommendation outcomes...');
+        this.uploadProgressPercent.set(65);
+      }, 1200);
 
       setTimeout(() => {
-        this.closeUploadExcelModal();
-      }, 1200);
+        this.uploadLoadingStatus.set('Compiling official Empanelment Order with eligible companies...');
+        this.uploadProgressPercent.set(90);
+      }, 2400);
+
+      setTimeout(() => {
+        this.uploadProgressPercent.set(100);
+        this.isUploading.set(false);
+        this.showUploadModal.set(false);
+        this.selectedUploadFile.set(null);
+        this.router.navigate(['/admin/empanelment-order-editor', sId]);
+      }, 3500);
+
     } catch (err: any) {
       console.error('Error uploading evaluation excel:', err);
       this.uploadError.set(err?.message || 'Failed to process Excel file. Please ensure valid OpenXML structure.');
-    } finally {
       this.isUploading.set(false);
     }
   }

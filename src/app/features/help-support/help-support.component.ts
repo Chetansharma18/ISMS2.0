@@ -1,31 +1,46 @@
 // ui-guard-allow: page-frame - standalone Help & Support FAQ page without portal shell
-import { ChangeDetectionStrategy, Component, ElementRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, IconComponent, InputDirective } from '../../shared';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import {
+  ButtonComponent,
+  IconComponent,
+  FormInputComponent,
+  FormSelectComponent,
+  FormTextareaComponent,
+  FormFileUploadComponent
+} from '../../shared';
+import { AuthService } from '../../core/auth/auth.service';
+import { OtrFormService } from '../registration/services/otr-form.service';
+import { DataEngineService } from '../../core/services/data-engine.service';
+import { FileDoc } from '../registration/models/otr-form.model';
+import { Grievance, AdminGrievance } from '../grievance/grievance.shared';
+import { GrievanceIssueType } from '../../core/models/grievance.model';
 
-export interface FaqItem {
+export interface EssentialFaq {
   id: string;
-  category: string;
   question: string;
   answer: string;
-  isOpen: boolean;
 }
-
-export type FaqCategory =
-  | 'All'
-  | 'Login & Registration'
-  | 'User Account'
-  | 'Schemes & Applications'
-  | 'Documents & Verification'
-  | 'Technical Issues';
 
 @Component({
   selector: 'app-help-support',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, FormsModule, ButtonComponent, IconComponent, InputDirective],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    ButtonComponent,
+    IconComponent,
+    FormInputComponent,
+    FormSelectComponent,
+    FormTextareaComponent,
+    FormFileUploadComponent
+  ],
   host: {
     class: 'block w-full min-h-screen bg-slate-50 font-sans text-slate-800'
   },
@@ -33,64 +48,47 @@ export type FaqCategory =
     <div class="min-h-screen flex flex-col bg-slate-50 selection:bg-[#7C0E44] selection:text-white">
       
       <!-- ====================================================================
-           1. TOP STANDALONE BRANDED HEADER BAR WITH HOME/BACK NAVIGATION
+           1. TOP APPLICATION HEADER WITH ISMS BRANDING & BACK TO HOME
            ==================================================================== -->
-      <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between gap-4">
+      <header class="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
-          <!-- Left: Official Emblem & ISMS Branding -->
+          <!-- Emblem & ISMS Branding -->
           <div class="flex items-center gap-3 sm:gap-4 min-w-0">
             <a routerLink="/" class="flex items-center gap-2.5 sm:gap-3 shrink-0 cursor-pointer" title="Go to ISMS 2.0 Home">
               <img
                 src="/Rajasthan-Sarkar.png"
                 alt="Government of Rajasthan Emblem"
-                class="h-9 sm:h-11 w-auto object-contain"
+                class="h-9 sm:h-10 w-auto object-contain"
                 loading="lazy"
               />
               <img
                 src="/rsldc-logo.png"
                 alt="RSLDC Logo"
-                class="h-8 sm:h-10 w-auto object-contain hidden xs:block"
+                class="h-8 sm:h-9 w-auto object-contain hidden xs:block"
                 loading="lazy"
               />
             </a>
 
-            <div class="h-8 w-px bg-slate-200 hidden sm:block"></div>
+            <div class="h-7 w-px bg-slate-200 hidden sm:block"></div>
 
             <div class="flex flex-col min-w-0">
-              <div class="flex items-center gap-2">
-                <span class="text-sm sm:text-base font-extrabold text-[#7C0E44] tracking-tight">ISMS 2.0</span>
-                <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full text-[#7C0E44] border border-[#7C0E44]/30 shrink-0">
-                  Help Center
-                </span>
-              </div>
-              <span class="text-[11px] sm:text-xs text-slate-500 truncate">
-                Frequently Asked Questions &amp; Support
+              <span class="text-sm sm:text-base font-extrabold text-[#7C0E44] tracking-tight leading-tight">ISMS 2.0</span>
+              <span class="text-[11px] sm:text-xs text-slate-500 truncate leading-tight">
+                Rajasthan Skill and Livelihoods Development Corporation
               </span>
             </div>
           </div>
 
-          <!-- Right: Clear Back / Home Navigation Button -->
+          <!-- Navigation: One Back to Home Button -->
           <div class="flex items-center gap-2 shrink-0">
             <button
               appButton
               variant="outline"
               size="sm"
               type="button"
-              (click)="goBack()"
-              aria-label="Back to Previous Page"
-            >
-              <app-icon name="chevron-left" [stroke]="2" size="sm" />
-              <span class="hidden sm:inline">Back</span>
-            </button>
-
-            <button
-              appButton
-              variant="primary"
-              size="sm"
-              type="button"
               (click)="goHome()"
-              aria-label="Go to ISMS 2.0 Home"
+              aria-label="Back to Home"
             >
               <span>Back to Home</span>
             </button>
@@ -100,283 +98,316 @@ export type FaqCategory =
       </header>
 
       <!-- ====================================================================
-           2. HERO / SEARCH BANNER
+           2. BREADCRUMB & PAGE TITLE
            ==================================================================== -->
-      <section
-        class="relative text-white py-10 sm:py-14 px-4 sm:px-6 lg:px-8 overflow-hidden select-none"
-        style="background: linear-gradient(135deg, #4A0626 0%, #7C0E44 55%, #5E0832 100%);"
-      >
-        <!-- Subtle Rajasthan Fort Outline Silhouette in background -->
-        <div
-          class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none opacity-20"
-          style="background-image: url('/hero-bg.png'); background-position: right 20%;"
-        ></div>
+      <div class="border-b border-slate-200 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+          <nav aria-label="Breadcrumb" class="flex items-center gap-1.5 text-xs text-slate-500 mb-1.5">
+            <a routerLink="/" class="hover:text-[#7C0E44] transition-colors cursor-pointer">Home</a>
+            <span class="text-slate-400">/</span>
+            <span class="text-slate-800 font-medium" aria-current="page">Help &amp; Support</span>
+          </nav>
 
-        <div class="relative z-10 max-w-4xl mx-auto text-center space-y-3 sm:space-y-4">
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-semibold border border-white/20">
-            <app-icon name="info-circle" size="sm" />
-            <span>Official Portal Guide &amp; Knowledgebase</span>
-          </div>
-
-          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-tight m-0">
-            Frequently Asked Questions (FAQs)
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight m-0">
+            Help &amp; Support
           </h1>
-
-          <p class="text-xs sm:text-sm md:text-base text-rose-100 max-w-2xl mx-auto m-0 leading-relaxed">
-            Find instant, verified answers on login, One-Time Registration (OTR), active schemes, EOI proposal submissions, documents, and technical support.
+          <p class="text-xs sm:text-sm text-slate-500 m-0 mt-0.5">
+            Find answers to common questions or submit a support request.
           </p>
-
-          <!-- Search Input Box -->
-          <div class="pt-2 sm:pt-4 max-w-2xl mx-auto">
-            <div class="relative w-full">
-              <app-icon
-                name="search"
-                size="sm"
-                [stroke]="2"
-                class="text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              />
-              <input
-                appInput
-                type="text"
-                [ngModel]="searchQuery()"
-                (ngModelChange)="onSearchInput($event)"
-                placeholder="Search FAQs by keywords (e.g. OTR, EOI, Biometric, PAN, Login)..."
-                class="w-full pl-10 pr-9 py-2.5 sm:py-3 text-xs sm:text-sm bg-white text-slate-800 rounded-lg shadow-md border-0 focus:ring-2 focus:ring-amber-400 placeholder:text-slate-400"
-                autocomplete="off"
-              />
-              @if (searchQuery()) {
-                <button
-                  appButton
-                  variant="ghost"
-                  size="xs"
-                  iconOnly
-                  type="button"
-                  (click)="clearSearch()"
-                  title="Clear search"
-                  aria-label="Clear search"
-                >
-                  <app-icon name="close" size="sm" />
-                </button>
-              }
-            </div>
-          </div>
         </div>
-      </section>
+      </div>
 
       <!-- ====================================================================
-           3. MAIN FAQ ACCORDION SECTION
+           3. TWO-COLUMN MAIN CONTENT (Desktop 45% Left / 55% Right)
            ==================================================================== -->
-      <main class="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-6">
-        
-        <!-- Category Filter Tabs & Expand/Collapse All Toolbar -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          <!-- Category Tabs -->
-          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
-            @for (cat of categories; track cat) {
-              <button
-                appButton
-                size="sm"
-                type="button"
-                [variant]="selectedCategory() === cat ? 'primary' : 'outline'"
-                (click)="selectCategory(cat)"
-              >
-                <span>{{ cat }}</span>
-                <span class="ml-1 opacity-80 tabular-nums">
-                  ({{ getCategoryCount(cat) }})
-                </span>
-              </button>
-            }
-          </div>
-
-          <!-- Quick Action: Expand/Collapse All -->
-          <div class="flex items-center gap-2 shrink-0 self-end md:self-auto">
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              (click)="expandAll()"
-            >
-              <span>Expand All</span>
-            </button>
-            <span class="text-slate-300">|</span>
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              (click)="collapseAll()"
-            >
-              <span>Collapse All</span>
-            </button>
-          </div>
-
-        </div>
-
-        <!-- Active Filter Indicator / Result Count -->
-        <div class="flex items-center justify-between text-xs text-slate-500">
-          <span>
-            Showing <strong class="text-slate-800 font-bold tabular-nums">{{ filteredFaqs().length }}</strong> questions
-            @if (selectedCategory() !== 'All') {
-              in <strong class="text-slate-800 font-bold">{{ selectedCategory() }}</strong>
-            }
-            @if (searchQuery()) {
-              matching "<strong class="text-slate-800 font-bold">{{ searchQuery() }}</strong>"
-            }
-          </span>
-          @if (searchQuery() || selectedCategory() !== 'All') {
-            <button
-              appButton
-              variant="ghost"
-              size="xs"
-              type="button"
-              (click)="resetFilters()"
-            >
-              <span>Reset Filters</span>
-            </button>
-          }
-        </div>
-
-        <!-- Empty Results Message -->
-        @if (filteredFaqs().length === 0) {
-          <div class="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 space-y-3">
-            <div class="w-12 h-12 rounded-full bg-rose-50 text-[#7C0E44] flex items-center justify-center mx-auto">
-              <app-icon name="search" size="md" />
-            </div>
-            <h3 class="text-base font-bold text-slate-800 m-0">No matching questions found</h3>
-            <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto m-0 leading-relaxed">
-              We couldn't find any questions matching your query. Please try searching with different keywords or reset your filters.
-            </p>
-            <button
-              appButton
-              variant="primary"
-              size="sm"
-              type="button"
-              (click)="resetFilters()"
-            >
-              <span>View All FAQs</span>
-            </button>
-          </div>
-        }
-
-        <!-- Expandable FAQ Accordion Cards -->
-        <div class="space-y-3">
-          @for (faq of filteredFaqs(); track faq.id) {
-            <div
-              class="border rounded-xl overflow-hidden bg-white shadow-2xs transition-all duration-200"
-              [ngClass]="faq.isOpen ? 'border-[#7C0E44]/40 ring-1 ring-[#7C0E44]/15' : 'border-slate-200 hover:border-slate-300'"
-            >
-              <!-- Accordion Header Button -->
-              <button
-                appButton
-                variant="ghost"
-                block
-                type="button"
-                (click)="toggleFaq(faq.id)"
-                class="justify-between text-left h-auto"
-                [attr.aria-expanded]="faq.isOpen"
-              >
-                <div class="flex items-start sm:items-center gap-3 min-w-0 pr-2 py-1">
-                  <span
-                    class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md shrink-0 border mt-0.5 sm:mt-0"
-                    [ngClass]="getBadgeClass(faq.category)"
-                  >
-                    {{ faq.category }}
-                  </span>
-                  <span
-                    class="text-xs sm:text-[14.5px] font-bold leading-snug tracking-tight text-slate-800 break-words"
-                    [class.text-[#7C0E44]]="faq.isOpen"
-                  >
-                    {{ faq.question }}
-                  </span>
-                </div>
-
-                <app-icon
-                  [name]="faq.isOpen ? 'chevron-up' : 'chevron-down'"
-                  size="sm"
-                  [stroke]="2"
-                  class="shrink-0 transition-transform duration-200 ml-2"
-                  [class.text-[#7C0E44]]="faq.isOpen"
-                  [class.text-slate-400]="!faq.isOpen"
-                />
-              </button>
-
-              <!-- Expandable Accordion Body -->
-              @if (faq.isOpen) {
-                <div class="px-4 pb-4 pt-1 sm:px-5 sm:pb-5 text-xs sm:text-[13.5px] text-slate-600 leading-relaxed border-t border-slate-100 whitespace-pre-line">
-                  {{ faq.answer }}
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-        <!-- ====================================================================
-             4. NEED MORE HELP / OFFICIAL HELPLINE CARDS
-             ==================================================================== -->
-        <div class="mt-12 pt-8 border-t border-slate-200">
-          <div class="bg-gradient-to-r from-rose-50/80 via-white to-amber-50/60 border border-rose-200/80 rounded-2xl p-5 sm:p-7 shadow-xs">
+          <!-- LEFT COLUMN (~45% / 5 cols): Contact Helpdesk + Submit Form -->
+          <section class="lg:col-span-5 flex flex-col gap-5">
             
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              
-              <div class="space-y-1.5 max-w-xl">
-                <div class="flex items-center gap-2">
-                  <app-icon name="phone" size="sm" class="text-[#7C0E44]" />
-                  <span class="text-xs font-bold text-[#7C0E44] uppercase tracking-wider">Still have questions?</span>
+            <!-- Left Upper: Contact Helpdesk -->
+            <div class="bg-white border border-[#EADCE2] rounded-lg p-5 shadow-2xs">
+              <h2 class="text-base font-semibold text-slate-900 m-0 pb-3 border-b border-[#EADCE2]">
+                Contact Helpdesk
+              </h2>
+
+              <div class="mt-4 space-y-3.5 text-xs sm:text-[13px]">
+                <!-- Helpline -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded bg-[#FCF8FA] border border-[#EADCE2] flex items-center justify-center text-[#7C0E44] shrink-0 mt-0.5">
+                    <app-icon name="phone" size="xs" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <span class="block text-[11px] font-medium text-slate-500 uppercase tracking-wider">Helpline</span>
+                    <a href="tel:01412716091" class="text-sm font-semibold text-[#7C0E44] hover:underline" aria-label="Call Helpline 0141-2716091">
+                      0141-2716091
+                    </a>
+                  </div>
                 </div>
-                <h3 class="text-base sm:text-lg font-bold text-slate-900 m-0">
-                  RSLDC Nodal Support &amp; Technical Helpdesk
-                </h3>
-                <p class="text-xs sm:text-sm text-slate-600 m-0 leading-relaxed">
-                  Our technical support team is available Monday to Friday (9:30 AM – 6:00 PM) to assist you with portal procedures, scheme proposals, and credentials. Email us at <span class="font-medium text-slate-800">support@isms.rajasthan.gov.in</span>.
+
+                <!-- General Helpdesk -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded bg-[#FCF8FA] border border-[#EADCE2] flex items-center justify-center text-[#7C0E44] shrink-0 mt-0.5">
+                    <app-icon name="phone" size="xs" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <span class="block text-[11px] font-medium text-slate-500 uppercase tracking-wider">General Helpdesk</span>
+                    <a href="tel:01412792600" class="text-sm font-semibold text-[#7C0E44] hover:underline" aria-label="Call General Helpdesk 0141-2792600">
+                      0141-2792600
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded bg-[#FCF8FA] border border-[#EADCE2] flex items-center justify-center text-[#7C0E44] shrink-0 mt-0.5">
+                    <app-icon name="mail" size="xs" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <span class="block text-[11px] font-medium text-slate-500 uppercase tracking-wider">Email</span>
+                    <a href="mailto:support@isms.rajasthan.gov.in" class="text-sm font-semibold text-[#7C0E44] hover:underline break-all" aria-label="Email support@isms.rajasthan.gov.in">
+                      support@isms.rajasthan.gov.in
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Working Hours -->
+                <div class="flex items-start gap-2.5">
+                  <div class="w-7 h-7 rounded bg-[#FCF8FA] border border-[#EADCE2] flex items-center justify-center text-slate-500 shrink-0 mt-0.5">
+                    <app-icon name="clock" size="xs" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <span class="block text-[11px] font-medium text-slate-500 uppercase tracking-wider">Working Hours</span>
+                    <span class="text-xs sm:text-[13px] text-slate-700 font-medium">Monday to Friday, 9:30 AM – 6:00 PM</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Left Lower: Submit a Query / Complaint Form -->
+            <div class="bg-white border border-[#EADCE2] rounded-lg p-5 shadow-2xs">
+              <div class="pb-3 border-b border-[#EADCE2]">
+                <h2 class="text-base font-semibold text-slate-900 m-0">
+                  Submit a Query / Complaint
+                </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Provide your details and briefly describe the issue.
                 </p>
               </div>
 
-              <div class="flex flex-wrap items-center gap-3 shrink-0">
-                <a
-                  appButton
-                  variant="primary"
-                  size="sm"
-                  href="tel:01412716091"
-                  aria-label="Call RSLDC Helpline"
+              <!-- Inline Success Confirmation -->
+              @if (submittedRefNumber()) {
+                <div
+                  class="mt-4 p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 space-y-2 animate-fade-in"
+                  role="alert"
+                  aria-live="polite"
                 >
-                  <app-icon name="phone" size="sm" />
-                  <span>Call 0141-2716091</span>
-                </a>
+                  <div class="flex items-center gap-2">
+                    <app-icon name="check-circle" size="sm" class="text-emerald-700 shrink-0" />
+                    <span class="font-semibold text-sm">Your support request has been submitted successfully.</span>
+                  </div>
+                  <p class="text-xs text-emerald-800 m-0">
+                    Reference Number: <strong class="font-bold tracking-wide">{{ submittedRefNumber() }}</strong>
+                  </p>
+                  <p class="text-xs text-emerald-700 m-0">
+                    Please retain this reference number for future communication.
+                  </p>
+                  <div class="pt-2">
+                    <button
+                      appButton
+                      variant="outline"
+                      size="sm"
+                      type="button"
+                      (click)="resetForm()"
+                    >
+                      <span>Submit Another Request</span>
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <!-- Form Inputs -->
+                <form (ngSubmit)="onSubmit()" class="mt-4 space-y-3.5" novalidate>
+                  
+                  <!-- Failure Notice -->
+                  @if (submissionError()) {
+                    <div class="p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center gap-2" role="alert">
+                      <app-icon name="error" size="xs" class="text-rose-600 shrink-0" />
+                      <span>{{ submissionError() }}</span>
+                    </div>
+                  }
 
-                <a
-                  appButton
-                  variant="outline"
-                  size="sm"
-                  href="mailto:support@isms.rajasthan.gov.in"
-                  aria-label="Email ISMS Support"
-                >
-                  <app-icon name="mail" size="sm" />
-                  <span>support@isms.rajasthan.gov.in</span>
-                </a>
-              </div>
+                  <!-- Full Name & Mobile Number (2-Column Grid) -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <app-form-input
+                      id="fullName"
+                      label="Full Name"
+                      placeholder="Enter full name"
+                      [required]="true"
+                      [value]="fullName()"
+                      (valueChange)="fullName.set($event); onFieldChange('fullName')"
+                      [error]="getFieldError('fullName')"
+                      [maxLength]="100"
+                    />
 
+                    <app-form-input
+                      id="mobileNumber"
+                      label="Mobile Number"
+                      type="tel"
+                      placeholder="10-digit mobile"
+                      [required]="true"
+                      [value]="mobileNumber()"
+                      (valueChange)="mobileNumber.set($event); onFieldChange('mobileNumber')"
+                      [error]="getFieldError('mobileNumber')"
+                      [maxLength]="10"
+                    />
+                  </div>
+
+                  <!-- Email Address (Full Width, Optional) -->
+                  <app-form-input
+                    id="email"
+                    label="Email Address"
+                    type="email"
+                    placeholder="e.g. name@example.com (Optional)"
+                    [required]="false"
+                    [value]="email()"
+                    (valueChange)="email.set($event); onFieldChange('email')"
+                    [error]="getFieldError('email')"
+                    [maxLength]="100"
+                  />
+
+                  <!-- Request Type (Full Width) -->
+                  <app-form-select
+                    id="requestType"
+                    label="Request Type"
+                    placeholder="Select request type"
+                    [required]="true"
+                    [options]="requestTypeOptions"
+                    [value]="requestType()"
+                    (valueChange)="requestType.set($event); onFieldChange('requestType')"
+                    [error]="getFieldError('requestType')"
+                  />
+
+                  <!-- Description (Full Width, 10-1000 Chars) -->
+                  <app-form-textarea
+                    id="description"
+                    label="Description"
+                    placeholder="Describe your issue or query (10 to 1000 characters)..."
+                    [required]="true"
+                    [value]="description()"
+                    (valueChange)="description.set($event); onFieldChange('description')"
+                    [error]="getFieldError('description')"
+                    [maxLength]="1000"
+                    [showCharCount]="true"
+                  />
+
+                  <!-- Attachment (Full Width, Max 5MB) -->
+                  <app-form-file-upload
+                    label="Attachment"
+                    [fileDoc]="attachmentFileDoc()"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    [maxSizeMb]="5"
+                    hint="Optional (PDF, JPG, JPEG, PNG • Max 5 MB)"
+                    [error]="attachmentError()"
+                    (fileChange)="onAttachmentChange($event)"
+                  />
+
+                  <!-- Submit Action Button -->
+                  <div class="pt-1">
+                    <button
+                      appButton
+                      variant="primary"
+                      block
+                      type="submit"
+                      [disabled]="isSubmitting()"
+                      class="justify-center"
+                    >
+                      @if (isSubmitting()) {
+                        <app-icon name="spinner" size="xs" class="animate-spin mr-1.5" />
+                        <span>Submitting...</span>
+                      } @else {
+                        <span>Submit Request</span>
+                      }
+                    </button>
+                  </div>
+
+                </form>
+              }
             </div>
 
-          </div>
-        </div>
+          </section>
 
+          <!-- RIGHT COLUMN (~55% / 7 cols): Frequently Asked Questions Accordion -->
+          <section class="lg:col-span-7">
+            <div class="bg-white border border-[#EADCE2] rounded-lg p-5 shadow-2xs">
+              <div class="pb-3 border-b border-[#EADCE2]">
+                <h2 class="text-base font-semibold text-slate-900 m-0">
+                  Frequently Asked Questions
+                </h2>
+                <p class="text-xs text-slate-500 m-0 mt-0.5">
+                  Essential questions regarding portal login, registration, schemes, and applications.
+                </p>
+              </div>
+
+              <!-- 5 Official FAQs in Accordion with Thin Neutral Separators -->
+              <div class="divide-y divide-[#EADCE2] border-b border-[#EADCE2]">
+                @for (faq of faqs; track faq.id) {
+                  <div>
+                    <button
+                      appButton
+                      variant="ghost"
+                      block
+                      type="button"
+                      (click)="toggleFaq(faq.id)"
+                      [attr.aria-expanded]="expandedFaqId() === faq.id"
+                      [attr.aria-controls]="'faq-answer-' + faq.id"
+                      [id]="'faq-question-' + faq.id"
+                      class="justify-between text-left h-auto font-normal"
+                    >
+                      <span
+                        class="text-xs sm:text-[13.5px] leading-snug pr-3 py-1.5 select-none"
+                        [class.font-semibold]="expandedFaqId() === faq.id"
+                        [class.text-[#7C0E44]]="expandedFaqId() === faq.id"
+                      >
+                        {{ faq.question }}
+                      </span>
+
+                      <app-icon
+                        [name]="expandedFaqId() === faq.id ? 'chevron-up' : 'chevron-down'"
+                        size="xs"
+                        class="shrink-0 transition-transform duration-150"
+                        [class.text-[#7C0E44]]="expandedFaqId() === faq.id"
+                      />
+                    </button>
+
+                    @if (expandedFaqId() === faq.id) {
+                      <div
+                        [id]="'faq-answer-' + faq.id"
+                        [attr.aria-labelledby]="'faq-question-' + faq.id"
+                        role="region"
+                        class="pb-4 pt-1 px-1 text-xs sm:text-[13px] leading-relaxed text-slate-600 animate-fade-in"
+                      >
+                        {{ faq.answer }}
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </section>
+
+        </div>
       </main>
 
       <!-- ====================================================================
-           5. CLEAN STANDALONE FOOTER BAR
+           4. GOVERNMENT APPLICATION COMMON FOOTER
            ==================================================================== -->
-      <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-4 sm:px-6 text-center text-xs text-slate-500">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>&copy; 2026 Government of Rajasthan. All rights reserved (ISMS 2.0).</span>
-          <div class="flex items-center gap-4 text-slate-600">
+      <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-4 sm:px-6 lg:px-8 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+          <span>&copy; Government of Rajasthan. All rights reserved. | ISMS 2.0</span>
+          <div class="flex items-center gap-3">
             <button appButton variant="ghost" size="xs" type="button" (click)="goHome()">
               <span>Home</span>
-            </button>
-            <span>&bull;</span>
-            <button appButton variant="ghost" size="xs" type="button" (click)="scrollToTop()">
-              <span>Back to Top &uarr;</span>
             </button>
           </div>
         </div>
@@ -387,264 +418,285 @@ export type FaqCategory =
 })
 export class HelpSupportComponent implements OnInit {
   private router = inject(Router);
-  private elementRef = inject(ElementRef);
+  private authService = inject(AuthService);
+  private otrService = inject(OtrFormService);
+  private dataEngine = inject(DataEngineService);
 
-  ngOnInit(): void {
-    this.scrollToTop(false);
-    if (typeof requestAnimationFrame !== 'undefined') {
-      requestAnimationFrame(() => this.scrollToTop(false));
+  private readonly grievanceRepo = this.dataEngine.for<Grievance>('GRIEVANCES');
+  private readonly adminGrievanceRepo = this.dataEngine.for<AdminGrievance>('ADMIN_GRIEVANCES');
+
+  // =========================================================================
+  // 1. FIVE ESSENTIAL FAQS (Collapsed by default, single expanded at a time)
+  // =========================================================================
+  readonly faqs: EssentialFaq[] = [
+    {
+      id: 'faq-1',
+      question: 'How do I log in to the ISMS 2.0 portal?',
+      answer: 'Users can access the portal using their registered Rajasthan Single Sign-On (SSO) credentials. Complete any additional verification required for the respective user role.'
+    },
+    {
+      id: 'faq-2',
+      question: 'How do I complete One-Time Registration (OTR)?',
+      answer: 'Log in to the portal, open One-Time Registration and complete the organization details, authorized signatory details, bank details and mandatory undertakings. Submit the registration after completing all required fields.'
+    },
+    {
+      id: 'faq-3',
+      question: 'How can I apply for an EOI or scheme?',
+      answer: 'Log in using your registered account, navigate to the available EOI or scheme section, review the eligibility requirements, complete the application and upload the required documents before submission.'
+    },
+    {
+      id: 'faq-4',
+      question: 'How can I check my application status?',
+      answer: 'Log in to your registered account and navigate to the relevant application or proposal section to view its current status and any remarks provided by the department.'
+    },
+    {
+      id: 'faq-5',
+      question: 'What should I do if I face a technical issue?',
+      answer: 'Contact the official helpdesk or submit a support request using the form available on this page. Provide a clear description of the issue and attach supporting screenshots if required.'
     }
-  }
-
-  readonly searchQuery = signal<string>('');
-  readonly selectedCategory = signal<FaqCategory>('All');
-
-  readonly categories: FaqCategory[] = [
-    'All',
-    'Login & Registration',
-    'User Account',
-    'Schemes & Applications',
-    'Documents & Verification',
-    'Technical Issues'
   ];
 
-  readonly faqs = signal<FaqItem[]>([
-    // Category 1: Login & Registration
-    {
-      id: 'faq-lr-1',
-      category: 'Login & Registration',
-      question: 'How do I log in to the ISMS 2.0 portal?',
-      answer: 'All users access the ISMS 2.0 portal using their verified Rajasthan Single Sign-On (RajSSO) credentials at sso.rajasthan.gov.in. Department Administrators additionally complete a mandatory 6-digit OTP security verification upon signing in.',
-      isOpen: true
-    },
-    {
-      id: 'faq-lr-2',
-      category: 'Login & Registration',
-      question: 'What is One-Time Registration (OTR)?',
-      answer: 'One-Time Registration (OTR) is the standardized statutory onboarding flow for Training Partners (TPs) and Project Implementation Agencies (PIAs) on ISMS 2.0. It captures verified organization credentials, authorized signatory details, banking information, and mandatory undertakings.',
-      isOpen: false
-    },
-    {
-      id: 'faq-lr-3',
-      category: 'Login & Registration',
-      question: 'Can I skip mandatory OTR sections and complete them later?',
-      answer: 'No. To ensure compliance with RSLDC guidelines, ISMS 2.0 enforces strict sequential progression across the 4 registration steps: Organization Details (Step 1), Authorized Signatory (Step 2), Bank Details (Step 3), and Mandatory Undertakings (Step 4). You cannot advance to subsequent steps without completing all mandatory fields.',
-      isOpen: false
-    },
-    {
-      id: 'faq-lr-4',
-      category: 'Login & Registration',
-      question: 'What happens if I exit the registration wizard before submitting?',
-      answer: 'Your entered data is preserved automatically as a registration draft in your active session. When you reopen the registration screen, the form restores your data and initializes at Step 1 with a clean validation state so you can review each section before final submission.',
-      isOpen: false
-    },
-
-    // Category 2: User Account
-    {
-      id: 'faq-ua-1',
-      category: 'User Account',
-      question: 'What personas and user roles exist in ISMS 2.0?',
-      answer: 'ISMS 2.0 supports dedicated role-based portals:\n• New User: Training partner applicants completing initial One-Time Registration (OTR).\n• Existing User (Training Partner): Approved organizations managing centers, batches, trainee attendance, and EOI proposals.\n• Aspirant: Candidates enrolling in skill programs, viewing course schedules, and tracking certifications.\n• Department Admin: RSLDC scrutiny officers evaluating proposals, sanction orders, IPAs, and batch approvals.\n• Super Admin: Portal administrators managing EOI configurations, dynamic forms, and masters.',
-      isOpen: false
-    },
-    {
-      id: 'faq-ua-2',
-      category: 'User Account',
-      question: 'How can I view or update my organization profile?',
-      answer: 'You can navigate to the "Profile" page from the main portal navigation menu. The profile screen displays your approved organizational details, PAN, GSTIN, bank records, and center affiliations.',
-      isOpen: false
-    },
-    {
-      id: 'faq-ua-3',
-      category: 'User Account',
-      question: 'Why does the portal session time out?',
-      answer: 'In compliance with Department of Information Technology & Communication (DoITC) cybersecurity standards, portal sessions automatically time out after periods of inactivity to protect sensitive financial and applicant records. Simply re-authenticate via Rajasthan SSO to continue.',
-      isOpen: false
-    },
-
-    // Category 3: Schemes & Applications
-    {
-      id: 'faq-sa-1',
-      category: 'Schemes & Applications',
-      question: 'Where can I find open and active skill development schemes?',
-      answer: 'Browse the "Active Schemes" page (/tenders). You can search by scheme name (e.g. Vishwakarma Yuva Udyami Protsahan Yojana, MMKVY, PMKVY 4.0, Rooftop Solar), reference number, or scheme category (Rajvik, Samarth, Saksham) with instant dynamic keystroke filtering.',
-      isOpen: false
-    },
-    {
-      id: 'faq-sa-2',
-      category: 'Schemes & Applications',
-      question: 'How do I submit an Expression of Interest (EOI) proposal?',
-      answer: '1. Browse active schemes on the Active Schemes page (/tenders).\n2. Ensure your One-Time Registration (OTR) has been approved.\n3. Click the "View" button for your chosen scheme to inspect detailed guidelines, RFP documents, and EMD requirements.\n4. Click "Apply for EOI" to begin the proposal submission flow.\n5. Track proposal progress anytime on the EOI Status page (/tender-status).',
-      isOpen: false
-    },
-    {
-      id: 'faq-sa-3',
-      category: 'Schemes & Applications',
-      question: 'Can I resume an incomplete EOI proposal application?',
-      answer: 'Yes. If you leave an EOI proposal before finishing all steps, an "Application Pending" alert appears prominently at the top of the Active Schemes page showing the scheme name, reference number, and exact step number. Click "Continue Application" to resume immediately where you left off.',
-      isOpen: false
-    },
-    {
-      id: 'faq-sa-4',
-      category: 'Schemes & Applications',
-      question: 'How do I track the status of my submitted proposal?',
-      answer: 'Navigate to "EOI Status" (/tender-status) from the sidebar. You can monitor the real-time stage of your proposal across scrutiny desk verification, committee evaluation, In-Principle Approval (IPA), and Sanction Order issuance.',
-      isOpen: false
-    },
-    {
-      id: 'faq-sa-5',
-      category: 'Schemes & Applications',
-      question: 'What are the biometric attendance device rules for skill training centers?',
-      answer: 'Approved Training Partners must deploy Aadhaar-enabled Biometric Attendance System (AEBAS) devices at each accredited Skill Development Center (SDC). Trainee and trainer daily attendance must be captured via registered biometric devices and synced directly with ISMS 2.0 to qualify for batch milestone payments.',
-      isOpen: false
-    },
-
-    // Category 4: Documents & Verification
-    {
-      id: 'faq-dv-1',
-      category: 'Documents & Verification',
-      question: 'What documents are required for OTR onboarding and EOI applications?',
-      answer: 'Key statutory documents include:\n• Organization PAN Card (self-attested copy)\n• GST Registration Certificate\n• Certificate of Incorporation, Society, or Trust Registration\n• Authorized Person Board Resolution / Authorization Letter\n• Bank Account Details with Cancelled Cheque (IFSC verified)\n• CA-certified Audited Financial Statements and Turnover Certificates for the last 3 financial years\n• Notarized Affidavit for not being blacklisted by any Govt. / PSU entity.',
-      isOpen: false
-    },
-    {
-      id: 'faq-dv-2',
-      category: 'Documents & Verification',
-      question: 'What are the accepted file formats and upload size limits?',
-      answer: 'The portal accepts PDF, TXT, JPEG, JPG, PNG, DOC, DOCX, XLS, and XLSX file formats. Individual attachments must not exceed the maximum upload limit of 25 MB.',
-      isOpen: false
-    },
-    {
-      id: 'faq-dv-3',
-      category: 'Documents & Verification',
-      question: 'How does departmental document scrutiny work?',
-      answer: 'Submitted registration dossiers and EOI proposals are routed directly to the Department Scrutiny Desk. Designated scrutiny officers verify uploaded attachments against statutory criteria and RTPP guidelines before passing proposals to the evaluation committee.',
-      isOpen: false
-    },
-
-    // Category 5: Technical Issues
-    {
-      id: 'faq-ti-1',
-      category: 'Technical Issues',
-      question: 'What should I do if the portal displays "No Internet Connection"?',
-      answer: 'ISMS 2.0 features global internet connectivity detection across all routes. If internet access is lost, a modal popup appears automatically to prevent data loss. Once your connection is restored, the popup automatically dismisses and you can continue your work.',
-      isOpen: false
-    },
-    {
-      id: 'faq-ti-2',
-      category: 'Technical Issues',
-      question: 'Why is my file upload failing?',
-      answer: 'Please check that:\n1. Your file format is supported: PDF, DOC, DOCX, XLS, XLSX, JPG, or PNG.\n2. Your file size does not exceed the 25 MB limit.\n3. The file name contains only letters, numbers, hyphens, and underscores without illegal special characters.\n4. Your internet connection is active.',
-      isOpen: false
-    },
-    {
-      id: 'faq-ti-3',
-      category: 'Technical Issues',
-      question: 'Who should I contact for technical portal assistance or grievances?',
-      answer: 'Official RSLDC Helpline and Support Channels:\n• Toll-Free / Nodal: 0141-2716091\n• General Helpdesk: 0141-2792600 (Mon–Fri, 9:30 AM – 6:00 PM)\n• Support Email: support@isms.rajasthan.gov.in / isms-support@rajasthan.gov.in\n• Headquarters: EMI Campus, J-8-B, Jhalana Institutional Area, Jaipur - 302004, Rajasthan\n• Grievance Redressal: Submit an official grievance ticket with attachments via the Grievance module (/grievance).',
-      isOpen: false
-    }
-  ]);
-
-  readonly filteredFaqs = computed(() => {
-    const q = this.searchQuery().trim().toLowerCase();
-    const cat = this.selectedCategory();
-    let list = this.faqs();
-
-    if (cat !== 'All') {
-      list = list.filter(f => f.category === cat);
-    }
-
-    if (q) {
-      list = list.filter(
-        f =>
-          f.question.toLowerCase().includes(q) ||
-          f.answer.toLowerCase().includes(q) ||
-          f.category.toLowerCase().includes(q)
-      );
-    }
-
-    return list;
-  });
-
-  getCategoryCount(cat: FaqCategory): number {
-    if (cat === 'All') return this.faqs().length;
-    return this.faqs().filter(f => f.category === cat).length;
-  }
-
-  getBadgeClass(cat: string): string {
-    switch (cat) {
-      case 'Login & Registration':
-        return 'text-blue-700 border-blue-200';
-      case 'User Account':
-        return 'text-purple-700 border-purple-200';
-      case 'Schemes & Applications':
-        return 'text-amber-700 border-amber-200';
-      case 'Documents & Verification':
-        return 'text-emerald-700 border-emerald-200';
-      case 'Technical Issues':
-        return 'text-rose-700 border-rose-200';
-      default:
-        return 'text-slate-700 border-slate-200';
-    }
-  }
-
-  onSearchInput(value: string): void {
-    this.searchQuery.set(value);
-  }
-
-  clearSearch(): void {
-    this.searchQuery.set('');
-  }
-
-  selectCategory(cat: FaqCategory): void {
-    this.selectedCategory.set(cat);
-  }
-
-  resetFilters(): void {
-    this.searchQuery.set('');
-    this.selectedCategory.set('All');
-  }
+  readonly expandedFaqId = signal<string | null>(null);
 
   toggleFaq(id: string): void {
-    this.faqs.update(list =>
-      list.map(f => (f.id === id ? { ...f, isOpen: !f.isOpen } : f))
+    this.expandedFaqId.update(current => (current === id ? null : id));
+  }
+
+  // =========================================================================
+  // 2. QUERY / COMPLAINT FORM STATE
+  // =========================================================================
+  readonly fullName = signal<string>('');
+  readonly mobileNumber = signal<string>('');
+  readonly email = signal<string>('');
+  readonly requestType = signal<string>('');
+  readonly description = signal<string>('');
+  readonly attachmentFileDoc = signal<FileDoc | null>(null);
+  readonly attachmentError = signal<string>('');
+
+  readonly touchedFields = signal<Record<string, boolean>>({});
+  readonly isSubmitted = signal<boolean>(false);
+  readonly isSubmitting = signal<boolean>(false);
+  readonly submittedRefNumber = signal<string | null>(null);
+  readonly submissionError = signal<string | null>(null);
+
+  readonly requestTypeOptions: string[] = [
+    'General Query',
+    'Login / Registration Issue',
+    'EOI / Application Issue',
+    'Document / Verification Issue',
+    'Technical Issue',
+    'Complaint / Grievance',
+    'Other'
+  ];
+
+  ngOnInit(): void {
+    this.prefillUserInfo();
+  }
+
+  prefillUserInfo(): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      const otr = this.otrService.formData();
+      const prefillName = otr?.step3?.name || otr?.step1?.fullName || (user.label !== 'New User' ? user.label : '') || '';
+      const prefillMobile = otr?.step3?.mobileNo || otr?.step1?.contactNo || '';
+      const prefillEmail = otr?.step3?.emailId || otr?.step1?.emailId || '';
+
+      if (prefillName && !this.fullName()) this.fullName.set(prefillName);
+      if (prefillMobile && !this.mobileNumber()) this.mobileNumber.set(prefillMobile);
+      if (prefillEmail && !this.email()) this.email.set(prefillEmail);
+    }
+  }
+
+  onFieldChange(field: string): void {
+    this.touchedFields.update(curr => ({ ...curr, [field]: true }));
+  }
+
+  onAttachmentChange(doc: FileDoc | null): void {
+    if (doc) {
+      const ext = doc.fileName.split('.').pop()?.toLowerCase() || '';
+      if (!['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+        this.attachmentError.set('Only PDF, JPG, JPEG, and PNG files are allowed.');
+        this.attachmentFileDoc.set(null);
+        return;
+      }
+    }
+    this.attachmentFileDoc.set(doc);
+    this.attachmentError.set('');
+  }
+
+  // =========================================================================
+  // 3. FIELD VALIDATIONS
+  // =========================================================================
+  validateFullName(): string {
+    const val = this.fullName().trim();
+    if (!val) return 'Full Name is required.';
+    if (val.length < 2 || val.length > 100) return 'Full Name must be between 2 and 100 characters.';
+    if (!/^[\p{L}\s.'\-]+$/u.test(val)) return 'Full Name contains invalid characters.';
+    return '';
+  }
+
+  validateMobile(): string {
+    const val = this.mobileNumber().trim();
+    if (!val) return 'Mobile Number is required.';
+    if (!/^[6-9]\d{9}$/.test(val)) return 'Enter a valid 10-digit Indian mobile number.';
+    return '';
+  }
+
+  validateEmail(): string {
+    const val = this.email().trim();
+    if (!val) return '';
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val)) {
+      return 'Enter a valid email address.';
+    }
+    return '';
+  }
+
+  validateRequestType(): string {
+    const val = this.requestType().trim();
+    if (!val) return 'Please select a request type.';
+    if (!this.requestTypeOptions.includes(val)) return 'Please select a valid request type.';
+    return '';
+  }
+
+  validateDescription(): string {
+    const val = this.description().trim();
+    if (!val) return 'Description is required.';
+    if (val.length < 10) return 'Description must be at least 10 characters.';
+    if (val.length > 1000) return 'Description cannot exceed 1000 characters.';
+    return '';
+  }
+
+  getFieldError(field: string): string {
+    if (!this.isSubmitted() && !this.touchedFields()[field]) {
+      return '';
+    }
+    switch (field) {
+      case 'fullName':
+        return this.validateFullName();
+      case 'mobileNumber':
+        return this.validateMobile();
+      case 'email':
+        return this.validateEmail();
+      case 'requestType':
+        return this.validateRequestType();
+      case 'description':
+        return this.validateDescription();
+      default:
+        return '';
+    }
+  }
+
+  isFormValid(): boolean {
+    return (
+      !this.validateFullName() &&
+      !this.validateMobile() &&
+      !this.validateEmail() &&
+      !this.validateRequestType() &&
+      !this.validateDescription() &&
+      !this.attachmentError()
     );
   }
 
-  expandAll(): void {
-    this.faqs.update(list => list.map(f => ({ ...f, isOpen: true })));
-  }
-
-  collapseAll(): void {
-    this.faqs.update(list => list.map(f => ({ ...f, isOpen: false })));
-  }
-
-  goBack(): void {
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      window.history.back();
-    } else {
-      this.router.navigate(['/']);
-    }
-  }
-
-  goHome(): void {
-    this.router.navigate(['/']);
-  }
-
-  scrollToTop(smooth = true): void {
-    if (typeof window !== 'undefined') {
-      const behavior: ScrollBehavior = smooth ? 'smooth' : 'auto';
-      window.scrollTo({ top: 0, behavior });
-      const host = this.elementRef?.nativeElement as HTMLElement | undefined;
-      const main = host?.closest('main') || (typeof document !== 'undefined' ? document.querySelector('main') : null);
-      if (main) {
-        if (typeof main.scrollTo === 'function') {
-          main.scrollTo({ top: 0, behavior });
-        } else {
-          main.scrollTop = 0;
+  focusFirstInvalid(): void {
+    if (typeof document === 'undefined') return;
+    const errorFieldIds = ['fullName', 'mobileNumber', 'email', 'requestType', 'description'];
+    for (const id of errorFieldIds) {
+      if (this.getFieldError(id)) {
+        const el = document.getElementById(id) || document.querySelector(`[id*="${id}"]`);
+        if (el && 'focus' in el) {
+          (el as HTMLElement).focus();
+          break;
         }
       }
     }
+  }
+
+  // =========================================================================
+  // 4. SUBMISSION WORKFLOW & DATA PERSISTENCE
+  // =========================================================================
+  onSubmit(): void {
+    this.isSubmitted.set(true);
+    this.submissionError.set(null);
+
+    if (!this.isFormValid()) {
+      this.focusFirstInvalid();
+      return;
+    }
+
+    this.isSubmitting.set(true);
+
+    const refNum = `ISMS-REQ-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    const mappedIssueType: GrievanceIssueType =
+      this.requestType() === 'Technical Issue' ||
+      this.requestType() === 'Login / Registration Issue' ||
+      this.requestType() === 'Complaint / Grievance'
+        ? 'Technical'
+        : 'Enquire';
+
+    const user = this.authService.currentUser();
+    const ssoId = user?.ssoId || 'guest';
+    const emailStr = this.email().trim() ? ` | Email: ${this.email().trim()}` : '';
+    const fullDesc = `[Requester: ${this.fullName().trim()} | Mobile: ${this.mobileNumber().trim()}${emailStr} | SSO: ${ssoId}]\n\n${this.description().trim()}`;
+
+    const grievanceRecord: Partial<Grievance> = {
+      title: `[${refNum}] ${this.requestType()}`,
+      schemeName: 'General / Support Request',
+      description: fullDesc,
+      issueType: mappedIssueType,
+      attachment: this.attachmentFileDoc()?.fileName || 'None',
+      status: 'Open',
+      submittedAt: new Date().toISOString()
+    };
+
+    const adminRecord: Partial<AdminGrievance> = {
+      ...grievanceRecord,
+      userName: this.fullName().trim()
+    };
+
+    forkJoin([
+      this.grievanceRepo.create(grievanceRecord),
+      this.adminGrievanceRepo.create(adminRecord)
+    ])
+      .pipe(
+        catchError(() => {
+          this.submissionError.set('Unable to submit your request. Please try again.');
+          this.isSubmitting.set(false);
+          return of(null);
+        })
+      )
+      .subscribe(res => {
+        if (res) {
+          this.isSubmitting.set(false);
+          this.submittedRefNumber.set(refNum);
+          this.clearFormFields();
+        }
+      });
+  }
+
+  resetForm(): void {
+    this.submittedRefNumber.set(null);
+    this.submissionError.set(null);
+    this.isSubmitted.set(false);
+    this.touchedFields.set({});
+    this.clearFormFields();
+    this.prefillUserInfo();
+  }
+
+  clearFormFields(): void {
+    this.fullName.set('');
+    this.mobileNumber.set('');
+    this.email.set('');
+    this.requestType.set('');
+    this.description.set('');
+    this.attachmentFileDoc.set(null);
+    this.attachmentError.set('');
+  }
+
+  // =========================================================================
+  // 5. NAVIGATION
+  // =========================================================================
+  goHome(): void {
+    this.router.navigate(['/']);
   }
 }

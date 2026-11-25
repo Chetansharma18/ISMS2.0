@@ -153,7 +153,14 @@ export class MockDatabaseService {
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
           } else {
-            this.store.set(key, stored);
+            const upgraded = stored.map((item: any) => {
+              if (item?.schemeName === 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)' && item?.processFees === 2000) {
+                return { ...item, processFees: 10000 };
+              }
+              return item;
+            });
+            this.store.set(key, upgraded);
+            this.saveToStorage(key, upgraded);
           }
         } else if (key === 'GRADING_MASTERS') {
           const hasInvalidGrades = stored.some(

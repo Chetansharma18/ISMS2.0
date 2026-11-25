@@ -6,6 +6,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { StorageService } from '../../core/services/storage.service';
 import { EOI_WIZARD_STEP_COUNT, EoiDraft, EoiDraftService } from '../../core/services/eoi-draft.service';
 import { PermissionService } from '../../core/permissions/permission.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { SchemeService } from './services/scheme.service';
 import { SchemeRequirementsService } from '../../core/services/scheme-requirements.service';
 import {
@@ -425,6 +426,7 @@ export class TendersPageComponent {
   private schemeService = inject(SchemeService);
   private storage = inject(StorageService);
   private destroyRef = inject(DestroyRef);
+  private notificationService = inject(NotificationService);
 
   private permissions = inject(PermissionService);
   readonly currentUser = this.authService.currentUser;
@@ -1132,7 +1134,51 @@ export class TendersPageComponent {
     this.openConfigureScreen();
   }
 
+  private focusField(fieldKey: string): void {
+    const fieldMap: Record<string, string> = {
+      refNo: 'eoiRefNoInput',
+      scheme: 'eoiSchemeSelect',
+      schemeCategory: 'eoiSchemeCategorySelect',
+      eoiCategory: 'eoiCategorySelect',
+      publishedDate: 'eoiPublishedDateInput',
+      submissionDate: 'eoiSubmissionDateInput',
+      eoiDurationValue: 'eoiDurationInput',
+      description: 'eoiDescriptionInput',
+      emdFee: 'eoiEmdFeeInput',
+      processFee: 'eoiProcessFeeInput'
+    };
+    const elId = fieldMap[fieldKey];
+    if (elId) {
+      setTimeout(() => {
+        const el = document.getElementById(elId);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el?.focus();
+      }, 60);
+    }
+  }
+
   nextEoiStep(): void {
+    this.newEoiSubmitted.set(true);
+
+    const step1Validation = validatePublishDetailsStep(this.newEoiData, {
+      existingRefNos: this.existingRefNos(),
+      currentRefNo: this.editingSchemeRefNo(),
+      activeSchemeNames: this.schemeNameOptions(),
+      activeEoiCategories: [...this.eoiCategoryOptions()],
+      schemeMasterItems: this.schemeMasterItems()
+    });
+
+    if (!step1Validation.isValid) {
+      const firstInvalidKey = Object.keys(step1Validation.errors)[0];
+      if (firstInvalidKey) {
+        this.focusField(firstInvalidKey);
+        this.notificationService.error(
+          step1Validation.errors[firstInvalidKey] || 'Please complete all required Publish Details fields.'
+        );
+      }
+      return;
+    }
+
     this.eoiCurrentStep.set(2);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -1143,9 +1189,12 @@ export class TendersPageComponent {
   }
 
   goToEoiStep(step: number): void {
-    if (step >= 1 && step <= 2) {
-      this.eoiCurrentStep.set(step);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (step === 2) {
+      this.nextEoiStep();
+      return;
+    }
+    if (step === 1) {
+      this.prevEoiStep();
     }
   }
 
@@ -1358,6 +1407,39 @@ export class TendersPageComponent {
   submitNewEoi(): void {
     this.newEoiSubmitted.set(true);
 
+    // 1. Validate Step 1 (Publish Details)
+    const step1Validation = validatePublishDetailsStep(this.newEoiData, {
+      existingRefNos: this.existingRefNos(),
+      currentRefNo: this.editingSchemeRefNo(),
+      activeSchemeNames: this.schemeNameOptions(),
+      activeEoiCategories: [...this.eoiCategoryOptions()],
+      schemeMasterItems: this.schemeMasterItems()
+    });
+
+    if (!step1Validation.isValid) {
+      this.eoiCurrentStep.set(1);
+      const firstInvalidKey = Object.keys(step1Validation.errors)[0];
+      if (firstInvalidKey) {
+        this.focusField(firstInvalidKey);
+        this.notificationService.error(
+          step1Validation.errors[firstInvalidKey] || 'Please complete all required Publish Details fields.'
+        );
+      }
+      return;
+    }
+
+    // 2. Validate Step 2 (Uploading Details)
+    const step2Validation = validateUploadingDetailsStep(this.newEoiData);
+    if (!step2Validation.isValid) {
+      const firstDocErr = Object.values(step2Validation.docErrors)[0];
+      const firstAnnexErr = Object.values(step2Validation.annexureErrors)[0];
+      this.notificationService.error(
+        firstDocErr || firstAnnexErr || 'Please check supporting document and annexure requirements.'
+      );
+      return;
+    }
+
+    // 3. Complete validation check
     const validation = validateEoiFormComplete(this.newEoiData, {
       existingRefNos: this.existingRefNos(),
       currentRefNo: this.editingSchemeRefNo(),
@@ -1369,24 +1451,13 @@ export class TendersPageComponent {
     if (!validation.isValid) {
       const firstInvalidKey = Object.keys(validation.errors)[0];
       if (firstInvalidKey) {
-        const fieldMap: Record<string, string> = {
-          refNo: 'eoiRefNoInput',
-          scheme: 'eoiSchemeSelect',
-          schemeCategory: 'eoiSchemeCategorySelect',
-          eoiCategory: 'eoiCategorySelect',
-          publishedDate: 'eoiPublishedDateInput',
-          submissionDate: 'eoiSubmissionDateInput',
-          eoiDurationValue: 'eoiDurationInput',
-          description: 'eoiDescriptionInput',
-          emdFee: 'eoiEmdFeeInput',
-          processFee: 'eoiProcessFeeInput'
-        };
-        const elId = fieldMap[firstInvalidKey];
-        if (elId) {
-          const el = document.getElementById(elId);
-          el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el?.focus();
-        }
+        this.eoiCurrentStep.set(1);
+        this.focusField(firstInvalidKey);
+        this.notificationService.error(
+          validation.errors[firstInvalidKey] || 'Please check all required fields.'
+        );
+      } else {
+        this.notificationService.error('Please check all required EOI configuration fields.');
       }
       return;
     }
@@ -1446,6 +1517,7 @@ export class TendersPageComponent {
       this.isSubmitting.set(false);
       this.showConfigureScreen.set(false);
       this.showCorrigendumModal.set(true);
+      this.notificationService.success('EOI configuration updated successfully.');
     } else {
       // New EOI mode: save directly via SchemeService
       this.schemeService.createScheme(newScheme).subscribe({
@@ -1454,11 +1526,13 @@ export class TendersPageComponent {
           this.isSubmitting.set(false);
           this.showConfigureScreen.set(false);
           this.editingSchemeRefNo.set(null);
+          this.notificationService.success('EOI configuration published successfully.');
           this.router.navigate([], { relativeTo: this.route, queryParams: {} });
         },
         error: (err: any) => {
           this.isSubmitting.set(false);
           this.fileError.set(err?.message || 'Failed to configure EOI');
+          this.notificationService.error(err?.message || 'Failed to configure EOI');
         }
       });
     }

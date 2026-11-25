@@ -191,7 +191,7 @@ export const MOCK_SCHEME_MASTER_ITEMS: SchemeMasterItem[] = resolveMock([
   { sNo: 2, id: 'sch-2', schemeName: 'Mukhyamantri Yuva Swarojgar Yojana (2026)', schemeCategory: 'samarth', categoryName: 'GOVERNMENT INSTITUTION/PSU', budget: 75000000, amount: 75000, processFees: 15000, status: 'Active' },
   { sNo: 3, id: 'sch-3', schemeName: 'Mukhyamantri Yuva Sambal Yojana', schemeCategory: 'saksham', categoryName: 'GOVERNMENT INSTITUTION/INSTITUTION', budget: 25000000, amount: 25000, processFees: 5000, status: 'Active' },
   { sNo: 4, id: 'sch-4', schemeName: 'Mukhya Mantri Yuva Kaushal Yojana', schemeCategory: 'Rajvik, samarth', categoryName: 'SPECIAL TARGET GROUP', budget: 100000000, amount: 100000, processFees: 25000, status: 'Active' },
-  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 50000, processFees: 2000, status: 'Active' },
+  { sNo: 5, id: 'sch-5', schemeName: 'Mukhya Mantri Kaushalya Vikas Yojana (MMKVY)', schemeCategory: 'Rajvik', categoryName: 'GENERAL', budget: 50000000, amount: 50000, processFees: 10000, status: 'Active' },
   { sNo: 6, id: 'sch-6', schemeName: 'Pradhan Mantri Kaushal Vikas Yojana (PMKVY 4.0)', schemeCategory: 'PMKVY, Central', categoryName: 'GENERAL', budget: 80000000, amount: 50000, processFees: 10000, status: 'Active' },
   { sNo: 7, id: 'sch-7', schemeName: 'Rooftop Solar Skill Development Scheme (Surya Ghar Yojana)', schemeCategory: 'Solar, Rajvik', categoryName: 'SPECIAL TARGET GROUP', budget: 60000000, amount: 60000, processFees: 12000, status: 'Active' }
 ]);

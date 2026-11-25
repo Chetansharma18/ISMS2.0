@@ -901,20 +901,24 @@ export class ConfigureEoiFormComponent {
     this.formChange.emit();
   }
 
-  hasError(_field: string): boolean {
-    return false;
+  hasError(field: string): boolean {
+    if (!this.submitted() && !this.touchedFields()[field]) return false;
+    return !!this.validation().errors[field];
   }
 
-  getError(_field: string): string {
-    return '';
+  getError(field: string): string {
+    if (!this.submitted() && !this.touchedFields()[field]) return '';
+    return this.validation().errors[field] || '';
   }
 
-  hasDocError(_index: number): boolean {
-    return false;
+  hasDocError(index: number): boolean {
+    if (!this.submitted() && !this.touchedDocFields()[index]) return false;
+    return !!this.validation().docErrors[index];
   }
 
-  getDocError(_index: number): string {
-    return '';
+  getDocError(index: number): string {
+    if (!this.submitted() && !this.touchedDocFields()[index]) return '';
+    return this.validation().docErrors[index] || '';
   }
 
   onAnnexureChange(index: number): void {
@@ -923,12 +927,14 @@ export class ConfigureEoiFormComponent {
     this.formChange.emit();
   }
 
-  hasAnnexureError(_index: number): boolean {
-    return false;
+  hasAnnexureError(index: number): boolean {
+    if (!this.submitted() && !this.touchedAnnexureFields()[index]) return false;
+    return !!this.validation().annexureErrors?.[index];
   }
 
-  getAnnexureError(_index: number): string {
-    return '';
+  getAnnexureError(index: number): string {
+    if (!this.submitted() && !this.touchedAnnexureFields()[index]) return '';
+    return this.validation().annexureErrors?.[index] || '';
   }
 
   onDocFileUpload(index: number, event: Event): void {

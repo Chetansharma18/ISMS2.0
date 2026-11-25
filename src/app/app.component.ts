@@ -160,11 +160,12 @@ export class AppComponent {
     // RajSSO sends the user back through the backend with ?verifylogin=...; finish the sign-in from here.
     const ssoReturn = inject(SsoLoginFlowService).handleReturn();
 
-    // Already signed in (reload): use the tab's cached permissions; reload them only when the cache is old.
-    // Changes in between arrive through permissionsSyncInterceptor (version header or 403).
+    // Already signed in (reload): show the tab's cached permissions straight away and fetch them again in the
+    // background, so a permission granted (or removed) since shows up on the next reload. Returning to the tab
+    // reloads them only when the cache is old; other changes arrive through permissionsSyncInterceptor (403).
     const tableAccess = inject(TableAccessService);
     if (!ssoReturn && this.authService.currentUser()) {
-      tableAccess.refreshIfStale();
+      tableAccess.refresh();
     }
     const doc = inject(DOCUMENT);
     fromEvent(doc, 'visibilitychange')

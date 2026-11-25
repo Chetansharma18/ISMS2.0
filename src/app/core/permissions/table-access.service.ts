@@ -26,10 +26,10 @@ const OLD_STORAGE_KEY = 'isms_permitted_tables';
  * Table permissions of the signed-in user, from GET /auth/permissions (backend RolePermissions).
  *
  * - Loaded right after sign-in (and after a role switch), cached in sessionStorage, cleared on logout.
- *   A page reload uses the cache and does not call the API.
- * - Reloaded only when they may have changed: the backend sends a different `X-Permissions-Version` header on any
- *   response, an API call answers 403, or the cache is older than 15 minutes when the user reloads or returns to
- *   the tab (`refreshIfStale`).
+ *   A page reload shows the cache at once and fetches the permissions again in the background (AppComponent).
+ * - Also reloaded when they may have changed: the backend sends a different `X-Permissions-Version` header on any
+ *   response, an API call answers 403, or the cache is older than 15 minutes when the user returns to the tab
+ *   (`refreshIfStale`).
  * - `navGroups()` drives the sidebar: only permitted tables that have a screen, grouped by the API's categories.
  * - `can(table, method)` / `canDataKey(dataKey, method)` drive buttons; `tableAccessGuard` drives routes.
  *

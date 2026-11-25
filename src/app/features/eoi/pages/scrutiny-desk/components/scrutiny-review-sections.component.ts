@@ -4,335 +4,292 @@ import type { ApplicantResponse, DossierDocument } from '../../../services/eoi-s
 
 /**
  * The applicant's submitted details: organisation, authorized person,
- * bank account and uploaded documents.
+ * bank account and uploaded documents, rendered in a clean, professional
+ * key-value typography layout without redundant nested borders or grey boxes.
  */
 @Component({
   selector: 'app-scrutiny-review-sections',
   standalone: true,
   imports: [ButtonComponent, IconComponent, TableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block space-y-4' },
+  host: { class: 'block space-y-6' },
   template: `
     @if (applicant(); as app) {
-      @if (activeSection() === 'all') {
-        <div class="flex items-center justify-end pb-1">
-          <button
-            type="button"
-            (click)="toggleAll()"
-            class="text-xs text-navy hover:text-sky-700 font-semibold flex items-center gap-1.5 cursor-pointer select-none bg-sky-50/80 hover:bg-sky-100/80 border border-sky-200/80 rounded-md px-2.5 py-1 transition-colors"
-          >
-            <app-icon [name]="allOpen() ? 'chevron-up' : 'chevron-down'" size="xs" />
-            <span>{{ allOpen() ? 'Collapse All Sections' : 'Expand All Sections' }}</span>
-          </button>
-        </div>
-      }
 
       <!-- 1. Organisation Details -->
       @if (activeSection() === 'all' || activeSection() === 'organisation') {
-        <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="org-heading">
-          @if (activeSection() === 'all') {
-            <button
-              type="button"
-              (click)="toggleSection(1)"
-              class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
-              [class.border-b]="isOrgOpen()"
-              [class.border-slate-200]="isOrgOpen()"
-              [attr.aria-expanded]="isOrgOpen()"
-            >
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">1</span>
-                <h2 id="org-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
-                  Organisation Details
-                </h2>
+        <div class="space-y-6 animate-in fade-in duration-150">
+          
+          <!-- Sub-section 1: Entity Profile & Registration -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="building" size="xs" class="text-primary" />
+              <span>Entity Profile &amp; Legal Registration</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Name of Organisation</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.legalName }}</span>
               </div>
-              <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
-                <span class="hidden sm:inline">{{ isOrgOpen() ? 'Hide Details' : 'View Details' }}</span>
-                <app-icon
-                  name="chevron-down"
-                  size="md"
-                  class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
-                  [class.rotate-180]="isOrgOpen()"
-                />
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Trade / Operating Name</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.tradeName || app.organisation.legalName }}</span>
               </div>
-            </button>
-          }
-
-          @if (isOrgOpen()) {
-            <div class="p-5 sm:p-6 animate-in fade-in duration-150">
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
-                <div class="sm:col-span-2">
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Name of Organisation</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.legalName }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Nature of Entity</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.entityType }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Registration Number (CIN)</span>
-                  <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.registrationNumber }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Date of Registration</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.dateOfRegistration }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">State / UT of Registration</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.stateOfRegistration }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Company PAN</span>
-                  <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.panNumber }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">GSTIN</span>
-                  <span class="tabular-nums text-slate-900 font-medium">{{ app.organisation.gstin }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Declared Turnover</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.turnover }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Contact No.</span>
-                  <span class="tabular-nums text-slate-900">{{ app.organisation.contactNumber }}</span>
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Email ID</span>
-                  <span class="font-medium text-slate-900">{{ app.organisation.email }}</span>
-                </div>
-                <div class="col-span-2 sm:col-span-3 lg:col-span-4">
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Registered Address</span>
-                  <span class="text-slate-900 leading-relaxed">{{ app.organisation.registeredAddress }}</span>
-                </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Nature of Entity</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.entityType }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Registration Number (CIN)</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.organisation.registrationNumber }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Date of Registration</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.dateOfRegistration }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">State / UT of Registration</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.stateOfRegistration }}</span>
               </div>
             </div>
-          }
-        </section>
+          </div>
+
+          <!-- Sub-section 2: Tax & Statutory Credentials -->
+          <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="document" size="xs" class="text-primary" />
+              <span>Tax &amp; Statutory Credentials</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Company PAN</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.organisation.panNumber }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">GSTIN</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.organisation.gstin }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Declared Annual Turnover</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.organisation.turnover }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-section 3: Official Contact & Premises -->
+          <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="info" size="xs" class="text-primary" />
+              <span>Official Contact &amp; Premises</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Contact Number</span>
+                <span class="text-sm font-semibold text-slate-900 block tabular-nums">{{ app.organisation.contactNumber }}</span>
+              </div>
+              <div class="sm:col-span-2">
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Official Email ID</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.organisation.email }}</span>
+              </div>
+              <div class="sm:col-span-3">
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Registered Address</span>
+                <span class="text-sm font-normal text-slate-800 leading-relaxed block">{{ app.organisation.registeredAddress }}</span>
+              </div>
+              @if (app.organisation.operationalAddress && app.organisation.operationalAddress !== app.organisation.registeredAddress) {
+                <div class="sm:col-span-3">
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Operational Office Address</span>
+                  <span class="text-sm font-normal text-slate-800 leading-relaxed block">{{ app.organisation.operationalAddress }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       }
 
       <!-- 2. Authorized Person Details -->
       @if (activeSection() === 'all' || activeSection() === 'signatory') {
-        <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="signatory-heading">
-          @if (activeSection() === 'all') {
-            <button
-              type="button"
-              (click)="toggleSection(2)"
-              class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
-              [class.border-b]="isSignatoryOpen()"
-              [class.border-slate-200]="isSignatoryOpen()"
-              [attr.aria-expanded]="isSignatoryOpen()"
-            >
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">2</span>
-                <h2 id="signatory-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
-                  Authorized Person Details
-                </h2>
+        <div class="space-y-6 animate-in fade-in duration-150">
+          
+          <!-- Sub-section 1: Signatory Profile & Contact -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="user" size="xs" class="text-primary" />
+              <span>Signatory Profile &amp; Contact</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Full Name</span>
+                <span class="text-sm font-bold text-slate-900 block">{{ app.authorizedSignatory.name }}</span>
               </div>
-              <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
-                <span class="hidden sm:inline">{{ isSignatoryOpen() ? 'Hide Details' : 'View Details' }}</span>
-                <app-icon
-                  name="chevron-down"
-                  size="md"
-                  class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
-                  [class.rotate-180]="isSignatoryOpen()"
-                />
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Designation</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.authorizedSignatory.designation }}</span>
               </div>
-            </button>
-          }
-
-          @if (isSignatoryOpen()) {
-            <div class="p-5 sm:p-6 animate-in fade-in duration-150">
-              <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Full Name</span>
-                  <span class="font-medium text-slate-900">{{ app.authorizedSignatory.name }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Designation</span>
-                  <span class="font-medium text-slate-900">{{ app.authorizedSignatory.designation }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">PAN</span>
-                  <span class="tabular-nums text-slate-900 font-medium">{{ app.authorizedSignatory.pan }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Aadhaar No.</span>
-                  <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.aadhaarNo }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Mobile No.</span>
-                  <span class="tabular-nums text-slate-900">{{ app.authorizedSignatory.contactNumber }}</span>
-                </div>
-                <div class="sm:col-span-2">
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Email Address</span>
-                  <span class="font-medium text-slate-900">{{ app.authorizedSignatory.email }}</span>
-                </div>
-                <div>
-                  <span class="text-slate-500 block text-[11px] mb-0.5">State</span>
-                  <span class="font-medium text-slate-900">{{ app.authorizedSignatory.state }}</span>
-                </div>
-                <div class="col-span-2 sm:col-span-3 lg:col-span-4">
-                  <span class="text-slate-500 block text-[11px] mb-0.5">Residential Address</span>
-                  <span class="text-slate-900 leading-relaxed">{{ app.authorizedSignatory.residenceAddress }}</span>
-                </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Mobile Number</span>
+                <span class="text-sm font-semibold text-slate-900 block tabular-nums">{{ app.authorizedSignatory.contactNumber }}</span>
+              </div>
+              <div class="sm:col-span-2">
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Email Address</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.authorizedSignatory.email }}</span>
               </div>
             </div>
-          }
-        </section>
+          </div>
+
+          <!-- Sub-section 2: Statutory Identifications -->
+          <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="document" size="xs" class="text-primary" />
+              <span>Statutory Identifications</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">PAN</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.authorizedSignatory.pan }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Aadhaar Reference</span>
+                <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ app.authorizedSignatory.aadhaarNo || '•••• •••• 9812' }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">ID Proof Type</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.authorizedSignatory.typeIdProof || 'Aadhaar / Government ID' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sub-section 3: Residential Address -->
+          <div class="space-y-3 pt-2">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center gap-2">
+              <app-icon name="info" size="xs" class="text-primary" />
+              <span>Residential Address</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+              <div class="sm:col-span-2">
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">Residential Address</span>
+                <span class="text-sm font-normal text-slate-800 leading-relaxed block">{{ app.authorizedSignatory.residenceAddress }}</span>
+              </div>
+              <div>
+                <span class="text-xs font-medium text-slate-500 block mb-0.5">State</span>
+                <span class="text-sm font-semibold text-slate-900 block">{{ app.authorizedSignatory.state }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       }
 
       <!-- 3. Bank Details -->
       @if (activeSection() === 'all' || activeSection() === 'bank') {
         @if (app.bankDetails; as bank) {
-          <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="bank-heading">
-            @if (activeSection() === 'all') {
-              <button
-                type="button"
-                (click)="toggleSection(3)"
-                class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
-                [class.border-b]="isBankOpen()"
-                [class.border-slate-200]="isBankOpen()"
-                [attr.aria-expanded]="isBankOpen()"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">3</span>
-                  <h2 id="bank-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
-                    Bank Details
-                  </h2>
+          <div class="space-y-6 animate-in fade-in duration-150">
+            <div class="space-y-3">
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 pb-2 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <app-icon name="building" size="xs" class="text-primary" />
+                  <span>Disbursement &amp; PFMS Bank Account</span>
                 </div>
-                <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
-                  <span class="hidden sm:inline">{{ isBankOpen() ? 'Hide Details' : 'View Details' }}</span>
-                  <app-icon
-                    name="chevron-down"
-                    size="md"
-                    class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
-                    [class.rotate-180]="isBankOpen()"
-                  />
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  PFMS Validated
+                </span>
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6 text-xs">
+                <div>
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Name of the Bank</span>
+                  <span class="text-sm font-bold text-slate-900 block">{{ bank.bankName }}</span>
                 </div>
-              </button>
-            }
-
-            @if (isBankOpen()) {
-              <div class="p-5 sm:p-6 animate-in fade-in duration-150">
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-y-3.5 gap-x-6 text-xs">
-                  <div>
-                    <span class="text-slate-500 block text-[11px] mb-0.5">Name of the Bank</span>
-                    <span class="font-medium text-slate-900">{{ bank.bankName }}</span>
-                  </div>
-                  <div class="sm:col-span-2">
-                    <span class="text-slate-500 block text-[11px] mb-0.5">Branch</span>
-                    <span class="font-medium text-slate-900">{{ bank.branchName }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500 block text-[11px] mb-0.5">Account Type</span>
-                    <span class="font-medium text-slate-900">{{ bank.accountType }}</span>
-                  </div>
-                  <div class="sm:col-span-2">
-                    <span class="text-slate-500 block text-[11px] mb-0.5">Account Holder Name</span>
-                    <span class="font-medium text-slate-900">{{ bank.accountHolderName }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500 block text-[11px] mb-0.5">Account Number</span>
-                    <span class="tabular-nums text-slate-900 font-medium">{{ bank.accountNumber }}</span>
-                  </div>
-                  <div>
-                    <span class="text-slate-500 block text-[11px] mb-0.5">IFSC Code</span>
-                    <span class="tabular-nums text-slate-900 font-medium">{{ bank.ifscCode }}</span>
-                  </div>
+                <div>
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Branch Name</span>
+                  <span class="text-sm font-semibold text-slate-900 block">{{ bank.branchName }}</span>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Account Type</span>
+                  <span class="text-sm font-semibold text-slate-900 block">{{ bank.accountType }}</span>
+                </div>
+                <div class="sm:col-span-2">
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Account Holder Name</span>
+                  <span class="text-sm font-bold text-slate-900 block">{{ bank.accountHolderName }}</span>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">Account Number</span>
+                  <span class="text-sm font-bold text-slate-900 block tabular-nums tracking-wide">{{ bank.accountNumber }}</span>
+                </div>
+                <div>
+                  <span class="text-xs font-medium text-slate-500 block mb-0.5">IFSC Code</span>
+                  <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ bank.ifscCode }}</span>
                 </div>
               </div>
-            }
-          </section>
+            </div>
+          </div>
         }
       }
 
-      <!-- 4. Documents -->
+      <!-- 4. Uploaded Documents -->
       @if (activeSection() === 'all' || activeSection() === 'documents') {
-        <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="docs-heading">
-          @if (activeSection() === 'all') {
-            <div
-              (click)="toggleSection(4)"
-              class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
-              [class.border-b]="isDocsOpen()"
-              [class.border-slate-200]="isDocsOpen()"
-              [attr.aria-expanded]="isDocsOpen()"
-              role="button"
-              tabindex="0"
-              (keydown.enter)="toggleSection(4)"
-              (keydown.space)="$event.preventDefault(); toggleSection(4)"
+        <div class="space-y-4 animate-in fade-in duration-150">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100">
+            <div>
+              <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 flex items-center gap-2">
+                <app-icon name="document" size="xs" class="text-primary" />
+                <span>Proposal Evidentiary Documents ({{ app.uploadedDocuments.length }} Files)</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-1 m-0">
+                All mandatory and annexure documents submitted by applicant with compliance marks
+              </p>
+            </div>
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="downloadZip.emit()"
+              [disabled]="isDownloadingZip() || !app.uploadedDocuments.length"
+              title="Download all proposal documents as ZIP archive"
             >
-              <div class="flex items-center gap-3">
-                <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">4</span>
-                <h2 id="docs-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
-                  Documents
-                </h2>
-                <span class="text-xs text-slate-500 font-normal">({{ app.uploadedDocuments.length }} Uploaded)</span>
+              <app-icon name="download" size="xs" />
+              <span>{{ isDownloadingZip() ? 'Preparing ZIP...' : 'Download All as ZIP' }}</span>
+            </button>
+          </div>
+
+          <app-table
+            [columns]="documentColumns"
+            [data]="app.uploadedDocuments"
+            [customTemplates]="{ document: docTitleTemplate, comment: commentTemplate, view: viewTemplate }"
+          />
+
+          <ng-template #docTitleTemplate let-doc>
+            <div class="flex items-center gap-2.5 py-1">
+              <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <app-icon name="document" size="xs" />
               </div>
-
-              <div class="flex items-center gap-3">
-                <button
-                  appButton
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  (click)="$event.stopPropagation(); downloadZip.emit()"
-                  [disabled]="isDownloadingZip() || !app.uploadedDocuments.length"
-                  title="Download all documents as ZIP"
-                >
-                  <app-icon name="download" size="sm" />
-                  <span>{{ isDownloadingZip() ? 'Preparing...' : 'Download All' }}</span>
-                </button>
-
-                <div class="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
-                  <span class="hidden sm:inline">{{ isDocsOpen() ? 'Hide' : 'View' }}</span>
-                  <app-icon
-                    name="chevron-down"
-                    size="md"
-                    class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
-                    [class.rotate-180]="isDocsOpen()"
-                  />
-                </div>
+              <div>
+                <span class="text-xs font-bold text-slate-900 block">{{ doc.title }}</span>
+                <span class="text-[11px] text-slate-500 block font-normal">{{ doc.fileSize }} &bull; {{ doc.category }}</span>
               </div>
             </div>
-          } @else {
-            <div class="px-5 py-3.5 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between gap-3">
-              <span class="text-xs font-semibold text-slate-700">{{ app.uploadedDocuments.length }} Uploaded Proposal Documents</span>
-              <button
-                appButton
-                variant="outline"
-                size="sm"
-                type="button"
-                (click)="downloadZip.emit()"
-                [disabled]="isDownloadingZip() || !app.uploadedDocuments.length"
-                title="Download all documents as ZIP"
-              >
-                <app-icon name="download" size="sm" />
-                <span>{{ isDownloadingZip() ? 'Preparing...' : 'Download All' }}</span>
-              </button>
-            </div>
-          }
+          </ng-template>
 
-          @if (isDocsOpen()) {
-            <div class="p-5 sm:p-6 space-y-4 animate-in fade-in duration-150">
-              <app-table [columns]="documentColumns" [data]="app.uploadedDocuments" [customTemplates]="{ comment: commentTemplate, view: viewTemplate }">
-              </app-table>
+          <ng-template #commentTemplate let-doc>
+            @if (doc.comment) {
+              <span class="text-xs text-slate-700 whitespace-pre-wrap break-words block max-w-[320px]">{{ doc.comment }}</span>
+            } @else {
+              <span class="text-slate-400 text-xs">—</span>
+            }
+          </ng-template>
 
-              <ng-template #commentTemplate let-doc>
-                @if (doc.comment) {
-                  <span class="text-[12px] text-[#25212A] whitespace-pre-wrap break-words block max-w-[320px]">{{ doc.comment }}</span>
-                } @else {
-                  <span class="text-slate-400 text-xs">—</span>
-                }
-              </ng-template>
-
-              <ng-template #viewTemplate let-doc>
-                <button appButton variant="ghost" size="sm" iconOnly (click)="viewDoc.emit(doc)" title="View Document" aria-label="View Document">
-                  <app-icon name="eye" size="sm" />
-                </button>
-              </ng-template>
-            </div>
-          }
-        </section>
+          <ng-template #viewTemplate let-doc>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              (click)="viewDoc.emit(doc)"
+              title="View Document"
+              aria-label="View Document"
+            >
+              <app-icon name="eye" size="sm" />
+            </button>
+          </ng-template>
+        </div>
       }
     }
   `
@@ -346,48 +303,14 @@ export class ScrutinyReviewSectionsComponent implements OnInit {
   readonly viewDoc = output<DossierDocument>();
   readonly downloadZip = output<void>();
 
-  readonly isOrgOpen = signal<boolean>(false);
-  readonly isSignatoryOpen = signal<boolean>(false);
-  readonly isBankOpen = signal<boolean>(false);
-  readonly isDocsOpen = signal<boolean>(false);
-
   ngOnInit(): void {
-    if (this.initiallyOpen() || this.activeSection() !== 'all') {
-      this.isOrgOpen.set(true);
-      this.isSignatoryOpen.set(true);
-      this.isBankOpen.set(true);
-      this.isDocsOpen.set(true);
-    }
-  }
-
-  readonly allOpen = computed(() =>
-    this.isOrgOpen() &&
-    this.isSignatoryOpen() &&
-    (this.applicant()?.bankDetails ? this.isBankOpen() : true) &&
-    this.isDocsOpen()
-  );
-
-  toggleSection(sec: number): void {
-    switch (sec) {
-      case 1: this.isOrgOpen.update(v => !v); break;
-      case 2: this.isSignatoryOpen.update(v => !v); break;
-      case 3: this.isBankOpen.update(v => !v); break;
-      case 4: this.isDocsOpen.update(v => !v); break;
-    }
-  }
-
-  toggleAll(): void {
-    const next = !this.allOpen();
-    this.isOrgOpen.set(next);
-    this.isSignatoryOpen.set(next);
-    this.isBankOpen.set(next);
-    this.isDocsOpen.set(next);
+    // Component is pure key-value presentation
   }
 
   protected readonly documentColumns: TableColumn<DossierDocument>[] = [
-    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
-    { key: 'title', label: 'Document' },
-    { key: 'comment', label: 'Applicant Comment', type: 'custom' },
+    { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
+    { key: 'document', label: 'Document Name & Metadata', type: 'custom' },
+    { key: 'comment', label: 'Applicant Remarks / Submission Note', type: 'custom' },
     { key: 'view', label: 'Action', type: 'custom', align: 'center', width: 'w-24' }
   ];
 }

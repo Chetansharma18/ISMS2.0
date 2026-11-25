@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, input, signal } from '@angular/core';
-import { NgClass } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { IconComponent, TableColumn, TableComponent } from '../../../../../shared';
 import type { PastEngagement } from '../../../services/eoi-state.models';
 
@@ -9,137 +9,113 @@ function percent(part: number, whole: number): number {
 }
 
 /**
- * Track record of the organisation under earlier EOIs in a collapsible dropdown card.
+ * Track record of the organisation under earlier government skill schemes.
  */
 @Component({
   selector: 'app-scrutiny-past-performance',
   standalone: true,
-  imports: [NgClass, TableComponent, IconComponent],
+  imports: [NgClass, DecimalPipe, TableComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block' },
+  host: { class: 'block space-y-5' },
   template: `
-    <section class="bg-white rounded-xl border border-slate-200/90 shadow-2xs overflow-hidden" aria-labelledby="past-heading">
-      <button
-        type="button"
-        (click)="toggleOpen()"
-        class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-5 py-4 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer select-none group focus:outline-none"
-        [class.border-b]="isOpen()"
-        [class.border-slate-200]="isOpen()"
-        [attr.aria-expanded]="isOpen()"
-      >
-        <div class="flex items-center gap-3">
-          <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">5</span>
-          <h2 id="past-heading" class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-navy transition-colors m-0">
-            Past Performance
-          </h2>
-          <span class="text-xs text-slate-500 font-normal">({{ engagements().length }} Schemes)</span>
+    @if (engagements().length === 0) {
+      <div class="py-10 text-center text-slate-500 text-xs">
+        <app-icon name="info" size="md" class="mx-auto mb-2 text-slate-400" />
+        <p class="m-0 font-medium">This organisation has not been empaneled under any prior state or central skilling schemes.</p>
+      </div>
+    } @else {
+      <!-- Overall result across all earlier schemes: Clean Grid (No heavy box borders) -->
+      <div class="space-y-4">
+        <div class="pb-3 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0 flex items-center gap-2">
+            <app-icon name="document" size="xs" class="text-primary" />
+            <span>Cumulative Skilling Track Record Summary</span>
+          </h3>
+          <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">
+            Overall Placement: {{ totals().placedPercent }}%
+          </span>
         </div>
 
-        <div class="flex items-center gap-2 text-slate-500 text-xs font-medium">
-          <span class="hidden sm:inline">{{ isOpen() ? 'Hide Details' : 'View Details' }}</span>
-          <app-icon
-            name="chevron-down"
-            size="md"
-            class="text-slate-400 group-hover:text-slate-600 transition-transform duration-200"
-            [class.rotate-180]="isOpen()"
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-y-4 gap-x-6 text-xs pb-4 border-b border-slate-100">
+          <div>
+            <span class="text-xs font-medium text-slate-500 block mb-0.5">Prior Schemes</span>
+            <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ engagements().length }} Schemes</span>
+          </div>
+          <div>
+            <span class="text-xs font-medium text-slate-500 block mb-0.5">Total Target Allocated</span>
+            <span class="text-sm font-bold text-slate-900 block tabular-nums">{{ totals().target | number }}</span>
+          </div>
+          <div>
+            <span class="text-xs font-medium text-slate-500 block mb-0.5">Candidates Trained</span>
+            <span class="text-sm font-bold text-slate-900 block tabular-nums">
+              {{ totals().trained | number }}
+              <span class="text-xs font-medium text-slate-500">({{ totals().trainedPercent }}%)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-xs font-medium text-slate-500 block mb-0.5">Candidates Placed</span>
+            <span class="text-sm font-bold text-slate-900 block tabular-nums">
+              {{ totals().placed | number }}
+              <span class="text-xs font-medium text-slate-500">({{ totals().placedPercent }}%)</span>
+            </span>
+          </div>
+          <div>
+            <span class="text-xs font-medium text-slate-500 block mb-0.5">Training Achievement</span>
+            <span class="text-sm font-bold block" [ngClass]="tone(totals().trainedPercent)">
+              {{ totals().trainedPercent }}% Verified
+            </span>
+          </div>
+        </div>
+
+        <!-- Schemes Track Record Table -->
+        <div class="space-y-2 pt-2">
+          <span class="text-xs font-bold text-slate-700 block">Scheme-Wise Performance History:</span>
+          <app-table
+            [columns]="columns"
+            [data]="engagements()"
+            [customTemplates]="{ achievement: achievementTemplate, status: statusTemplate }"
           />
-        </div>
-      </button>
 
-      @if (isOpen()) {
-        <div class="p-5 sm:p-6 space-y-4 animate-in fade-in duration-150">
-          @if (engagements().length === 0) {
-            <p class="m-0 text-xs text-slate-500">
-              This organisation has not been empanelled under any earlier scheme.
-            </p>
-          } @else {
-            <!-- Overall result across all earlier schemes -->
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-3 text-xs">
-              <div>
-                <span class="text-[11.5px] text-slate-500 block">Schemes</span>
-                <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ engagements().length }}</span>
+          <ng-template #achievementTemplate let-row>
+            <div class="flex items-center gap-2">
+              <div class="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden border border-slate-200">
+                <div class="bg-primary h-1.5 rounded-full" [style.width.%]="percent(row.trained, row.target)"></div>
               </div>
-              <div>
-                <span class="text-[11.5px] text-slate-500 block">Total Target</span>
-                <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ totals().target }}</span>
-              </div>
-              <div>
-                <span class="text-[11.5px] text-slate-500 block">Trained</span>
-                <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ totals().trained }} ({{ totals().trainedPercent }}% of target)</span>
-              </div>
-              <div>
-                <span class="text-[11.5px] text-slate-500 block">Placed</span>
-                <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ totals().placed }} ({{ totals().placedPercent }}% of trained)</span>
-              </div>
-              <div>
-                <span class="text-[11.5px] text-slate-500 block">Overall Achievement</span>
-                <span class="text-[12.5px] font-semibold block mt-1" [ngClass]="tone(totals().trainedPercent)">{{ totals().trainedPercent }}%</span>
-              </div>
+              <span class="text-xs font-bold tabular-nums text-slate-800">{{ percent(row.trained, row.target) }}%</span>
             </div>
+          </ng-template>
 
-            <app-table
-              [columns]="columns"
-              [data]="engagements()"
-              [customTemplates]="{ scheme: schemeTemplate, year: yearTemplate, achievement: achievementTemplate }"
+          <ng-template #statusTemplate let-row>
+            <span
+              class="inline-block px-2 py-0.5 rounded text-[11px] font-bold border"
+              [class.bg-emerald-50]="row.status === 'Completed'"
+              [class.text-emerald-800]="row.status === 'Completed'"
+              [class.border-emerald-200]="row.status === 'Completed'"
+              [class.bg-blue-50]="row.status === 'Ongoing'"
+              [class.text-blue-800]="row.status === 'Ongoing'"
+              [class.border-blue-200]="row.status === 'Ongoing'"
             >
-            </app-table>
-
-            <ng-template #schemeTemplate let-row>
-              <span class="block font-medium text-slate-900 text-[12.5px]">{{ row.schemeName }}</span>
-              <span class="block text-[11px] text-slate-500 tabular-nums">{{ row.eoiRefNo }}</span>
-            </ng-template>
-
-            <ng-template #yearTemplate let-row>
-              {{ row.financialYear }}
-              @if (row.status === 'Ongoing') {
-                <span class="ml-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800 text-[10px] font-semibold">Ongoing</span>
-              }
-            </ng-template>
-
-            <ng-template #achievementTemplate let-row>
-              <span class="font-semibold" [ngClass]="tone(achievement(row))">{{ achievement(row) }}%</span>
-            </ng-template>
-
-            <p class="m-0 text-[11px] text-slate-500">
-              Achievement is the share of the target that was trained. Placement is measured against the number trained.
-            </p>
-          }
+              {{ row.status }}
+            </span>
+          </ng-template>
         </div>
-      }
-    </section>
+      </div>
+    }
   `
 })
 export class ScrutinyPastPerformanceComponent implements OnInit {
   readonly engagements = input<PastEngagement[]>([]);
-  readonly initiallyOpen = input<boolean>(false);
-  readonly isOpen = signal<boolean>(false);
+  readonly initiallyOpen = input<boolean>(true);
 
-  ngOnInit(): void {
-    if (this.initiallyOpen()) {
-      this.isOpen.set(true);
-    }
-  }
+  ngOnInit(): void {}
 
-  toggleOpen(): void {
-    this.isOpen.update(v => !v);
-  }
+  protected percent = percent;
 
-  protected readonly columns: TableColumn<PastEngagement>[] = [
-    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-10' },
-    { key: 'scheme', label: 'Scheme', type: 'custom' },
-    { key: 'year', label: 'Year', type: 'custom', cellClass: 'whitespace-nowrap' },
-    { key: 'target', label: 'Target', align: 'right' },
-    { key: 'trained', label: 'Trained', align: 'right' },
-    { key: 'certified', label: 'Certified', align: 'right' },
-    { key: 'placed', label: 'Placed', align: 'right' },
-    { key: 'achievement', label: 'Achievement', type: 'custom', align: 'right', cellClass: 'whitespace-nowrap' }
-  ];
-
-  protected readonly totals = computed(() => {
-    const rows = this.engagements();
-    const target = rows.reduce((sum, r) => sum + r.target, 0);
-    const trained = rows.reduce((sum, r) => sum + r.trained, 0);
-    const placed = rows.reduce((sum, r) => sum + r.placed, 0);
+  readonly totals = computed(() => {
+    const list = this.engagements();
+    const target = list.reduce((sum, e) => sum + e.target, 0);
+    const trained = list.reduce((sum, e) => sum + e.trained, 0);
+    const placed = list.reduce((sum, e) => sum + e.placed, 0);
     return {
       target,
       trained,
@@ -149,14 +125,19 @@ export class ScrutinyPastPerformanceComponent implements OnInit {
     };
   });
 
-  protected achievement(row: PastEngagement): number {
-    return percent(row.trained, row.target);
+  tone(pct: number): string {
+    if (pct >= 80) return 'text-emerald-600';
+    if (pct >= 50) return 'text-amber-600';
+    return 'text-rose-600';
   }
 
-  /** Text colour for an achievement percentage: low results stand out. */
-  protected tone(value: number): string {
-    if (value >= 80) return 'text-navy';
-    if (value >= 50) return 'text-amber-700';
-    return 'text-rose-700';
-  }
+  protected readonly columns: TableColumn<PastEngagement>[] = [
+    { key: '$index', label: 'Sr. No', type: 'number', align: 'center', width: 'w-16' },
+    { key: 'schemeName', label: 'Scheme Name' },
+    { key: 'target', label: 'Target', type: 'number', align: 'center' },
+    { key: 'trained', label: 'Trained', type: 'number', align: 'center' },
+    { key: 'placed', label: 'Placed', type: 'number', align: 'center' },
+    { key: 'achievement', label: 'Achievement %', type: 'custom', align: 'center' },
+    { key: 'status', label: 'Status', type: 'custom', align: 'center', width: 'w-28' }
+  ];
 }

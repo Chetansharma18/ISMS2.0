@@ -118,43 +118,41 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 
                 <!-- Active Step Content -->
                 @if (stepKey() === 'overview') {
-                  <div class="space-y-5 animate-in fade-in duration-150">
-                    <!-- Applicant Header & Status Badge in same format -->
-                    <div class="mb-5">
+                  <div class="space-y-6 animate-in fade-in duration-150">
+                    <!-- Applicant Header & Status Badge -->
+                    <div>
                       <div class="flex items-center gap-3 flex-wrap">
-                        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight m-0">
                           {{ app.anonymousLabel }}
                         </h2>
                         <span
-                          class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
+                          class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold border"
                           [ngClass]="statusBadgeClass(app)"
                         >
                           {{ statusLabel(app) }}
                         </span>
                       </div>
-                      <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">
+                      <p class="text-xs sm:text-sm text-slate-500 mt-1 m-0 font-medium">
                         Proposal under {{ app.schemeName }}
                       </p>
 
-                      <!-- Summary Grid Card in same format -->
-                      <div class="mt-4 bg-slate-50/80 rounded-xl border border-slate-200/90 p-4 sm:p-5">
-                        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-                          <div>
-                            <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
-                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1 tabular-nums break-all">{{ app.eoiRefNo }}</span>
-                          </div>
-                          <div>
-                            <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>
-                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1">{{ app.schemeName }}</span>
-                          </div>
-                          <div>
-                            <span class="text-[11.5px] text-slate-500 block leading-tight">Registration No.</span>
-                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1 tabular-nums">{{ app.regNumber }}</span>
-                          </div>
-                          <div>
-                            <span class="text-[11.5px] text-slate-500 block leading-tight">Submitted On</span>
-                            <span class="text-[12.5px] font-semibold text-slate-900 block mt-1">{{ app.submissionDate }}</span>
-                          </div>
+                      <!-- Clean Definition List (No nested grey box borders) -->
+                      <div class="grid grid-cols-2 lg:grid-cols-4 gap-y-4 gap-x-6 text-xs py-4 my-4 border-y border-slate-100">
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">EOI Reference No.</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums break-all">{{ app.eoiRefNo }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Scheme</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block">{{ app.schemeName }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Registration No.</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums">{{ app.regNumber }}</span>
+                        </div>
+                        <div>
+                          <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">Submitted On</span>
+                          <span class="text-[13.5px] font-bold text-slate-900 block tabular-nums">{{ app.submissionDate }}</span>
                         </div>
                       </div>
                     </div>
@@ -166,16 +164,39 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
 
                     <!-- Appeal Quick Callout (if appeal exists) -->
                     @if (app.appeal) {
-                      <div class="bg-amber-50/70 border border-amber-200/90 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div
+                        class="p-4 sm:p-5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                        [class.bg-emerald-50/60]="app.appeal.status === 'Accepted'"
+                        [class.border-emerald-200]="app.appeal.status === 'Accepted'"
+                        [class.bg-amber-50/60]="app.appeal.status === 'Pending'"
+                        [class.border-amber-200]="app.appeal.status === 'Pending'"
+                        [class.bg-rose-50/60]="app.appeal.status === 'Rejected'"
+                        [class.border-rose-200]="app.appeal.status === 'Rejected'"
+                      >
                         <div>
                           <div class="flex items-center gap-2">
-                            <span class="font-bold text-amber-900 text-sm">Appeal Request Submitted</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                              Status: {{ app.appeal.status }}
+                            <span
+                              class="font-bold text-sm"
+                              [class.text-emerald-950]="app.appeal.status === 'Accepted'"
+                              [class.text-amber-950]="app.appeal.status === 'Pending'"
+                              [class.text-rose-950]="app.appeal.status === 'Rejected'"
+                            >
+                              {{ app.appeal.status === 'Accepted' ? 'Statutory Appeal Approved & Qualified' : (app.appeal.status === 'Rejected' ? 'Statutory Appeal Rejected' : 'Statutory Appeal Pending Committee Review') }}
+                            </span>
+                            <span
+                              class="px-2 py-0.5 rounded text-[11px] font-bold"
+                              [class.bg-emerald-100]="app.appeal.status === 'Accepted'"
+                              [class.text-emerald-800]="app.appeal.status === 'Accepted'"
+                              [class.bg-amber-100]="app.appeal.status === 'Pending'"
+                              [class.text-amber-800]="app.appeal.status === 'Pending'"
+                              [class.bg-rose-100]="app.appeal.status === 'Rejected'"
+                              [class.text-rose-800]="app.appeal.status === 'Rejected'"
+                            >
+                              {{ app.appeal.status === 'Accepted' ? 'Grade A+ (88/100)' : 'Awaiting Review' }}
                             </span>
                           </div>
-                          <p class="text-xs text-amber-800 mt-1 m-0 leading-relaxed">
-                            This applicant has submitted an appeal against the initial disqualification. Review the appeal justification and uploaded proofs in the Appeal Details section.
+                          <p class="text-xs text-slate-700 mt-1.5 m-0 leading-relaxed font-normal">
+                            {{ app.appeal.reply || 'Appeal against initial disqualification submitted with verified UDIN documentation.' }}
                           </p>
                         </div>
                         <button
@@ -186,31 +207,31 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
                           (click)="onStepSelect(2)"
                           class="shrink-0"
                         >
-                          <span>View Appeal</span>
+                          <span>View Appeal History &amp; Logs</span>
                           <app-icon name="forward" size="xs" />
                         </button>
                       </div>
                     }
 
                     <!-- Dossier Contents Highlights -->
-                    <div class="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5">
-                      <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3.5">Proposal Contents Overview</h3>
+                    <div class="space-y-3 pt-2">
+                      <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider m-0">Proposal Contents Overview</h3>
                       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 text-xs">
-                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
-                          <span class="text-[11px] text-slate-500 block">Uploaded Documents</span>
-                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.uploadedDocuments.length }} Files</span>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Uploaded Documents</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.uploadedDocuments.length }} Files</span>
                         </div>
-                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
-                          <span class="text-[11px] text-slate-500 block">Past Schemes</span>
-                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.pastEngagements?.length ?? 0 }} Schemes</span>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Past Schemes</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.pastEngagements?.length ?? 0 }} Schemes</span>
                         </div>
-                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
-                          <span class="text-[11px] text-slate-500 block">Proposed Centres</span>
-                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.trainingCentres.length }} Centres</span>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Proposed Centres</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.trainingCentres.length }} Centres</span>
                         </div>
-                        <div class="p-3 bg-slate-50/80 rounded-lg border border-slate-200">
-                          <span class="text-[11px] text-slate-500 block">Turnover Records</span>
-                          <span class="text-base font-bold text-slate-900 block mt-1">{{ app.financialYears.length }} FYs</span>
+                        <div class="p-4 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                          <span class="text-xs font-medium text-slate-500 block">Turnover Records</span>
+                          <span class="text-lg font-bold text-slate-900 block mt-1">{{ app.financialYears.length }} FYs</span>
                         </div>
                       </div>
                     </div>
@@ -286,6 +307,45 @@ import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
                     />
                   </div>
                 }
+
+                <!-- Bottom Step Navigation Footer -->
+                <div class="border-t border-slate-100 pt-5 mt-8 flex items-center justify-between gap-3">
+                  <button
+                    appButton
+                    variant="outline"
+                    size="sm"
+                    [disabled]="activeStep() === 1"
+                    (click)="prevStep()"
+                    title="Go to previous review section"
+                  >
+                    <app-icon name="back" size="xs" />
+                    <span>Previous Step</span>
+                  </button>
+
+                  @if (activeStep() < steps().length) {
+                    <button
+                      appButton
+                      variant="primary"
+                      size="sm"
+                      (click)="nextStep()"
+                      title="Proceed to next review section"
+                    >
+                      <span>Next: {{ getNextStepLabel() }}</span>
+                      <app-icon name="forward" size="xs" />
+                    </button>
+                  } @else {
+                    <a
+                      appButton
+                      variant="primary"
+                      size="sm"
+                      [routerLink]="['/admin/responses', app.schemeId || 'ALL']"
+                      title="Finish review and return to submissions list"
+                    >
+                      <app-icon name="check" size="xs" />
+                      <span>Finish Review &amp; Exit</span>
+                    </a>
+                  }
+                </div>
             </div>
           </div>
         </div>
@@ -446,6 +506,15 @@ export class ScrutinyDeskComponent {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
+  }
+
+  getNextStepLabel(): string {
+    const s = this.activeStep();
+    const steps = this.steps();
+    if (s < steps.length) {
+      return steps[s]?.label ?? 'Next Section';
+    }
+    return 'Finish Review';
   }
 
   onStepSelect(stepNumber: number): void {

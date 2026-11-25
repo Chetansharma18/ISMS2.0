@@ -47,6 +47,25 @@ export interface PastEngagement {
   status: 'Completed' | 'Ongoing';
 }
 
+export interface AppealHistoryItem {
+  id: string;
+  timestamp: string;
+  actor: string;
+  actorRole: string;
+  action: 'DISQUALIFIED' | 'APPEAL_FILED' | 'DESK_VERIFIED' | 'DECISION_APPROVED' | 'DECISION_REJECTED';
+  title: string;
+  remarks: string;
+  badgeLabel: string;
+  badgeVariant: 'danger' | 'warning' | 'info' | 'success';
+  files?: { fileName: string; fileSize?: string }[];
+  meta?: {
+    grade?: string;
+    marks?: string;
+    udin?: string;
+    refNo?: string;
+  };
+}
+
 export interface ApplicantAppeal {
   submittedOn: string;
   reply: string;
@@ -54,6 +73,7 @@ export interface ApplicantAppeal {
   status: 'Pending' | 'Accepted' | 'Rejected';
   decisionRemarks?: string;
   decidedAt?: string;
+  history?: AppealHistoryItem[];
   response?: {
     respondedOn: string;
     remarks?: string;

@@ -15,7 +15,7 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
   host: { class: 'block' },
   template: `
     <div class="flex items-center justify-between gap-3">
-      <div>
+      <div class="flex items-center gap-3">
         <a
           appButton
           variant="outline"
@@ -26,6 +26,11 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
           <app-icon name="back" />
           <span>Back</span>
         </a>
+        <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <span>EOI Responses</span>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-800 font-semibold truncate max-w-md">{{ applicant()?.schemeName || 'Proposal Scrutiny Desk' }}</span>
+        </div>
       </div>
 
       <!-- Review actions -->
@@ -45,13 +50,14 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
         } @else {
           <button
             appButton
-            variant="primary"
+            variant="outline"
             size="sm"
             type="button"
             (click)="remark.emit()"
-            title="Add Remark"
+            title="Add Departmental Remark"
           >
-            <span>Remark</span>
+            <app-icon name="document" size="xs" />
+            <span>Add Remark</span>
           </button>
         }
       </div>

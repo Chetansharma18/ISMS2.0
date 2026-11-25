@@ -55,8 +55,17 @@ export interface TenderProposalDocReplaceRequest {
           <app-icon name="eye" size="sm" />
         </button>
         @if (isEditing()) {
-          <button appButton variant="secondary" size="sm" type="button" (click)="replaceFileInput.click()">
-            Replace
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="replaceFileInput.click()"
+            title="Replace Document"
+            aria-label="Replace Document"
+          >
+            <app-icon name="refresh" size="sm" class="text-amber-600" />
           </button>
           <input #replaceFileInput type="file" (change)="replace.emit($event)" class="hidden" accept=".pdf,.png,.jpg,.jpeg" />
         }

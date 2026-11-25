@@ -1043,11 +1043,11 @@ interface FormBuilderFormData {
                                 <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
                                   <app-icon name="eye" size="sm" />
                                 </button>
-                                <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
-                                  <span>Change</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="changeOtrDoc(doc)" title="Replace Document" aria-label="Replace Document">
+                                  <app-icon name="refresh" size="sm" class="text-amber-600" />
                                 </button>
-                                <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(doc)">
-                                  <span>Remove</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="removeOtrDoc(doc)" title="Remove Document" aria-label="Remove Document">
+                                  <app-icon name="trash" size="sm" class="text-rose-600" />
                                 </button>
                               </div>
                             </div>
@@ -1136,11 +1136,11 @@ interface FormBuilderFormData {
                                 <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(doc.fileName)" title="View Document" aria-label="View Document">
                                   <app-icon name="eye" size="sm" />
                                 </button>
-                                <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(doc)">
-                                  <span>Change</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="changeOtrDoc(doc)" title="Replace Document" aria-label="Replace Document">
+                                  <app-icon name="refresh" size="sm" class="text-amber-600" />
                                 </button>
-                                <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(doc)">
-                                  <span>Remove</span>
+                                <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="removeOtrDoc(doc)" title="Remove Document" aria-label="Remove Document">
+                                  <app-icon name="trash" size="sm" class="text-rose-600" />
                                 </button>
                               </div>
                             </div>
@@ -1222,11 +1222,11 @@ interface FormBuilderFormData {
                             <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="viewApplyDoc(otrBankDoc.fileName)" title="View Document" aria-label="View Document">
                               <app-icon name="eye" size="sm" />
                             </button>
-                            <button appButton variant="outline" size="sm" type="button" (click)="changeOtrDoc(otrBankDoc)">
-                              <span>Change</span>
+                            <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="changeOtrDoc(otrBankDoc)" title="Replace Document" aria-label="Replace Document">
+                              <app-icon name="refresh" size="sm" class="text-amber-600" />
                             </button>
-                            <button appButton variant="danger" size="sm" type="button" (click)="removeOtrDoc(otrBankDoc)">
-                              <span>Remove</span>
+                            <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="removeOtrDoc(otrBankDoc)" title="Remove Document" aria-label="Remove Document">
+                              <app-icon name="trash" size="sm" class="text-rose-600" />
                             </button>
                           </div>
                         </div>

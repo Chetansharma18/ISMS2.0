@@ -631,7 +631,8 @@ export function validateEoiFormComplete(
 
   // 3. Scheme Category
   if (schemeItem?.schemeCategory && d.schemeCategory) {
-    if (schemeItem.schemeCategory.trim().toLowerCase() !== d.schemeCategory.trim().toLowerCase()) {
+    const validCats = schemeItem.schemeCategory.split(',').map(c => c.trim().toLowerCase());
+    if (!validCats.includes(d.schemeCategory.trim().toLowerCase())) {
       errors['schemeCategory'] = 'Scheme Category does not match the selected scheme.';
     }
   }

@@ -52,9 +52,8 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
 
             <!-- Remove Button for additional officers -->
             @if (idx > 0) {
-              <button appButton variant="danger" size="sm" type="button" (click)="removeOfficer(idx)" title="Remove this officer">
-                <app-icon name="trash" size="sm" />
-                <span>Remove</span>
+              <button appButton variant="ghost" size="sm" iconOnly type="button" (click)="removeOfficer(idx)" title="Remove Officer" aria-label="Remove Officer">
+                <app-icon name="trash" size="sm" class="text-rose-600" />
               </button>
             }
           </div>

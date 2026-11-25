@@ -107,7 +107,9 @@ const COMMENT_PRESETS = [
                     <span class="truncate text-slate-800">
                       {{ file.fileName }} <span class="text-slate-500">({{ file.fileSize }})</span>
                     </span>
-                    <button appButton variant="ghost" size="sm" class="shrink-0" (click)="removeFile(file.fileName)">Remove</button>
+                    <button appButton variant="ghost" size="sm" iconOnly class="shrink-0" (click)="removeFile(file.fileName)" title="Remove Document" aria-label="Remove Document">
+                      <app-icon name="trash" size="sm" class="text-rose-600" />
+                    </button>
                   </li>
                 }
               </ul>

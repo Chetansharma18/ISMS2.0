@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 import { FormsModule } from '@angular/forms';
 import { EoiAttachment, EoiDocumentUpload, EoiFormData, EoiRequiredInfoItem } from '../tenders.models';
 import { SchemeMasterItem, DocMasterItem, AnnexureMasterItem, DynamicFormField } from '../../../core/models/admin-masters.model';
+import { MOCK_SCHEME_MASTER_ITEMS } from '../../../core/mock/data/admin-masters.mock';
 import { INITIAL_DOC_ITEMS } from '../../admin-master/doc-master.component';
 import { INITIAL_ANNEXURE_ITEMS } from '../../admin-master/annexure-master.component';
 import { DocumentViewerService } from '../../../core/services/document-viewer.service';
@@ -65,7 +66,7 @@ import {
           <app-dropdown
             inputId="eoiSchemeSelect"
             [options]="schemeNameOptions()"
-            [value]="data().scheme"
+            [(value)]="data().scheme"
             (valueChange)="onSchemeChange($event)"
             placeholder="-- Select Scheme Name --"
             [invalid]="hasError('scheme')"
@@ -331,13 +332,15 @@ import {
                     </button>
                     <button
                       appButton
-                      variant="secondary"
+                      variant="ghost"
                       size="sm"
+                      iconOnly
                       type="button"
                       (click)="replaceInput.click()"
                       title="Replace Document"
+                      aria-label="Replace Document"
                     >
-                      Replace
+                      <app-icon name="refresh" size="sm" class="text-amber-600" />
                     </button>
                     <input
                       #replaceInput
@@ -348,13 +351,15 @@ import {
                     />
                     <button
                       appButton
-                      variant="danger"
+                      variant="ghost"
                       size="sm"
+                      iconOnly
                       type="button"
                       (click)="removeAttachmentItem(idx)"
                       title="Remove Document"
+                      aria-label="Remove Document"
                     >
-                      Remove
+                      <app-icon name="trash" size="sm" class="text-rose-600" />
                     </button>
                   </div>
                 </div>
@@ -679,19 +684,19 @@ export class ConfigureEoiFormComponent {
     this.externalVersion();
     const schemeName = this.data()?.scheme?.trim();
     if (!schemeName) return [];
-    return this.schemeCategoryOptions();
+    const list = [...this.schemeCategoryOptions()];
+    const current = this.data()?.schemeCategory?.trim();
+    if (current && !list.includes(current)) {
+      list.unshift(current);
+    }
+    return list;
   });
 
-  /** Whether the Scheme Category is locked (locked when no scheme is selected or when auto-filled from scheme master). */
+  /** Whether the Scheme Category is locked (locked when no scheme is selected). */
   readonly isCategoryLocked = computed(() => {
     this.formVersion();
     this.externalVersion();
-    const schemeName = this.data()?.scheme?.trim().toLowerCase();
-    if (!schemeName) return true;
-    const match = this.schemeMasterItems().find(
-      s => s.schemeName?.trim().toLowerCase() === schemeName
-    );
-    return !!match?.schemeCategory || !!this.data()?.schemeCategory;
+    return !this.data()?.scheme?.trim();
   });
 
   /** Real-time form validation state using government standards. */
@@ -1067,19 +1072,30 @@ export class ConfigureEoiFormComponent {
   onSchemeChange(schemeName: string): void {
     if (!schemeName) {
       // Clear dependent values
+      this.data().scheme = '';
       this.data().schemeCategory = '';
       this.data().emdFee = '';
       this.data().processFee = '';
       this.data().documents = [];
       this.data().annexures = [];
       this.data().documentFiles = {};
+      this.touchedFields.update(t => {
+        const next = { ...t };
+        delete next['schemeCategory'];
+        delete next['emdFee'];
+        delete next['processFee'];
+        return next;
+      });
       this.notifyMutation('scheme');
       this.schemeChange.emit(schemeName);
       return;
     }
 
+    this.data().scheme = schemeName;
+
     // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
-    const schemeItem = this.schemeMasterItems().find(
+    const masterList = this.schemeMasterItems().length > 0 ? this.schemeMasterItems() : MOCK_SCHEME_MASTER_ITEMS;
+    const schemeItem = masterList.find(
       s => s.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
     );
     if (schemeItem) {
@@ -1090,13 +1106,22 @@ export class ConfigureEoiFormComponent {
         this.data().processFee = formatInr(schemeItem.processFees);
       }
       if (schemeItem.schemeCategory) {
-        this.data().schemeCategory = schemeItem.schemeCategory;
+        this.data().schemeCategory = schemeItem.schemeCategory.split(',')[0].trim();
       }
     }
 
+    // Clear touched validation errors for these auto-filled fields
+    this.touchedFields.update(t => {
+      const next = { ...t };
+      delete next['schemeCategory'];
+      delete next['emdFee'];
+      delete next['processFee'];
+      return next;
+    });
+
     // 2. Auto-fill required documents from Doc Master
-    const masterList = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
-    const docs = parseMasterEntriesByScheme(masterList, schemeName, d => d.docName || d.documents);
+    const masterListDocs = this.docMasterItems().length > 0 ? this.docMasterItems() : INITIAL_DOC_ITEMS;
+    const docs = parseMasterEntriesByScheme(masterListDocs, schemeName, d => d.docName || d.documents);
     this.data().documents = [...docs];
     this.data().documentFiles = {};
     this.docFileError.set('');

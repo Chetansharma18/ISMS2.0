@@ -28,6 +28,10 @@ import {
   DocMasterItem,
   AnnexureMasterItem
 } from '../../core/models/admin-masters.model';
+import {
+  MOCK_SCHEME_MASTER_ITEMS,
+  MOCK_SCHEME_CATEGORY_MASTER_ITEMS
+} from '../../core/mock/data/admin-masters.mock';
 import { DOC_MASTER_STORAGE_KEY, INITIAL_DOC_ITEMS } from '../admin-master/doc-master.component';
 import { ANNEXURE_MASTER_STORAGE_KEY, INITIAL_ANNEXURE_ITEMS } from '../admin-master/annexure-master.component';
 import { SchemeDetailViewComponent } from './scheme-detail-view.component';
@@ -468,11 +472,24 @@ export class TendersPageComponent {
   readonly availableAdmins = this.schemeService.getAvailableAdmins();
   private promptDismissed = false;
 
-  readonly schemeMasterItems = signal<SchemeMasterItem[]>([]);
+  readonly schemeMasterItems = signal<SchemeMasterItem[]>(MOCK_SCHEME_MASTER_ITEMS);
   readonly docMasterItems = signal<DocMasterItem[]>(INITIAL_DOC_ITEMS);
   readonly annexureMasterItems = signal<AnnexureMasterItem[]>(INITIAL_ANNEXURE_ITEMS);
-  readonly schemeMasterNames = signal<string[]>(['MMKVY', 'Rajvik', 'PMMY', 'Vishwakarma Yuva Udyami Protsahan Yojana']);
-  readonly schemeCategoryNames = signal<string[]>(['Rajvik', 'MMKVY', 'Special Initiatives', 'ALL']);
+  readonly schemeMasterNames = signal<string[]>(
+    MOCK_SCHEME_MASTER_ITEMS.filter((s) => s.status !== 'Inactive').map((s) => s.schemeName!.trim())
+  );
+  readonly schemeCategoryNames = signal<string[]>(
+    Array.from(new Set([
+      'Rajvik',
+      'samarth',
+      'saksham',
+      'MMKVY',
+      'Special Initiatives',
+      'na',
+      'ALL',
+      ...MOCK_SCHEME_CATEGORY_MASTER_ITEMS.map((c) => (c.categoryName || c.schemeName)!.trim())
+    ]))
+  );
   readonly eoiCategoryNames = signal<string[]>(['General', 'Special', 'Empanelment']);
 
   /** Scheme names available in the "Configure New EOI" scheme dropdown (sourced from Scheme Master). */
@@ -941,16 +958,19 @@ export class TendersPageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (items) => {
-          this.schemeMasterItems.set(items || []);
-          const names = (items || [])
-            .filter((s) => s.status !== 'Inactive')
-            .map((s) => s.schemeName?.trim())
-            .filter((name): name is string => !!name);
-          this.schemeMasterNames.set(Array.from(new Set(names)));
+          if (items && items.length > 0) {
+            this.schemeMasterItems.set(items);
+            const names = items
+              .filter((s) => s.status !== 'Inactive')
+              .map((s) => s.schemeName?.trim())
+              .filter((name): name is string => !!name);
+            if (names.length > 0) {
+              this.schemeMasterNames.set(Array.from(new Set(names)));
+            }
+          }
         },
         error: () => {
-          this.schemeMasterItems.set([]);
-          this.schemeMasterNames.set([]);
+          // Keep mock fallback so lookups never fail
         }
       });
 
@@ -961,11 +981,15 @@ export class TendersPageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (items) => {
-          const cats = (items || [])
-            .filter((c) => c.status !== 'Inactive')
-            .map((c) => (c.categoryName || c.schemeName)?.trim())
-            .filter((name): name is string => !!name);
-          this.schemeCategoryNames.set(Array.from(new Set(cats)));
+          if (items && items.length > 0) {
+            const cats = items
+              .filter((c) => c.status !== 'Inactive')
+              .map((c) => (c.categoryName || c.schemeName)?.trim())
+              .filter((name): name is string => !!name);
+            if (cats.length > 0) {
+              this.schemeCategoryNames.set(Array.from(new Set(cats)));
+            }
+          }
         },
         error: () => this.schemeCategoryNames.set([])
       });
@@ -1031,6 +1055,7 @@ export class TendersPageComponent {
 
   onSchemeSelected(schemeName: string): void {
     if (!schemeName) {
+      this.newEoiData.scheme = '';
       this.newEoiData.schemeCategory = '';
       this.newEoiData.emdFee = '';
       this.newEoiData.processFee = '';
@@ -1041,8 +1066,11 @@ export class TendersPageComponent {
       return;
     }
 
+    this.newEoiData.scheme = schemeName;
+
     // 1. Auto-fill EMD Fee, Process Fee & Scheme Category from Scheme Master
-    const schemeItem = this.schemeMasterItems().find(
+    const masterList = this.schemeMasterItems().length > 0 ? this.schemeMasterItems() : MOCK_SCHEME_MASTER_ITEMS;
+    const schemeItem = masterList.find(
       (s) => s.schemeName?.trim().toLowerCase() === schemeName.trim().toLowerCase()
     );
     if (schemeItem) {
@@ -1053,7 +1081,7 @@ export class TendersPageComponent {
         this.newEoiData.processFee = formatInr(schemeItem.processFees);
       }
       if (schemeItem.schemeCategory) {
-        this.newEoiData.schemeCategory = schemeItem.schemeCategory;
+        this.newEoiData.schemeCategory = schemeItem.schemeCategory.split(',')[0].trim();
       }
     }
 
@@ -1114,8 +1142,26 @@ export class TendersPageComponent {
         ...savedDraft,
         documentFiles: {}
       };
-      if (this.newEoiData.scheme && (!this.newEoiData.documents?.length || !this.newEoiData.annexures?.length)) {
-        this.onSchemeSelected(this.newEoiData.scheme);
+      if (this.newEoiData.scheme) {
+        const masterList = this.schemeMasterItems().length > 0 ? this.schemeMasterItems() : MOCK_SCHEME_MASTER_ITEMS;
+        const schemeItem = masterList.find(
+          (s) => s.schemeName?.trim().toLowerCase() === this.newEoiData.scheme?.trim().toLowerCase()
+        );
+        if (schemeItem) {
+          const validCats = (schemeItem.schemeCategory || '').split(',').map((c) => c.trim().toLowerCase());
+          if (schemeItem.schemeCategory && (!this.newEoiData.schemeCategory || !validCats.includes(this.newEoiData.schemeCategory.trim().toLowerCase()))) {
+            this.newEoiData.schemeCategory = schemeItem.schemeCategory.split(',')[0].trim();
+          }
+          if (schemeItem.amount != null && !this.newEoiData.emdFee) {
+            this.newEoiData.emdFee = formatInr(schemeItem.amount);
+          }
+          if (schemeItem.processFees != null && !this.newEoiData.processFee) {
+            this.newEoiData.processFee = formatInr(schemeItem.processFees);
+          }
+        }
+        if (!this.newEoiData.documents?.length || !this.newEoiData.annexures?.length) {
+          this.onSchemeSelected(this.newEoiData.scheme);
+        }
       }
     } else {
       this.newEoiData = createEmptyEoiForm();

@@ -1,8 +1,8 @@
 {
   "/api": {
-    "target": "https://10.70.232.82",
+    "target": "http://localhost:5123",
     "secure": false,
     "changeOrigin": true,
-    "logLevel": "warn"
+    "logLevel": "debug"
   }
 }

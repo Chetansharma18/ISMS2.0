@@ -272,6 +272,12 @@ export class SchemeFormState {
       }
     });
 
+    // Synchronize editableStep1 with central OTR Form Service
+    effect(() => {
+      const step1 = this.otrFormService.formData().step1;
+      this.editableStep1 = { ...step1 };
+    });
+
     // Keep a draft up to date as the applicant fills their application,
     // so the Active Schemes page can flag this application as pending.
     effect(() => {

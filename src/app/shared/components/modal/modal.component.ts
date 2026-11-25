@@ -84,7 +84,7 @@ let nextId = 0;
         <!-- Header -->
         @if (title()) {
           <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-2 shrink-0 pr-12">
-            <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+            <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
               {{ title() }}
             </h2>
             @if (subtitle()) {

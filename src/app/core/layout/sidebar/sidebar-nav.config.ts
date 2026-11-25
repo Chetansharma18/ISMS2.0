@@ -57,7 +57,7 @@ export const EXISTING_USER_NAV: NavItem[] = [
   { key: 'attendance', label: 'Attendance', link: '/attendance', icon: 'clipboard-check' },
   { key: 'tp-users', label: 'User Management', link: '/tp/users', icon: 'users-group' },
   { key: 'grievance', label: 'Grievance', link: '/grievance', icon: 'alert-triangle' },
-  { key: 'payment-history', label: 'History', link: '/payment-history', icon: 'clipboard' },
+  { key: 'payment-history', label: 'Payment History', link: '/payment-history', icon: 'clipboard' },
   PROFILE
 ];
 
@@ -78,7 +78,7 @@ export const EOI_CONFIGURATION_NAV: NavItem = {
 
 /** Super admin links that are highlighted by the router itself (`routerLinkActive`). */
 export const ADMIN_TOOL_NAV: NavItem[] = [
-  { key: 'two-step', label: 'Two step verification', link: '/admin/two-step-verification', icon: 'shield-check' },
+  { key: 'two-step', label: 'Two Step Verification', link: '/admin/two-step-verification', icon: 'shield-check' },
   { key: 'form-builder', label: 'Dynamic Form Builder', link: '/admin/dynamic-form-builder', icon: 'clipboard' },
   PROFILE
 ];
@@ -90,7 +90,7 @@ export const MASTER_NAV: NavSubItem[] = [
   { label: 'Sector Master', link: '/admin/master/sector' },
   { label: 'Course Master', link: '/admin/master/course' },
   { label: 'District & Block Master', link: '/admin/master/district-block' },
-  { label: 'Designation', link: '/admin/master/designation' },
+  { label: 'Designation Master', link: '/admin/master/designation' },
   { label: 'Document Master', link: '/admin/master/doc' },
   { label: 'Annexure Master', link: '/admin/master/annexure' },
   { label: 'Remark Master', link: '/admin/master/remark' },
@@ -99,7 +99,7 @@ export const MASTER_NAV: NavSubItem[] = [
 
 export const USER_MANAGEMENT_NAV: NavSubItem[] = [
   { label: 'Users', link: '/admin/user-management', query: { filter: 'all' } },
-  { label: 'Blacklisted users', link: '/admin/user-management', query: { filter: 'blacklisted' } },
+  { label: 'Blacklisted Users', link: '/admin/user-management', query: { filter: 'blacklisted' } },
   { label: 'Role Management', link: '/admin/master/user-role' },
   { label: 'Permission Management', link: '/admin/master/permission' }
 ];

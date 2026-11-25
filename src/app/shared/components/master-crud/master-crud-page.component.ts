@@ -253,7 +253,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
             (secondaryAction)="closeModal()"
             (close)="closeModal()"
           >
-            <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+            <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
               {{ editingId() ? 'Edit' : 'Add New' }} {{ config.entityLabel }}
             </h2>
 
@@ -274,7 +274,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
             (secondaryAction)="closeViewModal()"
             (close)="closeViewModal()"
           >
-            <h2 class="m-0 text-brand-dark pb-2.5 border-b border-slate-100" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+            <h2 class="m-0 text-brand-dark pb-2.5 border-b border-slate-100" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
               {{ config.entityLabel }} Details
             </h2>
 

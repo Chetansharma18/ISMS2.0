@@ -39,6 +39,10 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.fullName || '-' }}</span>
           </div>
           <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Trade / Operating Name</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.shortName || '-' }}</span>
+          </div>
+          <div>
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Nature of Entity</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.natureOfEntity || '-' }}</span>
           </div>
@@ -53,7 +57,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
 
           <!-- Row 2: Registrations & Status -->
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration Number (CIN)</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.registrationNumber || '-' }}</span>
           </div>
           <div>
@@ -65,7 +69,7 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.stateOfLegalReg || '-' }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Company PAN</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.companyPan || '-' }}</span>
           </div>
 
@@ -113,6 +117,20 @@ import { DOC_ACCEPT, validateDocFile } from './step3-document-rules';
           <div class="sm:col-span-2">
             <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
             <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ state.officeAddressText }}</span>
+          </div>
+
+          <!-- Row 6: Financial Standing & Annual Turnover -->
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Declared Annual Turnover</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ state.editableStep1.turnOver ? '₹ ' + state.editableStep1.turnOver + ' Lacs' : '-' }}</span>
+          </div>
+          <div>
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Blacklisted Status</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.editableStep1.blackListed || 'No' }}</span>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">CA-Certified Turnover Certificate</span>
+            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ state.editableStep1.turnoverCertDoc?.fileName || '-' }}</span>
           </div>
 
           <!-- Uploaded registration documents -->

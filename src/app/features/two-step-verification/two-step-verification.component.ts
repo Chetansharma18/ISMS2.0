@@ -204,7 +204,7 @@ interface TwoStepFormData {
         (secondaryAction)="closeModal()"
         (close)="closeModal()"
       >
-        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
           {{ editingId() ? 'Edit' : 'Add new' }} Two Step Verification
         </h2>
 
@@ -284,7 +284,7 @@ interface TwoStepFormData {
         (secondaryAction)="closeViewModal()"
         (close)="closeViewModal()"
       >
-        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+        <h2 class="m-0 text-brand-dark" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
           Two Step Verification Details
         </h2>
 
@@ -472,8 +472,8 @@ export class TwoStepVerificationComponent implements OnInit {
     const unconfigured = this.availableRoles().find(r => !existingRoles.includes(r));
 
     this.formData = {
-      roleType: '',
-      authTypes: []
+      roleType: unconfigured || '',
+      authTypes: ['OTP']
     };
     this.showModal.set(true);
   }

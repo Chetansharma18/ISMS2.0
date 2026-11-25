@@ -56,7 +56,7 @@ export interface BreadcrumbItem {
         <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
           <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
             <h1
-              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#7C0E44] tracking-tight leading-tight"
+              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-semibold text-[#7C0E44] tracking-tight leading-tight"
             >
               {{ title }}
             </h1>

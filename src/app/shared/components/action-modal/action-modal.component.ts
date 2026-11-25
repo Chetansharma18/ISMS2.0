@@ -89,7 +89,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
 
             <!-- Title -->
             @if (title) {
-              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 600; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }

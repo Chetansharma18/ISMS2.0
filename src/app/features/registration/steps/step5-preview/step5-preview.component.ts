@@ -55,6 +55,10 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().fullName || '-' }}</span>
             </div>
             <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Trade / Operating Name</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().shortName || '-' }}</span>
+            </div>
+            <div>
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Nature of Entity</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().natureOfEntity || '-' }}</span>
             </div>
@@ -69,7 +73,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
 
             <!-- Row 2: Registrations & Status -->
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration No. (CIN / Reg. No.)</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Registration Number (CIN)</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().registrationNumber || '-' }}</span>
             </div>
             <div>
@@ -81,7 +85,7 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().stateOfLegalReg || '-' }}</span>
             </div>
             <div>
-              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Organisation PAN</span>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Company PAN</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().companyPan || '-' }}</span>
             </div>
 
@@ -149,6 +153,20 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <div class="sm:col-span-2">
               <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Office Address</span>
               <span class="font-medium text-slate-900 text-[12.5px] block mt-1 leading-relaxed">{{ officeAddressDisplay() }}</span>
+            </div>
+
+            <!-- Row 6: Financial Standing & Annual Turnover -->
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Declared Annual Turnover</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 tabular-nums">{{ step1().turnOver ? '₹ ' + step1().turnOver + ' Lacs' : '-' }}</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Blacklisted Status</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ step1().blackListed || 'No' }}</span>
+            </div>
+            <div class="sm:col-span-2">
+              <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">CA-Certified Turnover Certificate</span>
+              <span class="font-medium text-slate-900 text-[12.5px] block mt-1 truncate">{{ step1().turnoverCertDoc?.fileName || '-' }}</span>
             </div>
           </div>
         }

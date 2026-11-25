@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed, signal, input } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,7 +20,7 @@ import { FormInputComponent } from '../../../../shared/components/form-controls/
 import { FormSelectComponent } from '../../../../shared/components/form-controls/form-select/form-select.component';
 import { FormTextareaComponent } from '../../../../shared/components/form-controls/form-textarea/form-textarea.component';
 import { FormFileUploadComponent } from '../../../../shared/components/form-controls/form-file-upload/form-file-upload.component';
-import { IconComponent } from '../../../../shared';
+import { DocTableDirective, IconComponent, InputDirective } from '../../../../shared';
 
 @Component({
   selector: 'app-step1-org-details',
@@ -32,7 +32,9 @@ import { IconComponent } from '../../../../shared';
     FormInputComponent,
     FormSelectComponent,
     FormTextareaComponent,
-    FormFileUploadComponent
+    FormFileUploadComponent,
+    DocTableDirective,
+    InputDirective
   ],
   template: `
     <div class="w-full space-y-6 font-sans">
@@ -42,7 +44,7 @@ import { IconComponent } from '../../../../shared';
            ==================================================================== -->
       <section class="space-y-4">
         <div class="pb-2 border-b border-[#E8EEF5]">
-          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
             1. Basic Organisation Details
           </h3>
         </div>
@@ -56,11 +58,25 @@ import { IconComponent } from '../../../../shared';
               (valueChange)="update('fullName', $event)"
               placeholder="Enter organisation name"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('fullName')"
             ></app-form-input>
           </div>
 
-          <!-- 2. Nature of Entity * -->
+          <!-- 2. Trade / Operating Name -->
+          <div>
+            <app-form-input
+              label="Trade / Operating Name"
+              [value]="data().shortName"
+              (valueChange)="update('shortName', $event)"
+              placeholder="Enter trade or operating name"
+              [required]="false"
+              [disabled]="disabled()"
+              [error]="getFieldError('shortName')"
+            ></app-form-input>
+          </div>
+
+          <!-- 3. Nature of Entity * -->
           <div>
             <app-form-select
               label="Nature of Entity"
@@ -69,11 +85,12 @@ import { IconComponent } from '../../../../shared';
               [options]="natureOfEntitiesList"
               placeholder="Select entity type"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('natureOfEntity')"
             ></app-form-select>
           </div>
 
-          <!-- 3. Preferred Sector * (Multi-select with Checkboxes) -->
+          <!-- 4. Preferred Sector * (Multi-select with Checkboxes) -->
           <div>
             <app-form-select
               label="Preferred Sector"
@@ -83,11 +100,12 @@ import { IconComponent } from '../../../../shared';
               placeholder="Select preferred sector(s)"
               [multiple]="true"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('preferredSector')"
             ></app-form-select>
           </div>
 
-          <!-- 4. NSDC Partner -->
+          <!-- 5. NSDC Partner -->
           <div>
             <app-form-select
               label="NSDC Partner"
@@ -96,11 +114,12 @@ import { IconComponent } from '../../../../shared';
               [options]="nsdcPartnersList"
               placeholder="Select status"
               [required]="false"
+              [disabled]="disabled()"
               [error]="getFieldError('nsdcPartner')"
             ></app-form-select>
           </div>
 
-          <!-- 5. GST Registered * -->
+          <!-- 6. GST Registered * -->
           <div>
             <app-form-select
               label="GST Registered"
@@ -109,11 +128,12 @@ import { IconComponent } from '../../../../shared';
               [options]="['Yes', 'No']"
               placeholder="Select GST status"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('gstRegistered')"
             ></app-form-select>
           </div>
 
-          <!-- 6. MSME / Udyam Registered * -->
+          <!-- 7. MSME / Udyam Registered * -->
           <div>
             <app-form-select
               label="MSME / Udyam Registered"
@@ -122,6 +142,7 @@ import { IconComponent } from '../../../../shared';
               [options]="['Yes', 'No']"
               placeholder="Select MSME status"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('msmeRegistered')"
             ></app-form-select>
           </div>
@@ -137,6 +158,7 @@ import { IconComponent } from '../../../../shared';
                 [required]="true"
                 [uppercase]="true"
                 [maxLength]="15"
+                [disabled]="disabled()"
                 [error]="getFieldError('gstin')"
               ></app-form-input>
             </div>
@@ -149,6 +171,7 @@ import { IconComponent } from '../../../../shared';
                 [fileDoc]="data().gstCertDoc"
                 (fileChange)="updateDoc('gstCertDoc', $event)"
                 [required]="true"
+                [disabled]="disabled()"
                 [error]="getFieldError('gstCertDoc')"
               ></app-form-file-upload>
             </div>
@@ -165,6 +188,7 @@ import { IconComponent } from '../../../../shared';
                 [required]="true"
                 [uppercase]="true"
                 [maxLength]="25"
+                [disabled]="disabled()"
                 [error]="getFieldError('udyamNumber')"
               ></app-form-input>
             </div>
@@ -177,6 +201,7 @@ import { IconComponent } from '../../../../shared';
                 [fileDoc]="data().msmeCertDoc"
                 (fileChange)="updateDoc('msmeCertDoc', $event)"
                 [required]="true"
+                [disabled]="disabled()"
                 [error]="getFieldError('msmeCertDoc')"
               ></app-form-file-upload>
             </div>
@@ -192,7 +217,7 @@ import { IconComponent } from '../../../../shared';
            ==================================================================== -->
       <section class="space-y-4">
         <div class="pb-2 border-b border-[#E8EEF5]">
-          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
             2. Registration &amp; Documents
           </h3>
         </div>
@@ -205,10 +230,11 @@ import { IconComponent } from '../../../../shared';
               label="Registration Number"
               [value]="data().registrationNumber"
               (valueChange)="update('registrationNumber', $event)"
-              placeholder="Enter registration number"
+              placeholder="Enter registration number (CIN)"
               [required]="true"
               [uppercase]="true"
               [disableLabelClick]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('registrationNumber')"
             ></app-form-input>
           </div>
@@ -223,6 +249,7 @@ import { IconComponent } from '../../../../shared';
               placeholder="DD-MM-YYYY"
               [required]="true"
               [max]="maxRegistrationDate"
+              [disabled]="disabled()"
               (blur)="markTouched('dateOfRegistration')"
               [error]="getFieldError('dateOfRegistration')"
             ></app-form-input>
@@ -238,20 +265,22 @@ import { IconComponent } from '../../../../shared';
               placeholder="Select state / UT"
               [required]="true"
               [clearable]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('stateOfLegalReg')"
             ></app-form-select>
           </div>
 
-          <!-- 4. Organisation PAN * -->
+          <!-- 4. Company PAN * -->
           <div>
             <app-form-input
-              label="Organisation PAN"
+              label="Company PAN"
               [value]="data().companyPan"
               (valueChange)="update('companyPan', $event)"
               placeholder="Enter PAN number"
               [required]="true"
               [uppercase]="true"
               [maxLength]="10"
+              [disabled]="disabled()"
               [error]="getFieldError('companyPan')"
             ></app-form-input>
           </div>
@@ -265,6 +294,7 @@ import { IconComponent } from '../../../../shared';
               [fileDoc]="data().registrationCertDoc"
               (fileChange)="updateDoc('registrationCertDoc', $event)"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('registrationCertDoc')"
             ></app-form-file-upload>
           </div>
@@ -278,6 +308,7 @@ import { IconComponent } from '../../../../shared';
               [fileDoc]="data().panCardDoc"
               (fileChange)="updateDoc('panCardDoc', $event)"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('panCardDoc')"
             ></app-form-file-upload>
           </div>
@@ -292,7 +323,7 @@ import { IconComponent } from '../../../../shared';
            ==================================================================== -->
       <section class="space-y-4">
         <div class="pb-2 border-b border-[#E8EEF5]">
-          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
             3. Contact Information
           </h3>
         </div>
@@ -311,6 +342,7 @@ import { IconComponent } from '../../../../shared';
               [required]="true"
               [numericOnly]="true"
               [maxLength]="10"
+              [disabled]="disabled()"
               [error]="getFieldError('contactNo')"
             ></app-form-input>
           </div>
@@ -325,6 +357,7 @@ import { IconComponent } from '../../../../shared';
               (blur)="markTouched('emailId')"
               placeholder="Enter official email"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('emailId')"
             ></app-form-input>
           </div>
@@ -339,6 +372,7 @@ import { IconComponent } from '../../../../shared';
               (blur)="markTouched('website')"
               placeholder="https://example.com"
               [required]="false"
+              [disabled]="disabled()"
               [error]="getFieldError('website')"
             ></app-form-input>
           </div>
@@ -356,14 +390,14 @@ import { IconComponent } from '../../../../shared';
            ==================================================================== -->
       <section class="space-y-5">
         <div class="pb-2 border-b border-[#E8EEF5]">
-          <h3 class="text-[19px] font-semibold text-[#1E3A5F] tracking-tight m-0">
+          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
             4. Registered &amp; Office Address
           </h3>
         </div>
 
         <!-- Subsection A: Registered Address -->
         <div class="space-y-3.5">
-          <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
+          <h4 class="text-sm font-semibold text-slate-800 m-0">
             A. Registered Address
           </h4>
 
@@ -375,6 +409,7 @@ import { IconComponent } from '../../../../shared';
               (valueChange)="update('registeredAddress', $event)"
               placeholder="Address, locality, building name and number"
               [required]="true"
+              [disabled]="disabled()"
               [error]="getFieldError('registeredAddress')"
             ></app-form-textarea>
           </div>
@@ -390,6 +425,7 @@ import { IconComponent } from '../../../../shared';
                 placeholder="Select state"
                 [required]="true"
                 [clearable]="true"
+                [disabled]="disabled()"
                 [error]="getFieldError('registeredState')"
               ></app-form-select>
             </div>
@@ -400,7 +436,7 @@ import { IconComponent } from '../../../../shared';
                 [value]="data().registeredDistrict"
                 (valueChange)="update('registeredDistrict', $event)"
                 [options]="registeredDistricts()"
-                [disabled]="!data().registeredState"
+                [disabled]="disabled() || !data().registeredState"
                 placeholder="Select district"
                 [required]="true"
                 [error]="getFieldError('registeredDistrict')"
@@ -418,6 +454,7 @@ import { IconComponent } from '../../../../shared';
                 [required]="true"
                 [numericOnly]="true"
                 [maxLength]="6"
+                [disabled]="disabled()"
                 [error]="getFieldError('registeredPincode')"
               ></app-form-input>
             </div>
@@ -431,6 +468,7 @@ import { IconComponent } from '../../../../shared';
               type="checkbox"
               [ngModel]="data().sameAsRegistered"
               (ngModelChange)="toggleSameAsRegistered($event)"
+              [disabled]="disabled()"
               class="w-4.5 h-4.5 text-[#8B104D] border-[#D6E3F0] rounded focus:ring-[#8B104D] accent-[#8B104D] cursor-pointer"
             />
             <span>Office address is the same as registered address</span>
@@ -445,7 +483,7 @@ import { IconComponent } from '../../../../shared';
         <!-- Subsection B: Office Address (Displayed when unselected) -->
         @if (!data().sameAsRegistered) {
           <div class="space-y-3.5 pt-1">
-            <h4 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
+            <h4 class="text-sm font-semibold text-slate-800 m-0">
               B. Office Address
             </h4>
 
@@ -457,6 +495,7 @@ import { IconComponent } from '../../../../shared';
                 (valueChange)="update('officeAddress', $event)"
                 placeholder="Address, locality, building name and number"
                 [required]="true"
+                [disabled]="disabled()"
                 [error]="getFieldError('officeAddress')"
               ></app-form-textarea>
             </div>
@@ -472,6 +511,7 @@ import { IconComponent } from '../../../../shared';
                   placeholder="Select state"
                   [required]="true"
                   [clearable]="true"
+                  [disabled]="disabled()"
                   [error]="getFieldError('officeState')"
                 ></app-form-select>
               </div>
@@ -482,7 +522,7 @@ import { IconComponent } from '../../../../shared';
                   [value]="data().officeDistrict"
                   (valueChange)="update('officeDistrict', $event)"
                   [options]="officeDistricts()"
-                  [disabled]="!data().officeState"
+                  [disabled]="disabled() || !data().officeState"
                   placeholder="Select district"
                   [required]="true"
                   [error]="getFieldError('officeDistrict')"
@@ -500,9 +540,121 @@ import { IconComponent } from '../../../../shared';
                   [required]="true"
                   [numericOnly]="true"
                   [maxLength]="6"
+                  [disabled]="disabled()"
                   [error]="getFieldError('officePincode')"
                 ></app-form-input>
               </div>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- Divider -->
+      <div class="border-t border-[#E8EEF5]"></div>
+
+      <!-- ====================================================================
+           5. FINANCIAL STANDING & ANNUAL TURNOVER
+           ==================================================================== -->
+      <section class="space-y-4">
+        <div class="pb-2 border-b border-[#E8EEF5]">
+          <h3 class="text-lg font-semibold text-primary tracking-tight m-0">
+            5. Financial Standing &amp; Annual Turnover
+          </h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-4.5 pt-1">
+          <!-- Declared Turnover -->
+          <div>
+            <app-form-input
+              label="Declared Annual Turnover (in ₹ Lacs)"
+              [value]="data().turnOver"
+              (valueChange)="update('turnOver', $event)"
+              placeholder="e.g. 1203.35"
+              [required]="false"
+              [disabled]="disabled()"
+              [error]="getFieldError('turnOver')"
+            ></app-form-input>
+          </div>
+
+          <!-- Blacklisted status -->
+          <div>
+            <app-form-select
+              label="Blacklisted by Central / State Department"
+              [value]="data().blackListed"
+              (valueChange)="update('blackListed', $event)"
+              [options]="['No', 'Yes']"
+              placeholder="Select blacklisting status"
+              [required]="false"
+              [disabled]="disabled()"
+              [error]="getFieldError('blackListed')"
+            ></app-form-select>
+          </div>
+
+          <!-- CA-Certified Turnover Certificate upload -->
+          <div class="md:col-span-2">
+            <app-form-file-upload
+              label="CA-Certified Turnover Certificate"
+              [dropzoneStyle]="true"
+              uploadPrompt="Upload CA-certified turnover certificate (with valid UDIN)"
+              [fileDoc]="data().turnoverCertDoc"
+              (fileChange)="updateDoc('turnoverCertDoc', $event)"
+              [required]="false"
+              [disabled]="disabled()"
+              [error]="getFieldError('turnoverCertDoc')"
+            ></app-form-file-upload>
+          </div>
+        </div>
+
+        <!-- Multi-Year Turnover Grid (3 Financial Years) -->
+        @if (data().financialYears && data().financialYears.length > 0) {
+          <div class="pt-2">
+            <span class="text-xs font-semibold text-slate-700 block mb-2">
+              Three Consecutive Fiscal Years Turnover (₹ in Lacs)
+            </span>
+            <div class="overflow-x-auto border border-[#EADCE2] rounded-lg">
+              <!-- ui-guard-allow: financial turnover table -->
+              <table appDocTable class="w-full text-left border-collapse text-xs bg-white">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-800 font-semibold border-b border-[#EADCE2]">
+                    <th class="p-2.5 border-r border-[#EADCE2]">Financial Year</th>
+                    <th class="p-2.5 border-r border-[#EADCE2]">Total Annual Turnover (₹ Lacs)</th>
+                    <th class="p-2.5">Turnover from Skill Training (₹ Lacs)</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#EADCE2]">
+                  @for (fy of data().financialYears; track fy.year; let idx = $index) {
+                    <tr>
+                      <td class="p-2.5 font-bold text-slate-800 border-r border-[#EADCE2] bg-slate-50/50 w-36">
+                        {{ fy.year }}
+                      </td>
+                      <td class="p-2 border-r border-[#EADCE2]">
+                        <input
+                          appInput
+                          size="sm"
+                          type="text"
+                          [value]="fy.totalTurnover"
+                          [disabled]="disabled()"
+                          (input)="updateTurnoverYear(idx, 'totalTurnover', $any($event.target).value)"
+                          placeholder="e.g. 450.00"
+                          class="w-full text-xs tabular-nums"
+                        />
+                      </td>
+                      <td class="p-2">
+                        <input
+                          appInput
+                          size="sm"
+                          type="text"
+                          [value]="fy.skillTurnover"
+                          [disabled]="disabled()"
+                          (input)="updateTurnoverYear(idx, 'skillTurnover', $any($event.target).value)"
+                          placeholder="e.g. 210.00"
+                          class="w-full text-xs tabular-nums"
+                        />
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
             </div>
           </div>
         }
@@ -634,6 +786,7 @@ import { IconComponent } from '../../../../shared';
   `]
 })
 export class Step1OrgDetailsComponent {
+  readonly disabled = input<boolean>(false);
   private otrFormService = inject(OtrFormService);
   private validationService = inject(OtrValidationService);
 
@@ -833,9 +986,17 @@ export class Step1OrgDetailsComponent {
 
   update(field: string, value: any): void {
     if (field === 'fullName') {
-      this.otrFormService.updateStep1({ fullName: value, shortName: value });
+      this.otrFormService.updateStep1({ fullName: value, shortName: this.data().shortName || value });
     } else {
       this.otrFormService.updateStep1({ [field]: value });
+    }
+  }
+
+  updateTurnoverYear(index: number, key: 'totalTurnover' | 'skillTurnover', val: string): void {
+    const years = [...(this.data().financialYears || [])];
+    if (years[index]) {
+      years[index] = { ...years[index], [key]: val };
+      this.otrFormService.updateStep1({ financialYears: years });
     }
   }
 

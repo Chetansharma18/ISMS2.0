@@ -12,7 +12,7 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../shared'
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <!-- Info & Instructions -->
         <div class="min-w-0 flex-1">
-          <div class="flex items-center gap-2 mb-1">
+          <div class="flex items-center gap-2">
             <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200 uppercase tracking-wider">
               Debarment Action
             </span>
@@ -20,9 +20,6 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../shared'
               Blacklist User via SSO ID
             </h3>
           </div>
-          <p class="text-xs text-slate-500 m-0 leading-relaxed">
-            Search any registered user or training partner by their SSO ID or User ID to initiate debarment, configure debarred schemes, duration, and official debarment order.
-          </p>
         </div>
 
         <!-- Search SSO ID Input & Action -->
@@ -39,7 +36,7 @@ import { ButtonComponent, IconComponent, InputDirective } from '../../../shared'
                 [ngModel]="value()"
                 (ngModelChange)="valueChange.emit($event)"
                 (keydown.enter)="blacklist.emit()"
-                placeholder="Enter SSO ID (e.g. SSO_TP_01) or Username..."
+                placeholder="Search SSO ID or Username..."
                 class="w-full pl-8 text-xs font-medium"
               />
             </div>

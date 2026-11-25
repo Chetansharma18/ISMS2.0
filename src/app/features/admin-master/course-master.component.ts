@@ -52,6 +52,7 @@ const CONFIG: MasterCrudConfig<CourseMasterItem> = {
   dataKey: 'COURSES',
   entityLabel: 'Course',
   title: 'Course Master',
+  displayMode: 'screen',
   searchPlaceholder: 'Search by sector, job role name, or QP code...',
   searchFields: ['sector', 'jobRoleName', 'jobRoleCode'],
   itemUnit: 'courses',

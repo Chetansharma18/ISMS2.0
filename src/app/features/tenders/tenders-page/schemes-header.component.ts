@@ -8,22 +8,27 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [FormsModule, PageHeaderComponent, ButtonComponent, IconComponent],
-  host: { class: 'block' },
+  host: {
+    class: 'block',
+    '[attr.title]': 'null'
+  },
   template: `
     <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
     <app-page-header
       title="Active Schemes"
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
-      [searchable]="true"
-      searchPlaceholder="Search active schemes..."
-      [(searchQuery)]="searchQuery"
-      [suggestions]="suggestions()"
-      (search)="searchChange.emit($event)"
-      (clear)="searchChange.emit('')"
-      (suggestionSelect)="searchChange.emit($event)"
+      [searchable]="false"
     >
       @if (isSuperAdmin()) {
-        <button appButton size="sm" type="button" (click)="configureEoi.emit()" class="shrink-0">
+        <button
+          appButton
+          size="sm"
+          type="button"
+          (click)="configureEoi.emit()"
+          title="Configure New EOI"
+          aria-label="Configure New EOI"
+          class="shrink-0"
+        >
           <app-icon name="plus" size="sm" />
           <span>Configure New EOI</span>
         </button>

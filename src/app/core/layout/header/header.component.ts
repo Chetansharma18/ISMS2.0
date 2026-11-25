@@ -15,12 +15,13 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService, AssignedRole, UserRole } from '../../auth/auth.service';
 import { SsoLoginFlowService } from '../../auth/sso-login-flow.service';
-import { humanizeRoleName } from '../../auth/sso-session.util';
+import { humanizeRoleName, landingRouteFor } from '../../auth/sso-session.util';
 import { PermissionService } from '../../permissions/permission.service';
 import { ClickOutsideDirective } from '../../../shared/directives/click-outside.directive';
 import { HeaderNotificationComponent } from './header-notification.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
 
 @Component({
   selector: 'app-header',
@@ -32,7 +33,8 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
     ClickOutsideDirective,
     HeaderNotificationComponent,
     ButtonComponent,
-    IconComponent
+    IconComponent,
+    ActionModalComponent
   ],
   host: {
     class: 'block w-full sticky top-0 z-50'
@@ -62,7 +64,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
             </button>
           }
 
-          <a routerLink="/" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+          <a [routerLink]="homeRoute()" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
           <!-- Logos Group -->
           <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -317,7 +319,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
               <!-- User Icon -->
               <app-icon name="user" />
 
-              <span>Login</span>
+              <span>Login with SSO</span>
 
               <!-- Right Arrow Icon -->
               <app-icon name="forward" />
@@ -327,6 +329,23 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
         </div>
 
       </div>
+
+      <!-- Sign Out Confirmation Modal -->
+      <app-action-modal
+        [isOpen]="showLogoutConfirmModal()"
+        [showCloseButton]="true"
+        [closeOnBackdrop]="true"
+        [showAccentBar]="false"
+        title="Sign Out Confirmation"
+        description="Are you sure you want to sign out of the ISMS 2.0 portal?"
+        primaryLabel="Sign Out"
+        primaryVariant="danger"
+        secondaryLabel="Cancel"
+        maxWidthClass="max-w-[440px]"
+        (primaryAction)="confirmLogout()"
+        (secondaryAction)="cancelLogout()"
+        (close)="cancelLogout()"
+      />
     </header>
   `,
   styles: [`
@@ -360,6 +379,12 @@ export class HeaderComponent {
   readonly assignedRoles = this.authService.assignedRoles;
   readonly canSwitchRole = this.authService.canSwitchRole;
   readonly activeRoleLabel = this.authService.activeRoleLabel;
+
+  /** Emblem logo link: the signed-in role's landing page (same as after sign-in), the portal home otherwise. */
+  readonly homeRoute = computed(() => {
+    const user = this.currentUser();
+    return user ? landingRouteFor(user.role).path : '/';
+  });
 
   readonly displayName = computed(() => {
     const u = this.currentUser();
@@ -434,9 +459,20 @@ export class HeaderComponent {
     this.loginClicked.emit();
   }
 
+  readonly showLogoutConfirmModal = signal<boolean>(false);
+
   onLogout(): void {
     this.dropdownOpen.set(false);
+    this.showLogoutConfirmModal.set(true);
+  }
+
+  confirmLogout(): void {
+    this.showLogoutConfirmModal.set(false);
     this.authService.logout();
+  }
+
+  cancelLogout(): void {
+    this.showLogoutConfirmModal.set(false);
   }
 
   canGoBackToSso(): boolean {

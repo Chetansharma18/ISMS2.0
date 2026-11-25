@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActionModalComponent, InputDirective } from '../../../shared';
+import { ActionModalComponent, ButtonComponent, InputDirective } from '../../../shared';
 import { EoiAttachment } from '../tenders.models';
 import { createAttachment, validateUploadFile } from './tenders-page.util';
 
@@ -12,7 +12,7 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
   selector: 'app-attachment-upload-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ActionModalComponent, InputDirective],
+  imports: [FormsModule, ActionModalComponent, ButtonComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -48,11 +48,26 @@ import { createAttachment, validateUploadFile } from './tenders-page.util';
         <div>
           <label class="block text-slate-700 font-medium mb-1">Upload Document<span class="text-red-600">*</span></label>
           <input
+            #fileInput
             type="file"
             accept=".pdf,.txt,.jpeg,.jpg,.png,.doc,.docx,.xls,.xlsx"
             (change)="onAttachmentFileSelected($event)"
-            class="w-full file:mr-4 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-navy cursor-pointer"
+            class="hidden"
           />
+          <div class="flex items-center gap-3">
+            <button
+              appButton
+              variant="outline"
+              size="sm"
+              type="button"
+              (click)="fileInput.click()"
+            >
+              Choose File
+            </button>
+            <span class="text-xs text-slate-600 select-none">
+              {{ attachmentFormData.fileName || 'No file chosen' }}
+            </span>
+          </div>
           @if (attachmentSubmitted() && !attachmentFormData.file) {
             <div class="text-xs text-red-500 mt-1">Attachment file is required.</div>
           }

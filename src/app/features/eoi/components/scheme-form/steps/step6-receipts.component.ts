@@ -97,30 +97,38 @@ export class Step6ReceiptsComponent {
     { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-32' }
   ];
 
-  protected readonly receipts = computed<ReceiptRow[]>(() => [
-    {
-      id: 1,
-      name: 'Submission Acknowledgment',
-      reference: this.state.eoiApplicationId(),
-      amount: '-',
-      date: this.state.submissionTimestamp(),
-      download: () => this.state.downloadAcknowledgmentReceipt()
-    },
-    {
-      id: 2,
-      name: 'EMD Receipt',
-      reference: this.state.emdPaymentRef(),
-      amount: this.state.paymentMethod() === 'exemption' ? 'Exempted' : this.state.formattedEmdFee(),
-      date: this.state.submissionTimestamp(),
-      download: () => this.state.downloadEmdReceipt()
-    },
-    {
-      id: 3,
-      name: 'Processing Fee Receipt',
-      reference: this.state.procPaymentRef,
-      amount: this.state.formattedProcessFee(),
-      date: this.state.procFeeDate(),
-      download: () => this.state.downloadProcessingFeeReceipt()
+  /** Receipts of what the backend recorded: the submission, and each fee that was payable. */
+  protected readonly receipts = computed<ReceiptRow[]>(() => {
+    const rows: ReceiptRow[] = [
+      {
+        id: 1,
+        name: 'Submission Acknowledgment',
+        reference: this.state.eoiApplicationId(),
+        amount: '-',
+        date: this.state.submissionTimestamp(),
+        download: () => this.state.downloadAcknowledgmentReceipt()
+      }
+    ];
+    if (this.state.emdRequired()) {
+      rows.push({
+        id: 2,
+        name: 'EMD Receipt',
+        reference: this.state.emdPaymentRef(),
+        amount: this.state.emdExempted() ? 'Exempted' : this.state.formattedEmdFee(),
+        date: this.state.emdExempted() ? this.state.submissionTimestamp() : this.state.emdPaidDate(),
+        download: () => this.state.downloadEmdReceipt()
+      });
     }
-  ]);
+    if (this.state.procFeeRequired()) {
+      rows.push({
+        id: 3,
+        name: 'Processing Fee Receipt',
+        reference: this.state.procPaymentRef(),
+        amount: this.state.formattedProcessFee(),
+        date: this.state.procFeeDate(),
+        download: () => this.state.downloadProcessingFeeReceipt()
+      });
+    }
+    return rows;
+  });
 }

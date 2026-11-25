@@ -62,6 +62,17 @@ export type { EoiDocumentItem } from './scheme-form.model';
           </p>
         </div>
 
+        @if (state.loading()) {
+          <div class="p-6 rounded-xl border border-[#EADCE2] bg-white text-sm text-slate-500 flex items-center gap-2" role="status">
+            <span class="inline-block w-4 h-4 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
+            Opening your application...
+          </div>
+        } @else if (state.loadError() || !state.application()) {
+          <div class="p-5 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-700 space-y-3" role="alert">
+            <p class="m-0 font-semibold">{{ state.loadError() || 'Your application could not be opened.' }}</p>
+            <button appButton variant="outline" size="sm" (click)="goBack()">Back to Apply for EOI</button>
+          </div>
+        } @else {
         <!-- 2. Step progress card -->
         <div class="mb-5">
           <app-stepper
@@ -117,6 +128,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
             }
           }
         </div>
+        }
 
       </main>
       <!-- ====================================================================
@@ -151,8 +163,8 @@ export type { EoiDocumentItem } from './scheme-form.model';
           <!-- Payment summary -->
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-              <span class="text-slate-500 text-[11px] font-medium">Transaction ID</span>
-              <span class="tabular-nums font-semibold text-slate-800 text-xs">CIN-SBI-9912081</span>
+              <span class="text-slate-500 text-[11px] font-medium">Payment Reference No. (PRN)</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">{{ state.procPaymentRef() }}</span>
             </div>
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
               <span class="text-slate-500 text-[11px] font-medium">Paid On</span>
@@ -166,7 +178,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
 
           <p class="flex items-center justify-center gap-2 text-xs text-slate-500 m-0" role="status">
             <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Taking you to Step 5 (EMD Payment)...
+            Taking you to EMD Payment...
           </p>
         </div>
       </app-action-modal>
@@ -190,7 +202,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
           </div>
 
           <div class="space-y-1.5">
-            <h3 class="text-xl sm:text-2xl font-black text-slate-900 m-0">Payment Successful</h3>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900 m-0">Application Submitted</h3>
             <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
               Your EOI application has been submitted.
             </p>
@@ -198,8 +210,8 @@ export type { EoiDocumentItem } from './scheme-form.model';
 
           <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-left text-xs space-y-2.5">
             <div class="flex items-center justify-between gap-3 pb-2 border-b border-slate-200">
-              <span class="text-slate-500 text-[11px] font-medium">Payment Reference No.</span>
-              <span class="tabular-nums font-semibold text-slate-800 text-xs">{{ state.emdPaymentRef() }}</span>
+              <span class="text-slate-500 text-[11px] font-medium">EMD Payment Reference No.</span>
+              <span class="tabular-nums font-semibold text-slate-800 text-xs">{{ state.emdRequired() ? state.emdPaymentRef() : 'Not payable' }}</span>
             </div>
             <div class="flex items-center justify-between gap-3 pt-1">
               <span class="text-slate-500 text-[11px] font-medium">EOI Submission Reference No.</span>

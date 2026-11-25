@@ -92,7 +92,7 @@ interface IpaRow {
           size="sm"
           [disabled]="row.full"
           (click)="newSdc(row)"
-          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register the new SDC for this IPA'"
+          [title]="row.full ? 'Every SDC of this IPA is registered' : 'Register SDC'"
         >
           New SDC
         </button>
@@ -184,16 +184,55 @@ export class IpaListComponent {
 
   readonly rows = computed<IpaRow[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    return this.tpIpaService.ipas().flatMap(source => this.toRow(source)).filter(
-      row =>
-        !query ||
-        row.ipaNo.toLowerCase().includes(query) ||
-        row.schemeTitle.toLowerCase().includes(query) ||
-        row.refNo.toLowerCase().includes(query) ||
-        row.category.toLowerCase().includes(query) ||
-        row.district.toLowerCase().includes(query) ||
-        row.sector.toLowerCase().includes(query)
-    );
+    const fv = this.filterValues();
+    const selectedScheme = (fv['schemeTitle'] || '').trim();
+    const selectedCategory = (fv['category'] || '').trim();
+    const selectedDistrict = (fv['district'] || '').trim();
+    const selectedSector = (fv['sector'] || '').trim();
+
+    return this.allIpaRows().filter(row => {
+      // 1. Full-text search
+      if (query) {
+        const matchesQuery =
+          row.ipaNo.toLowerCase().includes(query) ||
+          row.schemeTitle.toLowerCase().includes(query) ||
+          row.refNo.toLowerCase().includes(query) ||
+          row.category.toLowerCase().includes(query) ||
+          row.district.toLowerCase().includes(query) ||
+          row.sector.toLowerCase().includes(query);
+        if (!matchesQuery) return false;
+      }
+
+      // 2. Scheme Name filter
+      if (selectedScheme && selectedScheme !== 'ALL') {
+        if (row.schemeTitle !== selectedScheme && !row.schemeTitle.toLowerCase().includes(selectedScheme.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 3. Scheme Category filter
+      if (selectedCategory && selectedCategory !== 'ALL') {
+        if (row.category.toLowerCase() !== selectedCategory.toLowerCase()) {
+          return false;
+        }
+      }
+
+      // 4. District filter
+      if (selectedDistrict && selectedDistrict !== 'ALL') {
+        if (!row.district.toLowerCase().includes(selectedDistrict.toLowerCase())) {
+          return false;
+        }
+      }
+
+      // 5. Sector filter
+      if (selectedSector && selectedSector !== 'ALL') {
+        if (!row.sector.toLowerCase().includes(selectedSector.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   });
 
   readonly columns: TableColumn<IpaRow>[] = [

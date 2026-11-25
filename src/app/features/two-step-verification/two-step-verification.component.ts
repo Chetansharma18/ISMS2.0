@@ -146,9 +146,10 @@ interface TwoStepFormData {
             size="sm"
             iconOnly
             type="button"
+            [disabled]="item.status === 'Inactive'"
             (click)="openEditModal(item)"
-            title="Edit"
-            aria-label="Edit"
+            [title]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
+            [attr.aria-label]="item.status === 'Inactive' ? 'Cannot edit inactive configuration' : 'Edit'"
           >
             <app-icon name="edit" size="sm" />
           </button>
@@ -406,10 +407,9 @@ export class TwoStepVerificationComponent implements OnInit {
     this.submitted.set(false);
     this.isAuthDropdownOpen.set(false);
 
-    // Pick first available role not already configured, or default
+    // Prefill the first role that has no configuration yet.
     const existingRoles = this.items().map(i => i.roleType);
     const unconfigured = this.availableRoles().find(r => !existingRoles.includes(r));
-
     this.formData = {
       roleType: unconfigured || this.availableRoles()[0] || '',
       authTypes: ['OTP']
@@ -418,6 +418,7 @@ export class TwoStepVerificationComponent implements OnInit {
   }
 
   openEditModal(item: TwoStepVerificationItem): void {
+    if (item.status === 'Inactive') return;
     this.editingId.set(item.id);
     this.submitted.set(false);
     this.isAuthDropdownOpen.set(false);

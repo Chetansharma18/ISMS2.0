@@ -32,6 +32,7 @@ interface ReviewStep {
     <div class="space-y-5">
       @for (item of review(); track item.step.key) {
         <section class="rounded-lg border border-[#D6E3F0] overflow-hidden">
+          @if (showStepTitle()) {
           <div class="flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 border-b border-[#D6E3F0]">
             <h3 class="text-[15px] font-semibold text-[#1E3A5F] m-0">
               {{ item.step.number }}. {{ item.step.title }}
@@ -46,6 +47,7 @@ interface ReviewStep {
               </button>
             }
           </div>
+          }
 
           <div class="p-4 space-y-4">
             @for (section of item.sections; track section.title) {
@@ -117,6 +119,10 @@ export class OtrReviewComponent {
   readonly accepted = input(false);
   readonly declarationError = input<string | undefined>(undefined);
   readonly readOnly = input(false);
+  /** Show only these steps (by step key); null shows every step. */
+  readonly stepKeys = input<readonly string[] | null>(null);
+  /** The "1. Organisation Details" bar above each step; off when the page already titles the step. */
+  readonly showStepTitle = input(true);
 
   readonly editStep = output<number>();
   readonly viewDocument = output<string>();
@@ -126,7 +132,8 @@ export class OtrReviewComponent {
     const all = this.values();
     const docs = this.documents();
     const errors = this.errors();
-    return formSteps(this.form()).map(step => {
+    const only = this.stepKeys();
+    return formSteps(this.form()).filter(step => !only || only.includes(step.key)).map(step => {
       const values = all[step.key] ?? {};
       const stepErrors = errors[step.key] ?? {};
       const sections = step.sections

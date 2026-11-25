@@ -18,6 +18,7 @@ import {
   InputDirective,
   IconComponent,
   SwitchComponent,
+  PageShellComponent,
   formatInr
 } from '../../shared';
 import { EoiCategoryItem, SchemeCategoryMasterItem, SchemeMasterItem } from '../../core/models/admin-masters.model';
@@ -41,16 +42,15 @@ const schemeCategoryOptions = signal<string[]>(['ALL', ...DEFAULT_SCHEME_CATEGOR
 const eoiCategoryOptions = signal<string[]>(DEFAULT_EOI_CATEGORIES);
 
 const COLUMNS: TableColumn<SchemeMasterItem>[] = [
-  { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-  { key: 'schemeName', label: 'Scheme Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
-  { key: 'schemeCategory', label: 'Scheme Category', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
-  { key: 'categoryName', label: 'EOI Category', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
+  { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-14 min-w-[55px]' },
+  { key: 'schemeName', label: 'Scheme Name', cellClass: 'font-semibold text-slate-800 min-w-[200px]' },
+  { key: 'schemeCategory', label: 'Scheme Category', cellClass: 'whitespace-nowrap font-medium text-slate-700 w-36' },
   {
     key: 'budget',
     label: 'Budget',
     align: 'right',
     type: 'custom',
-    width: 'min-w-[130px]',
+    width: 'w-36 min-w-[120px]',
     cellClass: 'whitespace-nowrap font-medium text-slate-800',
     format: (value: number) => formatInr(value ?? 0, { fractionDigits: 2 })
   },
@@ -58,6 +58,7 @@ const COLUMNS: TableColumn<SchemeMasterItem>[] = [
     key: 'amount',
     label: 'EMD amount',
     align: 'right',
+    width: 'w-32 min-w-[110px]',
     cellClass: 'whitespace-nowrap font-medium text-slate-800',
     format: (value: number) => formatInr(value ?? 0, { fractionDigits: 2 })
   },
@@ -65,6 +66,7 @@ const COLUMNS: TableColumn<SchemeMasterItem>[] = [
     key: 'processFees',
     label: 'Process Fees',
     align: 'right',
+    width: 'w-32 min-w-[110px]',
     cellClass: 'whitespace-nowrap font-medium text-slate-800',
     format: (value: number) => formatInr(value ?? 0, { fractionDigits: 2 })
   }
@@ -80,6 +82,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
   columns: COLUMNS,
   hasStatus: true,
   hideViewAction: true,
+  actionColumnWidth: 'w-44 min-w-[175px]',
   modalWidthClass: 'max-w-[840px]',
   filters: [
     {
@@ -138,11 +141,22 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
     InputDirective,
     IconComponent,
     SwitchComponent,
+    PageShellComponent,
     SchemeRequirementsModalComponent
   ],
   template: `
-    <app-master-crud-page [config]="config" [extraTemplates]="extraTemplates">
-    </app-master-crud-page>
+    @if (!isReqModalOpen()) {
+      <app-master-crud-page [config]="config" [extraTemplates]="extraTemplates">
+      </app-master-crud-page>
+    } @else {
+      <app-page-shell>
+        <app-scheme-requirements-modal
+          [isOpen]="true"
+          [scheme]="selectedSchemeForReq()"
+          (close)="closeRequirementsModal()"
+        />
+      </app-page-shell>
+    }
 
     <!-- Custom Budget Cell Template with Click-to-Edit for Super Admin -->
     <ng-template #budgetTemplate let-item>
@@ -253,13 +267,6 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
         </div>
       </div>
     </ng-template>
-
-    <!-- 4-Tab Scheme Requirements Drawer / Modal -->
-    <app-scheme-requirements-modal
-      [isOpen]="isReqModalOpen()"
-      [scheme]="selectedSchemeForReq()"
-      (close)="closeRequirementsModal()"
-    />
   `
 })
 export class SchemeMasterComponent {

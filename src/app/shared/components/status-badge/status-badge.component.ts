@@ -9,12 +9,19 @@ import { BadgeVariant } from '../table/table.types';
   imports: [CommonModule],
   template: `
     <span
-      class="inline-flex items-center justify-center min-h-6 px-2 rounded-sm text-[12px] font-medium leading-none select-none tracking-normal font-sans"
+      class="inline-flex items-center justify-center min-h-6 px-2.5 py-0.5 rounded-sm text-[12px] font-medium leading-normal select-none tracking-normal font-sans whitespace-nowrap min-w-fit"
       [ngClass]="variantClasses"
     >
       <ng-content></ng-content>
     </span>
-  `
+  `,
+  styles: [`
+    :host {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+    }
+  `]
 })
 export class StatusBadgeComponent {
   @Input() variant: BadgeVariant = 'neutral';

@@ -24,6 +24,12 @@ export type CrudAction = keyof CrudEndpoints;
 const endpoint = (method: ApiMethod, url: EndpointUrlResolver): EndpointDef => ({ url, method });
 const byId = (base: string) => (id: string | number) => `${base}/${encodeURIComponent(String(id))}`;
 
+/** `${eoiId}/${orderId}/<rest>` -> /eoi/responses/notices/{eoiId}/orders/{orderId}/<rest> (each segment encoded). */
+const orderPath = (id: string | number): string => {
+  const [eoiId, orderId, ...rest] = String(id).split('/').map(encodeURIComponent);
+  return `/eoi/responses/notices/${eoiId}/orders/${orderId}${rest.length ? `/${rest.join('/')}` : ''}`;
+};
+
 /** The five standard REST endpoints of a collection: GET/POST `base`, GET/PUT/DELETE `base/{id}`. */
 function crud(base: string): CrudEndpoints {
   return {
@@ -81,6 +87,98 @@ export const API_ENDPOINTS = {
     BACK_TO_SSO: endpoint('GET', '/auth/backtosso')
   },
 
+  // EOI Configuration (admin, EoiNotices permission): the "Active Schemes" list and the Configure / Edit EOI form.
+  EOI_CONFIG: {
+    /** Dropdowns: schemes (with fees), EOI categories, Doc Master documents, Annexure Master annexures, limits. */
+    OPTIONS: endpoint('GET', '/eoi/configurations/options'),
+    /** Paged (max 100 per page). */
+    LIST: endpoint('GET', '/eoi/configurations'),
+    GET: endpoint('GET', byId('/eoi/configurations')),
+    /** Body: EoiSaveRequest (`saveAsDraft: true` for a draft). */
+    ADD: endpoint('POST', '/eoi/configurations'),
+    /** Header `If-Match: <concurrencyStamp>`. */
+    UPDATE: endpoint('PUT', byId('/eoi/configurations')),
+    SET_STATUS: endpoint('PATCH', (id: string | number) => `/eoi/configurations/${encodeURIComponent(String(id))}/status`),
+    DELETE: endpoint('DELETE', byId('/eoi/configurations')),
+    /** multipart: title, kind (Document | Corrigendum), file */
+    ADD_ATTACHMENT: endpoint('POST', (id: string | number) => `/eoi/configurations/${encodeURIComponent(String(id))}/attachments`),
+    /** id = "<eoiId>/<attachmentId>" */
+    ATTACHMENT: endpoint('GET', (id: string | number) => `/eoi/configurations/${String(id).split('/').map(encodeURIComponent).join('/attachments/')}`),
+    DELETE_ATTACHMENT: endpoint('DELETE', (id: string | number) => `/eoi/configurations/${String(id).split('/').map(encodeURIComponent).join('/attachments/')}`),
+    COMMITTEE: endpoint('GET', (id: string | number) => `/eoi/configurations/${encodeURIComponent(String(id))}/committee`),
+    /** Body: `{ approverSsoId, memberSsoIds[] }` */
+    SAVE_COMMITTEE: endpoint('PUT', (id: string | number) => `/eoi/configurations/${encodeURIComponent(String(id))}/committee`),
+    COMMITTEE_CANDIDATES: endpoint('GET', '/eoi/configurations/committee-candidates')
+  },
+
+  // EOIs open to applicants (EoiApplications permission): the "Active Schemes" list on /tenders.
+  EOI_APPLY: {
+    NOTICES: endpoint('GET', '/eoi/apply/notices'),
+    /** Open EOI with its required documents, annexures and published files. */
+    NOTICE: endpoint('GET', byId('/eoi/apply/notices')),
+    /** id = "<eoiId>/<attachmentId>" */
+    ATTACHMENT: endpoint('GET', (id: string | number) => `/eoi/apply/notices/${String(id).split('/').map(encodeURIComponent).join('/attachments/')}`),
+    /** Start (or resume) my application for the EOI; the profile is copied from my submitted OTR. */
+    START: endpoint('POST', (eoiId: string | number) => `/eoi/apply/notices/${encodeURIComponent(String(eoiId))}/applications`),
+    APPLICATION: endpoint('GET', byId('/eoi/apply/applications')),
+    /** Body `{ answers }`; `?complete=true` when leaving the step (mandatory questions checked). */
+    SAVE_ANSWERS: endpoint('PUT', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/dynamic-answers`),
+    /** id = "<applicationId>/<requiredDocumentId>"; multipart: file, comment */
+    UPLOAD_DOCUMENT: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}`),
+    /** id = "<applicationId>/<requiredDocumentId>"; body `{ comment }` */
+    DOCUMENT_COMMENT: endpoint('PUT', (id: string | number) => `/eoi/apply/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}/comment`),
+    /** id = "<applicationId>/<requiredDocumentId>" */
+    DELETE_DOCUMENT: endpoint('DELETE', (id: string | number) => `/eoi/apply/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}`),
+    /** id = "<applicationId>/<documentId>" (the uploaded file's id) */
+    DOCUMENT: endpoint('GET', (id: string | number) => `/eoi/apply/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}`),
+    /** id = "<applicationId>/<fee>" (fee: process-fee | emd). Answer: RPP target URL + form fields. */
+    INITIATE_PAYMENT: endpoint('POST', (id: string | number) => {
+      const [applicationId, fee] = String(id).split('/');
+      return `/eoi/apply/applications/${encodeURIComponent(applicationId)}/payments/${encodeURIComponent(fee)}/initiate`;
+    }),
+    /** Body `{ prn? }`: records the processing fee paid on RPP. */
+    CONFIRM_PROCESS_FEE: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/process-fee`),
+    /** Body `{ mode: payment | exemption | none, prn? }` */
+    SET_EMD: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/emd`),
+    /** Body `{ declarationAccepted }` */
+    SUBMIT: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/submit`),
+    /** My applications (EOI Status): `?status=&page=&pageSize=`. Decisions show only once the results are published. */
+    MY_APPLICATIONS: endpoint('GET', '/eoi/apply/applications'),
+    /** The published Empanelment / Rejection Order that lists my application (PDF). */
+    RESULT_ORDER: endpoint('GET', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/result-order`),
+    /** Multipart `title`, `file`: a document the committee asked for. */
+    CLARIFICATION_UPLOAD: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/clarification/documents`),
+    /** Body `{ comment }`: sends the requested documents back to the committee. */
+    CLARIFICATION_SUBMIT: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/clarification/submit`),
+    /** Multipart `reason`, `files[]`, `titles[]`: appeal against the published result (within 7 days). */
+    APPEAL_SUBMIT: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/appeal`),
+    /** Multipart `title`, `file`: a document the committee asked for in the appeal response window. */
+    APPEAL_UPLOAD: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/appeal/documents`),
+    /** Body `{ text }`: my response to the committee in the appeal response window. */
+    APPEAL_RESPONSE: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/appeal/response`),
+    /** id = "<applicationId>/<documentId>": one of my appeal documents. */
+    APPEAL_DOCUMENT: endpoint('GET', (id: string | number) => {
+      const [applicationId, documentId] = String(id).split('/').map(encodeURIComponent);
+      return `/eoi/apply/applications/${applicationId}/appeal/documents/${documentId}`;
+    })
+  },
+
+  // Form Manager: dynamic forms with versioned schemas (Dynamic Form Builder screen). Needs the FormManager
+  // permission. A schema change published with UPDATE becomes a new version; submissions are keyed by
+  // (referenceType, referenceId).
+  FORM_MANAGER: {
+    /** `?moduleName=` filters by module (EOI, OTR ...). Listed forms carry no schema. */
+    LIST: endpoint('GET', '/form-manager'),
+    /** id = form id or form key; `?version=` for an older version. Includes `activeSchema`. */
+    GET: endpoint('GET', byId('/form-manager')),
+    ADD: endpoint('POST', '/form-manager'),
+    /** Body: title / moduleName / description / isActive, and `newSchema` + `changelog` to publish a new version. */
+    UPDATE: endpoint('PUT', byId('/form-manager')),
+    SUBMIT: endpoint('POST', (id: string | number) => `/form-manager/${encodeURIComponent(String(id))}/submissions`),
+    /** `?referenceType=&referenceId=` */
+    SUBMISSION: endpoint('GET', (id: string | number) => `/form-manager/${encodeURIComponent(String(id))}/submissions`)
+  },
+
   // One Time Registration (OTR) of the signed-in organisation. FORM returns the steps and their fields (plus any
   // FormManager fields attached to a step); each step is its own record, saved with PUT and checked by the backend
   // (400 with the failing field names). Needs the OtrRegistrations permission.
@@ -117,7 +215,51 @@ export const API_ENDPOINTS = {
   /** Schemes as the EOI scrutiny / sanction workflow sees them */
   EOI_SCHEMES: readOnly('/eoi/schemes'),
   /** Applicant responses under department scrutiny */
-  EOI_RESPONSES: crud('/eoi/responses'),
+  EOI_RESPONSES: {
+    ...crud('/eoi/responses'),
+    /** Applicant Submissions of one EOI: `?status=&search=&page=&pageSize=`; committee only, after closing. */
+    APPLICATIONS: endpoint('GET', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/applications`),
+    /** Evaluation Excel (bulk decisions), pre-filled with the current decisions and the grade dropdowns. */
+    DECISIONS_TEMPLATE: endpoint('GET', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/decisions/template`),
+    /** Check a filled evaluation Excel (multipart `file`); answers the row report, applies nothing. */
+    DECISIONS_UPLOAD: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/decisions/upload`),
+    /** Apply a checked evaluation Excel: id = `${eoiId}/${uploadId}`. All changes or none. */
+    DECISIONS_CONFIRM: endpoint('POST', (id: string | number) => {
+      const [eoiId, uploadId] = String(id).split('/').map(encodeURIComponent);
+      return `/eoi/responses/notices/${eoiId}/decisions/uploads/${uploadId}/confirm`;
+    }),
+    /** Result orders of the EOI with the decision counts (EoiOrdersOverviewDto). */
+    ORDERS: endpoint('GET', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/orders`),
+    /** Approver: generate a draft order `{ type: 'Empanelment' | 'Rejection', round }`. */
+    ORDER_GENERATE: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/orders`),
+    /** id = `${eoiId}/${orderId}/<draft | signed | otp/resend | otp/verify>` */
+    ORDER_FILE: endpoint('GET', (id: string | number) => orderPath(id)),
+    /** Can the orders be e-signed and released, and what is missing (EoiResultsReadinessDto). */
+    RESULTS_READINESS: endpoint('GET', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results`),
+    /** E-sign OTP to the signed-in approver's mobile `{ round }`. */
+    RESULTS_CHALLENGE: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results/publish/challenge`),
+    /** `{ challengeId, otp }`: e-signs every page of both orders and releases them. */
+    RESULTS_PUBLISH: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results/publish`),
+    /** Editable text of an order: GET / PUT `${eoiId}/${orderId}` (EoiOrderEditorDto). */
+    ORDER_CONTENT: endpoint('GET', (id: string | number) => `${orderPath(id)}/content`),
+    ORDER_SAVE_CONTENT: endpoint('PUT', (id: string | number) => `${orderPath(id)}/content`),
+    /** OTR form definition, to show an applicant's registration profile (no OtrRegistrations permission needed). */
+    OTR_FORM: endpoint('GET', '/eoi/responses/otr-form'),
+    /** One application on the Scrutiny Desk (EoiReviewApplicationDetailDto). */
+    APPLICATION: endpoint('GET', byId('/eoi/responses/applications')),
+    /** A document the applicant uploaded: id = `${applicationId}/${documentId}`. */
+    DOCUMENT: endpoint('GET', (id: string | number) => `/eoi/responses/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}`),
+    /** "Download All": every uploaded document of the application in one ZIP. */
+    DOCUMENTS_ZIP: endpoint('GET', (id: string | number) => `/eoi/responses/applications/${encodeURIComponent(String(id))}/documents/zip`),
+    /** An OTR document of the applicant: id = `${applicationId}/${documentType}` (gst-certificate, pan-card ...). */
+    OTR_DOCUMENT: endpoint('GET', (id: string | number) => `/eoi/responses/applications/${String(id).split('/').map(encodeURIComponent).join('/otr-documents/')}`),
+    /** Committee member's remark `{ remark, remarkMasterId }`. */
+    REMARK: endpoint('POST', (id: string | number) => `/eoi/responses/applications/${encodeURIComponent(String(id))}/remarks`),
+    /** Approver: `{ grade, remark, remarkMasterId, version }`. */
+    APPROVE: endpoint('POST', (id: string | number) => `/eoi/responses/applications/${encodeURIComponent(String(id))}/approve`),
+    /** Approver: `{ remark, remarkMasterId, version }`. */
+    REJECT: endpoint('POST', (id: string | number) => `/eoi/responses/applications/${encodeURIComponent(String(id))}/reject`)
+  },
   /** Sanction order document of each scheme (id = schemeId), draft or released */
   SANCTION_DOCUMENTS: crud('/eoi/sanction-documents'),
   /** IPA document of each application (id = `${schemeId}__${appId}`), draft, released and issued copies */

@@ -17,7 +17,7 @@ import { ConfirmModalData } from '../user-management.util';
       [title]="data()?.title || 'Confirmation'"
       [primaryLabel]="data()?.confirmLabel || 'Confirm'"
       secondaryLabel=""
-      maxWidthClass="max-w-[460px]"
+      size="sm"
       (primaryAction)="confirmed.emit()"
       (secondaryAction)="dismissed.emit()"
       (close)="dismissed.emit()"

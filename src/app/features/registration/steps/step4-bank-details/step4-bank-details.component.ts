@@ -45,8 +45,10 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           <div>
             <app-form-select
               label="Name of the Bank"
+              [disableLabelClick]="true"
               [value]="data().bankName"
               (valueChange)="update('bankName', $event)"
+              (blur)="markTouched('bankName')"
               [options]="banks"
               placeholder="Select bank"
               [required]="true"
@@ -58,6 +60,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           <div>
             <app-form-input
               label="Branch Name"
+              [disableLabelClick]="true"
               [value]="data().branchName"
               (valueChange)="update('branchName', $event)"
               (blur)="markTouched('branchName')"
@@ -72,6 +75,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           <div>
             <app-form-input
               label="Account Holder Name"
+              [disableLabelClick]="true"
               [value]="data().accountHolderName"
               (valueChange)="update('accountHolderName', $event)"
               (blur)="markTouched('accountHolderName')"
@@ -88,6 +92,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="Account Number"
               type="tel"
               [numericOnly]="true"
+              [disableLabelClick]="true"
               [value]="data().accountNo"
               (valueChange)="update('accountNo', $event)"
               (blur)="markTouched('accountNo')"
@@ -102,6 +107,7 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
           <div>
             <app-form-input
               label="IFSC Code"
+              [disableLabelClick]="true"
               [value]="data().ifscCode"
               (valueChange)="update('ifscCode', $event)"
               (blur)="markTouched('ifscCode')"
@@ -120,10 +126,11 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
               label="MICR Code (Optional)"
               type="tel"
               [numericOnly]="true"
+              [disableLabelClick]="true"
               [value]="data().micrCode"
               (valueChange)="update('micrCode', $event)"
               (blur)="markTouched('micrCode')"
-              placeholder="Enter MICR code (9 digits)"
+              placeholder="Enter MICR code"
               [maxLength]="9"
               [error]="getFieldError('micrCode')"
             ></app-form-input>
@@ -202,6 +209,14 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600 {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:hover:not(.cursor-not-allowed) {
+      border-color: #DC2626 !important;
+    }
+
     :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
       border-color: #DC2626 !important;
       box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
@@ -235,6 +250,19 @@ import { FormFileUploadComponent } from '../../../../shared/components/form-cont
     :host ::ng-deep app-form-select button[type="button"]:focus {
       border-color: #477DAF !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"].border-rose-600 {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"].border-rose-600:hover:not(:disabled) {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-select button[type="button"].border-rose-600:focus {
+      border-color: #DC2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
     }
 
     :host ::ng-deep app-form-file-upload .rounded-lg.border,
@@ -282,29 +310,36 @@ export class Step4BankDetailsComponent {
       return undefined;
     }
     if (field === 'branchName') {
-      if ((isSubmitted || isTouched) && !d.branchName?.trim()) return 'Branch Name is required';
+      const branch = d.branchName?.trim();
+      if ((isSubmitted || isTouched) && !branch) return 'Branch Name is required';
+      if (branch && branch.length < 2) return 'Branch Name must be at least 2 characters';
       return undefined;
     }
     if (field === 'accountHolderName') {
-      if ((isSubmitted || isTouched) && !d.accountHolderName?.trim()) return 'Account Holder Name is required';
+      const name = d.accountHolderName?.trim();
+      if ((isSubmitted || isTouched) && !name) return 'Account Holder Name is required';
+      if (name && name.length < 2) return 'Account Holder Name must be at least 2 characters';
       return undefined;
     }
     if (field === 'accountNo') {
-      if ((isSubmitted || isTouched) && !d.accountNo?.trim()) return 'Bank Account Number is required';
-      if (d.accountNo?.trim() && !REGEX.BANK_ACCOUNT.test(d.accountNo)) return 'Invalid Account Number (9 to 18 digits)';
+      const acc = d.accountNo?.trim();
+      if ((isSubmitted || isTouched) && !acc) return 'Bank Account Number is required';
+      if (acc && !REGEX.BANK_ACCOUNT.test(acc)) return 'Invalid Account Number (9 to 18 digits)';
       return undefined;
     }
     if (field === 'ifscCode') {
-      if ((isSubmitted || isTouched) && !d.ifscCode?.trim()) return 'IFSC Code is required';
-      if (d.ifscCode?.trim() && !REGEX.IFSC.test(d.ifscCode.toUpperCase())) return 'Invalid IFSC Code (e.g. SBIN0031804)';
+      const ifsc = d.ifscCode?.trim();
+      if ((isSubmitted || isTouched) && !ifsc) return 'IFSC Code is required';
+      if (ifsc && !REGEX.IFSC.test(ifsc.toUpperCase())) return 'Invalid IFSC Code (e.g. SBIN0031804)';
       return undefined;
     }
     if (field === 'micrCode') {
-      if (d.micrCode?.trim() && !REGEX.MICR.test(d.micrCode)) return 'Invalid MICR Code (9 digits)';
+      const micr = d.micrCode?.trim();
+      if (micr && !REGEX.MICR.test(micr)) return 'Invalid MICR Code (9 digits)';
       return undefined;
     }
     if (field === 'cancelledChequeDoc') {
-      if (isSubmitted && (!d.cancelledChequeDoc || d.cancelledChequeDoc.status !== 'uploaded')) {
+      if ((isSubmitted || isTouched) && (!d.cancelledChequeDoc || d.cancelledChequeDoc.status !== 'uploaded')) {
         return 'Cancelled Cheque or Bank Passbook upload is required';
       }
       return undefined;

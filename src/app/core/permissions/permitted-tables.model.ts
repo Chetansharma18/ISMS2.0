@@ -45,6 +45,8 @@ export interface TableScreen {
   query?: Record<string, string>;
   /** Other pages the screen leads to that the same permission opens (no sidebar link of their own). */
   alsoGoverns?: string[];
+  /** Further sidebar links the same table opens, shown right after its own link (e.g. "EOI Status" after "Apply for EOI"). */
+  extraLinks?: { key: string; label: string; route: string; icon?: IconName }[];
 }
 
 /** One link of the permission-driven sidebar. */

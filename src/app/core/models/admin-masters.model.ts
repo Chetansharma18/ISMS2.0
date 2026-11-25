@@ -198,6 +198,7 @@ export type DynamicFormFieldType =
   | 'phone'
   | 'datepicker'
   | 'dropdown'
+  | 'multiselect'
   | 'radio'
   | 'checkbox'
   | 'photo'

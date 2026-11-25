@@ -62,9 +62,9 @@ import { isEditDisabled } from './tenders-page.util';
           class="relative"
         >
           <app-icon name="users-committee" size="sm" [stroke]="2" />
-          @if ((item().committeeMembers && item().committeeMembers!.length > 0) || item().committeeApprover) {
+          @if (committeeCount(item()) > 0) {
             <span class="absolute -top-1 -right-1 px-1 min-w-[14px] h-[14px] leading-[14px] text-center rounded-full text-[9px] font-bold bg-[#7C0E44] text-white">
-              {{ (item().committeeMembers?.length || 0) + (item().committeeApprover ? 1 : 0) }}
+              {{ committeeCount(item()) }}
             </span>
           }
         </button>
@@ -80,7 +80,7 @@ import { isEditDisabled } from './tenders-page.util';
           type="button"
           [disabled]="isEditDisabled(item()) || item().isFrozen"
           (click)="$event.stopPropagation(); (!isEditDisabled(item()) && !item().isFrozen) ? editScheme.emit(item()) : null"
-          [title]="item().isFrozen ? 'Scheme is frozen' : (isEditDisabled(item()) ? 'Edit is only available within 24 hours of creation' : 'Edit')"
+          [title]="item().isFrozen ? 'Scheme is frozen' : (isEditDisabled(item()) ? (item().editDisabledReason || 'Edit is only available within 24 hours of creation') : 'Edit')"
           aria-label="Edit"
         >
           <app-icon name="edit" size="sm" />
@@ -119,8 +119,12 @@ export class SchemeRowActionsComponent {
 
   protected readonly isEditDisabled = isEditDisabled;
 
+  protected committeeCount(item: SchemeTender): number {
+    return item.committeeCount ?? (item.committeeMembers?.length || 0) + (item.committeeApprover ? 1 : 0);
+  }
+
   protected getCommitteeTooltip(item: SchemeTender): string {
-    const count = (item.committeeMembers?.length || 0) + (item.committeeApprover ? 1 : 0);
+    const count = this.committeeCount(item);
     if (count > 0) {
       return `Create Committee (${count} member${count > 1 ? 's' : ''} assigned)`;
     }

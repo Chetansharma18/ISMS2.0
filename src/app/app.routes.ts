@@ -77,8 +77,8 @@ export const routes: Routes = [
   {
     path: 'tender-status',
     loadComponent: () =>
-      import('./features/tenders/tender-status.component').then(
-        (m) => m.TenderStatusComponent
+      import('./features/tenders/eoi-status/eoi-status.component').then(
+        (m) => m.EoiStatusComponent
       )
   },
   {
@@ -267,6 +267,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/eoi/pages/scrutiny-desk/scrutiny-desk.component').then(
         (m) => m.ScrutinyDeskComponent
+      )
+  },
+  {
+    path: 'admin/result-orders/:eoiId/:orderId',
+    loadComponent: () =>
+      import('./features/eoi/pages/result-order-editor/result-order-editor.component').then(
+        (m) => m.ResultOrderEditorComponent
       )
   },
   {

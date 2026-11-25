@@ -165,7 +165,7 @@ import { SdcCameraFeed, SdcMonitoringItem } from '../../../core/models/camera.mo
                 <!-- Toggle Single / Multi View -->
                 <button
                   appButton
-                  variant="outline"
+                  [variant]="isMultiView() ? 'primary' : 'outline'"
                   size="sm"
                   (click)="toggleMultiView()"
                 >
@@ -270,8 +270,8 @@ import { SdcCameraFeed, SdcMonitoringItem } from '../../../core/models/camera.mo
         <ng-template #videoPlayerTpl let-feed let-itemClass="itemClass">
           <div #videoContainer [ngClass]="itemClass" class="relative w-full h-full min-h-[180px] bg-slate-950 rounded-xl overflow-hidden shadow-lg border border-slate-800 flex flex-col group select-none">
 
-            <!-- Video Header Overlay (Clean dark gradient) -->
-            <div class="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/85 via-black/40 to-transparent z-10 flex items-start justify-between pointer-events-none">
+            <!-- Video Header Overlay (Softened natural gradient) -->
+            <div class="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/40 via-black/15 to-transparent z-10 flex items-start justify-between pointer-events-none">
               <div class="text-white drop-shadow-md">
                 <div class="font-bold text-xs sm:text-sm tracking-wide flex items-center gap-2">
                   <span>{{ feed.cameraName }}</span>
@@ -737,6 +737,13 @@ export class CameraSdcListComponent {
   }
 
   toggleMultiView() {
+    if (typeof document !== 'undefined' && document.fullscreenElement) {
+      try {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch {}
+    }
     if (this.isMultiView()) {
       this.isMultiView.set(false);
       if (!this.selectedFeed() && this.multiSelectedCameras().length > 0) {
@@ -821,9 +828,9 @@ export class CameraSdcListComponent {
       if (videoEl) {
         const anyV = videoEl as any;
         if (typeof anyV.captureStream === 'function') {
-          stream = anyV.captureStream(30);
+          stream = anyV.captureStream();
         } else if (typeof anyV.mozCaptureStream === 'function') {
-          stream = anyV.mozCaptureStream(30);
+          stream = anyV.mozCaptureStream();
         }
       }
 
@@ -832,7 +839,7 @@ export class CameraSdcListComponent {
         for (let i = 0; i < videos.length; i++) {
           const v = videos[i] as any;
           if (v && typeof v.captureStream === 'function') {
-            stream = v.captureStream(30);
+            stream = v.captureStream();
             break;
           }
         }
@@ -870,7 +877,7 @@ export class CameraSdcListComponent {
 
       this.recordedChunks.set(cameraId, chunks);
       this.mediaRecorders.set(cameraId, recorder);
-      recorder.start(250);
+      recorder.start(1000);
       this.recordingStates.update(s => ({ ...s, [cameraId]: true }));
     } catch (err) {
       console.error('Error starting live recording:', err);

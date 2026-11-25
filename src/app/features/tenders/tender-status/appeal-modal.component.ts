@@ -1,20 +1,20 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import type { SubmittedTender, TenderAppeal } from '../../../core/models/tender.model';
 import { ActionModalComponent } from '../../../shared/components/action-modal/action-modal.component';
-import { ButtonComponent, IconComponent, InputDirective } from '../../../shared';
+import { IconComponent, InputDirective } from '../../../shared';
 import { formatDateMedium } from '../../../shared/utils';
-import { buildAppeal, MAX_APPEAL_FILES } from './tender-appeal.util';
+import { buildAppeal, getAppealDeadline } from './tender-appeal.util';
 
 /**
- * Appeal request confirmation modal:
- * Captures applicant's appeal remarks and proper supporting documents
- * to be submitted within 7 days of application rejection for department approval.
+ * Appeal request modal:
+ * Text-only appeal submission within the 7-day window.
+ * Available only when application is Approved or Rejected.
  */
 @Component({
   selector: 'app-appeal-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, ButtonComponent, IconComponent, InputDirective],
+  imports: [ActionModalComponent, IconComponent, InputDirective],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
@@ -23,10 +23,10 @@ import { buildAppeal, MAX_APPEAL_FILES } from './tender-appeal.util';
       [reverseButtons]="true"
       [showAccentBar]="false"
       accentBarClass="bg-navy"
-      title="Submit Appeal & Supporting Documents"
+      title="Submit Appeal Request"
       primaryLabel="Submit Appeal"
-      secondaryLabel=""
-      maxWidthClass="max-w-2xl"
+      secondaryLabel="Cancel"
+      maxWidthClass="max-w-xl"
       [disablePrimary]="!canSubmit()"
       (primaryAction)="submit()"
       (secondaryAction)="close.emit()"
@@ -35,125 +35,70 @@ import { buildAppeal, MAX_APPEAL_FILES } from './tender-appeal.util';
       @if (tender(); as t) {
         <div class="space-y-4 text-left text-xs max-h-[62vh] overflow-y-auto pr-1">
 
-          <!-- 1. Rejection Grounds & 7-Day Window Banner -->
-          <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/70 text-rose-950 space-y-2">
-            <div class="flex items-start gap-2.5">
-              <app-icon name="alert-triangle" size="sm" class="text-rose-600 mt-0.5 shrink-0" />
-              <div class="space-y-1">
-                <h4 class="m-0 text-[13px] font-bold text-rose-900">
-                  Rejection Grounds & 7-Day Appeal Window
-                </h4>
-                <p class="m-0 text-xs text-rose-800 leading-relaxed">
-                  Your application <span class="font-semibold">{{ t.appRef }} &bull; {{ t.schemeTitle }}</span> was rejected with remarks:
-                </p>
-                <p class="m-0 text-xs text-rose-950 font-semibold italic bg-white/90 p-2.5 rounded border border-rose-200">
-                  "{{ t.rejectionReason || 'Technical qualification criteria not met.' }}"
-                </p>
-                <p class="m-0 text-[11.5px] text-rose-700 leading-relaxed pt-0.5 font-medium">
-                  &bull; You have 7 days from rejection to appeal and respond with proper supporting documents. Once submitted, the department scrutiny committee will review and approve or reject your appeal.
-                </p>
+          <!-- 1. Grounds & 7-Day Window Context Banner -->
+          @if (t.submittedStatus === 'Approved' || t.submittedStatus === 'Accepted') {
+            <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-950 space-y-2">
+              <div class="flex items-start gap-2.5">
+                <app-icon name="check" size="sm" class="text-emerald-700 mt-0.5 shrink-0" />
+                <div class="space-y-1">
+                  <h4 class="m-0 text-[13px] font-bold text-emerald-900">
+                    Appeal on Approved Proposal & Terms
+                  </h4>
+                  <p class="m-0 text-xs text-emerald-800 leading-relaxed">
+                    Your application <span class="font-semibold">{{ t.appRef }} &bull; {{ t.schemeTitle }}</span> has been approved. You may submit an appeal regarding approved terms, allocated targets, sectors, or conditional remarks:
+                  </p>
+                  <p class="m-0 text-xs text-emerald-950 font-semibold italic bg-white/90 p-2.5 rounded border border-emerald-200">
+                    "{{ t.scrutinyRemarks || 'Application proposal meets qualification criteria.' }}"
+                  </p>
+                  <p class="m-0 text-[11.5px] text-emerald-700 leading-relaxed pt-0.5 font-medium">
+                    &bull; Appeal button is available for 7 days only from decision date (Deadline: <strong>{{ deadline(t) }}</strong>). Exactly one appeal is permitted per application.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          } @else {
+            <div class="p-4 rounded-xl border border-rose-200 bg-rose-50/70 text-rose-950 space-y-2">
+              <div class="flex items-start gap-2.5">
+                <app-icon name="alert-triangle" size="sm" class="text-rose-600 mt-0.5 shrink-0" />
+                <div class="space-y-1">
+                  <h4 class="m-0 text-[13px] font-bold text-rose-900">
+                    Rejection Grounds & 7-Day Appeal Window
+                  </h4>
+                  <p class="m-0 text-xs text-rose-800 leading-relaxed">
+                    Your application <span class="font-semibold">{{ t.appRef }} &bull; {{ t.schemeTitle }}</span> was rejected with remarks:
+                  </p>
+                  <p class="m-0 text-xs text-rose-950 font-semibold italic bg-white/90 p-2.5 rounded border border-rose-200">
+                    "{{ t.rejectionReason || 'Technical qualification criteria not met.' }}"
+                  </p>
+                  <p class="m-0 text-[11.5px] text-rose-700 leading-relaxed pt-0.5 font-medium">
+                    &bull; The appeal button is active for 7 days only from decision date (Deadline: <strong>{{ deadline(t) }}</strong>). Once submitted, the department scrutiny committee will review your appeal remarks.
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
 
-          <!-- 2. Applicant Appeal Remarks -->
+          <!-- 2. Applicant Appeal Remarks (Text Box Only) -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-semibold text-slate-800" for="appeal-reply">
-              Appeal Remarks / Explanation <span class="text-rose-600">*</span>
-            </label>
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-semibold text-slate-800" for="appeal-reply">
+                Appeal Remarks / Justification <span class="text-rose-600">*</span>
+              </label>
+              <span class="text-[11px] text-slate-400 tabular-nums">{{ reply().length }}/1000</span>
+            </div>
             <textarea
               appInput
               id="appeal-reply"
-              rows="3"
+              rows="5"
               maxlength="1000"
               [value]="reply()"
               (input)="reply.set($any($event.target).value)"
-              placeholder="Explain your justification or clarification against the rejection remarks..."
-              class="w-full"
+              [placeholder]="t.submittedStatus === 'Approved' || t.submittedStatus === 'Accepted' ? 'Enter your reasons or request for appeal regarding approved terms, targets or remarks...' : 'Enter your justification or explanation for appeal against the rejection remarks...'"
+              class="w-full text-xs"
             ></textarea>
-          </div>
-
-          <!-- 3. Upload Proper Supporting Documents -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <label class="block text-xs font-semibold text-slate-800">
-                Upload Supporting Documents
-                <span class="text-slate-500 font-normal text-[11px] ml-1">(Optional / Recommended)</span>
-              </label>
-              <span class="text-[11px] text-slate-500">Max {{ maxFiles }} files &bull; PDF, JPG, PNG (up to 25 MB each)</span>
-            </div>
-
-            <!-- Hidden native file input -->
-            <input
-              #fileInput
-              type="file"
-              multiple
-              accept=".pdf,.jpg,.jpeg,.png"
-              (change)="onFilesSelected($event)"
-              class="hidden"
-            />
-
-            <!-- Upload Dropzone Button -->
-            @if (files().length < maxFiles) {
-              <div
-                (click)="fileInput.click()"
-                class="w-full flex items-center justify-between p-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100/80 transition-colors cursor-pointer group"
-              >
-                <div class="flex items-center gap-2.5">
-                  <div class="w-8 h-8 rounded-md bg-white border border-slate-200 text-slate-600 group-hover:text-navy flex items-center justify-center shrink-0">
-                    <app-icon name="upload" size="sm" />
-                  </div>
-                  <div class="text-left">
-                    <span class="block text-xs font-semibold text-slate-800 group-hover:text-navy">
-                      Click to choose documents to attach
-                    </span>
-                    <span class="block text-[11px] text-slate-500">
-                      Upload verified certificates, UDIN documents, or receipts
-                    </span>
-                  </div>
-                </div>
-                <button appButton variant="secondary" size="xs" type="button" class="shrink-0 pointer-events-none">
-                  Browse Files
-                </button>
-              </div>
-            }
-
-            <!-- Attached Files List -->
-            @if (files().length > 0) {
-              <div class="space-y-1.5 pt-1">
-                <span class="text-[11px] font-semibold text-slate-600 uppercase tracking-wide block">
-                  Attached Documents ({{ files().length }}):
-                </span>
-                <div class="space-y-1.5">
-                  @for (file of files(); track file.fileName; let idx = $index) {
-                    <div class="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-slate-200 bg-white shadow-2xs">
-                      <div class="flex items-center gap-2.5 min-w-0">
-                        <app-icon name="pdf-badge" solid size="auto" class="w-5 h-5 text-[#E5252A] select-none shrink-0" />
-                        <div class="min-w-0">
-                          <span class="text-xs font-medium text-slate-900 block truncate" [title]="file.fileName">
-                            {{ file.fileName }}
-                          </span>
-                          <span class="text-[10.5px] text-slate-500 block">{{ file.fileSize }}</span>
-                        </div>
-                      </div>
-                      <button
-                        appButton
-                        variant="ghost"
-                        size="xs"
-                        iconOnly
-                        type="button"
-                        (click)="removeFile(idx)"
-                        class="shrink-0"
-                        title="Remove Document"
-                        aria-label="Remove Document"
-                      >
-                        <app-icon name="close" size="xs" class="text-rose-600" />
-                      </button>
-                    </div>
-                  }
-                </div>
-              </div>
-            }
+            <p class="text-[11px] text-slate-500 m-0 leading-normal">
+              Enter your detailed justification. No document upload is required; the department scrutiny committee will review this statement directly.
+            </p>
           </div>
 
         </div>
@@ -168,53 +113,24 @@ export class AppealModalComponent {
   readonly submitted = output<TenderAppeal>();
   readonly close = output<void>();
 
-  protected readonly maxFiles = MAX_APPEAL_FILES;
   protected readonly reply = signal('');
-  protected readonly files = signal<{ fileName: string; fileSize: string }[]>([]);
 
   protected readonly canSubmit = computed(() => !!this.tender() && this.reply().trim().length > 0);
 
   constructor() {
-    // Reset remark and files on open
+    // Reset remark on open
     effect(() => {
       this.tender();
       this.reply.set('');
-      this.files.set([]);
     });
   }
 
-  protected onFilesSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
-
-    const currentFiles = [...this.files()];
-    for (let i = 0; i < input.files.length; i++) {
-      if (currentFiles.length >= this.maxFiles) break;
-      const file = input.files[i];
-      const fileSize = this.formatFileSize(file.size);
-      if (!currentFiles.some(f => f.fileName === file.name)) {
-        currentFiles.push({ fileName: file.name, fileSize });
-      }
-    }
-
-    this.files.set(currentFiles);
-    input.value = '';
-  }
-
-  protected removeFile(index: number): void {
-    const list = [...this.files()];
-    list.splice(index, 1);
-    this.files.set(list);
-  }
-
-  private formatFileSize(bytes: number): string {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  protected deadline(tender: SubmittedTender): string {
+    return getAppealDeadline(tender);
   }
 
   protected submit(): void {
     if (!this.canSubmit()) return;
-    this.submitted.emit(buildAppeal(this.reply().trim(), this.files(), formatDateMedium(new Date(), '-')));
+    this.submitted.emit(buildAppeal(this.reply().trim(), formatDateMedium(new Date(), '-')));
   }
 }

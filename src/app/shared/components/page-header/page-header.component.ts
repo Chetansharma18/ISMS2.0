@@ -14,6 +14,9 @@ export interface BreadcrumbItem {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, RouterModule, FormsModule, IconComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   styles: [`
     :host {
       display: block;
@@ -73,6 +76,48 @@ export interface BreadcrumbItem {
 
       <!-- Right Action Slot -->
       <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
+        @if (searchable) {
+          <div class="relative w-full sm:w-80 md:w-96 lg:w-[420px] max-w-full">
+            <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              [value]="searchQuery()"
+              (input)="onSearchInput($any($event.target).value)"
+              (focus)="isSearchFocused.set(true)"
+              (blur)="onBlur()"
+              [placeholder]="searchPlaceholder"
+              class="w-full pl-9 pr-7 py-2 text-[13px] bg-white border border-[#E5D6DE] rounded-md placeholder:text-slate-400 focus:outline-none focus:border-[#AA5E7A] focus:ring-1 focus:ring-[#AA5E7A] transition-colors font-normal shadow-2xs text-[#25212A]"
+            />
+            @if (searchQuery()) {
+              <button
+                type="button"
+                (click)="onClearSearch()"
+                class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer text-xs"
+                title="Clear search"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            }
+
+            <!-- Autocomplete suggestions dropdown (Bug 5: text is fully visible, not truncated) -->
+            @if (isSearchFocused() && filteredSuggestions().length > 0) {
+              <div
+                class="absolute left-0 right-0 top-full mt-1 bg-white border border-[#EADCE2] rounded-md shadow-lg z-50 max-h-60 overflow-y-auto divide-y divide-slate-100"
+              >
+                @for (item of filteredSuggestions(); track item) {
+                  <button
+                    type="button"
+                    (mousedown)="selectSuggestion(item)"
+                    class="w-full text-left px-3.5 py-2.5 text-[12.5px] text-slate-800 hover:bg-[#FCF0F2] hover:text-[#7C0E44] transition-colors cursor-pointer whitespace-normal break-words leading-relaxed block"
+                  >
+                    {{ item }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
         <ng-content></ng-content>
       </div>
     </div>

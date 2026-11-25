@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { SchemeTender } from '../tenders.models';
+import { EoiDocumentItem } from '../tenders.models';
 import { ButtonComponent, IconComponent } from '../../../shared';
 
-/** 2-column table for Scheme Documents (PDF) with View action button. */
+/** The files published with the EOI (attached on the Configure EOI form, plus corrigenda), each with a View action. */
 @Component({
   selector: 'app-scheme-documents-panel',
   standalone: true,
@@ -15,83 +15,54 @@ import { ButtonComponent, IconComponent } from '../../../shared';
         <h3 class="text-sm font-bold text-slate-900">Scheme Documents</h3>
       </div>
 
-      <table class="w-full text-left border-collapse text-xs sm:text-[13px]">
-        <thead>
-          <tr class="border-b border-slate-200 bg-slate-50/40 text-[11.5px] uppercase tracking-wider text-slate-500 font-semibold">
-            <th class="px-4 py-2.5">PDF Document</th>
-            <th class="px-4 py-2.5 text-right w-28">Action</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-200">
-          <!-- Row 1: RFP -->
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2.5">
-                <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
-                <div class="min-w-0">
-                  <div class="font-semibold text-slate-900 leading-snug">
-                    Request for Proposal (RFP)
+      @if (docs().length === 0) {
+        <p class="px-4 py-6 text-xs text-slate-500 italic m-0">No documents attached to this EOI.</p>
+      } @else {
+        <table class="w-full text-left border-collapse text-xs sm:text-[13px]">
+          <thead>
+            <tr class="border-b border-slate-200 bg-slate-50/40 text-[11.5px] uppercase tracking-wider text-slate-500 font-semibold">
+              <th class="px-4 py-2.5">Document</th>
+              <th class="px-4 py-2.5 text-right w-28">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200">
+            @for (doc of docs(); track doc.sNo) {
+              <tr class="hover:bg-slate-50/50 transition-colors">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2.5">
+                    <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
+                    <div class="min-w-0">
+                      <div class="font-semibold text-slate-900 leading-snug">{{ doc.name }}</div>
+                      @if (doc.size) {
+                        <div class="text-[11px] text-slate-500 leading-tight tabular-nums">{{ doc.size }}</div>
+                      }
+                    </div>
                   </div>
-                  <div class="text-[11px] text-slate-500 leading-tight">
-                    PDF ({{ scheme().rfpDocSize || '2.4 MB' }})
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-3 text-right">
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="downloadRfp.emit()"
-                title="View Request for Proposal (RFP)"
-                aria-label="View Request for Proposal (RFP)"
-              >
-                <app-icon name="eye" size="sm" />
-              </button>
-            </td>
-          </tr>
-
-          <!-- Row 2: SOP -->
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-3">
-              <div class="flex items-center gap-2.5">
-                <app-icon name="pdf-badge" solid size="auto" class="w-6 h-6 text-[#E5252A] select-none shrink-0" />
-                <div class="min-w-0">
-                  <div class="font-semibold text-slate-900 leading-snug">
-                    Standard Operating Procedure (SOP)
-                  </div>
-                  <div class="text-[11px] text-slate-500 leading-tight">
-                    PDF ({{ scheme().sopDocSize || '1.8 MB' }}) • Training Partners
-                  </div>
-                </div>
-              </div>
-            </td>
-            <td class="px-4 py-3 text-right">
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="downloadSop.emit()"
-                title="View Standard Operating Procedure (SOP)"
-                aria-label="View Standard Operating Procedure (SOP)"
-              >
-                <app-icon name="eye" size="sm" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <button
+                    appButton
+                    variant="ghost"
+                    size="sm"
+                    iconOnly
+                    type="button"
+                    (click)="view.emit(doc.name)"
+                    [title]="'View ' + doc.name"
+                    [attr.aria-label]="'View ' + doc.name"
+                  >
+                    <app-icon name="eye" size="sm" />
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
     </div>
   `
 })
 export class SchemeDocumentsPanelComponent {
-  readonly scheme = input.required<SchemeTender>();
-
-  readonly downloadRfp = output<void>();
-  readonly downloadSop = output<void>();
+  readonly docs = input<EoiDocumentItem[]>([]);
+  /** Emits the document title to open. */
+  readonly view = output<string>();
 }

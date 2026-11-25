@@ -88,7 +88,7 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
         <app-modal
           title="Two-Factor Authentication (2FA)"
           [subtitle]="twoStepSubtitle()"
-          size="sm"
+          size="md"
           [closeOnBackdrop]="!flow.switchTargetName()"
           (close)="flow.cancel()"
         >

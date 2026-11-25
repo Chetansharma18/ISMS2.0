@@ -27,6 +27,9 @@ import { MasterFilterBarComponent } from '../../components/master-filter-bar/mas
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [PageShellComponent, PageHeaderComponent, TableComponent, MasterFilterBarComponent],
+  host: {
+    '[attr.title]': 'null'
+  },
   template: `
     <app-page-shell>
       <app-page-header

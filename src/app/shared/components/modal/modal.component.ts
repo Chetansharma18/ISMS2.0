@@ -1,14 +1,27 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  input,
+  output
+} from '@angular/core';
 import { IconComponent } from '../icon/icon.component';
+import { ModalService } from '../../services/modal.service';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 const WIDTH: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-  xl: 'max-w-4xl',
-  '2xl': 'max-w-5xl'
+  xs: 'max-w-[360px]',
+  sm: 'max-w-[400px]',
+  md: 'max-w-[560px]',
+  lg: 'max-w-[720px]',
+  xl: 'max-w-[960px]',
+  '2xl': 'max-w-[1200px]',
+  full: 'max-w-full'
 };
 
 let nextId = 0;
@@ -95,7 +108,9 @@ let nextId = 0;
     </div>
   `
 })
-export class ModalComponent {
+export class ModalComponent implements OnInit, OnDestroy {
+  private readonly modalService = inject(ModalService);
+
   readonly title = input('');
   readonly subtitle = input('');
   readonly size = input<ModalSize>('md');
@@ -110,6 +125,14 @@ export class ModalComponent {
 
   protected readonly titleId = `app-modal-title-${++nextId}`;
   protected readonly widthClass = computed(() => this.widthOverride() || WIDTH[this.size()]);
+
+  ngOnInit(): void {
+    this.modalService.registerModalOpen();
+  }
+
+  ngOnDestroy(): void {
+    this.modalService.registerModalClose();
+  }
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {

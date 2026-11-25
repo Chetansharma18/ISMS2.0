@@ -66,9 +66,10 @@ export interface TenderAppeal {
   /** DD-Mon-YYYY. */
   submittedOn: string;
   reply: string;
-  files: AppealFile[];
+  files?: AppealFile[];
   status?: 'Pending' | 'Accepted' | 'Rejected';
   rejectionReason?: string;
+  scrutinyRemarks?: string;
   decidedAt?: string;
   deptRemarks?: string;
   responseDeadline?: string;
@@ -91,6 +92,9 @@ export interface SubmittedTender {
   submittedStatus: 'Submitted' | 'Under Review' | 'Approved' | 'Accepted' | 'Rejected';
   eoiStatus: '-' | 'Under Review' | 'Reviewed' | string;
   rejectionReason?: string;
+  scrutinyRemarks?: string;
+  decisionDate?: string;
+  appealDeadline?: string;
   editCount: number;
   maxEdits: number;
 

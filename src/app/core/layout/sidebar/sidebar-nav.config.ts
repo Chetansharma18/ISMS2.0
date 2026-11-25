@@ -23,10 +23,11 @@ export interface NavSubItem {
   query?: Record<string, string>;
 }
 
-const PROFILE: NavItem = { key: 'profile', label: 'Profile', link: '/profile', icon: 'user' };
+export const PROFILE: NavItem = { key: 'profile', label: 'Profile', link: '/profile', icon: 'user' };
 
 /** Always shown with real sign-in, below the permission-driven groups. */
 export const PROFILE_NAV: NavItem = PROFILE;
+
 const ACTIVE_SCHEMES: NavItem = { key: 'active-schemes', label: 'Active Schemes', link: '/tenders', icon: 'briefcase' };
 
 export const ASPIRANT_NAV: NavItem[] = [
@@ -44,7 +45,8 @@ export const DEPT_ADMIN_NAV: NavItem[] = [
   { key: 'dept-sdc', label: 'SDC Approvals', link: '/sdc', icon: 'building' },
   { key: 'dept-batch-approvals', label: 'Batch Approvals', link: '/admin/batch-approvals', icon: 'clipboard-check', stroke: 2, bold: true },
   { key: 'dept-grievance', label: 'Grievance Management', link: '/admin/grievance', icon: 'users-group', stroke: 2 },
-  { key: 'dept-camera-monitoring', label: 'Camera Monitoring', link: '/admin/camera-monitoring', icon: 'video', stroke: 2 }
+  { key: 'dept-camera-monitoring', label: 'Camera Monitoring', link: '/admin/camera-monitoring', icon: 'video', stroke: 2 },
+  PROFILE
 ];
 
 /** Training partner who already has an approved registration. */
@@ -81,7 +83,8 @@ export const EOI_CONFIGURATION_NAV: NavItem = {
 /** Super admin links that are highlighted by the router itself (`routerLinkActive`). */
 export const ADMIN_TOOL_NAV: NavItem[] = [
   { key: 'two-step', label: 'Two step verification', link: '/admin/two-step-verification', icon: 'shield-check' },
-  { key: 'form-builder', label: 'Dynamic Form Builder', link: '/admin/dynamic-form-builder', icon: 'clipboard' }
+  { key: 'form-builder', label: 'Dynamic Form Builder', link: '/admin/dynamic-form-builder', icon: 'clipboard' },
+  PROFILE
 ];
 
 export const MASTER_NAV: NavSubItem[] = [

@@ -67,6 +67,17 @@ export class OtrRegistrationService {
     );
   }
 
+  /**
+   * Only the form definition (with its lookups), without the signed-in user's records. Used to show another
+   * organisation's registration, e.g. on the department's Scrutiny Desk. Does not change this service's state.
+   */
+  loadForm(source: EndpointDef = API_ENDPOINTS.OTR.FORM): Observable<OtrFormDef> {
+    return forkJoin({
+      response: this.http.call<OtrFullFormResponse>(source, { flags: QUIET }),
+      lookups: this.loadLookups()
+    }).pipe(map(({ response, lookups }) => buildFormDef(response, lookups)));
+  }
+
   /** Saves one step (create or update); the answer is the saved record. */
   saveStep(stepKey: string, body: Record<string, unknown>): Observable<OtrStepRecord> {
     return this.http.call<unknown>(SAVE[stepKey], { body, flags: QUIET }).pipe(

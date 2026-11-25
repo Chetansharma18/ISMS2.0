@@ -208,6 +208,7 @@ import { IconComponent } from '../../../../shared';
               placeholder="Enter registration number"
               [required]="true"
               [uppercase]="true"
+              [disableLabelClick]="true"
               [error]="getFieldError('registrationNumber')"
             ></app-form-input>
           </div>
@@ -336,7 +337,7 @@ import { IconComponent } from '../../../../shared';
               [value]="data().website"
               (valueChange)="update('website', $event)"
               (blur)="markTouched('website')"
-              placeholder="https://www.example.com"
+              placeholder="https://example.com"
               [required]="false"
               [error]="getFieldError('website')"
             ></app-form-input>
@@ -550,6 +551,14 @@ import { IconComponent } from '../../../../shared';
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
 
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600 {
+      border-color: #DC2626 !important;
+    }
+
+    :host ::ng-deep app-form-input > div > div.relative.border-rose-600:hover:not(.cursor-not-allowed) {
+      border-color: #DC2626 !important;
+    }
+
     :host ::ng-deep app-form-input > div > div.relative.border-rose-600:focus-within {
       border-color: #DC2626 !important;
       box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2) !important;
@@ -565,7 +574,7 @@ import { IconComponent } from '../../../../shared';
       font-size: 14px !important;
     }
 
-    :host ::ng-deep app-form-select button[type="button"] {
+    :host ::ng-deep app-form-select button[type="button"]:not(.form-select-search-clear) {
       height: 44px !important;
       min-height: 44px !important;
       border-radius: 6px !important;
@@ -576,11 +585,11 @@ import { IconComponent } from '../../../../shared';
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    :host ::ng-deep app-form-select button[type="button"]:hover:not(:disabled) {
+    :host ::ng-deep app-form-select button[type="button"]:not(.form-select-search-clear):hover:not(:disabled) {
       border-color: #B5CBE0 !important;
     }
 
-    :host ::ng-deep app-form-select button[type="button"]:focus {
+    :host ::ng-deep app-form-select button[type="button"]:not(.form-select-search-clear):focus {
       border-color: #477DAF !important;
       box-shadow: 0 0 0 2px rgba(71, 125, 175, 0.18) !important;
     }
@@ -696,17 +705,19 @@ export class Step1OrgDetailsComponent {
 
     // Specific live/blur format validations when user has entered content or touched field
     if (field === 'emailId') {
-      if (d.emailId?.trim() && !REGEX.EMAIL.test(d.emailId)) {
+      const email = d.emailId?.trim();
+      if (email && !REGEX.EMAIL.test(email)) {
         return 'Invalid Email ID format';
       }
-      if ((isSubmitted || isTouched) && !d.emailId?.trim()) {
+      if ((isSubmitted || isTouched) && !email) {
         return 'Organisation Email ID is required';
       }
       return undefined;
     }
 
     if (field === 'website') {
-      if (d.website?.trim() && !REGEX.URL.test(d.website)) {
+      const url = d.website?.trim();
+      if (url && !REGEX.URL.test(url)) {
         return 'Invalid Website URL format';
       }
       return undefined;

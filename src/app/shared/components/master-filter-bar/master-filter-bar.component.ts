@@ -32,7 +32,10 @@ export interface StatusFilterOption {
       <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
         <!-- Search Input with Search Icon & Clear Button -->
         @if (showSearch()) {
-          <div class="relative w-full sm:w-72 md:w-80 min-w-[220px]">
+          <div
+            class="relative w-full min-w-0 transition-all duration-150"
+            [ngClass]="hasOtherFilters() ? 'sm:flex-1 sm:min-w-[240px]' : 'flex-1'"
+          >
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <app-icon name="search" size="sm" />
             </span>
@@ -122,6 +125,10 @@ export class MasterFilterBarComponent {
   readonly status = model<string>('ALL');
   readonly showStatusFilter = input<boolean>(true);
   readonly statusOptions = input<StatusFilterOption[]>([]);
+
+  readonly hasOtherFilters = computed<boolean>(() => {
+    return this.showStatusFilter() || (this.filters() && this.filters().length > 0);
+  });
 
   readonly resolvedStatusOptions = computed<StatusFilterOption[]>(() => {
     const opts = this.statusOptions();

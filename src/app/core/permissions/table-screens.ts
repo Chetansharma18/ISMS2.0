@@ -20,13 +20,24 @@ export const TABLE_SCREENS: Readonly<Record<string, TableScreen>> = {
   /** EOI configuration: create and edit EOIs, attachments and committees. */
   EoiNotices: { route: '/admin/eoi-configuration', icon: 'clipboard' },
   /** Apply for EOI: the applicant's own EOI applications. */
-  EoiApplications: { route: '/tenders', icon: 'clipboard', alsoGoverns: ['/scheme-form', '/tender-status'] },
-  /** Committee review of submitted EOI applications (the per-scheme pages sit below this route). */
-  EoiResponses: { route: '/admin/responses', icon: 'clipboard' },
+  EoiApplications: {
+    route: '/tenders',
+    icon: 'clipboard',
+    alsoGoverns: ['/scheme-form', '/tender-status'],
+    /** The applicant follows each application (clarifications, result, result order, appeal) on EOI Status. */
+    extraLinks: [{ key: 'eoi-status', label: 'EOI Status', route: '/tender-status', icon: 'clock' }]
+  },
+  /**
+   * Committee review of submitted EOI applications: the EOI list first (EOI Responses), then each EOI's
+   * Applicant Submissions and the Scrutiny Desk of one application.
+   */
+  EoiResponses: { route: '/admin/eoi-view', icon: 'clipboard', alsoGoverns: ['/admin/responses', '/admin/review', '/admin/result-orders'] },
   /** One Time Registration of the organisation. */
   OtrRegistrations: { route: '/registration', icon: 'clipboard' },
   /** OTR form builder: steps, sections and fields of the registration form. */
   OtrForm: { route: '/admin/dynamic-form-builder', icon: 'list' },
+  /** Form Manager (/api/form-manager): dynamic forms and their versions, on the Dynamic Form Builder screen. */
+  FormManager: { route: '/admin/dynamic-form-builder', icon: 'list' },
 
   // Category: transactions
   PaymentTransactions: { route: '/payment-history', icon: 'clipboard', dataKey: 'PAYMENTS' },

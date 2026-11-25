@@ -157,6 +157,8 @@ export function isSchemeClosed(scheme: SchemeTender | null | undefined, now: num
 
 /** Edits are only allowed within 24 hours of scheme creation. */
 export function isEditDisabled(scheme: SchemeTender, now: number = Date.now()): boolean {
+  // The backend decides when it sends the flag (drafts stay editable; frozen EOIs never are).
+  if (scheme.isEditable !== undefined) return !scheme.isEditable;
   if (!scheme.createdAt) return false;
   return now - scheme.createdAt > TWENTY_FOUR_HOURS_MS;
 }
@@ -327,6 +329,8 @@ export function createEmptyEoiForm(): EoiFormData {
     attachments: [],
     documents: [],
     annexures: [],
+    publishFields: [],
+    uploadFields: [],
     documentFiles: {}
   };
 }
@@ -360,6 +364,8 @@ export function eoiFormFromScheme(scheme: SchemeTender, now: number = Date.now()
     })),
     documents: scheme.requiredDocs ? [...scheme.requiredDocs] : [],
     annexures: scheme.annexures ? [...scheme.annexures] : [],
+    publishFields: scheme.publishFields ? JSON.parse(JSON.stringify(scheme.publishFields)) : [],
+    uploadFields: scheme.uploadFields ? JSON.parse(JSON.stringify(scheme.uploadFields)) : [],
     documentFiles: {}
   };
 }
@@ -405,6 +411,11 @@ export function validatePublishedDate(
   const pubIso = toInputDate(pub);
   if (!isScheduled && pubIso > todayStr) {
     return 'EOI Publication Date cannot be a future date.';
+  }
+  const currentYear = parseInt(todayStr.split('-')[0], 10);
+  const pubYear = parseInt(pubIso.split('-')[0], 10);
+  if (pubYear < currentYear) {
+    return 'EOI Publication Date cannot be from a past year.';
   }
   return '';
 }
@@ -620,12 +631,7 @@ export function validateEoiFormComplete(
     s => s.schemeName?.trim().toLowerCase() === schemeName.toLowerCase()
   );
 
-  // 3. Scheme Category
-  if (schemeItem?.schemeCategory && d.schemeCategory) {
-    if (schemeItem.schemeCategory.trim().toLowerCase() !== d.schemeCategory.trim().toLowerCase()) {
-      errors['schemeCategory'] = 'Scheme Category does not match the selected scheme.';
-    }
-  }
+  // 3. Scheme Category: chosen on the EOI (one or more Scheme Category Master entries), not tied to the scheme.
 
   // 4. EOI Category
   const eoiCat = (d.eoiCategory ?? '').trim();
@@ -715,6 +721,36 @@ export function isEoiFormValid(
   return validateEoiFormComplete(d, options).isValid;
 }
 
+/**
+ * Validates Form 1: Publish Details (Expression of Interest Details).
+ * Validates the 10 core scheme parameters and EOI details.
+ */
+export function validatePublishDetailsStep(
+  d: EoiFormData,
+  options?: EoiValidationOptions
+): { isValid: boolean; errors: Record<string, string> } {
+  const complete = validateEoiFormComplete(d, options);
+  return {
+    isValid: Object.keys(complete.errors).length === 0,
+    errors: complete.errors
+  };
+}
+
+/**
+ * Validates Form 2: Uploading Details (Supporting Documents & Annexures).
+ */
+export function validateUploadingDetailsStep(
+  d: EoiFormData
+): { isValid: boolean; docErrors: Record<number, string>; annexureErrors: Record<number, string> } {
+  const docResult = validateDocuments(d.documents || []);
+  const annexureResult = validateAnnexures(d.annexures || []);
+  return {
+    isValid: docResult.isValid && annexureResult.isValid,
+    docErrors: docResult.errors,
+    annexureErrors: annexureResult.errors
+  };
+}
+
 /** Builds a new attachment entry from the upload form. */
 export function createAttachment(title: string, file: File): EoiAttachment {
   return {
@@ -778,6 +814,12 @@ export function buildSchemeFromForm(
     attachedDocs: attachedDocsList,
     requiredDocs: d.documents ? d.documents.filter(Boolean) : existingScheme?.requiredDocs || [],
     annexures: d.annexures ? d.annexures.filter(Boolean) : existingScheme?.annexures || [],
+    publishFields: d.publishFields || existingScheme?.publishFields || [],
+    uploadFields: d.uploadFields || existingScheme?.uploadFields || [],
+    customFields: [
+      ...(d.publishFields || existingScheme?.publishFields || []),
+      ...(d.uploadFields || existingScheme?.uploadFields || [])
+    ],
     createdAt: existingScheme ? (existingScheme.createdAt ?? now) : now,
     updatedAt: now,
     publishedAt: status === 'Open' ? (existingScheme?.publishedAt || now) : undefined,

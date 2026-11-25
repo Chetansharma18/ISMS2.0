@@ -144,6 +144,17 @@ export function buildNavGroups(
       query: screen.query,
       tableNames: [table.tableName]
     });
+    for (const extra of screen.extraLinks ?? []) {
+      if (group.items.some(i => i.route === extra.route)) continue;
+      group.items.push({
+        key: `table:${table.tableName}:${extra.key}`,
+        label: extra.label,
+        title: extra.label,
+        route: extra.route,
+        icon: extra.icon ?? screen.icon ?? 'list',
+        tableNames: [table.tableName]
+      });
+    }
   }
   return groups.filter(g => g.items.length > 0);
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { ButtonComponent, IconComponent } from '../../../../../shared';
 import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-state.service';
 
@@ -85,12 +85,22 @@ import type { ApplicantAppeal, ApplicantResponse } from '../../../services/eoi-s
 
         <!-- Body content -->
         <div class="p-5 sm:p-6 space-y-4 text-xs">
-          <!-- Rejection grounds if available -->
+          <!-- Rejection grounds / Decision context if available -->
           @if (rejectionReason()) {
-            <div class="bg-rose-50/70 border border-rose-200/80 rounded-lg p-3.5 space-y-1">
-              <span class="text-[11px] font-bold text-rose-800 uppercase tracking-wide flex items-center gap-1.5">
-                <app-icon name="alert-triangle" size="xs" />
-                Original Disqualification / Rejection Reason
+            <div
+              class="border rounded-lg p-3.5 space-y-1"
+              [class.bg-rose-50/70]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+              [class.border-rose-200/80]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+              [class.bg-emerald-50/70]="isApprovedProposal()"
+              [class.border-emerald-200/80]="isApprovedProposal()"
+            >
+              <span
+                class="text-[11px] font-bold uppercase tracking-wide flex items-center gap-1.5"
+                [class.text-rose-800]="applicant()?.status === 'REJECTED' || !isApprovedProposal()"
+                [class.text-emerald-800]="isApprovedProposal()"
+              >
+                <app-icon [name]="isApprovedProposal() ? 'check' : 'alert-triangle'" size="xs" />
+                {{ isApprovedProposal() ? 'Original Approved Proposal Decision' : 'Original Disqualification / Rejection Reason' }}
               </span>
               <p class="m-0 text-slate-800 leading-relaxed font-medium">
                 {{ rejectionReason() }}
@@ -180,4 +190,6 @@ export class ScrutinyAppealCardComponent {
   readonly accept = output<void>();
   readonly reject = output<void>();
   readonly viewFile = output<{ title: string; fileName: string; fileSize?: string }>();
+
+  protected readonly isApprovedProposal = computed(() => this.applicant()?.status === 'APPROVED');
 }

@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import type { SubmittedTender } from '../../../core/models/tender.model';
 import { ButtonComponent, IconComponent } from '../../../shared';
 import { TenderDocViewRequest } from './tender-doc-card.component';
-import { canAppeal, remainingDaysText } from './tender-appeal.util';
+import { canAppeal, getAppealDeadline, remainingDaysText } from './tender-appeal.util';
 
 /**
  * Appeal Request & Department Response section:
- * 1. Remarks why the application was rejected.
- * 2. 7-day window for the applicant to appeal and respond with proper documents.
- * 3. Department approval / review decision.
+ * 1. Remarks why the application was rejected or approved.
+ * 2. 7-day window for the applicant to submit appeal justification (text-only, no upload documents).
+ *    Apply appeal button is available for 7 days only.
+ * 3. Department decision / approval tracking.
  */
 @Component({
   selector: 'app-tender-appeal-section',
@@ -25,13 +26,13 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
           <span class="w-7 h-7 rounded-full bg-navy text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">6</span>
           <div>
             <h2 id="appeal-heading" class="text-base sm:text-lg font-bold text-slate-900 m-0">Appeal Request & Department Response</h2>
-            <p class="text-[11.5px] text-slate-500 m-0">Review rejection grounds, submit appeal with proper documents, and track department approval</p>
+            <p class="text-[11.5px] text-slate-500 m-0">Review decision grounds, submit appeal within the 7-day window, and track department decision</p>
           </div>
         </div>
 
         <div>
           @if (isRejected()) {
-            @if (app().submittedStatus === 'Approved' || app().appeal?.status === 'Accepted') {
+            @if (app().appeal?.status === 'Accepted') {
               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 <app-icon name="check" size="xs" class="mr-1 text-emerald-700" />
                 Appeal Approved
@@ -46,8 +47,24 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
                 Appeal Under Review
               </span>
             } @else if (canAppeal(app())) {
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
-                7 Days to Appeal & Respond
+              @if (app().submittedStatus === 'Rejected') {
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200">
+                  7 Days to Appeal ({{ remainingDays(appealDueDate()) }})
+                </span>
+              } @else {
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <app-icon name="check" size="xs" class="mr-1 text-emerald-700" />
+                  Appeal Option Available ({{ remainingDays(appealDueDate()) }})
+                </span>
+              }
+            } @else if (!app().appeal) {
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                Appeal Window Closed
+              </span>
+            } @else if (app().submittedStatus === 'Approved' || app().submittedStatus === 'Accepted') {
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <app-icon name="check" size="xs" class="mr-1 text-emerald-700" />
+                Application Approved
               </span>
             }
           } @else {
@@ -61,73 +78,137 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
       @if (isRejected()) {
         <div class="space-y-4">
 
-          <!-- 1. FIRST: REJECTION REMARKS & 7-DAY APPEAL WINDOW -->
-          <div class="rounded-xl border border-rose-200 bg-rose-50/70 p-4 sm:p-5 space-y-3 shadow-2xs">
-            <div class="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-rose-200/80">
-              <div class="flex items-center gap-2">
-                <app-icon name="alert-triangle" size="sm" class="text-rose-600" />
-                <h3 class="m-0 text-xs font-bold text-rose-950 uppercase tracking-wider">Rejection Remarks</h3>
-              </div>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
-                Application Rejected
-              </span>
-            </div>
-
-            <div class="space-y-1.5">
-              <span class="text-[11px] font-bold text-rose-900 uppercase tracking-wide block">Reason for Rejection:</span>
-              <p class="m-0 text-xs text-rose-950 leading-relaxed whitespace-pre-line bg-white/95 p-3.5 rounded-lg border border-rose-200 font-medium">
-                {{ app().rejectionReason || 'Technical qualification criteria not met.' }}
-              </p>
-            </div>
-
-            <!-- 7-Day Window Info -->
-            <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-white/90 border border-rose-200">
-              <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
-                  <app-icon name="clock" size="xs" />
+          <!-- 1. DECISION GROUNDS & 7-DAY APPEAL WINDOW INFO -->
+          @if (app().submittedStatus === 'Rejected') {
+            <div class="rounded-xl border border-rose-200 bg-rose-50/70 p-4 sm:p-5 space-y-3 shadow-2xs">
+              <div class="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-rose-200/80">
+                <div class="flex items-center gap-2">
+                  <app-icon name="alert-triangle" size="sm" class="text-rose-600" />
+                  <h3 class="m-0 text-xs font-bold text-rose-950 uppercase tracking-wider">Rejection Remarks</h3>
                 </div>
-                <div>
-                  <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
-                    <span>Appeal Window: <strong class="text-rose-700">7 Days</strong></span>
-                    <span class="text-slate-400">&bull;</span>
-                    <span>Deadline: <strong class="text-slate-900">{{ appealDueDate() }}</strong></span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-200">
+                  Application Rejected
+                </span>
+              </div>
+
+              <div class="space-y-1.5">
+                <span class="text-[11px] font-bold text-rose-900 uppercase tracking-wide block">Reason for Rejection:</span>
+                <p class="m-0 text-xs text-rose-950 leading-relaxed whitespace-pre-line bg-white/95 p-3.5 rounded-lg border border-rose-200 font-medium">
+                  {{ app().rejectionReason || 'Technical qualification criteria not met.' }}
+                </p>
+              </div>
+
+              <!-- 7-Day Window Info -->
+              <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-white/90 border border-rose-200">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                    <app-icon name="clock" size="xs" />
                   </div>
-                  <span class="text-[11px] text-slate-500 block">
-                    You have 7 days from the date of rejection to submit an appeal and respond with proper supporting documents.
-                  </span>
+                  <div>
+                    <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                      <span>Appeal Window: <strong class="text-rose-700">7 Days from Decision</strong></span>
+                      <span class="text-slate-400">&bull;</span>
+                      <span>Deadline: <strong class="text-slate-900">{{ appealDueDate() }}</strong></span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 block">
+                      The apply appeal button stays active for 7 days only from decision. No document upload is required.
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              @if (canAppeal(app())) {
-                <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900 border border-amber-300">
+                <span
+                  class="px-2.5 py-1 rounded-full text-xs font-bold border"
+                  [class.bg-amber-100]="canAppeal(app())"
+                  [class.text-amber-900]="canAppeal(app())"
+                  [class.border-amber-300]="canAppeal(app())"
+                  [class.bg-slate-100]="!canAppeal(app())"
+                  [class.text-slate-600]="!canAppeal(app())"
+                  [class.border-slate-300]="!canAppeal(app())"
+                >
                   {{ remainingDays(appealDueDate()) }}
                 </span>
-              }
+              </div>
             </div>
-          </div>
+          } @else {
+            <div class="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 sm:p-5 space-y-3 shadow-2xs">
+              <div class="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-emerald-200/80">
+                <div class="flex items-center gap-2">
+                  <app-icon name="check" size="sm" class="text-emerald-700" />
+                  <h3 class="m-0 text-xs font-bold text-emerald-950 uppercase tracking-wider">Application Approved</h3>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Proposal Approved
+                </span>
+              </div>
 
-          <!-- 2. APPEAL AND RESPOND WITH PROPER DOCUMENTS -->
+              <div class="space-y-1.5">
+                <span class="text-[11px] font-bold text-emerald-900 uppercase tracking-wide block">Approval Remarks & Status:</span>
+                <p class="m-0 text-xs text-emerald-950 leading-relaxed whitespace-pre-line bg-white/95 p-3.5 rounded-lg border border-emerald-200 font-medium">
+                  {{ app().scrutinyRemarks || 'Application proposal meets technical qualification and eligibility criteria.' }}
+                </p>
+              </div>
+
+              <!-- 7-Day Window Info -->
+              <div class="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-white/90 border border-emerald-200">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <app-icon name="clock" size="xs" />
+                  </div>
+                  <div>
+                    <div class="text-xs font-bold text-slate-800 flex items-center gap-2">
+                      <span>Appeal Option: <strong class="text-emerald-700">7 Days from Approval</strong></span>
+                      <span class="text-slate-400">&bull;</span>
+                      <span>Deadline: <strong class="text-slate-900">{{ appealDueDate() }}</strong></span>
+                    </div>
+                    <span class="text-[11px] text-slate-500 block">
+                      Appeals on approved proposals can be submitted within 7 days for targets, terms, or committee remarks.
+                    </span>
+                  </div>
+                </div>
+
+                <span
+                  class="px-2.5 py-1 rounded-full text-xs font-bold border"
+                  [class.bg-emerald-100]="canAppeal(app())"
+                  [class.text-emerald-900]="canAppeal(app())"
+                  [class.border-emerald-300]="canAppeal(app())"
+                  [class.bg-slate-100]="!canAppeal(app())"
+                  [class.text-slate-600]="!canAppeal(app())"
+                  [class.border-slate-300]="!canAppeal(app())"
+                >
+                  {{ remainingDays(appealDueDate()) }}
+                </span>
+              </div>
+            </div>
+          }
+
+          <!-- 2. APPEAL ACTION / SUBMISSION / EXPIRED STATUS -->
           @if (canAppeal(app())) {
-            <!-- APPLICANT HAS NOT YET APPEALED -->
+            <!-- APPLICANT WITHIN 7-DAY WINDOW (BUTTON ACTIVE) -->
             <div class="rounded-xl border border-amber-300 bg-linear-to-r from-amber-50/90 via-orange-50/40 to-amber-50/60 p-4 sm:p-5 space-y-3.5 shadow-2xs">
               <div class="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-amber-200/80">
                 <div class="flex items-center gap-2">
                   <app-icon name="document" size="sm" class="text-amber-700" />
-                  <h3 class="m-0 text-xs font-bold text-amber-950 uppercase tracking-wider">Appeal & Respond with Documents</h3>
+                  <h3 class="m-0 text-xs font-bold text-amber-950 uppercase tracking-wider">
+                    {{ app().submittedStatus === 'Rejected' ? 'Submit Appeal Justification' : 'Appeal Approved Terms & Remarks' }}
+                  </h3>
                 </div>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300">
-                  Action Required
+                  {{ remainingDays(appealDueDate()) }}
                 </span>
               </div>
 
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/95 p-4 rounded-lg border border-amber-200">
                 <div class="space-y-1 max-w-xl">
-                  <h4 class="m-0 text-xs font-bold text-slate-900">Submit Your Appeal & Upload Supporting Documents</h4>
+                  <h4 class="m-0 text-xs font-bold text-slate-900">
+                    {{ app().submittedStatus === 'Rejected' ? 'Submit Your Appeal Remarks' : 'Submit Appeal on Approved Proposal & Terms' }}
+                  </h4>
                   <p class="m-0 text-xs text-slate-600 leading-relaxed">
-                    Provide your justification remarks and attach the proper supporting documents (e.g. valid CA certificate, UDIN proof, registration papers) for department reconsideration.
+                    {{ app().submittedStatus === 'Rejected'
+                      ? 'Enter your justification remarks in the appeal form. No document upload is required; the department scrutiny committee will review your justification directly.'
+                      : 'Provide your appeal explanation or requested adjustments regarding approved terms, allocated targets, sectors, or conditional remarks.' }}
                   </p>
                   <p class="m-0 text-[11px] text-amber-800 font-semibold pt-0.5">
-                    &bull; Note: Exactly one appeal is permitted per application. The department will review and approve or reject your appeal.
+                    &bull; Note: The apply appeal button stays for 7 days only from decision date. Exactly one appeal is permitted per application.
                   </p>
                 </div>
                 <button appButton size="sm" type="button" (click)="requestAppeal.emit(app())" class="shrink-0 font-semibold" title="Appeal Request">
@@ -135,14 +216,25 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
                 </button>
               </div>
             </div>
+          } @else if (!app().appeal) {
+            <!-- 7-DAY APPEAL WINDOW EXPIRED (BUTTON GONE) -->
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5 space-y-2 shadow-2xs">
+              <div class="flex items-center gap-2 pb-2 border-b border-slate-200">
+                <app-icon name="clock" size="sm" class="text-slate-500" />
+                <h3 class="m-0 text-xs font-bold text-slate-800 uppercase tracking-wider">Appeal Window Closed</h3>
+              </div>
+              <p class="m-0 text-xs text-slate-600 leading-relaxed">
+                The 7-day period to submit an appeal expired on <strong class="text-slate-800">{{ appealDueDate() }}</strong>. The appeal request button is no longer available.
+              </p>
+            </div>
           } @else if (app().appeal; as appeal) {
-            <!-- APPLICANT HAS SUBMITTED APPEAL AND DOCUMENTS -->
+            <!-- APPLICANT HAS SUBMITTED APPEAL -->
             <div class="rounded-xl border border-sky-200 bg-sky-50/30 p-4 sm:p-5 space-y-3.5 shadow-2xs">
               <div class="flex items-center justify-between gap-2 flex-wrap pb-2.5 border-b border-sky-100">
                 <div class="flex items-center gap-2">
                   <app-icon name="check" size="sm" class="text-sky-700" />
                   <div>
-                    <h3 class="m-0 text-xs font-bold text-slate-900 uppercase tracking-wider">Your Submitted Appeal & Documents</h3>
+                    <h3 class="m-0 text-xs font-bold text-slate-900 uppercase tracking-wider">Your Submitted Appeal Remarks</h3>
                     <span class="text-[11px] text-slate-500">Submitted on {{ appeal.submittedOn }}</span>
                   </div>
                 </div>
@@ -151,49 +243,13 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
                 </span>
               </div>
 
-              <!-- Remarks -->
+              <!-- Remarks (Text only) -->
               <div class="space-y-1.5 text-xs">
                 <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">Your Remarks / Justification:</span>
                 <p class="m-0 text-slate-900 text-xs leading-relaxed whitespace-pre-line bg-white p-3.5 rounded-lg border border-slate-200 font-medium">
                   {{ appeal.reply }}
                 </p>
               </div>
-
-              <!-- Uploaded Supporting Documents -->
-              @if (appeal.files && appeal.files.length > 0) {
-                <div class="space-y-1.5 text-xs pt-1">
-                  <span class="text-[11px] font-bold text-slate-700 uppercase tracking-wide block">
-                    Uploaded Supporting Documents ({{ appeal.files.length }}):
-                  </span>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    @for (file of appeal.files; track file.fileName) {
-                      <div class="flex items-center justify-between gap-3 p-3 rounded-lg border border-slate-200 bg-white hover:border-sky-300 transition-colors shadow-2xs">
-                        <div class="flex items-center gap-2.5 min-w-0">
-                          <app-icon name="pdf-badge" solid size="auto" class="w-5 h-5 text-[#E5252A] select-none shrink-0" />
-                          <div class="min-w-0">
-                            <span class="text-xs font-medium text-slate-900 block truncate" [title]="file.fileName">
-                              {{ file.fileName }}
-                            </span>
-                            <span class="text-[10.5px] text-slate-500 block">{{ file.fileSize }}</span>
-                          </div>
-                        </div>
-                        <button
-                          appButton
-                          variant="ghost"
-                          size="sm"
-                          type="button"
-                          (click)="viewDoc.emit({ fileName: file.fileName, title: 'Appeal Document', fileSize: file.fileSize })"
-                          class="shrink-0"
-                          title="View Document"
-                          aria-label="View Document"
-                        >
-                          View
-                        </button>
-                      </div>
-                    }
-                  </div>
-                </div>
-              }
             </div>
 
             <!-- 3. DEPARTMENT APPROVAL / DECISION STATUS -->
@@ -204,7 +260,7 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
                   <h3 class="m-0 text-xs font-bold text-emerald-950 uppercase tracking-wider">Appeal Approved by Department</h3>
                 </div>
                 <p class="m-0 text-xs text-emerald-900 leading-relaxed font-medium">
-                  The Department Scrutiny Committee has reviewed your appeal justification and uploaded supporting documents and approved your application.
+                  The Department Scrutiny Committee has reviewed your appeal justification and approved your request.
                 </p>
                 @if (appeal.deptRemarks) {
                   <p class="m-0 text-xs text-emerald-950 bg-white/90 p-3 rounded-lg border border-emerald-200 font-medium">
@@ -233,7 +289,7 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
                   <h3 class="m-0 text-xs font-bold text-amber-950 uppercase tracking-wider">Under Department Scrutiny Review</h3>
                 </div>
                 <p class="m-0 text-xs text-amber-900 leading-relaxed">
-                  Your appeal and supporting documents have been submitted to the Department Scrutiny Committee. Once reviewed, the final approval or rejection decision will appear here.
+                  Your appeal remarks have been submitted to the Department Scrutiny Committee. Once reviewed, the final approval or rejection decision will appear here.
                 </p>
               </div>
             }
@@ -241,17 +297,17 @@ import { canAppeal, remainingDaysText } from './tender-appeal.util';
 
         </div>
       } @else {
-        <!-- APPLICATION IS NOT REJECTED -->
+        <!-- APPLICATION NOT ELIGIBLE FOR APPEAL -->
         <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-6 sm:p-8 text-center space-y-3">
           <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-500 mx-auto flex items-center justify-center">
             <app-icon name="info-circle" size="md" class="text-slate-600" />
           </div>
           <div class="space-y-1 max-w-lg mx-auto">
-            <h3 class="text-sm font-bold text-slate-900 m-0">No Appeal Required</h3>
+            <h3 class="text-sm font-bold text-slate-900 m-0">No Appeal Available</h3>
             <p class="text-xs text-slate-600 leading-relaxed m-0">
               This application is currently in 
               <strong class="font-semibold text-slate-800">{{ app().submittedStatus }}</strong> status. 
-              Appeals are only applicable if an application is rejected during departmental scrutiny.
+              Appeals can be submitted for applications with Rejected or Approved status within 7 days of decision.
             </p>
           </div>
         </div>
@@ -267,18 +323,15 @@ export class TenderAppealSectionComponent {
 
   protected readonly canAppeal = canAppeal;
 
-  protected readonly isRejected = computed(() => this.app().submittedStatus === 'Rejected' || !!this.app().appeal);
+  protected readonly isEligibleForAppeal = computed(() =>
+    this.app().submittedStatus === 'Rejected' ||
+    this.app().submittedStatus === 'Approved' ||
+    this.app().submittedStatus === 'Accepted' ||
+    !!this.app().appeal
+  );
+  protected readonly isRejected = this.isEligibleForAppeal;
 
-  protected readonly appealDueDate = computed(() => {
-    const appeal = this.app().appeal;
-    if (appeal?.responseDeadline) return appeal.responseDeadline;
-    const shortfalls = this.app().shortfalls;
-    if (shortfalls && shortfalls.length > 0 && shortfalls[0].dueDate) {
-      return shortfalls[0].dueDate;
-    }
-    // Default 7 days from applied or current date
-    return '19-Oct-2026';
-  });
+  protected readonly appealDueDate = computed(() => getAppealDeadline(this.app()));
 
   remainingDays(dueDate: string): string {
     return remainingDaysText(dueDate);

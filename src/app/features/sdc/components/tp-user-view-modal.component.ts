@@ -65,7 +65,7 @@ export class TpUserViewModalComponent {
   readonly closed = output<void>();
 
   protected readonly columns: TableColumn<TpAssignment>[] = [
-    { key: '$index', label: '#', type: 'number', align: 'center', width: 'w-12' },
+    { key: '$index', label: 'S.No', type: 'number', align: 'center', width: 'w-12' },
     { key: 'label', label: 'Assigned To', width: 'min-w-[200px]' },
     { key: 'detail', label: 'Details', width: 'min-w-[260px]' },
     { key: 'status', label: 'Status', width: 'min-w-[130px]' }

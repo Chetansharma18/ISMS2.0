@@ -281,6 +281,21 @@ import {
                   />
                 }
 
+                <!-- 8b. Multi-select -->
+                @else if (field.type === 'multiselect') {
+                  <app-dropdown
+                    multiple
+                    [inputId]="field.id"
+                    size="sm"
+                    [options]="getFieldOptions(field)"
+                    [(values)]="values[field.id]"
+                    (valuesChange)="onFieldInput(field)"
+                    [invalid]="hasError(field.id)"
+                    [placeholder]="'-- Select ' + field.label + ' --'"
+                    class="w-full"
+                  />
+                }
+
                 <!-- 9. Radio Options -->
                 @else if (field.type === 'radio') {
                   <div class="flex flex-wrap items-center gap-4 pt-1">
@@ -499,7 +514,7 @@ export class DynamicFormRendererComponent {
     if (field.optionsText) {
       return field.optionsText.split(',').map(o => o.trim()).filter(Boolean);
     }
-    return ['Option 1', 'Option 2', 'Option 3'];
+    return [];
   }
 
   onFieldInput(field: DynamicFormField): void {

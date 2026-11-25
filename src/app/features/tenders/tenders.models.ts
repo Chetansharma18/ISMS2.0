@@ -1,3 +1,5 @@
+import { DynamicFormField } from '../../core/models/admin-masters.model';
+
 export interface EoiDocumentItem {
   sNo: number;
   name: string;
@@ -30,6 +32,9 @@ export interface SchemeTender {
   attachedDocs?: EoiDocumentItem[];
   requiredDocs?: string[];
   annexures?: string[];
+  publishFields?: DynamicFormField[];
+  uploadFields?: DynamicFormField[];
+  customFields?: DynamicFormField[];
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;
@@ -40,6 +45,11 @@ export interface SchemeTender {
   isActive?: boolean;
   isFrozen?: boolean;
   isNew?: boolean;
+  /** From the backend: whether Edit is allowed, and why not. */
+  isEditable?: boolean;
+  editDisabledReason?: string | null;
+  /** From the backend list: committee size (approver + members). */
+  committeeCount?: number;
 }
 
 /** A required-information / supporting-document entry for an EOI. */
@@ -92,6 +102,9 @@ export interface EoiFormData {
   attachments: EoiAttachment[];
   documents: string[];
   annexures: string[];
+  publishFields?: DynamicFormField[];
+  uploadFields?: DynamicFormField[];
+  customFields?: DynamicFormField[];
   documentFiles?: Record<number, EoiDocumentUpload>;
   status?: 'Open' | 'Closed' | 'Draft' | 'Scheduled' | 'Cancelled';
   isFeeExempted?: boolean;

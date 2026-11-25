@@ -440,7 +440,7 @@ export const REGEX = {
   MICR: /^\d{9}$/,
   BANK_ACCOUNT: REGEX_PATTERNS.BANK_ACCOUNT,
   EMAIL: REGEX_PATTERNS.EMAIL,
-  URL: /^(https?:\/\/)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/i
+  URL: /^(https?:\/\/)?(www\.)?([a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+(com|org|in|net|gov|edu|biz|info|co|io|tech|ai|me|app|dev|online|site|store|global|co\.in|org\.in|net\.in|gov\.in|nic\.in|ac\.in|edu\.in|gen\.in|res\.in)(\/[^\s]*)?$/i
 };
 
 export function createInitialOtrFormData(): OtrFormData {

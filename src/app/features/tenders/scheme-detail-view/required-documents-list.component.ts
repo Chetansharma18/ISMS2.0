@@ -20,7 +20,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       >
         <div class="flex items-center gap-2">
           <h2 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-navy transition-colors">
-            Supporting Documents
+            Required Documents
           </h2>
         </div>
 
@@ -38,7 +38,7 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
       @if (isOpen()) {
         <div class="p-4 sm:p-5 border-t border-slate-200 bg-white animate-in fade-in duration-150">
           @if (requiredInfo().length === 0) {
-            <p class="text-xs text-slate-500 italic m-0">No supporting documents configured for this scheme.</p>
+            <p class="text-xs text-slate-500 italic m-0">No required documents configured for this EOI.</p>
           } @else {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-2.5">
               <!-- Left Column (first half) -->

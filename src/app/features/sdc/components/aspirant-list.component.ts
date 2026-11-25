@@ -367,7 +367,7 @@ export class AspirantListComponent {
   });
 
   readonly hasActiveFilters = computed(
-    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.activeStatus() !== 'ALL' || this.searchQuery().trim() !== ''
+    () => this.selectedSdc() !== 'ALL' || this.selectedBatch() !== 'ALL' || this.selectedScheme() !== 'ALL' || this.searchQuery().trim() !== ''
   );
 
   readonly filteredAspirants = computed(() => {
@@ -391,7 +391,6 @@ export class AspirantListComponent {
   });
 
   resetFilters(): void {
-    this.activeStatus.set('ALL');
     this.selectedSdc.set('ALL');
     this.selectedBatch.set('ALL');
     this.selectedScheme.set('ALL');

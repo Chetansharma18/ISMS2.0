@@ -159,27 +159,49 @@ const emptyForm = (roleId = ''): PermissionForm => ({
       </ng-template>
 
       <ng-template #actionTpl let-row>
-        <div class="flex items-center justify-center whitespace-nowrap">
+        <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
           @if (canEdit()) {
-            <button appButton variant="ghost" size="sm" type="button" title="Edit" (click)="$event.stopPropagation(); openEdit(row)">
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              title="Edit"
+              aria-label="Edit"
+              (click)="$event.stopPropagation(); openEdit(row)"
+            >
               <app-icon name="edit" size="sm" />
-              <span>Edit</span>
             </button>
           }
           @if (canRemove()) {
-            <div class="h-3.5 w-px bg-slate-300 shrink-0 mx-2"></div>
-            <button appButton variant="ghost" size="sm" type="button" title="Remove" (click)="$event.stopPropagation(); remove(row)">
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              title="Remove"
+              aria-label="Remove"
+              (click)="$event.stopPropagation(); remove(row)"
+            >
               <app-icon name="trash" size="sm" />
-              <span>Remove</span>
             </button>
           }
           @if (canEdit()) {
-            <div class="h-3.5 w-px bg-slate-300 shrink-0 mx-2"></div>
-            <div class="inline-flex items-center gap-1.5" (click)="$event.stopPropagation()">
-              <app-switch [checked]="row.status" label="Active" [disabled]="saving()" (toggled)="toggleStatus(row)" />
-              <span class="text-[12px] font-semibold" [class.text-emerald-700]="row.status" [class.text-slate-500]="!row.status">
-                {{ row.status ? 'Active' : 'Inactive' }}
-              </span>
+            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            <div
+              class="inline-flex items-center"
+              [title]="row.status ? 'Status: Active (Click to deactivate)' : 'Status: Inactive (Click to activate)'"
+              (click)="$event.stopPropagation()"
+            >
+              <app-switch
+                [checked]="row.status"
+                [label]="row.status ? 'Active' : 'Inactive'"
+                [disabled]="saving()"
+                (toggled)="toggleStatus(row)"
+              />
             </div>
           }
         </div>
@@ -196,7 +218,7 @@ const emptyForm = (roleId = ''): PermissionForm => ({
         [showAccentBar]="false"
         [disablePrimary]="saving()"
         [primaryLabel]="saving() ? 'Saving...' : 'Save'"
-        secondaryLabel="Cancel"
+        secondaryLabel=""
         maxWidthClass="max-w-[560px]"
         (primaryAction)="submit()"
         (secondaryAction)="closeModal()"
@@ -205,19 +227,15 @@ const emptyForm = (roleId = ''): PermissionForm => ({
         <div class="mt-4 space-y-4 text-[13px]">
           <div>
             <label class="block mb-1 font-medium text-slate-700" for="perm-role">Role*</label>
-            <select
-              appInput
-              id="perm-role"
+            <app-dropdown
+              inputId="perm-role"
               class="w-full"
+              placeholder="Select role"
+              [options]="roleOptions()"
               [disabled]="!!editing()"
               [invalid]="submitted() && !form.roleId"
-              [(ngModel)]="form.roleId"
-            >
-              <option value="" disabled>Select role</option>
-              @for (role of roles(); track role.id) {
-                <option [value]="role.id">{{ role.roleTypeName }}{{ role.status === 'Inactive' ? ' (inactive)' : '' }}</option>
-              }
-            </select>
+              [(value)]="form.roleId"
+            />
             @if (submitted() && !form.roleId) {
               <p class="m-0 mt-1 text-xs font-medium text-rose-700">Select a role.</p>
             }
@@ -363,6 +381,14 @@ export class PermissionMasterComponent {
     this.statusFilter.set('ALL');
     this.filterValues.set({});
   }
+
+  /** Roles for the dialog's role dropdown (value: role id). */
+  readonly roleOptions = computed<DropdownItem[]>(() =>
+    this.roles().map(role => ({
+      value: String(role.id),
+      label: `${role.roleTypeName}${role.status === 'Inactive' ? ' (inactive)' : ''}`
+    }))
+  );
 
   /** Tables to choose from: the table list, plus any table a role already has a grant on. */
   readonly tableOptions = computed<DropdownItem[]>(() => {

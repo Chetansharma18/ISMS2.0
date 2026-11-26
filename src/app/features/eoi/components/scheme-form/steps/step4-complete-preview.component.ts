@@ -48,7 +48,7 @@ import { answerText, formatBytes } from '../eoi-apply.util';
       @if (state.hasCustomFields()) {
         <section class="rounded-lg border border-[#D6E3F0] overflow-hidden">
           <div class="flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 border-b border-[#D6E3F0]">
-            <h2 class="text-[15px] font-semibold text-[#1E3A5F] m-0">Scheme Proposal Details</h2>
+            <h2 class="text-[15px] font-semibold text-[#1E3A5F] m-0">EOI Form</h2>
             <button appButton variant="outline" size="sm" type="button" (click)="state.goToStep(state.stepIndexCustomFields())">
               <app-icon name="edit" size="sm" />
               <span>Edit</span>

@@ -96,10 +96,10 @@ import { acceptOf, formatBytes, formatsOf } from '../eoi-apply.util';
 
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <button appButton variant="outline" size="lg" (click)="state.goToStep(state.hasCustomFields() ? state.stepIndexCustomFields() : state.stepIndexProfile)">
-          &larr; {{ state.hasCustomFields() ? 'Back to Scheme Proposal Details' : 'Back to Registration Profile' }}
+          &larr; Back
         </button>
         <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">
-          Proceed to Preview &rarr;
+          Next &rarr;
         </button>
       </div>
     </div>

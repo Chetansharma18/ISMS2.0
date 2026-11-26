@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
-import { ButtonComponent, IconComponent } from '../../../../shared';
+import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../../shared';
 import { SchemeFormState } from './scheme-form.state';
 import { SchemeHeaderCardComponent } from './steps/scheme-header-card.component';
 import { Step1ProcessingFeeComponent } from './steps/step1-processing-fee.component';
@@ -25,6 +25,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [
     ButtonComponent,
     IconComponent,
+    PageHeaderComponent,
     ActionModalComponent,
     StepperComponent,
     SchemeHeaderCardComponent,
@@ -40,26 +41,29 @@ export type { EoiDocumentItem } from './scheme-form.model';
   template: `
     <div class="min-h-screen bg-white flex flex-col selection:bg-[#7C0E44] selection:text-white font-sans text-slate-800" >
 
-      <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
+      <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 pb-6">
 
-        <!-- 1. Header row: Back button, page title, mandatory indicator, subtitle (same as Organization Registration Form) -->
-        <div class="mb-5 space-y-3">
-          <div>
-            <button appButton variant="outline" size="sm" (click)="goBack()">
-              <app-icon name="back" />
-              <span>Back</span>
-            </button>
-          </div>
+        <!-- Sticky Top Bar: Page Header + Scheme Info Strip + Stepper -->
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-xs -mx-4 sm:-mx-5 lg:-mx-6 px-4 sm:px-5 lg:px-6 pt-3 pb-3 mb-5 border-b border-[#EADCE2] space-y-2.5">
+          <app-page-header
+            title="Apply for EOI"
+            [showBack]="true"
+            backTitle="Back to Active EOI"
+            (back)="goBack()"
+          />
 
-          <div>
-            <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
-              Apply for EOI
-            </h1>
-          </div>
+          @if (!state.loading() && !state.loadError() && state.application()) {
+            <app-scheme-header-card />
 
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-            Complete the six steps below to submit your Expression of Interest application.
-          </p>
+            <app-stepper
+              variant="wizard"
+              ariaLabel="EOI Application Steps"
+              [steps]="state.wizardSteps()"
+              [currentStep]="state.currentStep()"
+              [completedSteps]="state.completedWizardSteps()"
+              (stepClick)="state.goToStep($event)"
+            ></app-stepper>
+          }
         </div>
 
         @if (state.loading()) {
@@ -70,26 +74,9 @@ export type { EoiDocumentItem } from './scheme-form.model';
         } @else if (state.loadError() || !state.application()) {
           <div class="p-5 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-700 space-y-3" role="alert">
             <p class="m-0 font-semibold">{{ state.loadError() || 'Your application could not be opened.' }}</p>
-            <button appButton variant="outline" size="sm" (click)="goBack()">Back to Apply for EOI</button>
+            <button appButton variant="outline" size="sm" (click)="goBack()">Back to Active EOI</button>
           </div>
         } @else {
-        <!-- 2. Step progress card -->
-        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-xs -mx-4 sm:-mx-5 lg:-mx-6 px-4 sm:px-5 lg:px-6 py-2.5 mb-5 border-b border-slate-200/80">
-          <app-stepper
-            variant="wizard"
-            ariaLabel="EOI Application Steps"
-            [steps]="state.wizardSteps()"
-            [currentStep]="state.currentStep()"
-            [completedSteps]="state.completedWizardSteps()"
-            (stepClick)="state.goToStep($event)"
-          ></app-stepper>
-        </div>
-
-        <!-- Scheme summary strip (shown at the top of all steps) -->
-        <div class="mb-5">
-          <app-scheme-header-card />
-        </div>
-
         <!-- 3. Main form card: numbered step title + the active step -->
         <div class="bg-white rounded-xl border border-[#EADCE2] shadow-xs p-5 sm:p-7 space-y-6">
 
@@ -98,11 +85,11 @@ export type { EoiDocumentItem } from './scheme-form.model';
               <span class="w-7 h-7 rounded-full bg-[#7C0E44] text-white font-bold flex items-center justify-center text-sm shadow-2xs shrink-0">
                 {{ state.currentStep() }}
               </span>
-              <h2 class="text-lg sm:text-[19px] font-bold text-[#7C0E44] m-0">
+              <h2 class="text-base sm:text-[18px] font-bold text-[#7C0E44] m-0">
                 {{ stepTitle() }}
               </h2>
             </div>
-            <p class="text-xs sm:text-sm text-slate-500 pl-10 m-0">
+            <p class="text-xs sm:text-[13px] text-slate-500 pl-10 m-0">
               {{ stepSubtitle() }}
             </p>
           </div>
@@ -247,7 +234,7 @@ export class SchemeFormComponent {
       return 'Verify the organisation, authorized signatory and bank details that will accompany your EOI application.';
     }
     if (hasCustom && step === 2) {
-      return 'Provide scheme-specific proposal parameters and technical requirements for this application.';
+      return 'Fill in the EOI form fields configured for this scheme.';
     }
     const docStep = hasCustom ? 3 : 2;
     const previewStep = hasCustom ? 4 : 3;

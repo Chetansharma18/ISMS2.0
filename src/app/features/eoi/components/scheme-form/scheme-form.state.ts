@@ -153,7 +153,7 @@ export class SchemeFormState {
 
   readonly wizardSteps = computed<StepperStep[]>(() => [
     { label: 'Registration Profile' },
-    ...(this.hasCustomFields() ? [{ label: 'Scheme Proposal Details' }] : []),
+    ...(this.hasCustomFields() ? [{ label: 'EOI Form' }] : []),
     { label: 'Upload Documents' },
     { label: 'Complete Preview' },
     { label: 'Processing Fee' },

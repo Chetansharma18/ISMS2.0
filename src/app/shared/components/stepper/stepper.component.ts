@@ -72,24 +72,29 @@ export interface StepperStep {
       </nav>
     } @else if (variant === 'wizard') {
       <nav
-        class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs px-5 sm:px-8 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
+        class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs"
+        [ngClass]="steps.length >= 5 ? 'px-3 sm:px-5 py-2.5 sm:py-3' : 'px-5 sm:px-8 py-3 sm:py-3.5'"
         [attr.aria-label]="ariaLabel"
       >
         <ol
-          class="list-none m-0 p-0 flex items-center justify-between w-full"
-          [ngClass]="steps.length > 2 && !hideLabelsOnMobile ? 'min-w-135 sm:min-w-0' : ''"
+          class="list-none m-0 p-0 flex items-center justify-between w-full gap-1"
+          [ngClass]="steps.length > 2 && steps.length < 5 && !hideLabelsOnMobile ? 'min-w-135 sm:min-w-0' : ''"
         >
           @for (step of steps; track step.label; let i = $index; let last = $last) {
             <li class="contents">
               <button
                 type="button"
                 (click)="stepClick.emit(i + 1)"
-                class="flex items-center gap-2 sm:gap-2.5 transition-all cursor-pointer bg-transparent border-0 p-0 text-left shrink-0"
+                class="flex items-center transition-all cursor-pointer bg-transparent border-0 p-0 text-left min-w-0"
+                [ngClass]="steps.length >= 5 ? 'gap-1.5' : 'gap-2 sm:gap-2.5 shrink-0'"
                 [attr.aria-current]="isCurrent(i + 1) ? 'step' : null"
               >
                 <span
-                  class="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 transition-colors shadow-2xs border-2"
-                  [ngClass]="wizardCircleClass(i + 1)"
+                  class="rounded-full flex items-center justify-center font-bold shrink-0 transition-colors shadow-2xs border-2"
+                  [ngClass]="[
+                    wizardCircleClass(i + 1),
+                    steps.length >= 5 ? 'w-6 h-6 sm:w-7 sm:h-7 text-[11px] sm:text-xs' : 'w-7 h-7 sm:w-8 sm:h-8 text-xs sm:text-sm'
+                  ]"
                   aria-hidden="true"
                 >
                   @if (isCompleted(i + 1) && !isCurrent(i + 1)) {
@@ -100,16 +105,23 @@ export interface StepperStep {
                 </span>
                 <span class="sr-only">Step {{ i + 1 }}: {{ step.label }}{{ isCompleted(i + 1) ? ' (completed)' : '' }}</span>
                 <span
-                  class="text-xs sm:text-[13.5px] tracking-tight whitespace-nowrap"
-                  [ngClass]="[wizardLabelClass(i + 1), hideLabelsOnMobile ? 'hidden md:block' : 'block']"
+                  class="tracking-tight leading-tight"
+                  [ngClass]="[
+                    wizardLabelClass(i + 1),
+                    hideLabelsOnMobile ? 'hidden md:block' : 'block',
+                    steps.length >= 5 ? 'text-[11px] sm:text-xs' : 'text-xs sm:text-[13.5px] whitespace-nowrap'
+                  ]"
                   aria-hidden="true"
                 >{{ step.label }}</span>
               </button>
 
               @if (!last) {
                 <span
-                  class="flex-1 h-[2px] mx-3 sm:mx-6 rounded-full transition-colors duration-200"
-                  [ngClass]="isCompleted(i + 1) ? 'bg-navy' : 'bg-slate-200'"
+                  class="flex-1 h-[2px] rounded-full transition-colors duration-200"
+                  [ngClass]="[
+                    isCompleted(i + 1) ? 'bg-navy' : 'bg-slate-200',
+                    steps.length >= 5 ? 'min-w-[8px] mx-1 sm:mx-2' : 'mx-3 sm:mx-6'
+                  ]"
                   aria-hidden="true"
                 ></span>
               }

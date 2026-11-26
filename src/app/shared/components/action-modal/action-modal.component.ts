@@ -11,7 +11,6 @@ import {
   inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IconComponent } from '../icon/icon.component';
 import { ModalService } from '../../services/modal.service';
 
 export type ActionModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
@@ -30,7 +29,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
   selector: 'app-action-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule],
   host: {
     '[attr.title]': 'null'
   },
@@ -58,19 +57,6 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
             <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
           }
 
-          <!-- Close Button -->
-          @if (showCloseButton) {
-            <button
-              type="button"
-              (click)="onClose()"
-              class="absolute top-4 right-5 sm:right-6 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
-              title="Close"
-              aria-label="Close"
-            >
-              <app-icon name="close" [stroke]="2.5" />
-            </button>
-          }
-
           <!-- Modal Body -->
           <div
             class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
@@ -89,7 +75,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
 
             <!-- Title -->
             @if (title) {
-              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
@@ -102,7 +88,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full flex-1 min-h-0 flex flex-col overflow-y-auto pr-0.5">
+            <div class="w-full flex-1 min-h-0 flex flex-col" [class.overflow-y-auto]="scrollable" [class.overflow-visible]="!scrollable" [class.pr-0.5]="scrollable">
               <ng-content></ng-content>
             </div>
 

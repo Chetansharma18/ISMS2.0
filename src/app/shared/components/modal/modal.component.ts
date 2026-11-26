@@ -9,7 +9,6 @@ import {
   input,
   output
 } from '@angular/core';
-import { IconComponent } from '../icon/icon.component';
 import { ModalService } from '../../services/modal.service';
 
 export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
@@ -46,7 +45,7 @@ let nextId = 0;
   selector: 'app-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [IconComponent],
+  imports: [],
   host: {
     '[attr.title]': 'null'
   },
@@ -68,22 +67,9 @@ let nextId = 0;
         [attr.aria-labelledby]="title() ? titleId : null"
         (click)="$event.stopPropagation()"
       >
-        <!-- Top Right Close Button -->
-        @if (showClose()) {
-          <button
-            type="button"
-            (click)="close.emit()"
-            class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
-            title="Close"
-            aria-label="Close"
-          >
-            <app-icon name="close" [stroke]="2.5" />
-          </button>
-        }
-
         <!-- Header -->
         @if (title()) {
-          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-2 shrink-0 pr-12">
+          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-2 shrink-0">
             <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
               {{ title() }}
             </h2>

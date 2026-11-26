@@ -11,17 +11,20 @@ import { IconComponent } from '../../../shared/components/icon/icon.component';
   imports: [IconComponent],
   host: { class: 'block' },
   template: `
-    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs">
+    <div class="border border-[#EADCE2] rounded-xl overflow-hidden bg-white shadow-2xs">
       <button
         type="button"
         (click)="toggleOpen()"
-        class="w-full bg-slate-50/80 hover:bg-slate-100/80 px-4 py-3 flex items-center justify-between text-left transition-colors cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40"
+        class="w-full bg-white hover:bg-[#FAF5F7] px-5 py-3.5 flex items-center justify-between text-left transition-colors cursor-pointer select-none group focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40"
         [attr.aria-expanded]="isOpen()"
       >
         <div class="flex items-center gap-2">
-          <h2 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-navy transition-colors">
+          <h2 class="text-sm sm:text-base font-bold text-[#7C0E44] m-0">
             Required Documents
           </h2>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+            {{ requiredInfo().length }}
+          </span>
         </div>
 
         <div class="flex items-center gap-1.5 text-slate-500 text-xs font-medium">

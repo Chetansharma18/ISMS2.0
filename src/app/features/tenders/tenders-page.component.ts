@@ -51,6 +51,7 @@ import {
   createEmptyEoiForm,
   isSchemeClosed,
   parseMasterEntriesByScheme,
+  toInputDate,
   validateEoiFormComplete
 } from './tenders-page/tenders-page.util';
 import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
@@ -94,34 +95,38 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
            VIEW 1: CONFIGURE / EDIT EOI SCREEN (Full Page View)
            ==================================================================== -->
       @if (showConfigureScreen()) {
-        <div class="p-4 sm:p-5 space-y-4 font-sans" style="background-color: #ffffff;">
-          <app-page-header
-            [title]="editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI'"
-            [breadcrumbs]="[
-              { label: 'Home', url: '/' },
-              { label: 'Active Schemes', url: '/admin/eoi-configuration' },
-              { label: editingSchemeRefNo() ? 'Edit EOI' : 'Configure New EOI' }
-            ]"
-            [showBack]="true"
-            (back)="closeConfigureScreen()"
-            backTitle="Back to Active Schemes"
-          >
-          </app-page-header>
+        <div class="w-full font-sans" style="background-color: #ffffff;">
+          <!-- Sticky Top Header & Stepper Bar -->
+          <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-slate-200/80 px-4 sm:px-5 pt-4 sm:pt-5 pb-3 space-y-3">
+            <app-page-header
+              [title]="editingSchemeRefNo() ? 'Edit EOI Configuration' : 'Configure New EOI'"
+              [breadcrumbs]="[
+                { label: 'Home', url: '/' },
+                { label: 'Active EOI', url: '/admin/eoi-configuration' },
+                { label: editingSchemeRefNo() ? 'Edit EOI' : 'Configure New EOI' }
+              ]"
+              [showBack]="true"
+              (back)="closeConfigureScreen()"
+              backTitle="Back to Active EOI"
+            >
+            </app-page-header>
 
-          <!-- Step progress card (Wizard Stepper - Full width border with centered steps) -->
-          <div class="w-full">
-            <app-stepper
-              variant="wizard"
-              ariaLabel="EOI Configuration Steps"
-              [steps]="eoiWizardSteps"
-              [currentStep]="eoiCurrentStep()"
-              [completedSteps]="completedEoiSteps()"
-              (stepClick)="goToEoiStep($event)"
-            ></app-stepper>
+            <!-- Step progress card -->
+            <div class="w-full">
+              <app-stepper
+                variant="wizard"
+                ariaLabel="EOI Configuration Steps"
+                [steps]="eoiWizardSteps"
+                [currentStep]="eoiCurrentStep()"
+                [completedSteps]="completedEoiSteps()"
+                (stepClick)="goToEoiStep($event)"
+              ></app-stepper>
+            </div>
           </div>
 
-          <!-- Main Form Card Container - Styled exactly like Registration Form Box -->
-          <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
+          <div class="p-4 sm:p-5">
+            <!-- Main Form Card Container - Styled exactly like Registration Form Box -->
+            <div class="bg-white rounded-xl border border-[#D6E3F0] shadow-xs p-5 sm:p-7 space-y-6">
 
             <!-- Card Header Strip -->
             <div class="pb-4 border-b border-[#E8EEF5] flex items-center justify-between gap-3">
@@ -225,6 +230,7 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
               }
             </div>
 
+            </div>
           </div>
         </div>
       } @else if (selectedScheme(); as s) {
@@ -305,38 +311,38 @@ export type { SchemeTender, EoiDocumentItem } from './tenders.models';
           >
           </app-table>
 
-          <!-- Scheme name, with Government-style Blinking "NEW" / "Expired" badge and "pending" tag when the applicant left this application unfinished -->
+          <!-- Scheme name centered, with static top-right "NEW" / "Expired" / "Pending" status tags -->
           <ng-template #schemeNameTemplate let-item>
-            <div class="flex items-start justify-between gap-2">
-              <span class="text-slate-800 font-medium text-[13px] leading-snug">{{ item.schemeName }}</span>
-              <div class="inline-flex items-center gap-1.5 shrink-0 pt-0.5">
-                @if (isSchemeExpired(item)) {
-                  <span
-                    class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wide uppercase bg-rose-50 text-rose-700 border border-rose-200 shrink-0 shadow-2xs"
-                    title="Scheme Expired &bull; Closing Date: {{ item.closingDate }}"
-                  >
-                    <app-icon name="clock" size="xs" class="text-rose-500 shrink-0" />
-                    <span class="animate-blink font-extrabold text-rose-700">Expired</span>
-                  </span>
-                } @else if (isNewScheme(item)) {
-                  <span
-                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-black tracking-wider uppercase bg-[#DC2626] text-white shadow-xs animate-blink shrink-0"
-                    title="Newly Added Scheme"
-                  >
-                    <app-icon name="bell" size="xs" class="text-white shrink-0" />
-                    <span>NEW</span>
-                  </span>
-                }
-                @if (draftFor(item.refNo); as draft) {
-                  <span
-                    class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[10px] font-semibold shrink-0"
-                    title="Application Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}"
-                  >
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-                    Pending
-                  </span>
-                }
-              </div>
+            <div class="relative flex items-center justify-center min-h-[28px] px-10">
+              <span class="text-slate-800 font-medium text-[13px] leading-snug text-center">{{ item.schemeName }}</span>
+              @if (isSchemeExpired(item) || isNewScheme(item) || draftFor(item.refNo)) {
+                <div class="absolute -top-1 -right-1.5 inline-flex items-center gap-1 shrink-0">
+                  @if (isSchemeExpired(item)) {
+                    <span
+                      class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase bg-rose-50 text-rose-700 border border-rose-200 leading-none"
+                      title="Scheme Expired &bull; Closing Date: {{ item.closingDate }}"
+                    >
+                      Expired
+                    </span>
+                  } @else if (isNewScheme(item)) {
+                    <span
+                      class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase bg-[#DC2626] text-white leading-none"
+                      title="Newly Added Scheme"
+                    >
+                      NEW
+                    </span>
+                  }
+                  @if (draftFor(item.refNo); as draft) {
+                    <span
+                      class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full border border-amber-300 bg-amber-100 text-amber-800 text-[9px] font-semibold leading-none"
+                      title="Application Pending &bull; Step {{ draft.step }} of {{ draftStepCount }}"
+                    >
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+                      Pending
+                    </span>
+                  }
+                </div>
+              }
             </div>
           </ng-template>
 
@@ -427,7 +433,17 @@ export class TendersPageComponent {
   private permissions = inject(PermissionService);
   readonly currentUser = this.authService.currentUser;
 
-  readonly isProfileIncomplete = computed(() => this.permissions.hasRole('new_user'));
+  /** Registered OTR status loaded from GET /otr/me (null = not checked yet). */
+  private readonly hasRegisteredProfile = signal<boolean | null>(null);
+
+  readonly isProfileIncomplete = computed(() => {
+    const registered = this.hasRegisteredProfile();
+    if (registered !== null) return !registered;
+    const user = this.currentUser();
+    if (user?.isProfileComplete === true) return false;
+    if (user?.isProfileComplete === false) return true;
+    return this.permissions.hasRole('new_user');
+  });
 
   private readonly http = inject(HttpService);
   private readonly dataEngine = inject(DataEngineService);
@@ -543,7 +559,8 @@ export class TendersPageComponent {
   readonly statusFilterOptions = computed<StatusFilterOption[]>(() => [
     { value: 'ALL', label: 'All Status' },
     { value: 'Active', label: 'Active' },
-    { value: 'Expired', label: 'Expired' }
+    { value: 'Expired', label: 'Expired' },
+    { value: 'Inactive', label: 'Inactive' }
   ]);
 
   readonly schemeFilters = computed<MasterFilterConfig[]>(() => [
@@ -558,6 +575,18 @@ export class TendersPageComponent {
       label: 'EOI Category',
       options: () => this.eoiCategoryOptions(),
       placeholder: 'All EOI Categories'
+    },
+    {
+      key: 'datePublished',
+      label: 'Published Date',
+      type: 'date',
+      placeholder: 'Filter by Publication Date'
+    },
+    {
+      key: 'closingDate',
+      label: 'Closing Date',
+      type: 'date',
+      placeholder: 'Filter by Closing Date'
     }
   ]);
 
@@ -586,9 +615,11 @@ export class TendersPageComponent {
 
     const st = this.statusFilter();
     if (st === 'Active') {
-      list = list.filter(s => !isSchemeClosed(s));
-    } else if (st === 'Expired' || st === 'Inactive') {
+      list = list.filter(s => s.isActive !== false && !isSchemeClosed(s));
+    } else if (st === 'Expired') {
       list = list.filter(s => isSchemeClosed(s));
+    } else if (st === 'Inactive') {
+      list = list.filter(s => s.isActive === false);
     }
 
     const schemeCat = this.filterValues()['schemeCategory'];
@@ -605,6 +636,16 @@ export class TendersPageComponent {
         const c = s.eoiCategory || (s as any).category || '';
         return c.toLowerCase().includes(eoiCat.toLowerCase());
       });
+    }
+
+    const pubDate = this.filterValues()['datePublished'];
+    if (pubDate) {
+      list = list.filter(s => toInputDate(s.datePublished) === pubDate);
+    }
+
+    const closeDate = this.filterValues()['closingDate'];
+    if (closeDate) {
+      list = list.filter(s => toInputDate(s.closingDate) === closeDate);
     }
 
     // Sort: New schemes at top, and current (newest) to old (oldest)
@@ -652,8 +693,22 @@ export class TendersPageComponent {
 
   isNewScheme(item: SchemeTender): boolean {
     if (item.isNew) return true;
-    if (item.createdAt && (Date.now() - item.createdAt < 7 * 24 * 60 * 60 * 1000)) {
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    if (item.createdAt && now - item.createdAt < sevenDaysMs) {
       return true;
+    }
+    if (item.publishedAt && item.publishedAt <= now && now - item.publishedAt < sevenDaysMs) {
+      return true;
+    }
+    if (item.datePublished) {
+      const iso = toInputDate(item.datePublished);
+      if (iso) {
+        const pubMs = new Date(`${iso}T00:00:00`).getTime();
+        if (!isNaN(pubMs) && pubMs <= now && now - pubMs < sevenDaysMs) {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -705,6 +760,7 @@ export class TendersPageComponent {
   constructor() {
     this.schemeService.loadSchemes().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
     this.loadMasterOptions();
+    this.loadProfileRegistrationStatus();
 
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       const fromLogin = params['fromLogin'] === 'true';
@@ -764,12 +820,41 @@ export class TendersPageComponent {
     });
   }
 
+  private isOtrRecordRegistered(record: Record<string, unknown> | null): boolean {
+    if (!record) return false;
+    const status = String(record['status'] ?? '').trim().toLowerCase();
+    return (
+      status === 'submitted' ||
+      status === 'approved' ||
+      status === 'verified' ||
+      (!!record['id'] && status !== 'draft' && status !== 'incomplete' && status !== '')
+    );
+  }
+
+  private loadProfileRegistrationStatus(): void {
+    if (!this.currentUser() || this.isSuperAdmin()) return;
+    this.http
+      .call<Record<string, unknown> | null>(API_ENDPOINTS.OTR.ME, { flags: { skipErrorToast: true, skipLoading: true } })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: record => {
+          this.hasRegisteredProfile.set(this.isOtrRecordRegistered(record));
+        },
+        error: () => {
+          this.hasRegisteredProfile.set(false);
+        }
+      });
+  }
+
   private evaluateOtrModalPrompt(): void {
-    const isNewUser = this.permissions.hasRole('new_user');
+    if (this.isSuperAdmin()) {
+      this.showOtrPromptModal.set(false);
+      return;
+    }
     const isDismissed = this.storage.getSessionString('isms_otr_prompt_dismissed') === 'true' || this.promptDismissed;
 
-    // Show popup strictly for new_user role on their first visit / fresh login
-    if (isNewUser && !isDismissed) {
+    // Show popup when the API confirms the signed-in user does not have a registered profile.
+    if (this.hasRegisteredProfile() === false && !isDismissed) {
       this.showOtrPromptModal.set(true);
     } else {
       this.showOtrPromptModal.set(false);
@@ -779,12 +864,9 @@ export class TendersPageComponent {
   dismissOtrPrompt(): void {
     this.showOtrPromptModal.set(false);
     this.promptDismissed = true;
+    this.pendingApplyAfterOtrDismiss = false;
     this.storage.setSessionString('isms_otr_prompt_dismissed', 'true');
     this.storage.setString('isms_eoi_prompt_shown_new_user', 'true');
-    if (this.pendingApplyAfterOtrDismiss) {
-      this.pendingApplyAfterOtrDismiss = false;
-      this.navigateToSchemeForm(this.selectedScheme());
-    }
   }
 
   /** The EOI's published files (RFP, SOP, corrigenda) for the detail view. */
@@ -796,31 +878,29 @@ export class TendersPageComponent {
   readonly eoiRequiredInfo: EoiRequiredInfoItem[] = [];
 
   readonly schemeColumns = computed<TableColumn<SchemeTender>[]>(() => [
-    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-14 min-w-[50px] max-w-[60px]' },
+    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-14 whitespace-nowrap' },
     {
       key: 'refNo',
       label: 'EOI Reference No.',
-      width: 'w-36 min-w-[120px]',
-      cellClass: 'text-[12.5px] font-normal text-slate-800 break-words'
+      cellClass: 'text-[12.5px] font-normal text-slate-800 whitespace-nowrap'
     },
     {
       key: 'schemeName',
       label: 'Scheme Name',
+      align: 'center',
       type: 'custom',
-      cellClass: 'text-[13px] font-medium text-slate-800'
+      cellClass: 'relative text-[13px] font-medium text-slate-800'
     },
     {
       key: 'schemeCategory',
       label: 'Scheme Category',
       align: 'center',
-      width: 'w-28 min-w-[90px]',
       cellClass: 'text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'datePublished',
       label: 'EOI Publication Date',
       align: 'center',
-      width: 'w-28 min-w-[100px]',
       cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
@@ -828,21 +908,19 @@ export class TendersPageComponent {
       label: 'Date of Closing',
       align: 'center',
       type: 'custom',
-      width: 'w-28 min-w-[100px]',
       cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'eoiCategory',
       label: 'EOI Category',
       align: 'center',
-      width: 'w-24 min-w-[80px]',
       cellClass: 'whitespace-nowrap text-[12.5px] font-normal text-slate-700'
     },
     {
       key: 'viewAction',
       label: 'Action',
       align: 'center',
-      width: this.isSuperAdmin() ? 'w-40 min-w-[145px]' : 'w-20 min-w-[65px]',
+      width: 'w-px whitespace-nowrap',
       type: 'custom'
     }
   ]);
@@ -912,10 +990,33 @@ export class TendersPageComponent {
   }
 
   handleApplyForScheme(): void {
-    // Check if profile is incomplete
     if (this.isProfileIncomplete()) {
       this.pendingApplyAfterOtrDismiss = true;
       this.showOtrPromptModal.set(true);
+      return;
+    }
+
+    if (this.hasRegisteredProfile() === null && this.currentUser() && !this.isSuperAdmin()) {
+      this.http
+        .call<Record<string, unknown> | null>(API_ENDPOINTS.OTR.ME, { flags: { skipErrorToast: true } })
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: record => {
+            const isRegistered = this.isOtrRecordRegistered(record);
+            this.hasRegisteredProfile.set(isRegistered);
+            if (!isRegistered) {
+              this.pendingApplyAfterOtrDismiss = true;
+              this.showOtrPromptModal.set(true);
+            } else {
+              this.navigateToSchemeForm(this.selectedScheme());
+            }
+          },
+          error: () => {
+            this.hasRegisteredProfile.set(false);
+            this.pendingApplyAfterOtrDismiss = true;
+            this.showOtrPromptModal.set(true);
+          }
+        });
       return;
     }
 
@@ -1276,7 +1377,8 @@ export class TendersPageComponent {
       currentRefNo: this.editingSchemeRefNo(),
       activeSchemeNames: this.schemeNameOptions(),
       activeEoiCategories: [...this.eoiCategoryOptions()],
-      schemeMasterItems: this.schemeMasterItems()
+      schemeMasterItems: this.schemeMasterItems(),
+      isScheduled: true
     });
 
     if (!validation.isValid) {

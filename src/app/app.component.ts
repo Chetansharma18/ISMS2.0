@@ -51,7 +51,7 @@ import { ConnectivityService } from './core/services/connectivity.service';
       @if (showHeader()) {
         <app-header
           [isSticky]="true"
-          class="shrink-0 sticky top-0 z-50"
+          class="shrink-0 sticky top-0 z-40"
           (loginClicked)="onLoginClick()"
           (toggleMobileMenu)="toggleMobileSidebar()"
         ></app-header>

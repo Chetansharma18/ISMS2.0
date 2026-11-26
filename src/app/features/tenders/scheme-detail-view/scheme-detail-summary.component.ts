@@ -2,71 +2,76 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 import { SchemeTender } from '../tenders.models';
 import { formatFeeDisplay } from './scheme-detail-view.util';
 
-/** 2-column table displaying Scheme Details and parameters. */
+/** Clean 3-column metadata grid displaying unique Scheme Details, fee structure, and description. */
 @Component({
   selector: 'app-scheme-detail-summary',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block h-full' },
+  host: { class: 'block' },
   template: `
-    <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-2xs h-full flex flex-col">
-      <div class="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-slate-900">Scheme Details</h3>
+    <section class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs p-5 sm:p-6 space-y-5">
+      <div class="pb-4 border-b border-[#EADCE2] space-y-1">
+        <h2 class="text-sm sm:text-base font-bold text-[#7C0E44] m-0">Scheme Description</h2>
+        <p class="text-[13.5px] text-slate-700 leading-relaxed m-0 whitespace-pre-line">
+          {{ scheme().eoiDescription || 'No description provided.' }}
+        </p>
       </div>
-      <table class="w-full text-left border-collapse text-xs sm:text-[13px] flex-1">
-        <tbody class="divide-y divide-slate-200">
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 w-5/12 bg-slate-50/30">EOI Reference No.</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900 break-all select-all">{{ scheme().refNo }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Scheme Name</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().schemeName }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Scheme Category</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().schemeCategory || scheme().category || '-' }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Category</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiCategory || '-' }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Publication Date</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().datePublished || '-' }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Date of Closing</td>
-            <td class="px-4 py-2.5 font-bold text-red-600">{{ scheme().closingDate || '-' }}</td>
-          </tr>
-          <tr class="hover:bg-slate-50/50 transition-colors">
-            <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EOI Duration</td>
-            <td class="px-4 py-2.5 font-semibold text-slate-900">{{ scheme().eoiDuration || '-' }}</td>
-          </tr>
-          @if (scheme().isFeeExempted) {
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD / Process Fees</td>
-              <td class="px-4 py-2.5 font-semibold text-slate-900">Exempted</td>
-            </tr>
-          } @else {
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">EMD Amount</td>
-              <td class="px-4 py-2.5 font-semibold text-slate-900">
-                <span>{{ formattedEmdFee() }}</span>
-                <span class="text-slate-500 font-normal text-xs ml-1.5">(Refundable)</span>
-              </td>
-            </tr>
-            <tr class="hover:bg-slate-50/50 transition-colors">
-              <td class="px-4 py-2.5 font-medium text-slate-500 bg-slate-50/30">Process Fees</td>
-              <td class="px-4 py-2.5 font-semibold text-slate-900">
-                <span>{{ formattedProcessFee() }}</span>
-                <span class="text-slate-500 font-normal text-xs ml-1.5">(Non-Refundable)</span>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+
+      <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5 m-0">
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EOI Reference No.</dt>
+          <dd class="text-[13.5px] font-semibold text-slate-900 m-0 break-all select-all">{{ scheme().refNo }}</dd>
+        </div>
+
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Scheme Category</dt>
+          <dd class="text-[13.5px] font-semibold text-slate-900 m-0">{{ scheme().schemeCategory || scheme().category || '-' }}</dd>
+        </div>
+
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EOI Category</dt>
+          <dd class="text-[13.5px] font-semibold text-slate-900 m-0">{{ scheme().eoiCategory || '-' }}</dd>
+        </div>
+
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EOI Duration</dt>
+          <dd class="text-[13.5px] font-semibold text-slate-900 m-0">{{ scheme().eoiDuration || '-' }}</dd>
+        </div>
+
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EOI Publication Date</dt>
+          <dd class="text-[13.5px] font-semibold text-slate-900 m-0 tabular-nums">{{ scheme().datePublished || '-' }}</dd>
+        </div>
+
+        <div class="space-y-1">
+          <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Date of Closing</dt>
+          <dd class="text-[13.5px] font-bold text-rose-600 m-0 tabular-nums">{{ scheme().closingDate || '-' }}</dd>
+        </div>
+
+        @if (scheme().isFeeExempted) {
+          <div class="space-y-1">
+            <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EMD / Process Fees</dt>
+            <dd class="text-[13.5px] font-semibold text-emerald-700 m-0">Exempted</dd>
+          </div>
+        } @else {
+          <div class="space-y-1">
+            <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">EMD Amount</dt>
+            <dd class="text-[13.5px] font-semibold text-slate-900 m-0 tabular-nums">
+              <span>{{ formattedEmdFee() }}</span>
+              <span class="text-slate-500 font-normal text-xs ml-1">(Refundable)</span>
+            </dd>
+          </div>
+
+          <div class="space-y-1">
+            <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Process Fees</dt>
+            <dd class="text-[13.5px] font-semibold text-slate-900 m-0 tabular-nums">
+              <span>{{ formattedProcessFee() }}</span>
+              <span class="text-slate-500 font-normal text-xs ml-1">(Non-Refundable)</span>
+            </dd>
+          </div>
+        }
+      </dl>
+    </section>
   `
 })
 export class SchemeDetailSummaryComponent {

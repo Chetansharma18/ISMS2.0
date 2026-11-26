@@ -90,122 +90,170 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
           [closeOnBackdrop]="!flow.switchTargetName()"
           (close)="flow.cancel()"
         >
-          @if (methodTabs().length > 1) {
-            <!-- Method choice: radio options (a choice, not an action) -->
-            <fieldset class="mb-4 border-0 p-0 m-0">
-              <legend class="mb-2 p-0 text-[13px] font-medium text-slate-700">Verify using</legend>
-              <div class="flex flex-col gap-2 sm:flex-row" role="radiogroup">
-                @for (option of methodTabs(); track option.id) {
-                  <label
-                    class="flex flex-1 cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] transition-colors"
-                    [class.border-[#7C0E44]]="method() === option.id"
-                    [class.bg-[#FCF0F2]]="method() === option.id"
-                    [class.border-slate-200]="method() !== option.id"
-                    [class.hover:border-slate-300]="method() !== option.id"
-                  >
-                    <input
-                      type="radio"
-                      name="sso-two-step-method"
-                      class="h-4 w-4 shrink-0 cursor-pointer accent-[#7C0E44]"
-                      [value]="option.id"
-                      [checked]="method() === option.id"
-                      (change)="method.set(option.id)"
-                    />
-                    <span class="font-medium text-slate-800">{{ option.label }}</span>
-                  </label>
+          <div class="space-y-4 font-sans">
+            <!-- Theme Header Card -->
+            <div class="flex items-center gap-3 rounded-xl border border-[#EADCE2] bg-[#FAF5F7] px-3.5 py-2.5">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-[#EADCE2] text-[#7C0E44]">
+                <app-icon name="shield-check" size="md" [stroke]="2" />
+              </div>
+              <div class="min-w-0">
+                <p class="m-0 text-[13px] font-semibold text-[#7C0E44]">Security Verification</p>
+                <p class="m-0 text-xs text-slate-600">
+                  Verify your identity to access the ISMS 2.0 portal.
+                </p>
+              </div>
+            </div>
+
+            @if (methodTabs().length > 1) {
+              <!-- Method choice -->
+              <fieldset class="border-0 p-0 m-0">
+                <legend class="mb-2 p-0 text-xs font-semibold text-slate-700">Verify using</legend>
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup">
+                  @for (option of methodTabs(); track option.id) {
+                    <label
+                      class="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3.5 py-2.5 text-[13px] transition-colors"
+                      [class.border-[#7C0E44]]="method() === option.id"
+                      [class.bg-[#FCF0F2]]="method() === option.id"
+                      [class.border-slate-200]="method() !== option.id"
+                      [class.hover:border-slate-300]="method() !== option.id"
+                    >
+                      <input
+                        type="radio"
+                        name="sso-two-step-method"
+                        class="h-4 w-4 shrink-0 cursor-pointer accent-[#7C0E44]"
+                        [value]="option.id"
+                        [checked]="method() === option.id"
+                        (change)="method.set(option.id)"
+                      />
+                      <span class="font-medium text-slate-800">{{ option.label }}</span>
+                    </label>
+                  }
+                </div>
+              </fieldset>
+            }
+
+            @if (method() === 'OTP') {
+              @if (flow.resettingPin()) {
+                <div class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2.5 text-[13px] leading-5 text-sky-900" role="status">
+                  Forgot your PIN? Sign in with OTP. You will then be taken to your profile to set a new PIN.
+                </div>
+              }
+              @if (!flow.otpSent()) {
+                <div class="rounded-lg border border-slate-200 bg-slate-50/70 px-3.5 py-3 text-[13px] text-slate-600 leading-relaxed">
+                  We will send a {{ otpLength }}-digit one-time password to
+                  <span class="font-semibold text-slate-800">{{ flow.otpDestination() || 'your registered mobile number' }}</span>.
+                </div>
+              } @else {
+                <div class="space-y-3">
+                  <p class="text-[13px] text-slate-600 m-0">
+                    Enter the {{ otpLength }}-digit OTP sent to
+                    <span class="font-semibold text-slate-800">{{ flow.otpDestination() || 'your registered mobile number' }}</span>.
+                  </p>
+
+                  @if (flow.otpCodeHint(); as otp) {
+                    <div class="flex items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50/80 px-3.5 py-2 text-xs">
+                      <div class="flex items-center gap-2 text-emerald-900">
+                        <span class="font-medium">OTP:</span>
+                        <span class="tabular-nums text-sm font-bold tracking-widest text-emerald-800 select-all">{{ otp }}</span>
+                      </div>
+                      <button
+                        appButton
+                        variant="outline"
+                        size="xs"
+                        type="button"
+                        (click)="code.set(otp)"
+                      >
+                        Fill OTP
+                      </button>
+                    </div>
+                  }
+
+                  <div class="pt-1 flex justify-center">
+                    <app-otp-input [length]="otpLength" [(value)]="code" [invalid]="!!flow.error()" (completed)="submit()" />
+                  </div>
+                </div>
+              }
+            } @else if (pinSetup()) {
+              <!-- No PIN yet and the backend sent a setup token: set the PIN here, then sign in with it -->
+              <p class="text-[13px] text-slate-600 m-0">
+                You have not set a security PIN yet. Choose a {{ pinLength }}-digit PIN; you will use it to sign in from now on.
+              </p>
+              <div class="grid gap-4 sm:grid-cols-2">
+                <div class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-slate-700">New PIN</span>
+                  <app-otp-input
+                    [length]="pinLength"
+                    masked
+                    label="New PIN"
+                    [invalid]="setupAttempted() && !!setupError()"
+                    [(value)]="code"
+                  />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <span class="text-xs font-semibold text-slate-700">Confirm PIN</span>
+                  <app-otp-input
+                    [length]="pinLength"
+                    masked
+                    label="Confirm PIN"
+                    [autofocus]="false"
+                    [invalid]="setupAttempted() && !!setupError()"
+                    [(value)]="confirmCode"
+                    (completed)="setUpPin()"
+                  />
+                </div>
+              </div>
+              @if (setupAttempted() && setupError()) {
+                <div class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700" role="alert">
+                  {{ setupError() }}
+                </div>
+              }
+            } @else if (pinMissing()) {
+              <!-- No PIN yet, and the backend does not allow setting one before sign-in (another method is set up) -->
+              <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[13px] leading-5 text-amber-900" role="alert">
+                You have not set a security PIN yet.
+                @if (otpAllowed()) {
+                  Sign in with OTP now, then set your PIN under Profile &gt; Security PIN.
+                } @else {
+                  Your role allows PIN sign-in only. Ask the administrator to set up your PIN.
                 }
               </div>
-            </fieldset>
-          }
-
-          @if (method() === 'OTP') {
-            @if (flow.resettingPin()) {
-              <div class="mb-3 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2.5 text-[13px] leading-5 text-sky-900" role="status">
-                Forgot your PIN? Sign in with OTP. You will then be taken to your profile to set a new PIN.
-              </div>
-            }
-            @if (!flow.otpSent()) {
-              <p class="text-sm text-slate-600 m-0 mb-3">
-                We will send a one-time password to {{ flow.otpDestination() ? 'your mobile number ' + flow.otpDestination() : 'your registered mobile number' }}.
-              </p>
-            } @else {
-              <p class="text-sm text-slate-600 m-0 mb-1">
-                Enter the OTP sent to {{ flow.otpDestination() ? flow.otpDestination() : 'your registered mobile number' }}.
-              </p>
-              <app-otp-input class="my-4" [length]="otpLength" [(value)]="code" [invalid]="!!flow.error()" (completed)="submit()" />
-            }
-          } @else if (pinSetup()) {
-            <!-- No PIN yet and the backend sent a setup token: set the PIN here, then sign in with it -->
-            <p class="text-sm text-slate-600 m-0 mb-3">
-              You have not set a security PIN yet. Choose a {{ pinLength }}-digit PIN; you will use it to sign in from now on.
-            </p>
-            <div class="grid gap-4 sm:grid-cols-2">
-              <div class="flex flex-col gap-1.5">
-                <span class="text-[13px] font-medium text-slate-700">New PIN</span>
-                <app-otp-input
-                  [length]="pinLength"
-                  masked
-                  label="New PIN"
-                  [invalid]="setupAttempted() && !!setupError()"
-                  [(value)]="code"
-                />
-              </div>
-              <div class="flex flex-col gap-1.5">
-                <span class="text-[13px] font-medium text-slate-700">Confirm PIN</span>
-                <app-otp-input
-                  [length]="pinLength"
-                  masked
-                  label="Confirm PIN"
-                  [autofocus]="false"
-                  [invalid]="setupAttempted() && !!setupError()"
-                  [(value)]="confirmCode"
-                  (completed)="setUpPin()"
-                />
-              </div>
-            </div>
-            @if (setupAttempted() && setupError()) {
-              <p class="mt-3 text-xs font-semibold text-rose-700 m-0">{{ setupError() }}</p>
-            }
-          } @else if (pinMissing()) {
-            <!-- No PIN yet, and the backend does not allow setting one before sign-in (another method is set up) -->
-            <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[13px] leading-5 text-amber-900" role="alert">
-              You have not set a security PIN yet.
               @if (otpAllowed()) {
-                Sign in with OTP now, then set your PIN under Profile &gt; Security PIN.
-              } @else {
-                Your role allows PIN sign-in only. Ask the administrator to set up your PIN.
+                <button appButton variant="outline" size="sm" type="button" (click)="method.set('OTP')">Use OTP instead</button>
               }
-            </div>
-            @if (otpAllowed()) {
-              <button appButton variant="outline" size="sm" type="button" class="mt-3" (click)="method.set('OTP')">Use OTP instead</button>
-            }
-          } @else {
-            <p class="text-sm text-slate-600 m-0 mb-2">Enter your {{ pinLength }}-digit security PIN.</p>
-            <app-otp-input
-              class="my-2"
-              [length]="pinLength"
-              masked
-              label="Security PIN"
-              [invalid]="!!flow.error()"
-              [(value)]="code"
-              (completed)="submit()"
-            />
-            <button appButton variant="ghost" size="sm" type="button" class="mt-2" (click)="forgotPin()">Forgot PIN?</button>
-            @if (forgotBlocked()) {
-              <div class="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[13px] leading-5 text-amber-900" role="alert">
-                Your role allows PIN sign-in only, so the PIN cannot be reset here. Ask the administrator to reset your PIN.
+            } @else {
+              <div class="space-y-3">
+                <p class="text-[13px] text-slate-600 m-0">Enter your {{ pinLength }}-digit security PIN.</p>
+                <div class="flex justify-center">
+                  <app-otp-input
+                    [length]="pinLength"
+                    masked
+                    label="Security PIN"
+                    [invalid]="!!flow.error()"
+                    [(value)]="code"
+                    (completed)="submit()"
+                  />
+                </div>
+                <div class="flex justify-end">
+                  <button appButton variant="ghost" size="sm" type="button" (click)="forgotPin()">Forgot PIN?</button>
+                </div>
+                @if (forgotBlocked()) {
+                  <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[13px] leading-5 text-amber-900" role="alert">
+                    Your role allows PIN sign-in only, so the PIN cannot be reset here. Ask the administrator to reset your PIN.
+                  </div>
+                }
               </div>
             }
-          }
 
-          @if (flow.error() && !pinMissing() && !(pinSetup() && setupAttempted() && setupError())) {
-            <p class="mt-3 text-xs font-semibold text-rose-700 m-0">{{ flow.error() }}</p>
-          }
+            @if (flow.error() && !pinMissing() && !(pinSetup() && setupAttempted() && setupError())) {
+              <div class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700" role="alert">
+                {{ flow.error() }}
+              </div>
+            }
+          </div>
 
           <ng-container modalFooter>
-            <!-- During a role switch the previous session has already ended, so cancelling signs out of the portal -->
             <button appButton variant="outline" type="button" (click)="flow.cancel()">
-              {{ flow.switchTargetName() ? 'Cancel & sign out' : 'Cancel' }}
+              Cancel
             </button>
             @if (method() === 'OTP') {
               @if (flow.otpSent()) {

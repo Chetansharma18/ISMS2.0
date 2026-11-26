@@ -23,7 +23,8 @@ export interface MasterFieldConfig<T = any> {
 export interface MasterFilterConfig {
   key: string;
   label: string;
-  options: string[] | (() => string[]);
+  type?: 'select' | 'date';
+  options?: string[] | (() => string[]);
   placeholder?: string;
 }
 

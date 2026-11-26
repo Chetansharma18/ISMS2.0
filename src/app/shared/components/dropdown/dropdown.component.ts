@@ -198,9 +198,9 @@ let nextDropdownId = 0;
         </ul>
 
         @if (multiple() && footer()) {
-          <div class="p-2 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-[11px]">
-            <span class="text-slate-500">{{ values().length }} selected</span>
-            <button appButton size="sm" type="button" (mousedown)="$event.preventDefault()" (click)="close(true)">Done</button>
+          <div class="px-3 py-2 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between gap-2 text-xs">
+            <span class="text-slate-600 font-medium">{{ values().length }} selected</span>
+            <button appButton variant="primary" size="sm" type="button" (mousedown)="$event.preventDefault()" (click)="close(true)">Done</button>
           </div>
         }
       </div>
@@ -252,8 +252,10 @@ export class DropdownComponent implements OnDestroy {
   readonly overlay = input<boolean, unknown>(true, {
     transform: (v: unknown) => (v === undefined || v === '' ? true : booleanAttribute(v))
   });
-  /** Multi mode: footer with the selected count and a Done button. */
-  readonly footer = input(false, { transform: booleanAttribute });
+  /** Multi mode: footer with the selected count and a Done button. Defaults to true. */
+  readonly footer = input<boolean, unknown>(true, {
+    transform: (v: unknown) => (v === undefined || v === '' ? true : booleanAttribute(v))
+  });
   /** Opening direction: 'down' (default), 'up' (drop-up), or 'auto' (detects available space in viewport). */
   readonly direction = input<'down' | 'up' | 'auto'>('auto');
   /** `id` of the trigger, so a <label for="..."> points at it. */

@@ -25,59 +25,78 @@ import { filterAdmins } from './tenders-page.util';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgClass, FormsModule, ActionModalComponent, ButtonComponent, IconComponent, InputDirective],
+  styles: [`
+    .thin-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .thin-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .thin-scroll::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 9999px;
+    }
+    .thin-scroll::-webkit-scrollbar-thumb:hover {
+      background: rgba(100, 116, 139, 0.7);
+    }
+    .thin-scroll {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.5) transparent;
+    }
+  `],
   template: `
     <app-action-modal
       [isOpen]="isOpen()"
-      [showCloseButton]="true"
+      [showCloseButton]="false"
       [closeOnBackdrop]="true"
+      [scrollable]="false"
       [showAccentBar]="false"
-      accentBarClass="bg-primary"
       title="Create Committee"
       [primaryLabel]="saving() ? 'Saving...' : 'Save Committee'"
       [disablePrimary]="saving()"
-      secondaryLabel=""
-      maxWidthClass="max-w-[560px]"
+      secondaryLabel="Cancel"
+      maxWidthClass="max-w-[600px]"
       (primaryAction)="onSave()"
       (secondaryAction)="close.emit()"
       (close)="close.emit()"
     >
       @if (scheme(); as s) {
-        <div class="mt-3 font-sans text-xs space-y-4 pb-3">
-          <!-- Scheme Info Header Banner -->
-          <div class="bg-[#F8EDF1] border border-[#EADCE2] rounded-lg p-3 flex flex-col gap-1">
-            <div class="flex items-center justify-between">
-              <span class="text-xs font-semibold text-[#7C0E44]">{{ s.schemeName }}</span>
-              <span class="tabular-nums text-[11px] px-2 py-0.5 rounded bg-[#F2DACE] text-[#7C0E44] font-semibold border border-[#EADCE2]">
+        <div class="mt-2 font-sans text-[13px] space-y-4 pb-1">
+          <!-- Scheme Info Banner -->
+          <div class="bg-[#FAF5F7] border border-[#EADCE2] rounded-lg px-3.5 py-2.5 space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[13.5px] font-bold text-[#7C0E44] leading-snug">{{ s.schemeName }}</span>
+              <span class="tabular-nums text-[11px] px-2 py-0.5 rounded bg-white text-[#7C0E44] font-semibold border border-[#EADCE2] shrink-0">
                 {{ s.refNo }}
               </span>
             </div>
-            <p
-              class="text-[11px] text-slate-600 m-0 leading-relaxed max-h-24 overflow-y-auto pr-1"
-              [title]="s.eoiDescription"
-            >
-              {{ s.eoiDescription }}
-            </p>
+            @if (s.eoiDescription) {
+              <p class="text-xs text-slate-600 m-0 leading-relaxed line-clamp-2" [title]="s.eoiDescription">
+                {{ s.eoiDescription }}
+              </p>
+            }
           </div>
 
           @if (errorMessage() || serverError()) {
-            <div class="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 font-medium">
+            <div class="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium">
               {{ errorMessage() || serverError() }}
             </div>
           }
           @if (admins().length === 0) {
-            <p class="text-xs text-slate-500 italic m-0">No eligible users found. Committee users need an active role other than User / Tp.</p>
+            <p class="text-xs text-slate-500 m-0">No eligible users found. Committee users need an active role other than User / Tp.</p>
           }
 
           <!-- 1. APPROVER DROPDOWN (SINGLE SELECT + SEARCHABLE) -->
           <div class="relative approver-dropdown-container" [class.z-30]="isApproverDropdownOpen()">
-            <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center justify-between mb-1.5">
               <label class="block text-slate-700 font-semibold text-xs">
-                Approver *
+                Approver <span class="text-[#DC2626] font-bold">*</span>
               </label>
-              <span class="text-[10.5px] text-slate-400">Select 1 member</span>
+              <span class="text-[11px] text-slate-400">Select 1 member</span>
             </div>
 
-            <!-- Approver Dropdown Trigger Box -->
+            <!-- Approver Dropdown Trigger -->
             <div class="relative">
               <button
                 appButton
@@ -87,16 +106,16 @@ import { filterAdmins } from './tenders-page.util';
                 (click)="toggleApproverDropdown($event)"
                 class="justify-between text-left"
               >
-                <div class="flex items-center gap-2 min-w-0 pr-2">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
                   @if (selectedApprover()) {
-                    <span class="font-semibold text-slate-800 text-xs truncate">{{ nameOf(selectedApprover()) }}</span>
+                    <span class="font-medium text-slate-800 text-[13px] truncate">{{ nameOf(selectedApprover()) }}</span>
                     @if (getAdmin(selectedApprover()); as adm) {
-                      <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F2DACE] text-[#7C0E44] border border-[#EADCE2] shrink-0">
+                      <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shrink-0">
                         {{ adm.role }}
                       </span>
                     }
                   } @else {
-                    <span class="text-slate-400 text-xs font-normal">Select approver...</span>
+                    <span class="text-slate-400 text-[13px] font-normal">Select approver...</span>
                   }
                 </div>
 
@@ -111,7 +130,7 @@ import { filterAdmins } from './tenders-page.util';
                       class="text-slate-400 hover:text-rose-600 p-0.5 rounded transition-colors cursor-pointer"
                       title="Clear approver"
                     >
-                      <app-icon name="close" size="sm" [stroke]="2" />
+                      <app-icon name="close" size="xs" [stroke]="2" />
                     </span>
                   }
                   <app-icon
@@ -127,10 +146,10 @@ import { filterAdmins } from './tenders-page.util';
               @if (isApproverDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-theme rounded-lg shadow-[0_8px_24px_rgba(31,41,51,0.12)] flex flex-col font-sans z-50 animate-in fade-in duration-150"
+                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-theme rounded-lg shadow-[0_12px_28px_rgba(31,41,51,0.14)] flex flex-col font-sans z-50"
                 >
                   <!-- Search Bar -->
-                  <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
+                  <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/70 rounded-t-lg">
                     <div class="relative">
                       <input
                         appInput
@@ -139,28 +158,28 @@ import { filterAdmins } from './tenders-page.util';
                         placeholder="Search approver by name..."
                         [ngModel]="approverSearchQuery()"
                         (ngModelChange)="approverSearchQuery.set($event)"
-                        class="w-full pl-9 pr-8 focus:outline-none focus:ring-0"
+                        class="w-full pl-9 pr-8"
                       />
-                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
+                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2" />
                       @if (approverSearchQuery()) {
                         <button
                           appButton
                           variant="ghost"
-                          size="sm"
+                          size="xs"
                           iconOnly
                           type="button"
                           (click)="approverSearchQuery.set('')"
-                          class="absolute right-0.5 top-1/2 -translate-y-1/2"
+                          class="absolute right-1 top-1/2 -translate-y-1/2"
                           aria-label="Clear search"
                         >
-                          <app-icon name="close" size="sm" />
+                          <app-icon name="close" size="xs" />
                         </button>
                       }
                     </div>
                   </div>
 
                   <!-- Admins List (Single Selection) -->
-                  <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
+                  <div class="max-h-44 overflow-y-auto thin-scroll p-1.5 space-y-0.5">
                     @for (adm of filteredApproverAdmins(); track adm.id) {
                       <div
                         role="button"
@@ -168,36 +187,35 @@ import { filterAdmins } from './tenders-page.util';
                         (click)="selectApprover(adm.ssoId)"
                         (keydown.enter)="selectApprover(adm.ssoId)"
                         (keydown.space)="selectApprover(adm.ssoId); $event.preventDefault()"
-                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-xs select-none"
+                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-[13px] select-none"
                         [ngClass]="selectedApprover() === adm.ssoId ? 'bg-[#FAF5F7] text-[#7C0E44]' : 'hover:bg-slate-50 text-slate-800'"
                       >
                         <div class="flex items-center gap-2.5 min-w-0">
-                          <!-- Square Box Tick Indicator -->
                           <input
                             type="checkbox"
                             [checked]="selectedApprover() === adm.ssoId"
                             tabindex="-1"
-                            class="w-4 h-4 rounded text-[#7C0E44] focus:ring-[#AA5E7A] border-slate-300 cursor-pointer accent-[#7C0E44] pointer-events-none"
+                            class="w-4 h-4 rounded text-[#7C0E44] border-slate-300 accent-[#7C0E44] pointer-events-none shrink-0"
                           />
                           <div class="flex flex-col min-w-0">
-                            <span class="font-semibold truncate" [class.text-[#7C0E44]]="selectedApprover() === adm.ssoId" [class.text-slate-800]="selectedApprover() !== adm.ssoId">
+                            <span class="font-medium truncate" [class.text-[#7C0E44]]="selectedApprover() === adm.ssoId" [class.text-slate-800]="selectedApprover() !== adm.ssoId">
                               {{ adm.name }}
                             </span>
-                            <span class="text-[10px] tabular-nums" [class.text-[#AA5E7A]]="selectedApprover() === adm.ssoId" [class.text-slate-400]="selectedApprover() !== adm.ssoId">
+                            <span class="text-[11px] tabular-nums" [class.text-[#AA5E7A]]="selectedApprover() === adm.ssoId" [class.text-slate-400]="selectedApprover() !== adm.ssoId">
                               {{ adm.ssoId }}
                             </span>
                           </div>
                         </div>
                         <span
-                          class="px-2 py-0.5 rounded text-[10px] font-medium shrink-0 ml-2 border"
-                          [ngClass]="selectedApprover() === adm.ssoId ? 'bg-[#F2DACE] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-700 border-slate-200'"
+                          class="px-2 py-0.5 rounded text-[10.5px] font-medium shrink-0 ml-2 border"
+                          [ngClass]="selectedApprover() === adm.ssoId ? 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-600 border-slate-200'"
                         >
                           {{ adm.role }}
                         </span>
                       </div>
                     }
                     @if (filteredApproverAdmins().length === 0) {
-                      <div class="p-4 text-center text-xs text-slate-400 italic">
+                      <div class="p-4 text-center text-xs text-slate-400">
                         No members found matching "{{ approverSearchQuery() }}"
                       </div>
                     }
@@ -206,20 +224,20 @@ import { filterAdmins } from './tenders-page.util';
               }
             </div>
             @if (submitted() && !selectedApprover()) {
-              <p class="text-[11px] text-red-500 font-medium mt-1 m-0">Approver is required.</p>
+              <p class="text-[11px] text-rose-600 font-medium mt-1 m-0">Approver is required.</p>
             }
           </div>
 
           <!-- 2. MEMBERS DROPDOWN (MULTI SELECT + SEARCHABLE) -->
           <div class="relative member-dropdown-container" [class.z-20]="isMemberDropdownOpen()">
-            <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center justify-between mb-1.5">
               <label class="block text-slate-700 font-semibold text-xs">
-                Members *
+                Members <span class="text-[#DC2626] font-bold">*</span>
               </label>
-              <span class="text-[10.5px] text-slate-400">Multiple selection</span>
+              <span class="text-[11px] text-slate-400">Multiple selection</span>
             </div>
 
-            <!-- Members Dropdown Trigger Box -->
+            <!-- Members Dropdown Trigger -->
             <div class="relative">
               <button
                 appButton
@@ -229,11 +247,11 @@ import { filterAdmins } from './tenders-page.util';
                 (click)="toggleMemberDropdown($event)"
                 class="justify-between text-left"
               >
-                <div class="flex items-center gap-2 min-w-0 pr-2">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
                   @if (selectedAdminIds().length === 0) {
-                    <span class="text-slate-400 text-xs font-normal">Select committee members...</span>
+                    <span class="text-slate-400 text-[13px] font-normal">Select committee members...</span>
                   } @else {
-                    <span class="text-slate-800 text-xs font-semibold">
+                    <span class="text-slate-800 text-[13px] font-medium">
                       {{ selectedAdminIds().length }} member(s) selected
                     </span>
                   }
@@ -251,10 +269,10 @@ import { filterAdmins } from './tenders-page.util';
               @if (isMemberDropdownOpen()) {
                 <div
                   (click)="$event.stopPropagation()"
-                  class="absolute left-0 right-0 top-full mt-1.5 bg-white border border-theme rounded-lg shadow-[0_8px_24px_rgba(31,41,51,0.12)] flex flex-col font-sans z-50 animate-in fade-in duration-150"
+                  class="absolute left-0 right-0 top-full mt-1 bg-white border border-theme rounded-lg shadow-[0_12px_28px_rgba(31,41,51,0.14)] flex flex-col font-sans z-50"
                 >
                   <!-- Search Bar -->
-                  <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/60 rounded-t-lg">
+                  <div class="p-2 border-b border-slate-100 shrink-0 bg-slate-50/70 rounded-t-lg">
                     <div class="relative">
                       <input
                         appInput
@@ -263,31 +281,31 @@ import { filterAdmins } from './tenders-page.util';
                         placeholder="Search members by name..."
                         [ngModel]="memberSearchQuery()"
                         (ngModelChange)="memberSearchQuery.set($event)"
-                        class="w-full pl-9 pr-8 focus:outline-none focus:ring-0"
+                        class="w-full pl-9 pr-8"
                       />
-                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2.5" />
+                      <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-2.5 top-2" />
                       @if (memberSearchQuery()) {
                         <button
                           appButton
                           variant="ghost"
-                          size="sm"
+                          size="xs"
                           iconOnly
                           type="button"
                           (click)="memberSearchQuery.set('')"
-                          class="absolute right-0.5 top-1/2 -translate-y-1/2"
+                          class="absolute right-1 top-1/2 -translate-y-1/2"
                           aria-label="Clear search"
                         >
-                          <app-icon name="close" size="sm" />
+                          <app-icon name="close" size="xs" />
                         </button>
                       }
                     </div>
                   </div>
 
                   <!-- Admins List (Multi Selection) -->
-                  <div class="max-h-52 overflow-y-auto p-1.5 space-y-1">
+                  <div class="max-h-44 overflow-y-auto thin-scroll p-1.5 space-y-0.5">
                     @for (adm of filteredMemberAdmins(); track adm.id) {
                       <label
-                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-xs select-none"
+                        class="flex items-center justify-between px-2.5 py-2 rounded-md cursor-pointer transition-colors text-[13px] select-none"
                         [ngClass]="isMemberSelected(adm.ssoId) ? 'bg-[#FAF5F7] text-[#7C0E44]' : 'hover:bg-slate-50 text-slate-800'"
                       >
                         <div class="flex items-center gap-2.5 min-w-0">
@@ -295,52 +313,60 @@ import { filterAdmins } from './tenders-page.util';
                             type="checkbox"
                             [checked]="isMemberSelected(adm.ssoId)"
                             (change)="toggleMemberSelection(adm.ssoId)"
-                            class="w-4 h-4 rounded text-[#7C0E44] focus:ring-[#AA5E7A] border-slate-300 cursor-pointer accent-[#7C0E44]"
+                            class="w-4 h-4 rounded text-[#7C0E44] border-slate-300 cursor-pointer accent-[#7C0E44] shrink-0"
                           />
                           <div class="flex flex-col min-w-0">
-                            <span class="font-semibold truncate" [class.text-[#7C0E44]]="isMemberSelected(adm.ssoId)" [class.text-slate-800]="!isMemberSelected(adm.ssoId)">
+                            <span class="font-medium truncate" [class.text-[#7C0E44]]="isMemberSelected(adm.ssoId)" [class.text-slate-800]="!isMemberSelected(adm.ssoId)">
                               {{ adm.name }}
                             </span>
-                            <span class="text-[10px] tabular-nums" [class.text-[#AA5E7A]]="isMemberSelected(adm.ssoId)" [class.text-slate-400]="!isMemberSelected(adm.ssoId)">
+                            <span class="text-[11px] tabular-nums" [class.text-[#AA5E7A]]="isMemberSelected(adm.ssoId)" [class.text-slate-400]="!isMemberSelected(adm.ssoId)">
                               {{ adm.ssoId }}
                             </span>
                           </div>
                         </div>
                         <span
-                          class="px-2 py-0.5 rounded text-[10px] font-medium shrink-0 ml-2 border"
-                          [ngClass]="isMemberSelected(adm.ssoId) ? 'bg-[#F2DACE] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-700 border-slate-200'"
+                          class="px-2 py-0.5 rounded text-[10.5px] font-medium shrink-0 ml-2 border"
+                          [ngClass]="isMemberSelected(adm.ssoId) ? 'bg-[#F8EDF1] text-[#7C0E44] border-[#EADCE2]' : 'bg-slate-100 text-slate-600 border-slate-200'"
                         >
                           {{ adm.role }}
                         </span>
                       </label>
                     }
                     @if (filteredMemberAdmins().length === 0) {
-                      <div class="p-4 text-center text-xs text-slate-400 italic">
+                      <div class="p-4 text-center text-xs text-slate-400">
                         No members found matching "{{ memberSearchQuery() }}"
                       </div>
                     }
+                  </div>
+
+                  <!-- Multi-select Footer with Done button -->
+                  <div class="px-3 py-2 border-t border-slate-200 bg-slate-50/90 rounded-b-lg flex items-center justify-between gap-2 text-xs">
+                    <span class="text-slate-600 font-medium">{{ selectedAdminIds().length }} selected</span>
+                    <button appButton variant="primary" size="sm" type="button" (click)="isMemberDropdownOpen.set(false)">
+                      Done
+                    </button>
                   </div>
                 </div>
               }
             </div>
             @if (submitted() && selectedAdminIds().length === 0) {
-              <p class="text-[11px] text-red-500 font-medium mt-1 m-0">At least one committee member is required.</p>
+              <p class="text-[11px] text-rose-600 font-medium mt-1 m-0">At least one committee member is required.</p>
             }
           </div>
 
           <!-- 3. ASSIGNED MEMBERS SUMMARY -->
-          <div class="pt-1 border-t border-slate-100 space-y-3">
+          <div class="pt-3 border-t border-slate-200/80 space-y-3">
             <!-- Approver Badge -->
             @if (selectedApprover()) {
               <div>
-                <span class="block text-slate-500 font-semibold text-[11px] mb-1">
+                <span class="block text-slate-500 font-semibold text-[11px] uppercase tracking-wider mb-1.5">
                   Assigned Approver
                 </span>
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#F8EDF1] border border-[#EADCE2] text-xs">
-                  <app-icon name="shield-check" size="sm" [stroke]="2.5" class="text-[#7C0E44] shrink-0" />
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FAF5F7] border border-[#EADCE2] text-xs">
+                  <app-icon name="shield-check" size="sm" [stroke]="2.2" class="text-[#7C0E44] shrink-0" />
                   <span class="font-semibold text-[#7C0E44]">{{ nameOf(selectedApprover()) }}</span>
                   @if (getAdmin(selectedApprover()); as adm) {
-                    <span class="px-1.5 py-0.2 rounded text-[10px] font-medium bg-white text-[#7C0E44] border border-[#EADCE2]">
+                    <span class="px-1.5 py-0.5 rounded text-[10px] font-medium bg-white text-[#7C0E44] border border-[#EADCE2]">
                       {{ adm.role }}
                     </span>
                   }
@@ -351,7 +377,6 @@ import { filterAdmins } from './tenders-page.util';
                     iconOnly
                     type="button"
                     (click)="clearApprover($event)"
-                    class="ml-1"
                     title="Remove approver"
                     aria-label="Remove approver"
                   >
@@ -363,25 +388,25 @@ import { filterAdmins } from './tenders-page.util';
 
             <!-- Committee Members Badges -->
             <div>
-              <div class="flex items-center justify-between mb-1">
-                <span class="block text-slate-500 font-semibold text-[11px]">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="block text-slate-500 font-semibold text-[11px] uppercase tracking-wider">
                   Assigned Committee Members ({{ selectedAdminIds().length }})
                 </span>
                 @if (selectedAdminIds().length > 0) {
-                  <button appButton variant="ghost" size="sm" type="button" (click)="selectedAdminIds.set([])">
+                  <button appButton variant="ghost" size="xs" type="button" (click)="selectedAdminIds.set([])">
                     Clear all
                   </button>
                 }
               </div>
 
               @if (selectedAdminIds().length === 0) {
-                <p class="text-[11.5px] text-slate-400 italic m-0 bg-slate-50 border border-dashed border-slate-200 p-2.5 rounded-md text-center">
+                <p class="text-xs text-slate-400 m-0 bg-slate-50 border border-dashed border-slate-200 py-3 px-4 rounded-lg text-center">
                   No committee members selected yet. Use the Members dropdown above to add members.
                 </p>
               } @else {
-                <div class="flex flex-wrap gap-1.5 bg-slate-50 border border-slate-200 p-2.5 rounded-md max-h-36 overflow-y-auto">
+                <div class="flex flex-wrap gap-1.5 bg-slate-50/70 border border-slate-200 p-2.5 rounded-lg max-h-28 overflow-y-auto thin-scroll">
                   @for (ssoId of selectedAdminIds(); track ssoId) {
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2] shadow-2xs">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
                       <span>{{ nameOf(ssoId) }}</span>
                       <button
                         appButton

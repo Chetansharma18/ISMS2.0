@@ -84,18 +84,20 @@ const STEP_INFO: { label: string; description: string; next: string }[] = [
           ></app-aspirant-aadhaar-upload>
         </ng-template>
 
-        <app-aspirant-mapping-header [batch]="batch()" [replacedName]="replacing()?.aspirantName ?? ''" (back)="goBack()"></app-aspirant-mapping-header>
+        <div class="sticky top-0 z-30 bg-white/95 backdrop-blur-xs -mx-4 sm:-mx-5 px-4 sm:px-5 pt-1 pb-3 border-b border-slate-200/80 space-y-3">
+          <app-aspirant-mapping-header [batch]="batch()" [replacedName]="replacing()?.aspirantName ?? ''" (back)="goBack()"></app-aspirant-mapping-header>
 
-        <!-- Step progress card (same look as the Organization Registration form) -->
-        <app-stepper
-          class="block"
-          variant="wizard"
-          ariaLabel="Aspirant Registration Steps"
-          [steps]="wizardSteps"
-          [currentStep]="currentStep()"
-          [hideLabelsOnMobile]="true"
-          (stepClick)="goToStep($event)"
-        ></app-stepper>
+          <!-- Step progress card (same look as the Organization Registration form) -->
+          <app-stepper
+            class="block"
+            variant="wizard"
+            ariaLabel="Aspirant Registration Steps"
+            [steps]="wizardSteps"
+            [currentStep]="currentStep()"
+            [hideLabelsOnMobile]="true"
+            (stepClick)="goToStep($event)"
+          ></app-stepper>
+        </div>
 
         @if (errorMessage()) {
           <app-aspirant-error-banner [message]="errorMessage()" (dismiss)="errorMessage.set('')"></app-aspirant-error-banner>

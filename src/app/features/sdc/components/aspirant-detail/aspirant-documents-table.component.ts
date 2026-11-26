@@ -106,14 +106,15 @@ import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../
           <!-- 2. Replace File -->
           <button
             appButton
-            variant="secondary"
+            variant="ghost"
             size="sm"
+            iconOnly
             type="button"
             (click)="triggerReplaceDoc(doc, docReplaceFileInput)"
-            title="Upload replacement file"
+            title="Replace Document"
+            aria-label="Replace Document"
           >
-            <app-icon name="upload" size="xs" />
-            <span>Replace</span>
+            <app-icon name="refresh" size="sm" />
           </button>
 
           <!-- 3. Edit Document Details -->

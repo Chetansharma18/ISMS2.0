@@ -40,7 +40,7 @@ describe('TendersPageComponent - Table Navigation Guard (Bug 8)', () => {
     expect(component.selectedScheme()).toBeNull();
   });
 
-  it('proceeds to /scheme-form when Skip for Now is clicked after applying with incomplete profile (Bug 1)', () => {
+  it('stays on scheme details page when Skip for Now is clicked after applying with incomplete profile', () => {
     const navigateSpy = vi.spyOn(router, 'navigate');
     const dummyScheme: any = {
       id: '7',
@@ -61,13 +61,8 @@ describe('TendersPageComponent - Table Navigation Guard (Bug 8)', () => {
     // Click "Skip for Now" (dismiss)
     component.dismissOtrPrompt();
     expect(component.showOtrPromptModal()).toBe(false);
-
-    expect(navigateSpy).toHaveBeenCalledWith(['/scheme-form'], expect.objectContaining({
-      queryParams: expect.objectContaining({
-        eoiId: 7,
-        refNo: 'RSLDC/TEST/01'
-      })
-    }));
+    expect(component.selectedScheme()).toEqual(dummyScheme);
+    expect(navigateSpy).not.toHaveBeenCalledWith(['/scheme-form'], expect.anything());
   });
 
   it('does not navigate to /scheme-form when Skip is clicked from initial visit popup without applying', () => {

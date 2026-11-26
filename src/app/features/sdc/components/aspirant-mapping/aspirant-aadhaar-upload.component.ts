@@ -86,24 +86,30 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
             <!-- Replace Option -->
             <button
               appButton
-              variant="secondary"
+              variant="ghost"
               size="sm"
+              iconOnly
               type="button"
               (click)="replaceAadhaarInput.click()"
+              title="Replace Aadhaar Card"
+              aria-label="Replace Aadhaar Card"
             >
-              Replace
+              <app-icon name="refresh" size="sm" />
             </button>
             <input #replaceAadhaarInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="fileSelected.emit($event)" class="hidden" />
 
             <!-- Remove Option -->
             <button
               appButton
-              variant="danger"
+              variant="ghost"
               size="sm"
+              iconOnly
               type="button"
               (click)="removeDocument.emit()"
+              title="Remove Aadhaar Card"
+              aria-label="Remove Aadhaar Card"
             >
-              Remove
+              <app-icon name="trash" size="sm" class="text-rose-600" />
             </button>
           </div>
         </div>

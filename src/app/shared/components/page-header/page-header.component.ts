@@ -20,6 +20,12 @@ export interface BreadcrumbItem {
   styles: [`
     :host {
       display: block;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background-color: var(--color-background, #ffffff);
+      padding-top: 2px;
+      padding-bottom: 2px;
     }
   `],
   template: `

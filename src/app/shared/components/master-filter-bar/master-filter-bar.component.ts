@@ -27,48 +27,52 @@ export interface StatusFilterOption {
   imports: [CommonModule, FormsModule, ButtonComponent, IconComponent, InputDirective, DropdownComponent],
   template: `
     <div
-      class="mb-4 bg-white p-3 sm:p-4 rounded-[10px] border border-[#EADCE2] shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs font-sans relative z-20"
+      class="mb-4 bg-white px-4 py-3.5 rounded-[10px] border border-[#EADCE2] shadow-2xs text-xs font-sans relative z-20"
     >
-      <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+      <div class="flex flex-wrap items-end gap-3 w-full">
         <!-- Search Input with Search Icon & Clear Button -->
         @if (showSearch()) {
           <div
-            class="relative w-full min-w-0 transition-all duration-150"
-            [ngClass]="hasOtherFilters() ? 'sm:flex-1 sm:min-w-[240px]' : 'flex-1'"
+            class="flex flex-col gap-1 w-full min-w-0"
+            [ngClass]="hasOtherFilters() ? 'sm:flex-1 sm:min-w-[220px]' : 'flex-1'"
           >
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <app-icon name="search" size="sm" />
-            </span>
-            <input
-              appInput
-              [size]="inputSize()"
-              type="text"
-              [placeholder]="searchPlaceholder()"
-              [ngModel]="searchQuery()"
-              (ngModelChange)="searchQuery.set($event)"
-              class="w-full pl-9 pr-8 text-[13px] font-medium"
-            />
-            @if (searchQuery()) {
-              <button
-                appButton
-                variant="ghost"
-                size="xs"
-                iconOnly
-                type="button"
-                (click)="searchQuery.set('')"
-                class="absolute inset-y-0 right-0 pr-2 flex items-center shrink-0"
-                title="Clear search"
-                aria-label="Clear search"
-              >
-                <app-icon name="close" size="xs" />
-              </button>
-            }
+            <label class="text-[11px] font-semibold text-slate-500 tracking-wide select-none">Search</label>
+            <div class="relative w-full">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <app-icon name="search" size="sm" />
+              </span>
+              <input
+                appInput
+                [size]="inputSize()"
+                type="text"
+                [placeholder]="searchPlaceholder()"
+                [ngModel]="searchQuery()"
+                (ngModelChange)="searchQuery.set($event)"
+                class="w-full pl-9 pr-8 text-[13px] font-normal"
+              />
+              @if (searchQuery()) {
+                <button
+                  appButton
+                  variant="ghost"
+                  size="xs"
+                  iconOnly
+                  type="button"
+                  (click)="searchQuery.set('')"
+                  class="absolute inset-y-0 right-0 pr-2 flex items-center shrink-0"
+                  title="Clear search"
+                  aria-label="Clear search"
+                >
+                  <app-icon name="close" size="xs" />
+                </button>
+              }
+            </div>
           </div>
         }
 
         <!-- Status Filter Dropdown (Unified Design) -->
         @if (showStatusFilter()) {
-          <div class="inline-flex items-center gap-1.5 shrink-0 min-w-[150px] max-w-[240px]">
+          <div class="flex flex-col gap-1 shrink-0 min-w-[140px] sm:w-[155px]">
+            <label class="text-[11px] font-semibold text-slate-500 tracking-wide select-none">Status</label>
             <app-dropdown
               class="w-full"
               [size]="inputSize()"
@@ -80,18 +84,35 @@ export interface StatusFilterOption {
           </div>
         }
 
-        <!-- Dynamic Master Filters (e.g. Sector, Scheme, Category, Role dropdowns) -->
+        <!-- Dynamic Master Filters (e.g. Sector, Scheme, Category, Role dropdowns & Date filters) -->
         @for (filter of filters(); track filter.key) {
-          <div class="inline-flex items-center gap-1.5 shrink-0 min-w-[170px] max-w-[300px]">
-            <app-dropdown
-              class="w-full"
-              [size]="inputSize()"
-              [options]="resolveDropdownFilterOptions(filter)"
-              [value]="filterValues()[filter.key] || ''"
-              (valueChange)="setFilterValue(filter.key, $event)"
-              [placeholder]="filter.placeholder || 'All ' + filter.label"
-            />
-          </div>
+          @if (filter.type === 'date') {
+            <div class="flex flex-col gap-1 shrink-0 w-[148px]">
+              <label class="text-[11px] font-semibold text-slate-500 tracking-wide select-none">{{ filter.label }}</label>
+              <input
+                appInput
+                [size]="inputSize()"
+                type="date"
+                [attr.aria-label]="filter.label"
+                [title]="filter.placeholder || filter.label"
+                [ngModel]="filterValues()[filter.key] || ''"
+                (ngModelChange)="setFilterValue(filter.key, $event)"
+                class="w-full text-[12.5px]"
+              />
+            </div>
+          } @else {
+            <div class="flex flex-col gap-1 shrink-0 min-w-[165px] max-w-[240px]">
+              <label class="text-[11px] font-semibold text-slate-500 tracking-wide select-none">{{ filter.label }}</label>
+              <app-dropdown
+                class="w-full"
+                [size]="inputSize()"
+                [options]="resolveDropdownFilterOptions(filter)"
+                [value]="filterValues()[filter.key] || ''"
+                (valueChange)="setFilterValue(filter.key, $event)"
+                [placeholder]="filter.placeholder || 'All ' + filter.label"
+              />
+            </div>
+          }
         }
 
         <!-- Extra projected filters slot (e.g. custom inputs) -->
@@ -106,7 +127,7 @@ export interface StatusFilterOption {
             type="button"
             (click)="onReset()"
             title="Reset all filters"
-            class="shrink-0"
+            class="shrink-0 self-end"
           >
             <app-icon name="close" size="xs" />
             <span>Reset</span>

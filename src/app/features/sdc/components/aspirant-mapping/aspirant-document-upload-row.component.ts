@@ -99,24 +99,30 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
               <!-- Replace Option -->
               <button
                 appButton
-                variant="secondary"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="replaceInput.click()"
+                title="Replace Document"
+                aria-label="Replace Document"
               >
-                Replace
+                <app-icon name="refresh" size="sm" />
               </button>
               <input #replaceInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="fileSelected.emit($event)" class="hidden" />
 
               <!-- Remove Option -->
               <button
                 appButton
-                variant="danger"
+                variant="ghost"
                 size="sm"
+                iconOnly
                 type="button"
                 (click)="removeDocument.emit()"
+                title="Remove Document"
+                aria-label="Remove Document"
               >
-                Remove
+                <app-icon name="trash" size="sm" class="text-rose-600" />
               </button>
             </div>
           </div>

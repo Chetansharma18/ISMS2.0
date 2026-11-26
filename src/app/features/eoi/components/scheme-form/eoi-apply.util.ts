@@ -133,7 +133,8 @@ export function pendingBeforeFees(app: EoiApplication | null): string[] {
     if (step.key === 'documents') {
       for (const d of app.documents.filter(x => x.isMandatory && !x.file)) pending.push(`Upload the mandatory document: ${d.name}.`);
     } else {
-      pending.push(`Complete: ${step.title}.`);
+      const title = step.key === 'proposal-details' ? 'EOI Form' : step.title;
+      pending.push(`Complete: ${title}.`);
     }
   }
   return pending;

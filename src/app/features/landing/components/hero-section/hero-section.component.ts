@@ -15,11 +15,14 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
   template: `
     <section class="relative w-full overflow-hidden flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
       <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
-      <div
-        class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none select-none"
-        style="background-image: url('/raj.png');"
+      <img
+        src="/raj.png"
+        alt=""
         aria-hidden="true"
-      ></div>
+        fetchpriority="high"
+        decoding="async"
+        class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none"
+      />
 
       <!-- Centered Inner Container (Max-Width ~1440px) -->
       <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative">

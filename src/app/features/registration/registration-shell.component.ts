@@ -27,6 +27,7 @@ import {
 import {
   currentStepNumber,
   documentsFrom,
+  dynamicFieldErrors,
   firstStepWithErrors,
   formSteps,
   initialStepValues,
@@ -509,8 +510,17 @@ export class RegistrationShellComponent implements OnInit {
 
   private saveStep(step: OtrStepDef, state: 'next' | 'draft', done: () => void): void {
     if (this.saving() !== null) return;
+    const stepValues = this.values()[step.key] ?? {};
+    // The backend stores FormManager answers unchecked: a draft may be incomplete, moving on may not.
+    const dynamicErrors = state === 'next' ? dynamicFieldErrors(step, stepValues) : {};
+    if (Object.keys(dynamicErrors).length > 0) {
+      this.errors.update(all => ({ ...all, [step.key]: { ...(all[step.key] ?? {}), ...dynamicErrors } }));
+      this.notifications.error(`Please correct the highlighted fields in ${step.title}.`);
+      this.scrollToTop();
+      return;
+    }
     this.saving.set(state);
-    const payload = toStepPayload(step, this.values()[step.key] ?? {}, this.api.lookups());
+    const payload = toStepPayload(step, stepValues, this.api.lookups());
     this.api
       .saveStep(step.key, payload)
       .pipe(takeUntilDestroyed(this.destroyRef))

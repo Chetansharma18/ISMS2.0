@@ -26,7 +26,8 @@ import { fieldOptions, isFieldCopied, isFieldRequired, toFileDoc } from '../otr-
           [placeholder]="f.placeholder ?? ''"
           [required]="required()"
           [disabled]="locked()"
-          [maxLength]="undefined"
+          [maxLength]="f.rules?.maxLength"
+          [hint]="f.hint"
           [rows]="2"
           [error]="error()"
         />
@@ -113,6 +114,9 @@ import { fieldOptions, isFieldCopied, isFieldRequired, toFileDoc } from '../otr-
           [required]="required()"
           [disabled]="locked()"
           [uppercase]="f.transform === 'upper'"
+          [maxLength]="f.type === 'number' ? undefined : f.rules?.maxLength"
+          [min]="f.type === 'number' ? numberText(f.rules?.min) : undefined"
+          [max]="f.type === 'number' ? numberText(f.rules?.max) : undefined"
           [hint]="f.hint"
           [error]="error()"
         />
@@ -152,12 +156,17 @@ export class OtrFieldComponent {
     return !!f.optionsByParent && !!f.dependsOn && !!this.values()[f.dependsOn] && this.items().length === 0;
   });
   readonly fileDoc = computed(() => toFileDoc(this.document()));
-  readonly inputType = computed<'text' | 'email' | 'date' | 'tel'>(() => {
+  readonly inputType = computed<'text' | 'email' | 'date' | 'tel' | 'number'>(() => {
     switch (this.field().type) {
       case 'email': return 'email';
       case 'date': return 'date';
       case 'tel': return 'tel';
+      case 'number': return 'number';
       default: return 'text';
     }
   });
+
+  numberText(value: number | undefined): string | undefined {
+    return value === undefined ? undefined : String(value);
+  }
 }

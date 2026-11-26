@@ -162,6 +162,36 @@ describe('PermissionMasterComponent (backend roles API)', () => {
     expect(comp.rows().map(r => r.tableName)).toEqual(['SectorMasters']);
   });
 
+  it('shows no rows until a role is chosen, then only that role, numbered from 1', () => {
+    const comp = create();
+    expect(comp.visibleRows()).toEqual([]);
+    comp.filterValues.set({ role: 'admin' });
+    expect(comp.visibleRows().map(r => [r.tableName, r.sNo])).toEqual([['SectorMasters', 1]]);
+  });
+
+  it('saves the menu switch and the menu name from the row', () => {
+    const comp = create();
+    const row = comp.rows().find(r => r.tableName === 'Users')!;
+    comp.toggleMenu(row, true);
+    expect(calls.at(-1)?.body.permissions).toEqual([expect.objectContaining({ tableName: 'Users', enableInMenu: true })]);
+
+    const shown = comp.rows().find(r => r.tableName === 'Users')!;
+    comp.saveMenuName(shown, '  Portal Users ');
+    expect(calls.at(-1)?.body.permissions).toEqual([expect.objectContaining({ tableName: 'Users', menuCallingName: 'Portal Users' })]);
+
+    const posts = calls.filter(c => c.method === 'POST').length;
+    comp.saveMenuName(comp.rows().find(r => r.tableName === 'Users')!, 'Portal Users');
+    expect(calls.filter(c => c.method === 'POST').length).toBe(posts); // unchanged: not saved again
+  });
+
+  it('opens and closes the description of a table', () => {
+    const comp = create();
+    comp.toggleInfo('1/Users');
+    expect(comp.infoOpen()).toBe('1/Users');
+    comp.toggleInfo('1/Users');
+    expect(comp.infoOpen()).toBeNull();
+  });
+
   it('validates the add dialog', () => {
     const comp = create();
     comp.openAdd();

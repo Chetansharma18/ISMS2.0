@@ -9,9 +9,12 @@ import {
   OtrFullFormResponse,
   OtrLookups,
   OtrRecords,
-  OtrStepRecord
+  OtrStepDef,
+  OtrStepFormDto,
+  OtrStepRecord,
+  OtrUpdateLogDto
 } from '../models/otr-api.model';
-import { OTR_STEP_KEYS, buildFormDef, stepOfField, toOtrFormData } from '../otr-form.util';
+import { OTR_STEP_KEYS, buildFormDef, replaceStep, stepChanged, stepOfField, toOtrFormData } from '../otr-form.util';
 import { OtrFormService } from './otr-form.service';
 
 const READ: Record<string, EndpointDef> = {
@@ -24,6 +27,13 @@ const SAVE: Record<string, EndpointDef> = {
   organisation: API_ENDPOINTS.OTR.SAVE_ORGANISATION,
   'authorized-person': API_ENDPOINTS.OTR.SAVE_AUTHORIZED_PERSON,
   'bank-details': API_ENDPOINTS.OTR.SAVE_BANK_DETAILS
+};
+
+/** PATCH: a change to a saved step with the reason for it (recorded in the update logs). */
+const UPDATE: Record<string, EndpointDef> = {
+  organisation: API_ENDPOINTS.OTR.UPDATE_ORGANISATION,
+  'authorized-person': API_ENDPOINTS.OTR.UPDATE_AUTHORIZED_PERSON,
+  'bank-details': API_ENDPOINTS.OTR.UPDATE_BANK_DETAILS
 };
 
 const QUIET = { skipErrorToast: true };
@@ -78,9 +88,40 @@ export class OtrRegistrationService {
     }).pipe(map(({ response, lookups }) => buildFormDef(response, lookups)));
   }
 
-  /** Saves one step (create or update); the answer is the saved record. */
-  saveStep(stepKey: string, body: Record<string, unknown>): Observable<OtrStepRecord> {
-    return this.http.call<unknown>(SAVE[stepKey], { body, flags: QUIET }).pipe(
+  /**
+   * Re-reads one step's definition (GET /otr/form/steps/{stepKey}, not cached) and puts it in the form, so a
+   * FormManager schema published meanwhile is used. Answers the new step, or null when nothing changed or the call
+   * failed (the step loaded with the form stays).
+   */
+  refreshStep(stepKey: string): Observable<OtrStepDef | null> {
+    return this.http.call<OtrStepFormDto>(API_ENDPOINTS.OTR.STEP_FORM, { id: stepKey, flags: QUIET }).pipe(
+      map(dto => {
+        const form = this._form();
+        const current = form?.steps.find(s => s.key === stepKey);
+        if (!form || !current || !dto || dto.stepKey !== stepKey) return null;
+        const next = replaceStep(form, dto, this._lookups());
+        const step = next.steps.find(s => s.key === stepKey)!;
+        if (!stepChanged(current, step)) return null;
+        this._form.set(next);
+        return step;
+      }),
+      catchError(() => of(null))
+    );
+  }
+
+  /** The registration's change history, newest first by the screen; `section` narrows it to one step. */
+  updateLogs(section?: string): Observable<OtrUpdateLogDto[]> {
+    return this.http
+      .call<unknown>(API_ENDPOINTS.OTR.UPDATE_LOGS, { params: section ? { section } : undefined, flags: QUIET })
+      .pipe(map(res => (Array.isArray(res) ? (res as OtrUpdateLogDto[]) : [])));
+  }
+
+  /** Saves one step (create or update); the answer is the saved record. With a reason, the change goes by PATCH. */
+  saveStep(stepKey: string, body: Record<string, unknown>, reason?: string): Observable<OtrStepRecord> {
+    const call = reason !== undefined
+      ? this.http.call<unknown>(UPDATE[stepKey], { body: { ...body, reason }, flags: QUIET })
+      : this.http.call<unknown>(SAVE[stepKey], { body, flags: QUIET });
+    return call.pipe(
       map(asRecord),
       map(record => record ?? ({ id: null, status: 'Draft' } as OtrStepRecord)),
       tap(record => this.setRecords({ ...this._records(), [stepKey]: record }))

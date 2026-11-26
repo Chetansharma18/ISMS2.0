@@ -5,6 +5,7 @@ import {
   ActionModalComponent,
   ButtonComponent,
   DropdownComponent,
+  EmptyStateComponent,
   IconComponent,
   InputDirective,
   MasterFilterBarComponent,
@@ -81,6 +82,7 @@ const emptyForm = (roleId = ''): PermissionForm => ({
     ActionModalComponent,
     ButtonComponent,
     DropdownComponent,
+    EmptyStateComponent,
     IconComponent,
     InputDirective,
     PageHeaderComponent,
@@ -93,7 +95,6 @@ const emptyForm = (roleId = ''): PermissionForm => ({
     <app-page-shell>
       <app-page-header
         title="Role Permissions"
-        subtitle="Grant roles access (View, Add, Edit, Delete) to backend tables and choose their menu links"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Role Permissions' }]"
       >
         @if (canAdd()) {
@@ -107,27 +108,62 @@ const emptyForm = (roleId = ''): PermissionForm => ({
       <!-- The masters' shared filter bar: search, grant status and role -->
       <app-master-filter-bar
         [(searchQuery)]="searchQuery"
-        searchPlaceholder="Search by role, table or menu name..."
+        searchPlaceholder="Search by table or menu name..."
         [(status)]="statusFilter"
         [filters]="filterConfigs()"
         [(filterValues)]="filterValues"
-        [totalCount]="rows().length"
+        [totalCount]="roleRows().length"
         [filteredCount]="visibleRows().length"
         itemUnit="permissions"
         (resetFilters)="resetFilters()"
       />
 
-      <app-table
-        [columns]="columns"
-        [data]="visibleRows()"
-        [loading]="loading()"
-        [pagination]="true"
-        [pageSize]="10"
-        itemUnit="permissions"
-        [rowClass]="rowClass"
-        emptyMessage="No permissions found. Use Add Permission to grant a role access to a table."
-        [customTemplates]="{ access: accessTpl, menu: menuTpl, action: actionTpl }"
-      />
+      @if (roleFilter() === 'all') {
+        <app-empty-state
+          icon="shield-check"
+          title="Select a role"
+          description="Choose a role in the filter above to see and change its table permissions."
+        />
+      } @else {
+        <app-table
+          [columns]="columns"
+          [data]="visibleRows()"
+          [loading]="loading()"
+          [pagination]="true"
+          [pageSize]="10"
+          itemUnit="permissions"
+          [rowClass]="rowClass"
+          emptyMessage="No permissions found. Use Add Permission to grant this role access to a table."
+          [customTemplates]="{ table: tableTpl, access: accessTpl, menu: menuTpl, action: actionTpl }"
+        />
+      }
+
+      <!-- Table name with an "i" button that shows the table's description -->
+      <ng-template #tableTpl let-row>
+        <div class="min-w-[200px] max-w-[280px]">
+          <div class="flex items-center gap-1">
+            <span class="font-medium text-slate-700">{{ row.tableLabel }}</span>
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              [title]="descriptionOf(row) || 'No description'"
+              [attr.aria-label]="'About ' + row.tableLabel"
+              [attr.aria-expanded]="infoOpen() === row.key"
+              (click)="$event.stopPropagation(); toggleInfo(row.key)"
+            >
+              <app-icon name="info-circle" size="sm" />
+            </button>
+          </div>
+          @if (infoOpen() === row.key) {
+            <p class="m-0 mt-0.5 whitespace-normal text-xs leading-4 text-slate-500">
+              {{ descriptionOf(row) || 'No description for this table.' }}
+            </p>
+          }
+        </div>
+      </ng-template>
 
       <!-- Access ticks: each change is saved at once -->
       <ng-template #accessTpl let-row>
@@ -147,35 +183,37 @@ const emptyForm = (roleId = ''): PermissionForm => ({
         </div>
       </ng-template>
 
+      <!-- Menu: the "Show in menu" switch and the menu name, both saved at once (the name when the field is left) -->
       <ng-template #menuTpl let-row>
-        @if (row.enableInMenu) {
-          <span class="inline-flex items-center gap-1.5 text-[13px] text-slate-800">
-            <app-icon name="list" size="sm" class="text-slate-400" />
-            {{ row.menuCallingName || row.tableLabel }}
-          </span>
-        } @else {
-          <span class="text-xs text-slate-400">Not in menu</span>
-        }
+        <div class="flex items-center gap-2 min-w-[230px]" (click)="$event.stopPropagation()">
+          <app-switch
+            [checked]="row.enableInMenu"
+            [label]="row.enableInMenu ? 'Shown in menu' : 'Not in menu'"
+            [disabled]="!canEdit() || saving()"
+            (toggled)="toggleMenu(row, $event)"
+          />
+          @if (row.enableInMenu) {
+            <input
+              appInput
+              size="sm"
+              class="w-full min-w-0"
+              maxlength="150"
+              [attr.aria-label]="'Menu name for ' + row.tableLabel"
+              [value]="row.menuCallingName ?? ''"
+              [placeholder]="row.tableLabel"
+              [disabled]="!canEdit() || saving()"
+              (change)="saveMenuName(row, $any($event.target).value)"
+              (keydown.enter)="$any($event.target).blur()"
+            />
+          } @else {
+            <span class="text-xs text-slate-400">Not in menu</span>
+          }
+        </div>
       </ng-template>
 
       <ng-template #actionTpl let-row>
         <div class="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
-          @if (canEdit()) {
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              iconOnly
-              type="button"
-              title="Edit"
-              aria-label="Edit"
-              (click)="$event.stopPropagation(); openEdit(row)"
-            >
-              <app-icon name="edit" size="sm" />
-            </button>
-          }
           @if (canRemove()) {
-            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
             <button
               appButton
               variant="ghost"
@@ -190,7 +228,9 @@ const emptyForm = (roleId = ''): PermissionForm => ({
             </button>
           }
           @if (canEdit()) {
-            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            @if (canRemove()) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            }
             <div
               class="inline-flex items-center"
               [title]="row.status ? 'Status: Active (Click to deactivate)' : 'Status: Inactive (Click to activate)'"
@@ -355,7 +395,7 @@ export class PermissionMasterComponent {
   /** Filter bar dropdowns; `role` holds a role name. */
   readonly filterValues = signal<Record<string, string>>({});
   readonly filterConfigs = computed<MasterFilterConfig[]>(() => [
-    { key: 'role', label: 'Role', placeholder: 'All Roles', options: this.roles().map(r => r.roleTypeName) }
+    { key: 'role', label: 'Role', placeholder: 'Select role', options: this.roles().map(r => r.roleTypeName) }
   ]);
   /** The role chosen in the filter bar, as a role id ('all' when none). */
   readonly roleFilter = computed(() => {
@@ -369,11 +409,26 @@ export class PermissionMasterComponent {
   form: PermissionForm = emptyForm();
 
   readonly rows = computed(() => toPermissionRows(this.roles()));
+  /** The chosen role's grants; none until a role is chosen in the filter bar. */
+  readonly roleRows = computed(() => {
+    const role = this.roleFilter();
+    return role === 'all' ? [] : filterPermissionRows(this.rows(), role, '');
+  });
   readonly visibleRows = computed(() => {
     const status = this.statusFilter();
-    return filterPermissionRows(this.rows(), this.roleFilter(), this.searchQuery()).filter(
-      row => status === 'ALL' || (status === 'Active' ? row.status : !row.status)
-    );
+    return filterPermissionRows(this.roleRows(), 'all', this.searchQuery())
+      .filter(row => status === 'ALL' || (status === 'Active' ? row.status : !row.status))
+      .map((row, i) => ({ ...row, sNo: i + 1 }));
+  });
+
+  /** Row whose table description is open ("i" button). */
+  readonly infoOpen = signal<string | null>(null);
+  /** Table descriptions: GET /api/tablelist, else the signed-in user's GET /auth/permissions. */
+  private readonly descriptions = computed(() => {
+    const map = new Map<string, string>();
+    for (const t of this.tableAccess.tables()) if (t.description) map.set(t.tableName.toLowerCase(), t.description);
+    for (const t of this.tables()) if (t.description) map.set(t.tableName.toLowerCase(), t.description);
+    return map;
   });
 
   resetFilters(): void {
@@ -410,11 +465,10 @@ export class PermissionMasterComponent {
 
   readonly columns: TableColumn<PermissionRow>[] = [
     { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-    { key: 'roleName', label: 'Role', cellClass: 'whitespace-nowrap font-semibold text-slate-800 min-w-[140px]' },
-    { key: 'tableLabel', label: 'Table', cellClass: 'whitespace-nowrap font-medium text-slate-700 min-w-[180px]' },
+    { key: 'table', label: 'Table', type: 'custom' },
     { key: 'access', label: 'Access', type: 'custom', cellClass: 'min-w-[260px]' },
-    { key: 'menu', label: 'Menu', type: 'custom', cellClass: 'min-w-[160px]' },
-    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'min-w-[260px]' }
+    { key: 'menu', label: 'Menu', type: 'custom', cellClass: 'min-w-[240px]' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'min-w-[160px]' }
   ];
 
   protected readonly rowClass = (row: PermissionRow): string => (row.status ? 'bg-white' : 'opacity-60 !bg-slate-100/70');
@@ -505,6 +559,28 @@ export class PermissionMasterComponent {
       return;
     }
     this.save(String(row.roleId), [toTablePermissionRequest(next)]);
+  }
+
+  protected descriptionOf(row: PermissionRow): string {
+    return this.descriptions().get(row.tableName.toLowerCase()) ?? '';
+  }
+
+  toggleInfo(key: string): void {
+    this.infoOpen.update(open => (open === key ? null : key));
+  }
+
+  /** The row's "Show in menu" switch, saved at once. */
+  toggleMenu(row: PermissionRow, enableInMenu: boolean): void {
+    if (enableInMenu === row.enableInMenu) return;
+    if (enableInMenu && !row.get) this.notifications.warning('A menu link needs View access to open the screen.');
+    this.save(String(row.roleId), [toTablePermissionRequest({ ...row, enableInMenu })]);
+  }
+
+  /** The row's menu name, saved when the field is left; empty uses the table name. */
+  saveMenuName(row: PermissionRow, value: string): void {
+    const name = value.trim().slice(0, 150);
+    if (name === (row.menuCallingName ?? '').trim()) return;
+    this.save(String(row.roleId), [toTablePermissionRequest({ ...row, menuCallingName: name || null })]);
   }
 
   toggleStatus(row: PermissionRow): void {

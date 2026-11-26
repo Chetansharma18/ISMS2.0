@@ -93,6 +93,20 @@ export interface OtrStepRecord {
   [field: string]: unknown;
 }
 
+/** One entry of GET /otr/me/update-logs (OtrUpdateLogDto): a create or update of one step. */
+export interface OtrUpdateLogDto {
+  id: number;
+  section: string;
+  action: string;
+  targetRecordId: number;
+  reason?: string | null;
+  /** Changed properties of the step (camelCase), or `["*"]` for the first save. */
+  changedFields: string[];
+  oldValuesJson?: string | null;
+  newValuesJson?: string | null;
+  createdAt: string;
+}
+
 /** The user's records per step key; null when the step has not been saved yet. */
 export type OtrRecords = Record<string, OtrStepRecord | null>;
 

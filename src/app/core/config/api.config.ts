@@ -184,13 +184,20 @@ export const API_ENDPOINTS = {
   // (400 with the failing field names). Needs the OtrRegistrations permission.
   OTR: {
     FORM: endpoint('GET', '/otr/form'),
+    /** One step's definition with its current FormManager schema (not cached, unlike FORM); id = step key. */
+    STEP_FORM: endpoint('GET', byId('/otr/form/steps')),
     /** Organisation details (step 1); empty until saved. Its `status` is the registration status. */
     ME: endpoint('GET', '/otr/me'),
     SAVE_ORGANISATION: endpoint('PUT', '/otr/me/organisation'),
+    /** A change to a saved step, with `reason` in the body; it is recorded in the update logs. */
+    UPDATE_ORGANISATION: endpoint('PATCH', '/otr/me/organisation'),
     AUTHORIZED_PERSON: endpoint('GET', '/otr/me/authorized-person'),
     SAVE_AUTHORIZED_PERSON: endpoint('PUT', '/otr/me/authorized-person'),
+    UPDATE_AUTHORIZED_PERSON: endpoint('PATCH', '/otr/me/authorized-person'),
     BANK_DETAILS: endpoint('GET', '/otr/me/bank-details'),
     SAVE_BANK_DETAILS: endpoint('PUT', '/otr/me/bank-details'),
+    UPDATE_BANK_DETAILS: endpoint('PATCH', '/otr/me/bank-details'),
+    /** Change history of the registration; `?section=OrganisationDetails | AuthorizedPerson | BankDetails`. */
     UPDATE_LOGS: endpoint('GET', '/otr/me/update-logs'),
     /** multipart/form-data with the file in a part named "file"; id = document type (pan-card, cancelled-cheque ...). */
     UPLOAD_DOCUMENT: endpoint('POST', byId('/otr/me/documents')),

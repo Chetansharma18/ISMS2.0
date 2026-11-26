@@ -73,7 +73,13 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     component = fixture.componentInstance;
   });
 
-  afterEach(() => backend.verify());
+  /** Answers the step re-reads (GET /otr/form/steps/{key}) made on opening a step: no change. */
+  const flushStepReads = () => backend.match(r => r.url.includes('/otr/form/steps/')).forEach(r => r.flush(null));
+
+  afterEach(() => {
+    flushStepReads();
+    backend.verify();
+  });
 
   /** An empty answer, as ASP.NET sends for a step that was never saved (Ok(null) -> 204). */
   const empty = (req: TestRequest) => req.flush(null, { status: 204, statusText: 'No Content' });
@@ -216,6 +222,63 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     component.goToStep(1);
     expect(component.activeStep()).toBe(1);
     backend.expectNone(url('/otr/me/organisation'));
+  });
+
+  it('re-reads the open step and draws FormManager fields published after the form was loaded', () => {
+    start();
+    const req = backend.expectOne(url('/otr/form/steps/organisation'));
+    const step = FORM.steps[0];
+    req.flush({
+      ...step,
+      dynamicFormId: 12, dynamicFormVersion: 1, hasDynamicForm: true,
+      dynamicSchema: { title: 'Extra', fields: [{ fieldKey: 'cinNumber', label: 'CIN Number', fieldType: 'text', isRequired: false, displayOrder: 1, colSpan: 6 }] }
+    });
+    fixture.detectChanges();
+    expect(component.form()!.steps[0].dynamicFormId).toBe(12);
+    expect(component.values()['organisation']['dynamic.cinNumber']).toBe('');
+    expect(fixture.nativeElement.textContent).toContain('CIN Number');
+  });
+
+  it('asks for a reason and saves a change to a saved step with PATCH', () => {
+    start({ organisation: org(), person: person() });
+    component.goToStep(1);
+    flushStepReads();
+    const step = component.form()!.steps[0];
+
+    // Nothing changed: no call, the screen just moves on.
+    component.nextStep();
+    backend.expectNone(url('/otr/me/organisation'));
+    expect(component.activeStep()).toBe(2);
+
+    component.goToStep(1);
+    flushStepReads();
+    component.onValueChange(step, 'organisationName', 'Company 2');
+    component.nextStep();
+    expect(component.reasonOpen()).toBe(true);
+    backend.expectNone(url('/otr/me/organisation'));
+
+    component.confirmReason(); // no reason yet
+    expect(component.reasonOpen()).toBe(true);
+
+    component.changeReason.set('Name changed');
+    component.confirmReason();
+    const req = backend.expectOne(url('/otr/me/organisation'));
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body['reason']).toBe('Name changed');
+    expect(req.request.body['organisationName']).toBe('Company 2');
+    req.flush(org({ organisationName: 'Company 2' }));
+    expect(component.activeStep()).toBe(2);
+  });
+
+  it('shows the change history of the registration', () => {
+    start({ organisation: org() });
+    expect(component.hasSavedSteps()).toBe(true);
+    component.openHistory();
+    backend.expectOne(url('/otr/me/update-logs')).flush([
+      { id: 1, section: 'OrganisationDetails', action: 'Create', targetRecordId: 1, reason: 'Initial creation', changedFields: ['*'], createdAt: '2026-01-02T10:00:00Z' }
+    ]);
+    expect(component.historyOpen()).toBe(true);
+    expect(component.historyLogs().length).toBe(1);
   });
 
   it('explains a missing permission instead of showing an empty form', () => {

@@ -24,6 +24,7 @@
   "close": "x",
   "document": "file-text",
   "document-download": "file-down",
+  "dot": "dot",
   "download": "download",
   "edit": "square-pen",
   "error": "circle-alert",

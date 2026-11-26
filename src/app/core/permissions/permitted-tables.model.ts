@@ -19,6 +19,11 @@ export interface PermittedTable {
   inMenu: boolean;
   /** `menuCallingName`: the sidebar label; null when the backend sends none (the table name is shown readably). */
   menuName: string | null;
+  /**
+   * `apiEndpoint`: where the table's data is read from (e.g. `/api/news`). Used by the generic page of a table that
+   * has no dedicated screen; dedicated screens keep their own endpoints. Optional: older cached copies lack it.
+   */
+  apiEndpoint?: string | null;
 }
 
 /** What the frontend keeps from GET /auth/permissions. */

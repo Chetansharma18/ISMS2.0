@@ -50,6 +50,8 @@ function methodsOf(row: Raw): TableMethod[] {
   return METHODS.filter(m => row[FLAG_BY_METHOD[m]] === true);
 }
 
+const optionalEndpoint = (value: string): Pick<PermittedTable, 'apiEndpoint'> => (value ? { apiEndpoint: value } : {});
+
 /** Normalizes the GET /auth/permissions response (also accepts it wrapped in `{ data }`). */
 export function toPermittedTablesState(response: unknown, now: Date = new Date()): PermittedTablesState {
   const root = asRaw(response);
@@ -63,7 +65,8 @@ export function toPermittedTablesState(response: unknown, now: Date = new Date()
       categoryId: numberOrNull(row['tableCategoryId'] ?? row['tableCategory_Id']),
       methods: methodsOf(row),
       inMenu: isTrue(row['enableInMenu'] ?? row['enable_in_menu']),
-      menuName: text(row['menuCallingName'] ?? row['menu_calling_name']) || null
+      menuName: text(row['menuCallingName'] ?? row['menu_calling_name']) || null,
+      ...optionalEndpoint(text(row['apiEndpoint'] ?? row['api_endpoint']))
     }))
     .filter(t => t.tableName !== '' && t.methods.length > 0);
 
@@ -164,6 +167,19 @@ export const MODULE_ROUTE_PREFIX = '/module';
 
 export function moduleRoute(tableName: string): string {
   return `${MODULE_ROUTE_PREFIX}/${encodeURIComponent(tableName)}`;
+}
+
+/**
+ * The table's `apiEndpoint` as a path for `HttpService` (relative to `environment.apiUrl`): `/api/news` -> `/news`.
+ * Only our own API paths are accepted (a full URL, `//host` or a path outside `/api` gives null), so the API key
+ * headers never go to another host.
+ */
+export function tableApiPath(apiEndpoint: string | null | undefined): string | null {
+  const value = (apiEndpoint ?? '').trim();
+  if (!value.startsWith('/') || value.startsWith('//') || /[?#\s\\]|\.\./.test(value)) return null;
+  const match = /^\/api(\/[A-Za-z0-9/_-]*)?$/i.exec(value.replace(/\/+$/, ''));
+  if (!match) return null;
+  return match[1] && match[1] !== '/' ? match[1] : null;
 }
 
 /** The table name in a generic module URL (`/module/News`), or null for other URLs. */

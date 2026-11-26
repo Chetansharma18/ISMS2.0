@@ -9,6 +9,7 @@ import {
   ButtonComponent,
   EmptyStateComponent,
   IconComponent,
+  InputDirective,
   LoaderComponent,
   StepperComponent,
   StepperStep
@@ -22,6 +23,7 @@ import {
   OtrSectionDef,
   OtrStepDef,
   OtrStepValues,
+  OtrUpdateLogDto,
   OtrValue
 } from './models/otr-api.model';
 import {
@@ -32,15 +34,19 @@ import {
   formSteps,
   initialStepValues,
   isFieldVisible,
+  hasSavedStep,
   isSubmitted,
   mapFieldErrors,
+  mergeStepValues,
   referenceNumber,
   savedStepNumbers,
   setStepValue,
   stepFields,
+  stepPayloadChanged,
   toStepPayload
 } from './otr-form.util';
 import { OtrFieldComponent } from './parts/otr-field.component';
+import { OtrUpdateHistoryComponent } from './parts/otr-update-history.component';
 import { OtrReviewComponent } from './parts/otr-review.component';
 import { OtrFormService } from './services/otr-form.service';
 import { OtrPdfService } from './services/otr-pdf.service';
@@ -70,21 +76,29 @@ type SavingState = 'next' | 'draft' | 'submit' | null;
     ButtonComponent,
     EmptyStateComponent,
     IconComponent,
+    InputDirective,
     LoaderComponent,
     StepperComponent,
     OtrFieldComponent,
-    OtrReviewComponent
+    OtrReviewComponent,
+    OtrUpdateHistoryComponent
   ],
   template: `
     <div class="min-h-screen bg-white flex flex-col justify-between selection:bg-[#7C0E44] selection:text-white">
       <main class="flex-1 w-full px-4 sm:px-5 lg:px-6 py-4 sm:py-5">
 
         <div class="mb-5 space-y-3">
-          <div>
+          <div class="flex items-center justify-between gap-3">
             <button appButton variant="outline" size="sm" type="button" (click)="goBack()">
               <app-icon name="back" />
               <span>Back</span>
             </button>
+            @if (!loading() && !loadError() && hasSavedSteps()) {
+              <button appButton variant="outline" size="sm" type="button" (click)="openHistory()">
+                <app-icon name="clock" />
+                <span>Change History</span>
+              </button>
+            }
           </div>
           <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
             {{ form()?.title ?? 'Organization Registration' }}
@@ -240,6 +254,66 @@ type SavingState = 'next' | 'draft' | 'submit' | null;
         }
       </main>
 
+      <!-- A change to a saved step needs its reason (PATCH, kept in the change history) -->
+      <app-action-modal
+        [isOpen]="reasonOpen()"
+        title="Reason for change"
+        description="This step is already saved. Tell us why you are changing it; the reason is kept in the change history."
+        [showCloseButton]="true"
+        [closeOnBackdrop]="false"
+        [reverseButtons]="true"
+        maxWidthClass="max-w-md"
+        primaryLabel="Save changes"
+        secondaryLabel="Cancel"
+        [disablePrimary]="saving() !== null"
+        (primaryAction)="confirmReason()"
+        (secondaryAction)="cancelReason()"
+        (close)="cancelReason()"
+      >
+        <div class="mt-3">
+          <label class="block mb-1 text-[13px] font-medium text-slate-700" for="otr-change-reason">
+            Reason <span class="text-[#DC2626] font-bold">*</span>
+          </label>
+          <textarea
+            appInput
+            id="otr-change-reason"
+            class="w-full"
+            rows="3"
+            maxlength="500"
+            placeholder="e.g. Office address changed"
+            [invalid]="reasonSubmitted() && !changeReason().trim()"
+            [value]="changeReason()"
+            (input)="changeReason.set($any($event.target).value)"
+          ></textarea>
+          @if (reasonSubmitted() && !changeReason().trim()) {
+            <p class="m-0 mt-1 text-xs font-medium text-rose-700">Enter the reason for this change.</p>
+          }
+        </div>
+      </app-action-modal>
+
+      <app-action-modal
+        [isOpen]="historyOpen()"
+        title="Change History"
+        description="Every save of your registration steps, newest first."
+        [showCloseButton]="true"
+        maxWidthClass="max-w-4xl"
+        [scrollable]="true"
+        primaryLabel="Close"
+        [showPrimaryArrow]="false"
+        secondaryLabel=""
+        (primaryAction)="historyOpen.set(false)"
+        (close)="historyOpen.set(false)"
+      >
+        @if (historyOpen()) {
+          <app-otr-update-history
+            [form]="form()"
+            [logs]="historyLogs()"
+            [loading]="historyLoading()"
+            [error]="historyError()"
+          />
+        }
+      </app-action-modal>
+
       <app-action-modal
         [isOpen]="submittedOpen()"
         title="Registration submitted successfully."
@@ -283,6 +357,20 @@ export class RegistrationShellComponent implements OnInit {
   readonly uploadingField = signal<string | null>(null);
   readonly declarationAccepted = signal(false);
   readonly submittedOpen = signal(false);
+
+  /** Reason dialog for a change to a saved step (PATCH). */
+  readonly reasonOpen = signal(false);
+  readonly changeReason = signal('');
+  readonly reasonSubmitted = signal(false);
+  private pendingChange: { step: OtrStepDef; state: 'next' | 'draft'; done: () => void } | null = null;
+
+  /** Change history (GET /otr/me/update-logs). */
+  readonly historyOpen = signal(false);
+  readonly historyLoading = signal(false);
+  readonly historyError = signal<string | null>(null);
+  readonly historyLogs = signal<OtrUpdateLogDto[]>([]);
+  /** The history button shows once any step is saved. */
+  readonly hasSavedSteps = computed(() => this.completedSteps().length > 0);
 
   readonly readOnly = computed(() => isSubmitted(this.records()));
   readonly referenceNo = computed(() => referenceNumber(this.records()));
@@ -339,6 +427,7 @@ export class RegistrationShellComponent implements OnInit {
           this.errors.set({});
           this.activeStep.set(this.startStep(form, records));
           this.loading.set(false);
+          this.refreshActiveStep();
         },
         error: (error: unknown) => {
           this.loadError.set(this.loadErrorMessage(error));
@@ -519,10 +608,64 @@ export class RegistrationShellComponent implements OnInit {
       this.scrollToTop();
       return;
     }
-    this.saving.set(state);
-    const payload = toStepPayload(step, stepValues, this.api.lookups());
+    const record = this.records()[step.key];
+    if (hasSavedStep(step.key, record)) {
+      // A saved step: nothing to send when nothing changed; a change goes by PATCH with its reason.
+      if (!stepPayloadChanged(step, stepValues, record, this.api.lookups())) {
+        if (state === 'draft') this.notifications.info('No changes to save.');
+        else done();
+        return;
+      }
+      this.pendingChange = { step, state, done };
+      this.changeReason.set('');
+      this.reasonSubmitted.set(false);
+      this.reasonOpen.set(true);
+      return;
+    }
+    this.persist(step, state, undefined, done);
+  }
+
+  /** "Save changes" in the reason dialog. */
+  confirmReason(): void {
+    const pending = this.pendingChange;
+    this.reasonSubmitted.set(true);
+    const reason = this.changeReason().trim();
+    if (!pending || !reason) return;
+    this.reasonOpen.set(false);
+    this.pendingChange = null;
+    this.persist(pending.step, pending.state, reason, pending.done);
+  }
+
+  cancelReason(): void {
+    this.reasonOpen.set(false);
+    this.pendingChange = null;
+  }
+
+  openHistory(): void {
+    this.historyOpen.set(true);
+    this.historyLoading.set(true);
+    this.historyError.set(null);
     this.api
-      .saveStep(step.key, payload)
+      .updateLogs()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: logs => {
+          this.historyLogs.set(logs);
+          this.historyLoading.set(false);
+        },
+        error: (error: unknown) => {
+          this.historyError.set(error instanceof ApiError ? error.message : 'Please try again.');
+          this.historyLoading.set(false);
+        }
+      });
+  }
+
+  /** PUT for a new step, PATCH with the reason for a change to a saved one. */
+  private persist(step: OtrStepDef, state: 'next' | 'draft', reason: string | undefined, done: () => void): void {
+    this.saving.set(state);
+    const payload = toStepPayload(step, this.values()[step.key] ?? {}, this.api.lookups());
+    this.api
+      .saveStep(step.key, payload, reason)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: record => {
@@ -558,6 +701,23 @@ export class RegistrationShellComponent implements OnInit {
   private show(stepNumber: number): void {
     this.activeStep.set(stepNumber);
     this.scrollToTop();
+    this.refreshActiveStep();
+  }
+
+  /**
+   * Re-reads the open step's definition (GET /otr/form/steps/{stepKey}): when the admin changed its FormManager
+   * schema since the form was loaded, the step is redrawn with the new fields; typed values are kept.
+   */
+  private refreshActiveStep(): void {
+    const step = this.activeStepDef();
+    if (!step || step.kind !== 'form' || this.readOnly()) return;
+    this.api
+      .refreshStep(step.key)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(next => {
+        if (!next) return;
+        this.values.update(all => ({ ...all, [next.key]: mergeStepValues(next, all[next.key] ?? {}, this.records()[next.key]) }));
+      });
   }
 
   private scrollToTop(): void {

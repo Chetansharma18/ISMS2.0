@@ -125,6 +125,9 @@ export const LUCIDE_ICONS = {
     'M12 18v-6',
     'm9 15 3 3 3-3'
   ],
+  dot: [
+    'M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0'
+  ],
   download: [
     'M12 15V3',
     'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',

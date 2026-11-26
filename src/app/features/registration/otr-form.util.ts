@@ -216,6 +216,43 @@ function toSections(stepKey: string, fields: { field: OtrFieldDef; section: stri
   return sections;
 }
 
+/**
+ * The form with one step replaced by a fresh GET /otr/form/steps/{stepKey} definition (e.g. a FormManager schema
+ * published after the full form was loaded). Returns the same form when the step is unknown.
+ */
+export function replaceStep(form: OtrFormDef, dto: OtrStepFormDto, lookups: OtrLookups): OtrFormDef {
+  const current = form.steps.find(s => s.key === dto.stepKey && s.kind === 'form');
+  if (!current || !Array.isArray(dto.fixedFields)) return form;
+  const next = toStep(dto, current.number, lookups);
+  return { ...form, steps: form.steps.map(s => (s === current ? next : s)) };
+}
+
+/** True when the step's dynamic schema or its fields differ (then the screen values need new keys). */
+export function stepChanged(a: OtrStepDef, b: OtrStepDef): boolean {
+  const keys = (s: OtrStepDef) => stepFields(s).map(f => f.key).join('|');
+  return a.dynamicFormId !== b.dynamicFormId || a.dynamicFormVersion !== b.dynamicFormVersion || keys(a) !== keys(b);
+}
+
+/** Values for a rebuilt step: what was typed stays, fields new to the step start from the saved record. */
+export function mergeStepValues(step: OtrStepDef, typed: OtrStepValues, record: OtrStepRecord | null | undefined): OtrStepValues {
+  const fresh = initialStepValues(step, record);
+  const merged: OtrStepValues = {};
+  for (const key of Object.keys(fresh)) merged[key] = key in typed ? typed[key] : fresh[key];
+  return merged;
+}
+
+/** True when the request body of the step differs from the body of what the backend holds. */
+export function stepPayloadChanged(
+  step: OtrStepDef,
+  values: OtrStepValues,
+  record: OtrStepRecord | null | undefined,
+  lookups: OtrLookups
+): boolean {
+  const saved = toStepPayload(step, initialStepValues(step, record), lookups);
+  const current = toStepPayload(step, values, lookups);
+  return JSON.stringify(saved) !== JSON.stringify(current);
+}
+
 function toStep(dto: OtrStepFormDto, number: number, lookups: OtrLookups): OtrStepDef {
   const fixed = dto.fixedFields.map(f => ({ field: fixedField(dto.stepKey, f, lookups), section: f.sectionName || dto.stepTitle }));
   const schema = dto.hasDynamicForm ? dto.dynamicSchema?.fields ?? [] : [];

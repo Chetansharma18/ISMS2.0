@@ -106,7 +106,7 @@ export const PUBLIC_TENDERS: PublicTenderItem[] = [
     <app-modal
       title="Official Tenders & RFP Notices"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-      size="xl"
+      size="lg"
       [scrollBody]="true"
       (close)="onModalClose()"
     >

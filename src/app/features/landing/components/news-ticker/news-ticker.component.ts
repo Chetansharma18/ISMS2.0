@@ -114,7 +114,7 @@ export interface AnnouncementItem {
     .ticker-track {
       display: inline-flex;
       width: max-content;
-      animation: marquee 34s linear infinite;
+      animation: marquee 58s linear infinite;
       will-change: transform;
       backface-visibility: hidden;
     }

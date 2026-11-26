@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 
 export interface ConfirmModalOptions {
   title: string;
@@ -26,6 +26,9 @@ export interface AlertModalOptions {
 })
 export class ModalService {
   private activeModalCount = signal<number>(0);
+
+  /** True whenever at least one modal is open, so sticky chrome can yield stacking order. */
+  readonly hasOpenModal = computed(() => this.activeModalCount() > 0);
 
   /** Active confirm dialog state for app-level confirmation dialog outlet */
   readonly confirmState = signal<{

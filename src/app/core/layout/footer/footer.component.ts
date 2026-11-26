@@ -5,6 +5,7 @@ import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import type { SolidIconName } from '../../../shared/components/icon/icons.solid';
+import { formatDateMedium } from '../../../shared/utils/date.util';
 import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
 
 interface PartnerBannerLink {
@@ -258,7 +259,7 @@ interface SocialMediaLink {
                   <div class="w-1 h-1 rounded-full bg-[#AA5E7A]/60 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-sans">Last Updated:</span>
-                    <span class="text-[0.875rem] text-white font-semibold font-sans">8 Oct 2026</span>
+                    <span class="text-[0.875rem] text-white font-semibold font-sans">{{ lastUpdatedDate }}</span>
                   </div>
                 </div>
               </div>
@@ -360,6 +361,7 @@ export class FooterComponent {
 
   readonly helplineGlobal = HELPLINE_GLOBAL;
   readonly externalLegalUrl = EXTERNAL_LEGAL_URL;
+  readonly lastUpdatedDate = formatDateMedium(new Date());
   readonly isGeneratingManual = signal(false);
 
   protected readonly partnerLinks: readonly PartnerBannerLink[] = [

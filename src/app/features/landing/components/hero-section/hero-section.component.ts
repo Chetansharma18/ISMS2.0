@@ -22,7 +22,7 @@ import { IconComponent } from '../../../../shared/components/icon/icon.component
       ></div>
 
       <!-- Centered Inner Container (Max-Width ~1440px) -->
-      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative z-10">
+      <div class="max-w-360 mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-14 relative">
         <div class="flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 xl:gap-14 w-full">
           <!-- LEFT COLUMN (~55% width on desktop) -->
           <div class="w-full lg:w-[55%] text-left flex flex-col justify-center">

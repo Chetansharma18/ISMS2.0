@@ -52,7 +52,7 @@ let nextId = 0;
   },
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
       style="background: rgba(10, 20, 40, 0.45); backdrop-filter: blur(3px);"
       (click)="onBackdrop($event)"
     >
@@ -60,7 +60,7 @@ let nextId = 0;
         class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
         [class.overflow-visible]="!scrollBody()"
         [class.overflow-hidden]="scrollBody()"
-        [class.max-h-[90vh]]="scrollBody()"
+        [class.max-h-[82vh]]="scrollBody()"
         style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
         [class]="widthClass()"
         role="dialog"

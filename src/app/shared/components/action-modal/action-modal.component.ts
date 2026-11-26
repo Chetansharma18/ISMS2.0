@@ -37,7 +37,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
         style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
         (click)="onBackdropClick($event)"
       >
@@ -45,7 +45,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
           class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
           [class.overflow-visible]="!scrollable"
           [class.overflow-hidden]="scrollable"
-          [class.max-h-[90vh]]="scrollable"
+          [class.max-h-[82vh]]="scrollable"
           [ngClass]="resolvedMaxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"

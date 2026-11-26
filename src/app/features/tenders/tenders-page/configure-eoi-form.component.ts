@@ -69,6 +69,7 @@ import {
             (valueChange)="onSchemeChange($event)"
             placeholder="-- Select Scheme Name --"
             [invalid]="hasError('scheme')"
+            class="w-full"
           />
           @if (hasError('scheme')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('scheme') }}</p>
@@ -88,6 +89,7 @@ import {
             [disabled]="isCategoryLocked()"
             [placeholder]="data().scheme ? '-- Select Scheme Category --' : 'Auto-filled from Scheme'"
             [invalid]="hasError('schemeCategory')"
+            class="w-full"
           />
           @if (hasError('schemeCategory')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('schemeCategory') }}</p>
@@ -106,6 +108,7 @@ import {
             (valueChange)="data().eoiCategory = $event; onFieldChange('eoiCategory')"
             placeholder="-- Select EOI Category --"
             [invalid]="hasError('eoiCategory')"
+            class="w-full"
           />
           @if (hasError('eoiCategory')) {
             <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('eoiCategory') }}</p>

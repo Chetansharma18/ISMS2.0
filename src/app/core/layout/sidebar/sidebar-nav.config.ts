@@ -91,7 +91,7 @@ export const MASTER_NAV: NavSubItem[] = [
   { label: 'Course Master', link: '/admin/master/course' },
   { label: 'District & Block Master', link: '/admin/master/district-block' },
   { label: 'Designation', link: '/admin/master/designation' },
-  { label: 'Doc Master', link: '/admin/master/doc' },
+  { label: 'Document Master', link: '/admin/master/doc' },
   { label: 'Annexure Master', link: '/admin/master/annexure' },
   { label: 'Remark Master', link: '/admin/master/remark' },
   { label: 'Grading Master', link: '/admin/master/grading' }

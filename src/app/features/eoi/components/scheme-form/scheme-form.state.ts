@@ -264,10 +264,7 @@ export class SchemeFormState {
       if (params['eoiDescription']) this.schemeDescription.set(params['eoiDescription']);
       const schName = params['schemeName'] || params['title'] || this.schemeName();
       if (schName) {
-        const fields = this.schemeReqService.getCustomFieldsForScheme(schName);
-        if (fields && fields.length > 0) {
-          this.schemeCustomFields.set(fields);
-        }
+        this.loadSchemeRequirements(schName);
       }
       if (params['refNo'] && !this.draftRestored) {
         this.draftRestored = true;
@@ -303,6 +300,59 @@ export class SchemeFormState {
         updatedAt: new Date().toISOString()
       });
     });
+  }
+
+  /** Dynamically loads requirements (custom proposal fields, documents, and annexures) for the selected scheme. */
+  private loadSchemeRequirements(schName: string): void {
+    this.schemeReqService.syncWithMasters();
+    const reqs = this.schemeReqService.getRequirementsForScheme(schName);
+    if (reqs.customFields && reqs.customFields.length > 0) {
+      this.schemeCustomFields.set(reqs.customFields);
+    }
+    if ((reqs.documents && reqs.documents.length > 0) || (reqs.annexures && reqs.annexures.length > 0)) {
+      const existingDocs = this.eoiDocuments();
+      const existingMap = new Map<string, EoiDocumentItem>();
+      for (const d of existingDocs) {
+        existingMap.set(d.name.trim().toLowerCase(), d);
+      }
+
+      let nextId = 1;
+      const newDocs: EoiDocumentItem[] = [];
+
+      for (const doc of reqs.documents) {
+        const prev = existingMap.get(doc.masterItemName.trim().toLowerCase());
+        newDocs.push({
+          id: nextId++,
+          name: doc.masterItemName,
+          description: doc.category || 'Compliance & Verification',
+          fileName: prev?.fileName || '',
+          fileSize: prev?.fileSize || '',
+          uploadedDate: prev?.uploadedDate || '',
+          isMandatory: doc.isMandatory,
+          status: prev?.status || 'pending',
+          category: doc.isMandatory ? 'mandatory' : 'supporting',
+          comment: prev?.comment
+        });
+      }
+
+      for (const annex of reqs.annexures) {
+        const prev = existingMap.get(annex.masterItemName.trim().toLowerCase());
+        newDocs.push({
+          id: nextId++,
+          name: annex.masterItemName,
+          description: annex.category || 'Official Format',
+          fileName: prev?.fileName || '',
+          fileSize: prev?.fileSize || '',
+          uploadedDate: prev?.uploadedDate || '',
+          isMandatory: annex.isMandatory,
+          status: prev?.status || 'pending',
+          category: 'annexure',
+          comment: prev?.comment
+        });
+      }
+
+      this.eoiDocuments.set(newDocs);
+    }
   }
 
   /** Reopens an application that was left unfinished: fee status, uploaded documents and the step. */

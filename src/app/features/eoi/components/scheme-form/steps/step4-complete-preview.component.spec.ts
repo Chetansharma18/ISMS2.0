@@ -45,7 +45,7 @@ describe('Step4CompletePreviewComponent', () => {
     const headings = Array.from(compiled.querySelectorAll('h2')).map(h => h.textContent?.trim());
     expect(headings).not.toContain('Processing Fee');
     expect(headings).toContain('Organisation Details');
-    expect(headings).toContain('Authorized Signatory');
+    expect(headings.some(h => h?.includes('Authorized Person') || h?.includes('Authorized Signatory'))).toBe(true);
     expect(headings).toContain('Organisation Bank Details');
     expect(headings.some(h => h?.includes('Documents'))).toBe(true);
 

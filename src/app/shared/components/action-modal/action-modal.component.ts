@@ -4,10 +4,27 @@ import {
   Output,
   EventEmitter,
   HostListener,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  OnChanges,
+  OnDestroy,
+  SimpleChanges,
+  inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../icon/icon.component';
+import { ModalService } from '../../services/modal.service';
+
+export type ActionModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+
+const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
+  xs: 'max-w-[360px]',
+  sm: 'max-w-[400px]',
+  md: 'max-w-[560px]',
+  lg: 'max-w-[720px]',
+  xl: 'max-w-[960px]',
+  '2xl': 'max-w-[1200px]',
+  full: 'max-w-full'
+};
 
 @Component({
   selector: 'app-action-modal',
@@ -28,8 +45,8 @@ import { IconComponent } from '../icon/icon.component';
           class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
           [class.overflow-visible]="!scrollable"
           [class.overflow-hidden]="scrollable"
-          [class.max-h-[85vh]]="scrollable"
-          [ngClass]="maxWidthClass"
+          [class.max-h-[90vh]]="scrollable"
+          [ngClass]="resolvedMaxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"
           aria-modal="true"
@@ -46,7 +63,7 @@ import { IconComponent } from '../icon/icon.component';
             <button
               type="button"
               (click)="onClose()"
-              class="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
+              class="absolute top-4 right-5 sm:right-6 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
               title="Close"
               aria-label="Close"
             >
@@ -130,8 +147,11 @@ import { IconComponent } from '../icon/icon.component';
     }
   `
 })
-export class ActionModalComponent {
+export class ActionModalComponent implements OnChanges, OnDestroy {
   private static nextId = 0;
+  private readonly modalService = inject(ModalService);
+  private wasOpen = false;
+
   readonly titleId = `action-modal-title-${++ActionModalComponent.nextId}`;
 
   @Input() isOpen = false;
@@ -145,6 +165,7 @@ export class ActionModalComponent {
   @Input() accentBarClass = 'bg-navy';
   @Input() showCloseButton = false;
   @Input() showFooterDivider = true;
+  @Input() size?: ActionModalSize;
   @Input() maxWidthClass = 'max-w-[490px]';
   @Input() closeOnBackdrop = true;
   @Input() disablePrimary = false;
@@ -153,6 +174,32 @@ export class ActionModalComponent {
   @Input() scrollable = false;
   /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
   @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
+
+  get resolvedMaxWidthClass(): string {
+    if (this.size && ACTION_MODAL_WIDTHS[this.size]) {
+      return ACTION_MODAL_WIDTHS[this.size];
+    }
+    return this.maxWidthClass;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isOpen']) {
+      if (this.isOpen && !this.wasOpen) {
+        this.modalService.registerModalOpen();
+        this.wasOpen = true;
+      } else if (!this.isOpen && this.wasOpen) {
+        this.modalService.registerModalClose();
+        this.wasOpen = false;
+      }
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.wasOpen) {
+      this.modalService.registerModalClose();
+      this.wasOpen = false;
+    }
+  }
 
   get primaryVariantClass(): string {
     switch (this.primaryVariant) {

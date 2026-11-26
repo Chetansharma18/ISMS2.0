@@ -26,6 +26,7 @@ export interface RejectedAgencyItem {
   sNo: number;
   applicationId: string;
   agencyName: string;
+  category?: string;
   fileStatus: 'Not Eligible' | 'Rejected';
   reason: string;
 }
@@ -38,12 +39,18 @@ export interface EmpanelmentOrder {
   fileNo: string;
   orderDate: string;
   status: 'DRAFT' | 'E_SIGNED';
+  rejectionStatus?: 'DRAFT' | 'E_SIGNED';
   empanelledAgencies: EmpanelledAgencyItem[];
   rejectedAgencies: RejectedAgencyItem[];
   committeeMembers: CommitteeSignatory[];
   createdAt: string;
   signedAt?: string;
   rajKajRefNo?: string;
+  rejectionFileNo?: string;
+  rejectionDate?: string;
+  rejectionSignedAt?: string;
+  rejectionRajKajRefNo?: string;
+  rejectionCopyToList?: string[];
   issuingAuthority: {
     name: string;
     designation: string;

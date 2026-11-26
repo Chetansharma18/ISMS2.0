@@ -993,6 +993,7 @@ export class TendersPageComponent {
         next: (items) => {
           if (items && items.length > 0) {
             this.docMasterItems.set(items);
+            this.storage.setItem(DOC_MASTER_STORAGE_KEY, items);
           } else {
             const cached = this.storage.getItem<DocMasterItem[]>(DOC_MASTER_STORAGE_KEY);
             this.docMasterItems.set(cached?.length ? cached : INITIAL_DOC_ITEMS);
@@ -1013,6 +1014,7 @@ export class TendersPageComponent {
         next: (items) => {
           if (items && items.length > 0) {
             this.annexureMasterItems.set(items);
+            this.storage.setItem(ANNEXURE_MASTER_STORAGE_KEY, items);
           } else {
             const cached = this.storage.getItem<AnnexureMasterItem[]>(ANNEXURE_MASTER_STORAGE_KEY);
             this.annexureMasterItems.set(cached?.length ? cached : INITIAL_ANNEXURE_ITEMS);

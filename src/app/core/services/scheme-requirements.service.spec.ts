@@ -117,4 +117,37 @@ describe('SchemeRequirementsService', () => {
     const fetched = service.getEoiSnapshot('RSLDC/EOI/TEST/2026/01');
     expect(fetched).toEqual(snapshot);
   });
+
+  it('synchronizes updated document names and scheme associations via applyMastersSync', () => {
+    const targetScheme = 'Vishwakarma Yuva Udyami Protsahan Yojana';
+    const testDoc = {
+      id: 'doc-sync-test',
+      docName: 'New ISO Certificate 2026',
+      schemes: [targetScheme],
+      status: 'Active' as const
+    };
+
+    service.applyMastersSync([testDoc], []);
+
+    const reqs = service.getRequirementsForScheme(targetScheme);
+    const added = reqs.documents.find(d => d.masterItemId === 'doc-sync-test');
+    expect(added).toBeDefined();
+    expect(added?.masterItemName).toBe('New ISO Certificate 2026');
+
+    // Rename the document in master
+    const renamedDoc = { ...testDoc, docName: 'Updated ISO Certificate 2026' };
+    service.applyMastersSync([renamedDoc], []);
+
+    const updatedReqs = service.getRequirementsForScheme(targetScheme);
+    const renamed = updatedReqs.documents.find(d => d.masterItemId === 'doc-sync-test');
+    expect(renamed?.masterItemName).toBe('Updated ISO Certificate 2026');
+
+    // Unlink the scheme in master
+    const unlinkedDoc = { ...renamedDoc, schemes: [] };
+    service.applyMastersSync([unlinkedDoc], []);
+
+    const finalReqs = service.getRequirementsForScheme(targetScheme);
+    const unlinked = finalReqs.documents.find(d => d.masterItemId === 'doc-sync-test');
+    expect(unlinked).toBeUndefined();
+  });
 });

@@ -82,7 +82,6 @@ interface EditPermissionForm {
       <!-- Page Header -->
       <app-page-header
         title="Permission Management"
-        subtitle="Configure page-level access permissions (View, Edit, Delete) for system roles"
         [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Permission Management' }]"
       >
         <!-- Add Permission Button -->
@@ -115,6 +114,7 @@ interface EditPermissionForm {
       <app-table
         [columns]="columns"
         [data]="filteredItems()"
+        [loading]="loading()"
         [pagination]="true"
         [pageSize]="10"
         itemUnit="permissions"
@@ -438,6 +438,7 @@ export class PermissionMasterComponent {
   searchQuery = signal<string>('');
   selectedRoleFilter = signal<string>('all');
   filterValues = signal<Record<string, string>>({});
+  loading = signal<boolean>(true);
 
   showAddModal = signal<boolean>(false);
   showEditModal = signal<boolean>(false);
@@ -468,16 +469,20 @@ export class PermissionMasterComponent {
   ];
 
   constructor() {
-    this.permRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(list => {
-      const hasOldData = list.some(
-        i => i.id === 'perm-1' || i.id === 'perm-2' || i.id === 'perm-3' || i.roleType === 'Role1'
-      );
-      if (hasOldData) {
-        list.forEach(i => this.permRepo.delete(i.id).subscribe());
-        this.items.set([]);
-      } else {
-        this.items.set(list);
-      }
+    this.permRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (list) => {
+        const hasOldData = list.some(
+          i => i.id === 'perm-1' || i.id === 'perm-2' || i.id === 'perm-3' || i.roleType === 'Role1'
+        );
+        if (hasOldData) {
+          list.forEach(i => this.permRepo.delete(i.id).subscribe());
+          this.items.set([]);
+        } else {
+          this.items.set(list);
+        }
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
     });
 
     this.roleRepo.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe(roles => {

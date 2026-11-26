@@ -33,3 +33,5 @@ export * from './toast-outlet/toast-outlet.component';
 export * from './stepper/stepper.component';
 export * from './bar-chart/bar-chart.component';
 export * from './document-sheet-modal/document-sheet-modal.component';
+export * from './detail-view/detail-view.component';
+export * from './form-controls/form-field/form-field.component';

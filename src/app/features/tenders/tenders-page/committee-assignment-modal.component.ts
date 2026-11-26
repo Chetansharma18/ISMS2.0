@@ -41,7 +41,7 @@ import { filterAdmins } from './tenders-page.util';
       (close)="close.emit()"
     >
       @if (scheme(); as s) {
-        <div class="mt-3 font-sans text-xs space-y-4">
+        <div class="mt-3 font-sans text-xs space-y-4 pb-3">
           <!-- Scheme Info Header Banner -->
           <div class="bg-[#F8EDF1] border border-[#EADCE2] rounded-lg p-3 flex flex-col gap-1">
             <div class="flex items-center justify-between">
@@ -51,7 +51,7 @@ import { filterAdmins } from './tenders-page.util';
               </span>
             </div>
             <p
-              class="text-[11px] text-slate-600 m-0 line-clamp-1 hover:line-clamp-none transition-all cursor-default"
+              class="text-[11px] text-slate-600 m-0 leading-relaxed max-h-24 overflow-y-auto pr-1"
               [title]="s.eoiDescription"
             >
               {{ s.eoiDescription }}

@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ButtonComponent, IconComponent } from '../../../../../shared';
 import type { ApplicantResponse } from '../../../services/eoi-state.service';
@@ -11,12 +10,12 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
 @Component({
   selector: 'app-scrutiny-toolbar',
   standalone: true,
-  imports: [RouterLink, NgClass, ButtonComponent, IconComponent],
+  imports: [RouterLink, ButtonComponent, IconComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-3">
-      <div>
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
         <a
           appButton
           variant="outline"
@@ -27,64 +26,73 @@ import type { ApplicantResponse } from '../../../services/eoi-state.service';
           <app-icon name="back" />
           <span>Back</span>
         </a>
+        <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
+          <span>EOI Responses</span>
+          <span class="text-slate-300">/</span>
+          <span class="text-slate-800 font-semibold truncate max-w-md">{{ applicant()?.schemeName || 'Proposal Scrutiny Desk' }}</span>
+        </div>
       </div>
 
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-        <div class="flex items-center gap-3 flex-wrap">
-          <h1 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight m-0">
-            {{ applicant()?.anonymousLabel }}
-          </h1>
-          <span
-            class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border"
-            [ngClass]="{
-              'bg-emerald-50 text-emerald-800 border-emerald-200': applicant()?.appeal?.status === 'Accepted' || applicant()?.status === 'APPROVED',
-              'bg-amber-50 text-amber-800 border-amber-200': applicant()?.appeal?.status === 'Pending' || ((applicant()?.status === 'UNDER_SCRUTINY' || applicant()?.status === 'REVERTED') && applicant()?.appeal?.status !== 'Accepted'),
-              'bg-rose-50 text-rose-800 border-rose-200': applicant()?.status === 'REJECTED' || applicant()?.appeal?.status === 'Rejected'
-            }"
+      <!-- Review actions -->
+      <div class="flex items-center gap-2">
+        @if (isRemarked()) {
+          <button
+            appButton
+            variant="primary"
+            size="sm"
+            type="button"
+            (click)="remark.emit()"
+            title="Remark recorded. Click to view or update remark."
           >
-            {{ statusLabel() }}
-          </span>
-        </div>
-
-        <!-- Review actions -->
-        <div class="flex items-center gap-2 flex-wrap">
-          <button appButton variant="danger" size="sm" (click)="reject.emit()" title="Reject application">Reject</button>
-          <button appButton size="sm" (click)="approve.emit()" title="Approve application">Approve</button>
-        </div>
-      </div>
-
-      <p class="text-xs sm:text-sm text-slate-600 leading-relaxed m-0">
-        Proposal under {{ applicant()?.schemeName }}
-      </p>
-    </div>
-
-    <!-- Application summary -->
-    <div class="mt-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
-        <div>
-          <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums break-all">{{ applicant()?.eoiRefNo }}</span>
-        </div>
-        <div>
-          <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ applicant()?.schemeName }}</span>
-        </div>
-        <div>
-          <span class="text-[11.5px] text-slate-500 block leading-tight">Registration No.</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums">{{ applicant()?.regNumber }}</span>
-        </div>
-        <div>
-          <span class="text-[11.5px] text-slate-500 block leading-tight">Submitted On</span>
-          <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ applicant()?.submissionDate }}</span>
-        </div>
+            <app-icon name="check" size="sm" />
+            <span>Remarked</span>
+          </button>
+        } @else {
+          <button
+            appButton
+            variant="outline"
+            size="sm"
+            type="button"
+            (click)="remark.emit()"
+            title="Add Departmental Remark"
+          >
+            <app-icon name="document" size="xs" />
+            <span>Add Remark</span>
+          </button>
+        }
       </div>
     </div>
+
+    @if (showSummary()) {
+      <!-- Application summary -->
+      <div class="mt-4 bg-white rounded-xl border border-slate-200/90 shadow-2xs p-4 sm:p-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4 text-xs">
+          <div>
+            <span class="text-[11.5px] text-slate-500 block leading-tight">EOI Reference No.</span>
+            <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums break-all">{{ applicant()?.eoiRefNo }}</span>
+          </div>
+          <div>
+            <span class="text-[11.5px] text-slate-500 block leading-tight">Scheme</span>
+            <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ applicant()?.schemeName }}</span>
+          </div>
+          <div>
+            <span class="text-[11.5px] text-slate-500 block leading-tight">Registration No.</span>
+            <span class="text-[12.5px] font-medium text-slate-900 block mt-1 tabular-nums">{{ applicant()?.regNumber }}</span>
+          </div>
+          <div>
+            <span class="text-[11.5px] text-slate-500 block leading-tight">Submitted On</span>
+            <span class="text-[12.5px] font-medium text-slate-900 block mt-1">{{ applicant()?.submissionDate }}</span>
+          </div>
+        </div>
+      </div>
+    }
   `
 })
 export class ScrutinyToolbarComponent {
   readonly applicant = input<ApplicantResponse | undefined>();
-  readonly reject = output<void>();
-  readonly approve = output<void>();
+  readonly isRemarked = input<boolean>(false);
+  readonly showSummary = input<boolean>(false);
+  readonly remark = output<void>();
 
   protected statusLabel(): string {
     const app = this.applicant();

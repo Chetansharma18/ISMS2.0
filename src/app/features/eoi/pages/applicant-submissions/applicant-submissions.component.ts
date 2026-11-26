@@ -7,15 +7,16 @@ import { jsPDF } from 'jspdf';
 import { EoiStateService, ApplicantResponse } from '../../services/eoi-state.service';
 import { DataEngineService } from '../../../../core/services/data-engine.service';
 import { GradingMasterItem } from '../../../../core/models/admin-masters.model';
-import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
-import { GenerateEmpanelmentOrderModalComponent } from '../../components/generate-empanelment-order-modal/generate-empanelment-order-modal.component';
+import type { EmpanelmentOrder, EmpanelledAgencyItem, RejectedAgencyItem } from '../../models/empanelment-order.model';
+import { EmpanelmentOrderService, DEFAULT_COMMITTEE_MEMBERS } from '../../services/empanelment-order.service';
 import { OrderViewerModalComponent } from '../../components/order-viewer-modal/order-viewer-modal.component';
-import { downloadEvaluationExcelFile } from '../../utils/eoi-evaluation-excel.util';
+import { downloadEvaluationExcelFile, parseEvaluationSpreadsheet, ParsedEvaluationRow } from '../../utils/eoi-evaluation-excel.util';
 import { formatDate } from '../../../../shared/utils';
 import {
   ButtonComponent,
   IconComponent,
   ListPageComponent,
+  ModalComponent,
   TableColumn
 } from '../../../../shared';
 
@@ -29,7 +30,7 @@ import {
     ListPageComponent,
     ButtonComponent,
     IconComponent,
-    GenerateEmpanelmentOrderModalComponent,
+    ModalComponent,
     OrderViewerModalComponent
   ],
   template: `
@@ -73,20 +74,68 @@ import {
               title="Download Evaluation Excel with Dropdowns for Status and Grading"
             >
               <app-icon name="download" size="sm" />
-              <span>{{ isDownloadingExcel() ? 'Generating Excel...' : 'Download Evaluation Excel' }}</span>
+              <span>{{ isDownloadingExcel() ? 'Generating Excel...' : 'Download Excel' }}</span>
             </button>
 
-            <!-- Generate Empanelment Order Button -->
+            <!-- Upload Excel Button -->
             <button
               appButton
+              variant="outline"
               size="sm"
               class="shrink-0"
-              (click)="showGenerateOrderModal.set(true)"
-              title="Upload evaluated Excel to generate Empanelment and Rejection Orders"
+              (click)="openUploadExcelModal()"
+              title="Upload evaluated Excel spreadsheet (.xlsx, .xls)"
             >
-              <app-icon name="clipboard-check" size="sm" />
-              <span>Generate Empanelment Order</span>
+              <app-icon name="upload" size="sm" />
+              <span>Upload Excel</span>
             </button>
+
+            <!-- Dynamic Empanelment Order Release Flow Button -->
+            @if (!isApprovedOrderReleased()) {
+              <!-- Step 1: Approved Empanelment Order must be released first -->
+              <button
+                appButton
+                size="sm"
+                class="shrink-0"
+                (click)="navigateToOrderEditor('empanelment')"
+                title="Generate Empanelment Order for eligible applicants"
+              >
+                <app-icon name="clipboard-check" size="sm" />
+                <span>Generate Empanelment Order</span>
+              </button>
+            } @else if (!isRejectedOrderReleased()) {
+              <!-- Step 2: Approved Order is released, now release rejected order -->
+              <button
+                appButton
+                variant="danger"
+                size="sm"
+                class="shrink-0"
+                (click)="navigateToOrderEditor('rejection')"
+                title="Release Rejected Empanelment Order for disqualified applicants"
+              >
+                <app-icon name="alert-triangle" size="sm" />
+                <span>Release Rejected Empanelment Order</span>
+              </button>
+            } @else {
+              <!-- Step 3: Both orders released -->
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <app-icon name="check-circle" size="xs" class="text-emerald-600" />
+                  <span>All Orders Released</span>
+                </span>
+                <button
+                  appButton
+                  variant="outline"
+                  size="sm"
+                  class="shrink-0"
+                  (click)="navigateToOrderEditor('empanelment')"
+                  title="View Released Empanelment Orders"
+                >
+                  <app-icon name="eye" size="xs" />
+                  <span>View Orders</span>
+                </button>
+              </div>
+            }
           </div>
 
           <!-- Total Submissions Count -->
@@ -131,18 +180,113 @@ import {
 
     </app-list-page>
 
-    <!-- Modal for Generating Empanelment & Rejection Orders via Excel upload & Multi-Party E-Sign -->
-    @if (showGenerateOrderModal()) {
-      <app-generate-empanelment-order-modal
-        [schemeId]="schemeId()"
-        [schemeName]="currentSchemeName()"
-        [eoiRefNo]="currentEoiRefNo()"
-        [currentApplicants]="responses()"
-        (close)="showGenerateOrderModal.set(false)"
-        (orderGenerated)="onOrderGenerated($event)"
-        (viewEmpanelmentOrder)="onViewEmpanelmentOrder($event)"
-        (viewRejectionOrder)="onViewRejectionOrder($event)"
-      />
+    <!-- Upload Excel Modal -->
+    @if (showUploadModal()) {
+      <app-modal
+        title="Upload Evaluation Spreadsheet"
+        subtitle="Upload evaluated spreadsheet (.xlsx, .xls) to update applicant statuses"
+        size="md"
+        (close)="closeUploadExcelModal()"
+      >
+        @if (isUploading()) {
+          <!-- 3-4 Second Progress Loader -->
+          <div class="py-10 px-4 text-center space-y-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto animate-pulse">
+              <app-icon name="refresh" size="lg" class="animate-spin" />
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-sm font-bold text-slate-900 m-0">{{ uploadLoadingStatus() }}</h4>
+              <p class="text-xs text-slate-500 m-0">Evaluating records &amp; compiling official empanelment order...</p>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden max-w-xs mx-auto border border-slate-200">
+              <div
+                class="bg-primary h-2 rounded-full transition-all duration-700 ease-out"
+                [style.width.%]="uploadProgressPercent()"
+              ></div>
+            </div>
+          </div>
+        } @else {
+          <div class="space-y-4">
+            <!-- Hidden native file input -->
+            <input
+              #fileInput
+              type="file"
+              class="hidden"
+              accept=".xlsx,.xls"
+              (change)="onUploadFileSelected($event)"
+            />
+
+            <!-- Upload Dropzone Area -->
+            <div
+              (click)="fileInput.click()"
+              class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary/60 transition-colors bg-slate-50/50 cursor-pointer"
+            >
+              <div class="w-12 h-12 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <app-icon name="upload" size="lg" />
+              </div>
+              <p class="text-sm font-semibold text-slate-800 mb-1">
+                Click to choose an Excel file
+              </p>
+              <p class="text-xs text-slate-500">
+                Supports .xlsx and .xls formats
+              </p>
+            </div>
+
+            <!-- Selected File Display -->
+            @if (selectedUploadFile()) {
+              <div class="p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 truncate">
+                  <app-icon name="file" size="sm" class="text-primary shrink-0" />
+                  <span class="font-semibold text-slate-800 truncate">{{ selectedUploadFile()!.name }}</span>
+                  <span class="text-slate-500 shrink-0">({{ formatFileSize(selectedUploadFile()!.size) }})</span>
+                </div>
+                <button
+                  appButton
+                  variant="ghost"
+                  size="sm"
+                  iconOnly
+                  type="button"
+                  (click)="removeSelectedUploadFile($event)"
+                  title="Remove file"
+                >
+                  <app-icon name="close" size="xs" />
+                </button>
+              </div>
+            }
+
+            <!-- Validation Error Alert -->
+            @if (uploadError()) {
+              <div class="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2">
+                <app-icon name="alert-triangle" size="xs" class="shrink-0 mt-0.5" />
+                <span>{{ uploadError() }}</span>
+              </div>
+            }
+
+            <!-- Success Alert -->
+            @if (uploadSuccessMessage()) {
+              <div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-center gap-2">
+                <app-icon name="check-circle" size="xs" />
+                <span>{{ uploadSuccessMessage() }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <ng-container modalFooter>
+          <button
+            appButton
+            variant="primary"
+            size="sm"
+            class="w-full sm:w-auto"
+            [disabled]="!selectedUploadFile() || isUploading()"
+            (click)="submitExcelUpload()"
+            [loading]="isUploading()"
+          >
+            <app-icon name="upload" size="xs" />
+            <span>{{ isUploading() ? 'Processing...' : 'Submit Upload' }}</span>
+          </button>
+        </ng-container>
+      </app-modal>
     }
 
     <!-- Modal for Official Order Viewer with RajKaj Seal & Download -->
@@ -150,6 +294,7 @@ import {
       <app-order-viewer-modal
         [order]="selectedViewOrder()"
         [orderType]="selectedViewOrderType()"
+        [isEditable]="true"
         (close)="showOrderViewerModal.set(false)"
       />
     }
@@ -157,6 +302,7 @@ import {
 })
 export class ApplicantSubmissionsComponent {
   private eoiStateService = inject(EoiStateService);
+  private empanelmentOrderService = inject(EmpanelmentOrderService);
   private dataEngine = inject(DataEngineService, { optional: true });
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -169,10 +315,27 @@ export class ApplicantSubmissionsComponent {
   isDownloadingAll = signal<boolean>(false);
   downloadType = signal<'zip' | 'pdf'>('zip');
 
-  showGenerateOrderModal = signal<boolean>(false);
   showOrderViewerModal = signal<boolean>(false);
   selectedViewOrder = signal<EmpanelmentOrder | null>(null);
   selectedViewOrderType = signal<'EMPANELMENT' | 'REJECTION'>('EMPANELMENT');
+  currentOrder = signal<EmpanelmentOrder | null>(null);
+
+  readonly isApprovedOrderReleased = computed(() => {
+    return this.currentOrder()?.status === 'E_SIGNED';
+  });
+
+  readonly isRejectedOrderReleased = computed(() => {
+    return this.currentOrder()?.rejectionStatus === 'E_SIGNED';
+  });
+
+  // Excel Upload Modal State
+  showUploadModal = signal<boolean>(false);
+  selectedUploadFile = signal<File | null>(null);
+  uploadError = signal<string>('');
+  uploadSuccessMessage = signal<string>('');
+  isUploading = signal<boolean>(false);
+  uploadLoadingStatus = signal<string>('Validating evaluation spreadsheet records...');
+  uploadProgressPercent = signal<number>(25);
 
   readonly submissionColumns: TableColumn<ApplicantResponse>[] = [
     { key: '$index', label: 'S. No.', type: 'number', align: 'center', width: 'w-12' },
@@ -187,6 +350,14 @@ export class ApplicantSubmissionsComponent {
       const sId = params['schemeId'] || 'ALL';
       this.schemeId.set(sId);
       this.loadResponses(sId);
+      this.loadOrderState(sId);
+    });
+  }
+
+  loadOrderState(sId: string): void {
+    const targetSchemeId = sId === 'ALL' ? 'MMKVY-01' : sId;
+    this.empanelmentOrderService.getOrderBySchemeId(targetSchemeId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(order => {
+      this.currentOrder.set(order || null);
     });
   }
 
@@ -246,18 +417,235 @@ export class ApplicantSubmissionsComponent {
     );
   }
 
+  navigateToOrderEditor(type: 'empanelment' | 'rejection' = 'empanelment'): void {
+    const sId = this.schemeId() || 'MMKVY-01';
+    if (type === 'rejection') {
+      if (!this.isApprovedOrderReleased()) {
+        alert('Please release the Approved Empanelment Order first.');
+        return;
+      }
+      this.router.navigate(['/admin/empanelment-order-editor', sId], { queryParams: { type: 'rejection' } });
+    } else {
+      this.router.navigate(['/admin/empanelment-order-editor', sId]);
+    }
+  }
+
   onViewEmpanelmentOrder(order: EmpanelmentOrder): void {
     this.selectedViewOrder.set(order);
     this.selectedViewOrderType.set('EMPANELMENT');
-    this.showGenerateOrderModal.set(false);
     this.showOrderViewerModal.set(true);
   }
 
   onViewRejectionOrder(order: EmpanelmentOrder): void {
     this.selectedViewOrder.set(order);
     this.selectedViewOrderType.set('REJECTION');
-    this.showGenerateOrderModal.set(false);
     this.showOrderViewerModal.set(true);
+  }
+
+  openUploadExcelModal(): void {
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+    this.isUploading.set(false);
+    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
+    this.uploadProgressPercent.set(25);
+    this.showUploadModal.set(true);
+  }
+
+  closeUploadExcelModal(): void {
+    this.showUploadModal.set(false);
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+    this.isUploading.set(false);
+  }
+
+  onUploadFileSelected(event: Event): void {
+    const inputEl = event.target as HTMLInputElement;
+    if (!inputEl.files || inputEl.files.length === 0) return;
+
+    const file = inputEl.files[0];
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    if (ext !== '.xlsx' && ext !== '.xls') {
+      this.uploadError.set('Unsupported file format. Please upload a valid .xlsx or .xls file.');
+      this.selectedUploadFile.set(null);
+      return;
+    }
+
+    this.selectedUploadFile.set(file);
+  }
+
+  removeSelectedUploadFile(event: Event): void {
+    event.stopPropagation();
+    this.selectedUploadFile.set(null);
+    this.uploadError.set('');
+    this.uploadSuccessMessage.set('');
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  async submitExcelUpload(): Promise<void> {
+    const file = this.selectedUploadFile();
+    if (!file) {
+      this.uploadError.set('Please select an Excel file to upload.');
+      return;
+    }
+
+    this.isUploading.set(true);
+    this.uploadError.set('');
+    this.uploadLoadingStatus.set('Validating evaluation spreadsheet records...');
+    this.uploadProgressPercent.set(30);
+
+    try {
+      const parsed = await parseEvaluationSpreadsheet(file);
+      if (!parsed.isValid && parsed.errors && parsed.errors.length > 0) {
+        this.uploadError.set(parsed.errors[0]);
+        this.isUploading.set(false);
+        return;
+      }
+
+      const acceptedMap = new Map<string, ParsedEvaluationRow>();
+      parsed.accepted.forEach(r => {
+        acceptedMap.set(r.refNo.toLowerCase().trim(), r);
+      });
+
+      const rejectedMap = new Map<string, ParsedEvaluationRow>();
+      parsed.rejected.forEach(r => {
+        rejectedMap.set(r.refNo.toLowerCase().trim(), r);
+      });
+
+      this.responses.update(list =>
+        list.map(item => {
+          const key1 = item.regNumber.toLowerCase().trim();
+          const key2 = item.id.toLowerCase().trim();
+
+          const acc = acceptedMap.get(key1) || acceptedMap.get(key2);
+          if (acc) {
+            return {
+              ...item,
+              status: 'APPROVED' as const,
+              statusDisplay: 'Approved',
+              evaluationStatus: 'Approved',
+              evaluationGrade: acc.grade,
+              evaluationRemarks: acc.reason
+            };
+          }
+
+          const rej = rejectedMap.get(key1) || rejectedMap.get(key2);
+          if (rej) {
+            return {
+              ...item,
+              status: 'REJECTED' as const,
+              statusDisplay: 'Rejected',
+              evaluationStatus: 'Rejected',
+              evaluationGrade: rej.grade,
+              evaluationRemarks: rej.reason
+            };
+          }
+
+          return item;
+        })
+      );
+
+      // Seed / save top 10 eligible companies and rejected companies to EmpanelmentOrderService
+      const sId = this.schemeId() || 'MMKVY-01';
+      const approvedItems = this.responses().filter(r => r.status === 'APPROVED');
+      const empanelledRows: EmpanelledAgencyItem[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        const app = approvedItems[i];
+        empanelledRows.push({
+          sNo: i + 1,
+          applicationId: app?.regNumber || `ISMS-REG-2026-${8819 + i}`,
+          agencyName: `Company ${i + 1}`,
+          category: 'A1(skilling)',
+          fileStatus: 'Eligible',
+          marksGrade: app?.evaluationGrade || (i < 2 ? 'A+' : (i < 5 ? 'A' : 'B+'))
+        });
+      }
+
+      const rejectedItems = this.responses().filter(r => r.status === 'REJECTED');
+      const rejectedRows: RejectedAgencyItem[] = [];
+      if (rejectedItems.length > 0) {
+        rejectedItems.forEach((rep, idx) => {
+          rejectedRows.push({
+            sNo: idx + 1,
+            applicationId: rep.regNumber || `ISMS-REG-2026-${8835 + idx}`,
+            agencyName: rep.anonymousLabel || rep.actualLegalName || `Disqualified Agency ${idx + 1}`,
+            category: 'A1(skilling)',
+            fileStatus: 'Not Eligible',
+            reason: rep.evaluationRemarks || 'Failed to meet mandatory criteria as per EOI guidelines'
+          });
+        });
+      } else {
+        rejectedRows.push(
+          { sNo: 1, applicationId: 'ISMS-REG-2026-8835', agencyName: 'Universal Skills Pvt Ltd', category: 'A1(skilling)', fileStatus: 'Not Eligible', reason: 'Failed minimum turnover requirement for 3 consecutive fiscal years as per Clause 4.2.' },
+          { sNo: 2, applicationId: 'ISMS-REG-2026-8836', agencyName: 'Apex Educational Trust', category: 'A2(Non-skilling)', fileStatus: 'Not Eligible', reason: 'Non-submission of mandatory CA-certified net worth certificate and GST registration.' },
+          { sNo: 3, applicationId: 'ISMS-REG-2026-8837', agencyName: 'Vanguard Vocational Society', category: 'A1(skilling)', fileStatus: 'Not Eligible', reason: 'Blacklisted / barred by Central/State Department during preceding 2 years.' },
+          { sNo: 4, applicationId: 'ISMS-REG-2026-8838', agencyName: 'SkillTech Training Foundation', category: 'A2(Non-skilling)', fileStatus: 'Not Eligible', reason: 'Inadequate training center infrastructure & failure in physical inspection norms.' }
+        );
+      }
+
+      this.empanelmentOrderService.saveOrder({
+        id: `ORD-${sId}`,
+        schemeId: sId,
+        schemeName: this.currentSchemeName(),
+        eoiRefNo: this.currentEoiRefNo(),
+        fileNo: 'RSLDC/EOI/SAMARTH/2026-27/1709-15',
+        orderDate: formatDate(new Date()),
+        status: 'DRAFT',
+        subject: `Empanelment order against EOI published on 22.01.2026 under MMKVY Category III SAMARTH for FY 2026-2027.`,
+        preamble1: `An Expression of Interest (EOI) was published under Mukhya Mantri Kaushal Vikas Karyakram (MMKVY) category III SAMARTH scheme for empanelment of Project Implementing Agencies (PIAs).`,
+        preamble2: `Pursuant to the evaluation and De Novo Assessment process, the following agencies are hereby shortlisted and empaneled under SAMARTH scheme for FY 2026-2027.`,
+        issuingAuthority: {
+          name: 'Rishav Mandal',
+          designation: 'Managing Director, I.A.S.',
+          department: 'Rajasthan Skill & Livelihoods Development Corporation'
+        },
+        copyToList: [
+          "PS to Hon'ble Minister, DSEE",
+          'PS to Managing Director, RSLDC',
+          'General Manager, RSLDC',
+          'All Concerned Agencies',
+          'Guard File'
+        ],
+        committeeMembers: DEFAULT_COMMITTEE_MEMBERS.map(m => ({ ...m, otpVerified: false, otpSent: false })),
+        empanelledAgencies: empanelledRows,
+        rejectedAgencies: rejectedRows,
+        createdAt: formatDate(new Date())
+      });
+
+      // 3 to 4 Second Loader steps
+      setTimeout(() => {
+        this.uploadLoadingStatus.set('Evaluating applicant scores & recommendation outcomes...');
+        this.uploadProgressPercent.set(65);
+      }, 1200);
+
+      setTimeout(() => {
+        this.uploadLoadingStatus.set('Compiling official Empanelment Order with eligible companies...');
+        this.uploadProgressPercent.set(90);
+      }, 2400);
+
+      setTimeout(() => {
+        this.uploadProgressPercent.set(100);
+        this.isUploading.set(false);
+        this.showUploadModal.set(false);
+        this.selectedUploadFile.set(null);
+        this.router.navigate(['/admin/empanelment-order-editor', sId]);
+      }, 3500);
+
+    } catch (err: any) {
+      console.error('Error uploading evaluation excel:', err);
+      this.uploadError.set(err?.message || 'Failed to process Excel file. Please ensure valid OpenXML structure.');
+      this.isUploading.set(false);
+    }
   }
 
   /**
@@ -271,19 +659,33 @@ export class ApplicantSubmissionsComponent {
 
     this.isDownloadingExcel.set(true);
     try {
-      let gradeOptions = ['A+', 'A', 'B', 'C', 'D'];
+      let gradeOptions: (string | { grade: string; range?: string })[] = [
+        { grade: 'A+', range: '85 - 100' },
+        { grade: 'A', range: '70 - 84' },
+        { grade: 'B', range: '55 - 69' },
+        { grade: 'C', range: '40 - 54' },
+        { grade: 'D', range: '0 - 39' }
+      ];
       if (this.dataEngine) {
         try {
           const masters = await firstValueFrom(
             this.dataEngine.for<GradingMasterItem>('GRADING_MASTERS', { idKey: 'id' }).getAll()
           );
-          const activeGrades = (masters || [])
-            .filter(g => g.status !== 'Inactive')
-            .map(g => g.grade?.trim())
-            .filter((g): g is string => !!g);
-          const unique = Array.from(new Set(activeGrades));
-          if (unique.length > 0) {
-            gradeOptions = unique;
+          const activeItems = (masters || []).filter(g => g.status !== 'Inactive' && !!g.grade);
+          if (activeItems.length > 0) {
+            const seen = new Set<string>();
+            const unique: { grade: string; range?: string }[] = [];
+            for (const g of activeItems) {
+              const gradeName = g.grade.trim();
+              if (!seen.has(gradeName)) {
+                seen.add(gradeName);
+                const r = (g.range || (g.minimum !== undefined && g.maximum !== undefined ? `${g.minimum} - ${g.maximum}` : '')).trim();
+                unique.push({ grade: gradeName, range: r });
+              }
+            }
+            if (unique.length > 0) {
+              gradeOptions = unique;
+            }
           }
         } catch (e) {
           console.warn('Could not load grades from data engine, using defaults', e);

@@ -110,14 +110,11 @@ interface FormBuilderFormData {
             </button>
           </div>
 
-          <!-- Page Title & Subtitle Matching Government Theme -->
+          <!-- Page Title Matching Government Theme -->
           <div>
             <h1 class="text-2xl sm:text-[28px] font-bold text-[#7C0E44] tracking-tight m-0">
               {{ isEditing() ? 'Edit Dynamic Form' : 'Create Dynamic Form' }}
             </h1>
-            <p class="text-xs sm:text-sm text-slate-600 mt-1 m-0">
-              Configure form name, choose whether it's a step-form wizard, and design fields. Drag fields to reorder.
-            </p>
           </div>
 
           <!-- Main White Card Container -->
@@ -243,9 +240,23 @@ interface FormBuilderFormData {
 
                   <!-- Step Fields Header -->
                   <div class="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <span class="text-xs font-bold text-slate-800">
-                      Fields for Step {{ activeStepIndex() + 1 }} ({{ activeStep.fields.length }})
-                    </span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs sm:text-[13px] font-bold text-slate-800">
+                        Fields for Step {{ activeStepIndex() + 1 }} ({{ activeStep.fields.length }})
+                      </span>
+                      <button
+                        appButton
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                        type="button"
+                        (click)="closeStepSection()"
+                        title="Close step section"
+                        aria-label="Close step section"
+                      >
+                        <app-icon name="close" size="xs" />
+                      </button>
+                    </div>
 
                     <button appButton size="sm" type="button" (click)="addFieldToActiveStep()">
                       <app-icon name="plus" size="xs" />
@@ -664,7 +675,15 @@ interface FormBuilderFormData {
                 <button appButton variant="secondary" size="md" type="button" (click)="saveDraft()">
                   <span>Save Draft</span>
                 </button>
-                <button appButton variant="primary" size="md" type="button" (click)="submitForm()">
+                <button
+                  appButton
+                  variant="primary"
+                  size="md"
+                  type="button"
+                  (click)="submitForm()"
+                  [title]="isEditing() ? 'Update Form' : 'Save Form'"
+                  [attr.aria-label]="isEditing() ? 'Update Form' : 'Save Form'"
+                >
                   {{ isEditing() ? 'Update Form' : 'Save Form' }}
                 </button>
               </div>
@@ -676,9 +695,7 @@ interface FormBuilderFormData {
         <app-page-header
           title="Dynamic Form Builder"
           [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Dynamic Form Builder' }]"
-          [searchable]="true"
-          searchPlaceholder="Search by form name, step, or field..."
-          [(searchQuery)]="searchQuery"
+          [searchable]="false"
         >
           <button
             appButton
@@ -1523,7 +1540,7 @@ interface FormBuilderFormData {
                         variant="outline"
                         size="sm"
                         type="button"
-                        (click)="simulateFileUpload({ id: 'eoi-10', label: 'EOI Proposal File', type: 'photo', mandatory: true })"
+                        (click)="triggerFileUpload({ id: 'eoi-10', label: 'EOI Proposal File', type: 'photo', mandatory: true })"
                       >
                         <app-icon name="paperclip" [stroke]="2" class="transform -rotate-45" />
                         <span>+ Attach Document</span>
@@ -1825,7 +1842,7 @@ interface FormBuilderFormData {
               </button>
 
             <!-- Title & Mandatory Notice -->
-            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1">
+            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-1 pr-12">
               <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight m-0">
                 {{ form.formType }}
               </h1>
@@ -1835,7 +1852,7 @@ interface FormBuilderFormData {
             </div>
 
             <!-- Subtitle -->
-            <p class="text-xs text-slate-500 mt-1 mb-6">
+            <p class="text-xs text-slate-500 mt-1 mb-6 pr-12 max-w-2xl leading-relaxed">
               {{ getStepSubtitle(form, previewStepIndex()) }}
             </p>
 
@@ -1880,7 +1897,7 @@ interface FormBuilderFormData {
                 <!-- CASE A: STEPS 1 to 3 (Or any non-review step) -->
                 @if (!isReviewStep(form, previewStepIndex())) {
                   @if (form.steps[previewStepIndex()]; as currentStep) {
-                    <div class="bg-white p-5 sm:p-7 rounded-xl border border-slate-200 space-y-6">
+                    <div class="bg-white p-5 sm:p-7 rounded-xl border border-slate-200 space-y-6 mb-6">
                       <!-- Step Header Inside Card -->
                       <div>
                         <div class="flex items-center gap-2">
@@ -1910,7 +1927,7 @@ interface FormBuilderFormData {
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
                                 <div class="flex flex-wrap items-center gap-2.5">
-                                  <button appButton variant="outline" size="sm" type="button" (click)="simulateFileUpload(field)">
+                                  <button appButton variant="outline" size="sm" type="button" (click)="triggerFileUpload(field)">
                                     <app-icon name="upload" size="xs" />
                                     <span>Upload Document</span>
                                   </button>
@@ -1951,9 +1968,15 @@ interface FormBuilderFormData {
                                 <input appInput size="sm"
                                   type="text"
                                   [(ngModel)]="previewFormValues[field.id]"
+                                  (input)="validatePreviewField(field.id)"
+                                  (blur)="validatePreviewField(field.id)"
+                                  [invalid]="!!previewFieldErrors[field.id]"
                                   [placeholder]="getFieldPlaceholder(field)"
                                   class="w-full"
                                 />
+                                @if (previewFieldErrors[field.id]) {
+                                  <p class="text-[11px] text-rose-500 font-medium m-0 mt-1">{{ previewFieldErrors[field.id] }}</p>
+                                }
                               </div>
                             }
 
@@ -1967,9 +1990,15 @@ interface FormBuilderFormData {
                                 <input appInput size="sm"
                                   type="text"
                                   [(ngModel)]="previewFormValues[field.id]"
+                                  (input)="validatePreviewField(field.id)"
+                                  (blur)="validatePreviewField(field.id)"
+                                  [invalid]="!!previewFieldErrors[field.id]"
                                   [placeholder]="getFieldPlaceholder(field)"
                                   class="w-full"
                                 />
+                                @if (previewFieldErrors[field.id]) {
+                                  <p class="text-[11px] text-rose-500 font-medium m-0 mt-1">{{ previewFieldErrors[field.id] }}</p>
+                                }
                               </div>
                             }
 
@@ -2007,7 +2036,6 @@ interface FormBuilderFormData {
                                       <option [value]="opt">{{ opt }}</option>
                                     }
                                   </select>
-                                  <app-icon name="chevron-down" [stroke]="2" class="text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                                 </div>
                               </div>
                             }
@@ -2041,7 +2069,17 @@ interface FormBuilderFormData {
                                   {{ field.label }}
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
-                                <input appInput size="sm" type="email" [(ngModel)]="previewFormValues[field.id]" placeholder="name@domain.gov.in" class="w-full" />
+                                <input appInput size="sm" type="email"
+                                  [(ngModel)]="previewFormValues[field.id]"
+                                  (input)="validatePreviewField(field.id)"
+                                  (blur)="validatePreviewField(field.id)"
+                                  [invalid]="!!previewFieldErrors[field.id]"
+                                  placeholder="name@domain.gov.in"
+                                  class="w-full"
+                                />
+                                @if (previewFieldErrors[field.id]) {
+                                  <p class="text-[11px] text-rose-500 font-medium m-0 mt-1">{{ previewFieldErrors[field.id] }}</p>
+                                }
                               </div>
                             }
 
@@ -2052,7 +2090,17 @@ interface FormBuilderFormData {
                                   {{ field.label }}
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
-                                <input appInput size="sm" type="tel" [(ngModel)]="previewFormValues[field.id]" placeholder="9876543210" class="w-full" />
+                                <input appInput size="sm" type="tel"
+                                  [(ngModel)]="previewFormValues[field.id]"
+                                  (input)="validatePreviewField(field.id)"
+                                  (blur)="validatePreviewField(field.id)"
+                                  [invalid]="!!previewFieldErrors[field.id]"
+                                  placeholder="9876543210"
+                                  class="w-full"
+                                />
+                                @if (previewFieldErrors[field.id]) {
+                                  <p class="text-[11px] text-rose-500 font-medium m-0 mt-1">{{ previewFieldErrors[field.id] }}</p>
+                                }
                               </div>
                             }
 
@@ -2091,7 +2139,7 @@ interface FormBuilderFormData {
                                   {{ field.label }}
                                   @if (field.mandatory) { <span class="text-rose-500 font-bold ml-0.5">*</span> }
                                 </label>
-                                <div class="p-3 border-2 border-dashed border-slate-300 rounded-lg bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
+                                <div class="p-3 border-2 border-dashed border-slate-300 rounded-lg bg-white text-center cursor-pointer" (click)="triggerFileUpload(field)">
                                   <div class="text-xs font-semibold text-slate-800">Click to upload document (PDF/DOC)</div>
                                   <div class="text-[11px] text-slate-400 mt-0.5">Max {{ field.maxSizeMb || 10 }}MB</div>
                                 </div>
@@ -2378,7 +2426,7 @@ interface FormBuilderFormData {
                     </div>
 
                     <!-- Step 4 Bottom Action Buttons -->
-                    <div class="flex items-center justify-between pt-2">
+                    <div class="sticky bottom-0 bg-white/95 backdrop-blur-xs py-3 px-4 border-t border-slate-200 shadow-md rounded-b-xl flex items-center justify-between z-20 mt-4">
                       <button appButton variant="outline" type="button" (click)="previewPrevStep()">
                         <app-icon name="chevron-left" size="xs" />
                         <span>Previous</span>
@@ -2390,7 +2438,7 @@ interface FormBuilderFormData {
                           <span>Download PDF</span>
                         </button>
 
-                        <button appButton type="button" (click)="registerSubmit()">
+                        <button appButton type="button" (click)="registerSubmit(true)">
                           Register
                         </button>
                       </div>
@@ -2458,7 +2506,7 @@ interface FormBuilderFormData {
                         </label>
                       }
                       @if (field.type === 'file') {
-                        <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
+                        <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="triggerFileUpload(field)">
                           <div class="text-xs font-semibold text-slate-800">Click to upload document (PDF/DOC)</div>
                           <div class="text-[11px] text-slate-400 mt-1">
                             Max {{ field.maxSizeMb || 10 }}MB
@@ -2472,7 +2520,7 @@ interface FormBuilderFormData {
                         <hr class="border-slate-200 col-span-12 my-2" />
                       }
                       @if (field.type === 'photo') {
-                        <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="simulateFileUpload(field)">
+                        <div class="p-3.5 border-2 border-dashed border-slate-300 rounded-xl bg-white text-center cursor-pointer" (click)="triggerFileUpload(field)">
                           <div class="text-xs font-semibold text-slate-800">Click to upload document / photo</div>
                           <div class="text-[11px] text-slate-400 mt-1">
                             Min: {{ field.minPhotos || 1 }} • Max: {{ field.maxPhotos || 5 }} photos (Max {{ field.maxSizeMb || 5 }}MB)
@@ -2484,7 +2532,7 @@ interface FormBuilderFormData {
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex justify-end">
-                  <button appButton type="button" (click)="registerSubmit()">
+                  <button appButton type="button" (click)="registerSubmit(true)">
                     Submit Form
                   </button>
                 </div>
@@ -3482,8 +3530,82 @@ export class DynamicFormBuilderComponent {
     this.previewStepIndex.set(idx);
   }
 
-  previewNextStep(form: DynamicFormBuilderItem): void {
+  closeStepSection(): void {
+    this.activeStepIndex.set(0);
+  }
+
+  previewFieldErrors: Record<string, string> = {};
+
+  validatePreviewField(fieldId: string): void {
+    const rawVal = this.previewFormValues[fieldId];
+    const val = rawVal !== undefined && rawVal !== null ? String(rawVal).trim() : '';
+    if (!val) {
+      delete this.previewFieldErrors[fieldId];
+      return;
+    }
+    if (fieldId === 'crf-13' || fieldId === 'crf-207') {
+      if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val)) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid email address.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-12' || fieldId === 'crf-206') {
+      if (!/^[6-9]\d{9}$/.test(val)) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid 10-digit mobile number.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-14') {
+      if (!/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/.test(val) || val.length < 5 || /^\d+$/.test(val)) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid website URL.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-7' || fieldId === 'crf-205') {
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(val.toUpperCase())) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid 10-character PAN.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-18' || fieldId === 'crf-22') {
+      if (!/^\d{6}$/.test(val)) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid 6-digit PIN code.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-307') {
+      if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(val.toUpperCase())) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid 11-character IFSC code.';
+        return;
+      }
+    }
+    if (fieldId === 'crf-308') {
+      if (!/^\d{9}$/.test(val)) {
+        this.previewFieldErrors[fieldId] = 'Please enter a valid 9-digit MICR code.';
+        return;
+      }
+    }
+    delete this.previewFieldErrors[fieldId];
+  }
+
+  previewNextStep(form: DynamicFormBuilderItem, enforceValidation = false): void {
     if (form.steps && this.previewStepIndex() < form.steps.length - 1) {
+      if (enforceValidation) {
+        const currentStep = form.steps[this.previewStepIndex()];
+        if (currentStep && currentStep.fields) {
+          const missingMandatory = currentStep.fields.filter(f => {
+            if (!f.mandatory) return false;
+            if (f.type === 'heading' || f.type === 'divider') return false;
+            const val = this.previewFormValues[f.id];
+            return val === undefined || val === null || String(val).trim() === '';
+          });
+          if (missingMandatory.length > 0) {
+            const names = missingMandatory.map(f => f.label).slice(0, 2).join(', ');
+            this.notification.error(`Please fill in mandatory fields (${names}) before proceeding.`);
+            return;
+          }
+        }
+      }
       this.previewStepIndex.update(idx => idx + 1);
     }
   }
@@ -3571,6 +3693,24 @@ export class DynamicFormBuilderComponent {
     }
   }
 
+  triggerFileUpload(field: DynamicFormField): void {
+    if (typeof document === 'undefined') return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = field.type === 'photo' ? 'image/*' : '.pdf,.doc,.docx,.jpg,.jpeg,.png';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (file) {
+        const sizeFormatted = file.size > 1024 * 1024
+          ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+          : (file.size / 1024).toFixed(0) + ' KB';
+        this.uploadedFiles[field.id] = `${file.name} (${sizeFormatted})`;
+        this.notification.success(`${field.label} uploaded successfully.`);
+      }
+    };
+    input.click();
+  }
+
   simulateFileUpload(field: DynamicFormField): void {
     const sampleMap: Record<string, string> = {
       'crf-6': 'Incorporation_Certificate.pdf (2.4 MB)',
@@ -3597,7 +3737,38 @@ export class DynamicFormBuilderComponent {
     this.notification.success('Organisation Registration summary PDF downloaded successfully.');
   }
 
-  registerSubmit(): void {
+  registerSubmit(enforceValidation = false): void {
+    const form = this.selectedPreviewForm();
+    if (enforceValidation && form && form.isStepForm && form.steps) {
+      for (let sIdx = 0; sIdx < form.steps.length; sIdx++) {
+        if (this.isReviewStep(form, sIdx)) continue;
+        const step = form.steps[sIdx];
+        if (step.fields) {
+          const missing = step.fields.filter(f => {
+            if (!f.mandatory) return false;
+            if (f.type === 'heading' || f.type === 'divider') return false;
+            if (f.type === 'file' || f.type === 'photo') {
+              return !this.uploadedFiles[f.id];
+            }
+            const val = this.previewFormValues[f.id];
+            return val === undefined || val === null || String(val).trim() === '';
+          });
+          if (missing.length > 0) {
+            this.previewStepIndex.set(sIdx);
+            const names = missing.map(f => f.label).slice(0, 2).join(', ');
+            this.notification.error(`Please fill in mandatory fields (${names}) before proceeding.`);
+            return;
+          }
+        }
+      }
+    }
+    if (enforceValidation) {
+      const errorKeys = Object.keys(this.previewFieldErrors);
+      if (errorKeys.length > 0) {
+        this.notification.error(this.previewFieldErrors[errorKeys[0]]);
+        return;
+      }
+    }
     const refNo = 'REG-2026-' + Math.floor(10000 + Math.random() * 90000);
     this.notification.success(`Organisation Registration submitted successfully! Reference No: ${refNo}`);
     this.closePreviewModal();
@@ -3897,7 +4068,7 @@ export class DynamicFormBuilderComponent {
       'crf-7': 'Enter organisation PAN',
       'crf-12': 'Enter mobile number',
       'crf-13': 'Enter email address',
-      'crf-14': 'Enter website (https://www.example.com)',
+      'crf-14': 'https://example.com',
       'crf-15': 'Enter address, locality, building name and number',
       'crf-18': 'Enter PIN code',
       'crf-19': 'Enter office address, locality, building name and number',
@@ -3916,7 +4087,7 @@ export class DynamicFormBuilderComponent {
       'crf-305': 'Enter account holder name',
       'crf-306': 'Enter account number',
       'crf-307': 'Enter IFSC code',
-      'crf-308': 'Enter MICR code (9 digits)',
+      'crf-308': 'Enter MICR code',
       'crf-309': 'Enter branch address, street, locality, city, PIN code'
     };
     return placeholders[field.id] || '';

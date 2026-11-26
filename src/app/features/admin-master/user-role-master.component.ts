@@ -17,7 +17,6 @@ const CONFIG: MasterCrudConfig<UserRoleMasterItem> = {
   dataKey: 'USER_ROLES',
   entityLabel: 'Role Type',
   title: 'Role Management',
-  subtitle: 'Configure user roles, administrative authority, and designation scopes',
   breadcrumbs: [{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Role Management' }],
   searchPlaceholder: 'Search by role type...',
   searchFields: ['roleTypeName'],

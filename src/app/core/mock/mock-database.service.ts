@@ -194,7 +194,15 @@ export class MockDatabaseService {
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
           } else {
-            this.store.set(key, stored);
+            const storedIds = new Set(stored.map((it: any) => String(it.id)));
+            const missingSeeds = this.seeds[key].filter(s => !storedIds.has(String(s.id)));
+            if (missingSeeds.length > 0) {
+              const merged = [...stored, ...this.deepClone(missingSeeds)];
+              this.store.set(key, merged);
+              this.saveToStorage(key, merged);
+            } else {
+              this.store.set(key, stored);
+            }
           }
         } else if (key === 'ANNEXURE_MASTERS') {
           const hasOldSchema = !stored || stored.length === 0 || stored.some((item: any) => !item?.annexureName || !Array.isArray(item?.schemes));
@@ -203,7 +211,15 @@ export class MockDatabaseService {
             this.store.set(key, fresh);
             this.saveToStorage(key, fresh);
           } else {
-            this.store.set(key, stored);
+            const storedIds = new Set(stored.map((it: any) => String(it.id)));
+            const missingSeeds = this.seeds[key].filter(s => !storedIds.has(String(s.id)));
+            if (missingSeeds.length > 0) {
+              const merged = [...stored, ...this.deepClone(missingSeeds)];
+              this.store.set(key, merged);
+              this.saveToStorage(key, merged);
+            } else {
+              this.store.set(key, stored);
+            }
           }
         } else if (key === 'GRIEVANCES' || key === 'ADMIN_GRIEVANCES') {
           const hasLoginIssue = stored.some(

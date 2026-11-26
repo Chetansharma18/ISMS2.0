@@ -228,6 +228,20 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'admin/empanelment-order-editor/:schemeId',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-empanelment-editor/eoi-empanelment-editor.component').then(
+        (m) => m.EoiEmpanelmentEditorComponent
+      )
+  },
+  {
+    path: 'admin/empanelment-order-editor',
+    loadComponent: () =>
+      import('./features/eoi/pages/eoi-empanelment-editor/eoi-empanelment-editor.component').then(
+        (m) => m.EoiEmpanelmentEditorComponent
+      )
+  },
+  {
     path: 'admin/responses/:schemeId',
     loadComponent: () =>
       import('./features/eoi/pages/applicant-submissions/applicant-submissions.component').then(

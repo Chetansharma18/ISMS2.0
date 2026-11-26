@@ -74,9 +74,6 @@ export type { UserManagementItem };
       <!-- Page Header -->
       <app-page-header
         [title]="isBlacklistedView() ? 'Blacklisted Users' : 'Users'"
-        [subtitle]="isBlacklistedView()
-          ? 'Search SSO ID to debar users, monitor blacklisted training partners, and filter scheme-wise'
-          : 'Manage system administrators, department officers, scrutiny officers, and training partners'"
         [breadcrumbs]="isBlacklistedView()
           ? [{ label: 'Home', url: '/' }, { label: 'User Management', url: '/admin/user-management?filter=all' }, { label: 'Blacklisted Users' }]
           : [{ label: 'Home', url: '/' }, { label: 'User Management' }, { label: 'Users' }]"

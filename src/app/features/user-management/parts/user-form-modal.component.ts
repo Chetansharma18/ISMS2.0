@@ -23,12 +23,12 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
       [showAccentBar]="false"
       [primaryLabel]="editing() ? 'Save Changes' : 'Submit'"
       secondaryLabel=""
-      maxWidthClass="max-w-[780px]"
+      size="xl"
       (primaryAction)="save.emit()"
       (secondaryAction)="cancelled.emit()"
       (close)="cancelled.emit()"
     >
-      <h2 class="m-0 text-navy" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+      <h2 class="m-0 text-[#7C0E44] text-[18px] font-semibold leading-6 tracking-tight">
         {{ editing() ? 'Edit User' : 'Add New User' }}
       </h2>
 
@@ -125,6 +125,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="10"
               placeholder="10-digit mobile number"
               [(ngModel)]="f.mobileNo"
+              (keydown)="filterNumericKey($event)"
+              (input)="onMobileInput($event)"
               [invalid]="isSubmitted && !f.mobileNo"
               class="w-full"
             />
@@ -140,6 +142,7 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               appInput
               size="sm"
               type="date"
+              [max]="maxDateOfBirth"
               [(ngModel)]="f.dateOfBirth"
               class="w-full"
             />
@@ -154,6 +157,8 @@ import { DistrictBlockMasterItem } from '../../../core/models/admin-masters.mode
               maxlength="12"
               placeholder="12-digit Aadhaar number"
               [(ngModel)]="f.aadhaarId"
+              (keydown)="filterNumericKey($event)"
+              (input)="onAadhaarInput($event)"
               class="w-full tabular-nums"
             />
           </div>
@@ -230,6 +235,34 @@ export class UserFormModalComponent {
 
   readonly save = output<void>();
   readonly cancelled = output<void>();
+
+  readonly maxDateOfBirth = new Date().toISOString().split('T')[0];
+
+  filterNumericKey(event: KeyboardEvent): void {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'
+    ];
+    if (allowedKeys.includes(event.key) || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    if (!/^\d$/.test(event.key)) {
+      event.preventDefault();
+    }
+  }
+
+  onMobileInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 10);
+    input.value = cleaned;
+    this.formData().mobileNo = cleaned;
+  }
+
+  onAadhaarInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const cleaned = (input.value || '').replace(/\D/g, '').slice(0, 12);
+    input.value = cleaned;
+    this.formData().aadhaarId = cleaned;
+  }
 
   isRoleDisabled(role: string): boolean {
     const r = (role || '').trim().toLowerCase();

@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { PORTAL_CONFIG } from '../config/app.config';
 import { UserRole, RoleConfig } from '../models/role.model';
 import { UserPersona } from '../models/user.model';
 import { StorageService } from '../services/storage.service';
@@ -159,7 +160,8 @@ export class AuthService {
   }
 
   triggerSsoRedirect(): void {
-    this.isRedirecting.set(true);
+    this.isRedirecting.set(false);
+    this.router.navigate(['/sso-login']);
   }
 
   closeSsoRedirect(): void {

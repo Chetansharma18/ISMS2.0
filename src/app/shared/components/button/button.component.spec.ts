@@ -9,6 +9,8 @@ import { ButtonComponent } from './button.component';
   template: `
     <button id="plain" appButton>Go</button>
     <button id="outline" appButton variant="outline" size="sm" block>Back</button>
+    <button id="square" appButton variant="outline" square>Sharp</button>
+    <button id="tile" appButton variant="outline" square tile>Tile</button>
     <button id="submit" appButton type="submit">Save</button>
     <button id="busy" appButton [loading]="true">Saving</button>
     <button id="off" appButton [disabled]="true">Off</button>
@@ -16,7 +18,7 @@ import { ButtonComponent } from './button.component';
     <a id="link-off" appButton href="#" [disabled]="true">Home</a>
   `
 })
-class HostComponent {}
+class HostComponent { }
 
 function render(): HTMLElement {
   const fixture = TestBed.createComponent(HostComponent);
@@ -37,6 +39,17 @@ describe('ButtonComponent (appButton)', () => {
     expect(button.className).toContain('btn-outline');
     expect(button.className).toContain('btn-sm');
     expect(button.className).toContain('btn-block');
+  });
+
+  it('applies btn-square when square is set', () => {
+    const button = render().querySelector('#square') as HTMLButtonElement;
+    expect(button.className).toContain('btn-square');
+  });
+
+  it('applies btn-tile when tile is set', () => {
+    const button = render().querySelector('#tile') as HTMLButtonElement;
+    expect(button.className).toContain('btn-square');
+    expect(button.className).toContain('btn-tile');
   });
 
   it('keeps type="submit" when asked for', () => {

@@ -406,272 +406,304 @@ app-sidebar aside nav a[class*="bg-[#F2DACE]"] span {
    7. BUTTON SYSTEM
    --------------------------------------------------------- */
 @layer components {
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: var(--height-button);
-  padding: 0 var(--space-4);
-  border: 1px solid transparent;
-  border-radius: var(--radius-control);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
-  line-height: 20px;
-  cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast),
-    color var(--transition-fast);
-}
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--height-button);
+    padding: 0 var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    line-height: 20px;
+    cursor: pointer;
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      color var(--transition-fast);
+  }
 
-/* Primary action: deep burgundy, white text. */
-.btn-primary {
-  color: #FFFFFF !important;
-  background-color: #7C0E44;
-  border-color: #7C0E44;
-}
+  /* Primary action: deep burgundy, white text. */
+  .btn-primary {
+    color: #FFFFFF !important;
+    background-color: #7C0E44;
+    border-color: #7C0E44;
+  }
 
-.btn-primary:hover {
-  background-color: #5E0832;
-  border-color: #5E0832;
-}
+  .btn-primary:hover {
+    background-color: #5E0832;
+    border-color: #5E0832;
+  }
 
-.btn-secondary {
-  color: #FFFFFF !important;
-  background-color: #AA5E7A;
-  border-color: #AA5E7A;
-}
+  .btn-secondary {
+    color: #FFFFFF !important;
+    background-color: #AA5E7A;
+    border-color: #AA5E7A;
+  }
 
-.btn-secondary:hover {
-  background-color: #8C4B64;
-  border-color: #8C4B64;
-}
+  .btn-secondary:hover {
+    background-color: #8C4B64;
+    border-color: #8C4B64;
+  }
 
-/* Secondary action next to a primary one: white with a dusty rose border (Back, View, Cancel, Close). */
-.btn-outline {
-  color: #7C0E44;
-  background-color: #FFFFFF;
-  border-color: #AA5E7A;
-  box-shadow: 0 1px 2px rgba(124, 14, 68, 0.05);
-}
+  /* Secondary action next to a primary one: white with a dusty rose border (Back, View, Cancel, Close). */
+  .btn-outline {
+    color: #7C0E44;
+    background-color: #FFFFFF;
+    border-color: #AA5E7A;
+    box-shadow: 0 1px 2px rgba(124, 14, 68, 0.05);
+  }
 
-.btn-outline:hover {
-  background-color: #F8EDF1;
-  border-color: #7C0E44;
-  color: #5E0832;
-}
+  .btn-outline:hover {
+    background-color: #F8EDF1;
+    border-color: #7C0E44;
+    color: #5E0832;
+  }
 
-.btn-reset {
-  color: #7C0E44;
-  background-color: #FFFFFF;
-  border-color: #EADCE2;
-}
+  .btn-reset {
+    color: #7C0E44;
+    background-color: #FFFFFF;
+    border-color: #EADCE2;
+  }
 
-.btn-reset:hover {
-  background-color: #F8EDF1;
-  border-color: #AA5E7A;
-}
+  .btn-reset:hover {
+    background-color: #F8EDF1;
+    border-color: #AA5E7A;
+  }
 
-.btn-sm {
-  height: 32px;
-  padding: 0 var(--space-3);
-  font-size: var(--font-size-small);
-  line-height: 18px;
-}
+  .btn-sm {
+    height: 32px;
+    padding: 0 var(--space-3);
+    font-size: var(--font-size-small);
+    line-height: 18px;
+  }
 
-.btn-lg {
-  height: 44px;
-  padding: 0 var(--space-6);
-  font-size: var(--font-size-body);
-  line-height: 22px;
-}
+  .btn-lg {
+    height: 44px;
+    padding: 0 var(--space-6);
+    font-size: var(--font-size-body);
+    line-height: 22px;
+  }
 
-.btn-danger {
-  color: #FFFFFF !important;
-  background-color: #C5221F;
-  border-color: #C5221F;
-}
+  .btn-danger {
+    color: #FFFFFF !important;
+    background-color: #C5221F;
+    border-color: #C5221F;
+  }
 
-.btn-danger:hover {
-  background-color: #A51D1A;
-  border-color: #A51D1A;
-}
+  .btn-danger:hover {
+    background-color: #A51D1A;
+    border-color: #A51D1A;
+  }
 
-.btn-ghost {
-  color: var(--color-primary);
-  background-color: transparent;
-  border-color: transparent;
-}
+  .btn-ghost {
+    color: var(--color-primary);
+    background-color: transparent;
+    border-color: transparent;
+  }
 
-.btn-ghost:hover {
-  background-color: var(--color-primary-light);
-}
+  .btn-ghost:hover {
+    background-color: var(--color-primary-light);
+  }
 
-/* Quiet text action on a dark background (footer links) */
-.btn-inverse {
-  color: #CBD5E1 !important;
-  background-color: transparent;
-  border-color: transparent;
-}
+  /* Quiet text action on a dark background (footer links) */
+  .btn-inverse {
+    color: #CBD5E1 !important;
+    background-color: transparent;
+    border-color: transparent;
+  }
 
-.btn-inverse:hover {
-  color: #FFFFFF !important;
-  text-decoration: underline;
-}
+  .btn-inverse:hover {
+    color: #FFFFFF !important;
+    text-decoration: underline;
+  }
 
-/* Smallest size: a remove (x) inside a chip, a thumbnail or a dense row */
-.btn-xs {
-  height: 22px;
-  padding: 0 var(--space-2);
-  font-size: 11px;
-  line-height: 14px;
-}
+  /* Smallest size: a remove (x) inside a chip, a thumbnail or a dense row */
+  .btn-xs {
+    height: 22px;
+    padding: 0 var(--space-2);
+    font-size: 11px;
+    line-height: 14px;
+  }
 
-.btn-icon.btn-xs {
-  width: 22px;
-  padding: 0;
-}
+  .btn-icon.btn-xs {
+    width: 22px;
+    padding: 0;
+  }
 
-/* Modifiers shared by every variant */
-.btn {
-  gap: var(--space-2);
-  white-space: nowrap;
-  user-select: none;
-}
+  /* Modifiers shared by every variant */
+  .btn {
+    gap: var(--space-2);
+    white-space: nowrap;
+    user-select: none;
+  }
 
-.btn:focus:not(:focus-visible) {
-  outline: none;
-}
+  .btn:focus:not(:focus-visible) {
+    outline: none;
+  }
 
-.btn:disabled,
-.btn[aria-disabled='true'] {
-  opacity: 0.55;
-  pointer-events: none;
-}
+  .btn:disabled,
+  .btn[aria-disabled='true'] {
+    opacity: 0.55;
+    pointer-events: none;
+  }
 
-.btn-block {
-  display: flex;
-  width: 100%;
-}
+  .btn-block {
+    display: flex;
+    width: 100%;
+  }
 
-/* Square button that holds only an icon (close, delete, print) */
-.btn-icon {
-  width: var(--height-button);
-  padding: 0;
-}
+  .btn-square {
+    border-radius: 0;
+  }
 
-.btn-icon.btn-sm {
-  width: 32px;
-}
+  /* Vertical tile button (e.g. role picker cards: icon above single-line label) */
+  .btn-tile {
+    position: relative;
+    height: auto;
+    min-height: 92px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px var(--space-3);
+    white-space: nowrap;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(124, 14, 68, 0.14);
+    transition:
+      background-color var(--transition-fast),
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .btn-tile:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(94, 8, 50, 0.24);
+  }
+
+  .btn-tile:active {
+    transform: translateY(0);
+  }
+
+  /* Square button that holds only an icon (close, delete, print) */
+  .btn-icon {
+    width: var(--height-button);
+    padding: 0;
+  }
+
+  .btn-icon.btn-sm {
+    width: 32px;
+  }
 }
 
 /* ---------------------------------------------------------
    8. FORM CONTROLS & INPUTS
    --------------------------------------------------------- */
 @layer components {
-.form-label {
-  display: block;
-  margin-bottom: var(--space-2);
-  color: var(--color-text-primary);
-  font-size: var(--font-size-label);
-  font-weight: var(--font-weight-medium);
-  line-height: 20px;
-}
+  .form-label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-label);
+    font-weight: var(--font-weight-medium);
+    line-height: 20px;
+  }
 
-.form-control {
-  width: 100%;
-  height: var(--height-input);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--color-field-border, #E5D6DE);
-  border-radius: var(--radius-control);
-  outline: none;
-  background-color: var(--color-surface, #FFFFFF);
-  color: var(--color-text-primary, #25212A);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-body);
-  transition:
-    border-color var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
+  .form-control {
+    width: 100%;
+    height: var(--height-input);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--color-field-border, #E5D6DE);
+    border-radius: var(--radius-control);
+    outline: none;
+    background-color: var(--color-surface, #FFFFFF);
+    color: var(--color-text-primary, #25212A);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-body);
+    transition:
+      border-color var(--transition-fast),
+      box-shadow var(--transition-fast);
+  }
 
-select.form-control {
-  transition: none;
-}
+  select.form-control {
+    transition: none;
+  }
 
-.form-control:focus {
-  border-color: #AA5E7A;
-  box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2);
-  outline: none !important;
-}
+  .form-control:focus {
+    border-color: #AA5E7A;
+    box-shadow: 0 0 0 2px rgba(170, 94, 122, 0.2);
+    outline: none !important;
+  }
 
-.form-control::placeholder {
-  color: var(--color-text-muted, #89818A);
-}
+  .form-control::placeholder {
+    color: var(--color-text-muted, #89818A);
+  }
 
-/* Compact field for filters, toolbars and table cells */
-.form-control-sm {
-  height: 32px;
-  padding: 0 var(--space-2);
-  font-size: var(--font-size-small);
-}
+  /* Compact field for filters, toolbars and table cells */
+  .form-control-sm {
+    height: 32px;
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-small);
+  }
 
-/* A text area grows with its rows instead of keeping the single-line height */
-textarea.form-control {
-  height: auto;
-  min-height: var(--height-input);
-  padding: var(--space-2) var(--space-3);
-  line-height: 1.5;
-  resize: vertical;
-}
+  /* A text area grows with its rows instead of keeping the single-line height */
+  textarea.form-control {
+    height: auto;
+    min-height: var(--height-input);
+    padding: var(--space-2) var(--space-3);
+    line-height: 1.5;
+    resize: vertical;
+  }
 
-.form-control.is-invalid {
-  border-color: #E11D48;
-}
+  .form-control.is-invalid {
+    border-color: #E11D48;
+  }
 
-.form-control.is-invalid:focus {
-  border-color: #E11D48;
-  box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.15);
-}
+  .form-control.is-invalid:focus {
+    border-color: #E11D48;
+    box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.15);
+  }
 
-.form-control:disabled,
-.form-control[readonly] {
-  background-color: #F8FAFC;
-  cursor: not-allowed;
-}
+  .form-control:disabled,
+  .form-control[readonly] {
+    background-color: #F8FAFC;
+    cursor: not-allowed;
+  }
 
-/* Text typed straight into a printed letter or a table cell: no box around it */
-.form-control.form-control-plain {
-  height: auto;
-  min-height: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  font-size: inherit;
-}
+  /* Text typed straight into a printed letter or a table cell: no box around it */
+  .form-control.form-control-plain {
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: inherit;
+  }
 
-/* Only a bottom line (sign-in forms) */
-.form-control.form-control-underline {
-  height: auto;
-  padding: var(--space-2) 0;
-  border: 0;
-  border-bottom: 1px solid #94A3B8;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
+  /* Only a bottom line (sign-in forms) */
+  .form-control.form-control-underline {
+    height: auto;
+    padding: var(--space-2) 0;
+    border: 0;
+    border-bottom: 1px solid #94A3B8;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
 
-.form-control.form-control-underline:focus {
-  border-bottom-color: var(--color-navy);
-  box-shadow: none;
-}
+  .form-control.form-control-underline:focus {
+    border-bottom-color: var(--color-navy);
+    box-shadow: none;
+  }
 
-.form-control.form-control-plain:focus {
-  box-shadow: none;
-  background-color: rgba(23, 74, 110, 0.06);
-}
+  .form-control.form-control-plain:focus {
+    box-shadow: none;
+    background-color: rgba(23, 74, 110, 0.06);
+  }
 }
 
 /* =========================================================
@@ -775,7 +807,8 @@ app-table td {
   color: #25212A;
   border-bottom: 1px solid var(--color-border, #EADCE2);
   font-size: 13px !important;
-  font-weight: 400 !important; /* Uniform normal font inside all table data cells matching Active Schemes / Tender Status */
+  font-weight: 400 !important;
+  /* Uniform normal font inside all table data cells matching Active Schemes / Tender Status */
 }
 
 /* Ensure data cell spans, links, divs inside portal tables default to 13px text size and strictly normal font weight */
@@ -825,10 +858,13 @@ table.table tbody tr:hover {
 
 /* Government Portal Style Blinking Badge Animation */
 @keyframes isms-blink {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.45));
   }
+
   50% {
     opacity: 0.28;
     filter: none;

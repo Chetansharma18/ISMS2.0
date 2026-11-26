@@ -1,29 +1,33 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  signal,
-  ElementRef,
-  ViewChild,
-  AfterViewInit,
-  OnDestroy,
-  inject,
-  PLATFORM_ID
-} from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { HELPLINE_GLOBAL } from '../../../shared/helpline-global';
 import { UserManualPdfService } from '../../services/user-manual-pdf.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import type { SolidIconName } from '../../../shared/components/icon/icons.solid';
 import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
+
+interface PartnerBannerLink {
+  href: string;
+  title: string;
+  ariaLabel: string;
+  imgSrc: string;
+  fallbackSrc?: string;
+}
+
+interface SocialMediaLink {
+  href: string;
+  label: string;
+  icon: SolidIconName;
+}
 
 @Component({
   selector: 'app-footer',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, ButtonComponent, IconComponent],
+  imports: [RouterModule, ButtonComponent, IconComponent],
   host: {
-    class: 'block w-full bg-[#070e18]'
+    class: 'block w-full bg-[#1A020E]'
   },
   styles: [`
     @keyframes scroll {
@@ -35,15 +39,13 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
       }
     }
     .animate-scroll {
-      animation: scroll 28s linear infinite;
+      animation: scroll 26s linear infinite;
       will-change: transform;
       backface-visibility: hidden;
       transform: translate3d(0, 0, 0);
     }
-    @media (prefers-reduced-motion: reduce) {
-      .animate-scroll {
-        animation: none !important;
-      }
+    .marquee-viewport:hover .animate-scroll {
+      animation-play-state: paused;
     }
     .mask-fade {
       mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
@@ -62,7 +64,7 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
       text-decoration: underline;
     }
     .footer-social-btn {
-      color: #12223a !important;
+      color: #5E0832 !important;
       background-color: #ffffff !important;
     }
     .footer-social-btn:hover {
@@ -71,30 +73,26 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
     }
   `],
   template: `
-    <footer #footerRef 
-      class="relative w-full font-sans bg-[#0c1828] text-slate-300 border-t border-slate-700 select-none overflow-hidden" 
-      aria-label="Portal Footer">
-
-      <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (FOOTER BACKGROUND.png) - Prominently Visible -->
+    <footer
+      class="relative w-full font-sans bg-[#2D0418] text-slate-200 border-t border-[#7C0E44]/40 select-none overflow-hidden"
+      aria-label="Portal Footer"
+    >
+      <!-- Background Image Layer: Rajasthan Forts & Palaces Heritage Silhouette (Pure Burgundy & Rose Tones) -->
       <div class="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
-        <img 
-          src="/footer-images/FOOTER%20BACKGROUND.png" 
-          alt="Rajasthan Heritage Skyline" 
+        <img
+          src="/footer-images/FOOTER%20BACKGROUND.png"
+          alt="Rajasthan Heritage Skyline"
           aria-hidden="true"
           class="w-full h-full object-cover object-bottom opacity-90"
           loading="lazy"
         />
-        <!-- Soft gradient overlay keeping the skyline vividly visible while preserving text contrast -->
-        <div class="absolute inset-0 bg-linear-to-b from-[#0c1828]/50 via-transparent to-[#070e18]/65"></div>
+        <div class="absolute inset-0 bg-linear-to-b from-[#2D0418]/50 via-transparent to-[#1A020E]/65"></div>
       </div>
 
       <!-- Foreground Content Layer -->
       <div class="relative z-10 w-full">
-
         <!-- Tier 1: Other Important Links -->
         <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-          
-          <!-- Section Heading with Flanking Saffron/Amber Accents -->
           <div class="flex items-center justify-center gap-3 sm:gap-5 mb-7 sm:mb-9">
             <div class="h-px flex-1 max-w-30 bg-linear-to-l from-[#F59E0B] to-transparent"></div>
             <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide font-sans m-0 whitespace-nowrap">
@@ -106,245 +104,64 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
           <!-- Mobile View: Balanced Two-Column Responsive Grid (< 640px) -->
           <div class="block sm:hidden max-w-sm mx-auto">
             <div class="grid grid-cols-2 gap-3">
-              <!-- BIS Care -->
-              <a
-                href="https://bis.gov.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="BIS Care App"
-                aria-label="Bureau of Indian Standards BIS Care App (opens in a new tab)"
-                class="w-full bg-white rounded-2xl h-20 flex items-center justify-center p-2.5 shadow-md hover:shadow-xl transition-all cursor-pointer border border-white/20">
-                <img
-                  src="/footer-images/bis-care.png"
-                  alt="BIS Care App"
-                  class="max-h-full max-w-full object-contain"
-                  loading="lazy"
-                  onerror="this.src='/footer-images/bis.png'"
-                />
-              </a>
-
-              <!-- ACB -->
-              <a
-                href="https://acb.rajasthan.gov.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Anti Corruption Bureau"
-                aria-label="Anti Corruption Bureau Government of Rajasthan (opens in a new tab)"
-                class="w-full bg-white rounded-2xl h-20 flex items-center justify-center p-2.5 shadow-md hover:shadow-xl transition-all cursor-pointer border border-white/20">
-                <img
-                  src="/footer-images/acb.png"
-                  alt="Anti Corruption Bureau"
-                  class="max-h-full max-w-full object-contain"
-                  loading="lazy"
-                />
-              </a>
-
-              <!-- Pledge -->
-              <a
-                href="https://pledge.mygov.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Register for Pledge"
-                aria-label="Register for Pledge MyGov Portal (opens in a new tab)"
-                class="w-full bg-white rounded-2xl h-20 flex items-center justify-center p-2.5 shadow-md hover:shadow-xl transition-all cursor-pointer border border-white/20">
-                <img
-                  src="/footer-images/pledge.jpeg"
-                  alt="Register for Pledge"
-                  class="max-h-full max-w-full object-contain"
-                  loading="lazy"
-                />
-              </a>
-
-              <!-- Jan Soochna -->
-              <a
-                href="https://jansoochna.rajasthan.gov.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Jan Soochna Portal"
-                aria-label="Jan Soochna Portal Government of Rajasthan (opens in a new tab)"
-                class="w-full bg-white rounded-2xl h-20 flex items-center justify-center p-2.5 shadow-md hover:shadow-xl transition-all cursor-pointer border border-white/20">
-                <img
-                  src="/footer-images/jansoochna.png"
-                  alt="Jan Soochna Portal"
-                  class="max-h-full max-w-full object-contain"
-                  loading="lazy"
-                />
-              </a>
+              @for (item of partnerLinks; track item.href) {
+                <a
+                  [href]="item.href"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  [title]="item.title"
+                  [attr.aria-label]="item.ariaLabel"
+                  class="w-full bg-white rounded-2xl h-20 flex items-center justify-center p-2.5 shadow-md hover:shadow-xl transition-all cursor-pointer border border-white/20"
+                >
+                  <img
+                    [src]="item.imgSrc"
+                    [alt]="item.title"
+                    class="max-h-full max-w-full object-contain"
+                    loading="lazy"
+                    (error)="onPartnerImgError($event, item.fallbackSrc)"
+                  />
+                </a>
+              }
             </div>
           </div>
 
-          <!-- Desktop & Tablet View: Accessible Infinite Marquee Carousel (>= 640px) -->
+          <!-- Desktop & Tablet View: Auto-Playing Infinite Marquee Carousel (>= 640px, no play/pause button) -->
           <div class="hidden sm:block relative max-w-6xl mx-auto">
-            <div
-              class="flex-1 overflow-hidden mask-fade relative cursor-pointer"
-              (mouseenter)="isHovering.set(true)"
-              (mouseleave)="isHovering.set(false)"
-              (touchstart)="isHovering.set(true)"
-              (touchend)="isHovering.set(false)">
-
-              <div
-                class="flex gap-4 sm:gap-5 w-max animate-scroll py-1"
-                [style.animation-play-state]="shouldAnimate() ? 'running' : 'paused'">
-
-                <!-- Set 1 (Original) -->
-                <a
-                  href="https://bis.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="BIS Care App"
-                  aria-label="Bureau of Indian Standards BIS Care App (opens in a new tab)"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/bis-care.png"
-                    alt="BIS Care App"
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                    onerror="this.src='/footer-images/bis.png'"
-                  />
-                </a>
-
-                <a
-                  href="https://acb.rajasthan.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Anti Corruption Bureau"
-                  aria-label="Anti Corruption Bureau Government of Rajasthan (opens in a new tab)"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/acb.png"
-                    alt="Anti Corruption Bureau"
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
-
-                <a
-                  href="https://pledge.mygov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Register for Pledge"
-                  aria-label="Register for Pledge MyGov Portal (opens in a new tab)"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/pledge.jpeg"
-                    alt="Register for Pledge"
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
-
-                <a
-                  href="https://jansoochna.rajasthan.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Jan Soochna Portal"
-                  aria-label="Jan Soochna Portal Government of Rajasthan (opens in a new tab)"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/jansoochna.png"
-                    alt="Jan Soochna Portal"
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
-
-                <!-- Set 2 (Duplicate for seamless loop) -->
-                <a
-                  href="https://bis.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="BIS Care App"
-                  aria-hidden="true"
-                  tabindex="-1"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/bis-care.png"
-                    alt=""
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                    onerror="this.src='/footer-images/bis.png'"
-                  />
-                </a>
-
-                <a
-                  href="https://acb.rajasthan.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Anti Corruption Bureau"
-                  aria-hidden="true"
-                  tabindex="-1"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/acb.png"
-                    alt=""
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
-
-                <a
-                  href="https://pledge.mygov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Register for Pledge"
-                  aria-hidden="true"
-                  tabindex="-1"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/pledge.jpeg"
-                    alt=""
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
-
-                <a
-                  href="https://jansoochna.rajasthan.gov.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title="Jan Soochna Portal"
-                  aria-hidden="true"
-                  tabindex="-1"
-                  class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20">
-                  <img
-                    src="/footer-images/jansoochna.png"
-                    alt=""
-                    class="max-h-full max-w-full object-contain"
-                    loading="lazy"
-                  />
-                </a>
+            <div class="marquee-viewport flex-1 overflow-hidden mask-fade relative">
+              <div class="flex gap-4 sm:gap-5 w-max animate-scroll py-1">
+                @for (isDuplicate of [false, true]; track isDuplicate) {
+                  @for (item of partnerLinks; track item.href) {
+                    <a
+                      [href]="item.href"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [title]="item.title"
+                      [attr.aria-label]="isDuplicate ? null : item.ariaLabel"
+                      [attr.aria-hidden]="isDuplicate ? 'true' : null"
+                      [attr.tabindex]="isDuplicate ? -1 : null"
+                      class="w-45 sm:w-55 bg-white rounded-2xl h-20 sm:h-24 flex items-center justify-center p-2 sm:p-3 shrink-0 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer border border-white/20"
+                    >
+                      <img
+                        [src]="item.imgSrc"
+                        [alt]="isDuplicate ? '' : item.title"
+                        class="max-h-full max-w-full object-contain"
+                        loading="lazy"
+                        (error)="onPartnerImgError($event, item.fallbackSrc)"
+                      />
+                    </a>
+                  }
+                }
               </div>
             </div>
-
-            <!-- Pause / Play Accessibility Button -->
-            <div class="flex justify-center mt-3">
-              <button
-                appButton
-                variant="inverse"
-                size="sm"
-                type="button"
-                (click)="togglePause()"
-                [attr.aria-label]="isPausedManually() ? 'Resume animation' : 'Pause animation'">
-                @if (isPausedManually()) {
-                  <app-icon name="play" solid size="sm" class="text-[#F59E0B]" />
-                  <span>Resume Animation</span>
-                } @else {
-                  <app-icon name="pause" solid size="sm" class="text-slate-300" />
-                  <span>Pause Animation</span>
-                }
-              </button>
-            </div>
           </div>
-
         </div>
 
         <!-- Subtle Section Divider -->
-        <div class="w-full h-px bg-slate-700/50"></div>
+        <div class="w-full h-px bg-[#7C0E44]/40"></div>
 
         <!-- Tier 2: Main Footer Columns -->
         <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-8 sm:pt-14 sm:pb-10">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-14 items-start">
-
             <!-- Column 1: Branding & Identity -->
             <div class="flex flex-col items-center md:items-start text-center md:text-left">
               <div class="flex items-center gap-3.5 mb-4">
@@ -364,20 +181,17 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                 />
               </div>
 
-              <!-- ISMS 2.0 Brand Wordmark -->
               <div class="text-[1.75rem] font-black text-white tracking-tight leading-none font-sans mb-1.5">
                 ISMS <span class="text-[#F59E0B]">2.0</span>
               </div>
 
-              <!-- Subtitle -->
               <div class="text-[0.875rem] font-bold text-white mb-2.5 font-sans">
                 Integrated Scheme Management System
               </div>
 
-              <!-- Organisation Address / Department Hierarchy -->
               <div class="text-[0.8125rem] text-slate-300 leading-relaxed font-sans">
-                Rajasthan Skill &amp; Livelihoods Development Corporation<br/>
-                Department of Skill, Employment and Entrepreneurship<br/>
+                Rajasthan Skill &amp; Livelihoods Development Corporation<br />
+                Department of Skill, Employment and Entrepreneurship<br />
                 Government of Rajasthan
               </div>
             </div>
@@ -385,63 +199,41 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
             <!-- Column 2: Important Links + Dynamic Counters -->
             <div class="flex flex-col items-center w-full">
               <div class="flex flex-col items-start text-left w-fit">
-                
-                <!-- Section Heading -->
                 <div class="text-[0.9375rem] font-bold text-white mb-4 tracking-wider uppercase font-sans">
                   Important Links
                 </div>
 
-                <!-- Clean, High-Contrast Links (No dark dots, pure crisp text) -->
                 <ul class="space-y-3 flex flex-col items-start list-none p-0 m-0">
-                  <li>
-                    <a
-                      href="https://rajasthan.gov.in/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
-                      aria-label="Rajasthan Government Official Portal (opens in a new tab)">
-                      Rajasthan Government
-                    </a>
-                  </li>
+                  @for (link of externalPortalLinks; track link.label) {
+                    <li>
+                      <a
+                        [href]="link.href"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="footer-link text-[0.875rem] font-sans cursor-pointer"
+                        [attr.aria-label]="link.ariaLabel"
+                      >
+                        {{ link.label }}
+                      </a>
+                    </li>
+                  }
 
-                  <li>
-                    <a
-                      href="https://livelihoods.rajasthan.gov.in/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="footer-link text-[0.875rem] font-sans cursor-pointer"
-                      aria-label="RSLDC Official Portal (opens in a new tab)">
-                      RSLDC
-                    </a>
-                  </li>
-
-                  <li>
-                    <!-- ui-guard-allow: footer links are text-like, zero padding -->
-                    <a
-                      appButton
-                      variant="inverse"
-                      [href]="externalLegalUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="footer-link h-auto px-0 text-left"
-                      aria-label="View Privacy Policy (opens in a new tab)">
-                      Privacy Policy
-                    </a>
-                  </li>
-
-                  <li>
-                    <!-- ui-guard-allow: footer links are text-like, zero padding -->
-                    <a
-                      appButton
-                      variant="inverse"
-                      [href]="externalLegalUrl"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="footer-link h-auto px-0 text-left"
-                      aria-label="View Terms & Conditions (opens in a new tab)">
-                      Terms &amp; Conditions
-                    </a>
-                  </li>
+                  @for (legal of legalLinks; track legal.label) {
+                    <li>
+                      <!-- ui-guard-allow: footer links are text-like, zero padding -->
+                      <a
+                        appButton
+                        variant="inverse"
+                        [href]="externalLegalUrl"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="footer-link h-auto px-0 text-left"
+                        [attr.aria-label]="legal.ariaLabel"
+                      >
+                        {{ legal.label }}
+                      </a>
+                    </li>
+                  }
 
                   <li>
                     <!-- ui-guard-allow: footer links are text-like, zero padding -->
@@ -450,100 +242,67 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                       variant="inverse"
                       routerLink="/help-support"
                       class="footer-link h-auto px-0 text-left"
-                      aria-label="View Help & Support">
+                      aria-label="View Help & Support"
+                    >
                       Help &amp; Support
                     </a>
                   </li>
-
-               
                 </ul>
 
                 <!-- Dynamic Visitor Counter & Last Updated -->
-                <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-slate-700/50 pt-4 w-fit max-w-full">
+                <div class="flex flex-row flex-wrap items-center gap-4 mt-8 border-t border-[#7C0E44]/40 pt-4 w-fit max-w-full">
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-sans">Total Visitors:</span>
                     <span class="text-[0.875rem] text-white font-bold font-sans tabular-nums">042,159</span>
                   </div>
-                  <div class="w-1 h-1 rounded-full bg-slate-600 hidden sm:block"></div>
+                  <div class="w-1 h-1 rounded-full bg-[#AA5E7A]/60 hidden sm:block"></div>
                   <div class="flex items-center gap-1.5">
                     <span class="text-[0.8125rem] text-slate-400 font-sans">Last Updated:</span>
                     <span class="text-[0.875rem] text-white font-semibold font-sans">8 Oct 2026</span>
                   </div>
                 </div>
-
               </div>
             </div>
 
             <!-- Column 3: Connect With Us & Helpline -->
             <div class="flex flex-col items-start text-left md:ml-auto w-fit">
-              <!-- Connect With Us -->
               <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Connect With Us
               </div>
 
-              <!-- Social Media Buttons -->
               <div class="flex items-center justify-start gap-3 mb-7">
-                <!-- YouTube -->
-                <a
-                  [href]="helplineGlobal.social.youtube"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
-                  aria-label="YouTube">
-                  <app-icon name="youtube" solid size="md" />
-                </a>
-
-                <!-- Twitter / X -->
-                <a
-                  [href]="helplineGlobal.social.twitter"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
-                  aria-label="Twitter">
-                  <app-icon name="x-twitter" solid size="md" />
-                </a>
-
-                <!-- LinkedIn -->
-                <a
-                  [href]="helplineGlobal.social.linkedin"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
-                  aria-label="LinkedIn">
-                  <app-icon name="linkedin" solid size="md" />
-                </a>
-
-                <!-- Facebook -->
-                <a
-                  [href]="helplineGlobal.social.facebook"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
-                  aria-label="Facebook">
-                  <app-icon name="facebook" solid size="md" />
-                </a>
+                @for (social of socialLinks; track social.label) {
+                  <a
+                    [href]="social.href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="footer-social-btn w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm cursor-pointer"
+                    [attr.aria-label]="social.label"
+                  >
+                    <app-icon [name]="social.icon" solid size="md" />
+                  </a>
+                }
               </div>
 
-              <!-- Helpline Section -->
               <div class="text-[0.9375rem] font-bold text-white mb-3.5 tracking-wider uppercase font-sans">
                 Helpline
               </div>
 
               <div class="space-y-3">
-                <!-- Telephone -->
                 <a
                   [href]="'tel:' + helplineGlobal.contacts.phone"
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
-                  aria-label="Call ISMS Helpline">
+                  aria-label="Call ISMS Helpline"
+                >
                   <app-icon name="phone" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
                   <span class="text-[0.875rem] font-semibold font-sans">{{ helplineGlobal.contacts.phone }}</span>
                 </a>
 
-                <!-- Email -->
                 <a
                   [href]="'mailto:' + helplineGlobal.contacts.email"
                   class="footer-contact flex items-center gap-2.5 cursor-pointer group"
-                  aria-label="Email ISMS Support">
+                  aria-label="Email ISMS Support"
+                >
                   <app-icon name="mail" [stroke]="2" class="text-slate-400 group-hover:text-[#F59E0B] shrink-0 transition-colors" />
                   <span class="text-[0.875rem] font-semibold font-sans break-all sm:break-normal">{{ helplineGlobal.contacts.email }}</span>
                 </a>
@@ -558,10 +317,9 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                   (click)="downloadUserManual()"
                   [disabled]="isGeneratingManual()"
                   class="group h-auto p-0 text-left hover:no-underline"
-                  aria-label="Download ISMS 2.0 User Manual">
-                  <!-- The card look lives on this inner box so the button itself carries only layout classes -->
-                  <div class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-slate-900/70 p-3 whitespace-normal transition-colors group-hover:border-amber-400/60 group-hover:bg-slate-900">
-                    <!-- Text Details -->
+                  aria-label="Download ISMS 2.0 User Manual"
+                >
+                  <div class="w-full flex items-center gap-3 rounded-xl border border-amber-500/30 bg-[#2D0318]/70 p-3 whitespace-normal transition-colors group-hover:border-amber-400/60 group-hover:bg-[#1A020E]">
                     <div class="flex flex-col min-w-0">
                       <div class="flex items-center gap-1.5">
                         <span class="text-[0.875rem] font-bold text-white group-hover:text-amber-300 transition-colors">
@@ -575,20 +333,16 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
                         How ISMS 2.0 works &amp; step-by-step guide
                       </span>
                     </div>
-
-                    <!-- Arrow indicator -->
                     <app-icon name="chevron-right" [stroke]="2" class="text-slate-400 group-hover:text-amber-300 group-hover:translate-x-0.5 transition-all ml-auto shrink-0" />
                   </div>
                 </button>
               </div>
-
             </div>
-
           </div>
         </div>
 
         <!-- Tier 3: Bottom Copyright Bar -->
-        <div class="border-t border-slate-700/50 bg-[#070e18]">
+        <div class="border-t border-[#7C0E44]/40 bg-[#1A020E]">
           <div class="max-w-360 mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex justify-center items-center">
               <div class="text-[0.8125rem] text-slate-400 text-center font-sans">
@@ -597,66 +351,75 @@ import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
             </div>
           </div>
         </div>
-
       </div>
-
     </footer>
   `
 })
-export class FooterComponent implements AfterViewInit, OnDestroy {
-  private platformId = inject(PLATFORM_ID);
-  private userManualService = inject(UserManualPdfService);
-  
-  helplineGlobal = HELPLINE_GLOBAL;
+export class FooterComponent {
+  private readonly userManualService = inject(UserManualPdfService);
+
+  readonly helplineGlobal = HELPLINE_GLOBAL;
   readonly externalLegalUrl = EXTERNAL_LEGAL_URL;
-
-  @ViewChild('footerRef') footerRef?: ElementRef<HTMLElement>;
-
-  readonly isHovering = signal(false);
-  readonly isVisible = signal(false);
-  readonly isTabActive = signal(true);
-  readonly isPausedManually = signal(false);
   readonly isGeneratingManual = signal(false);
 
-  private observer?: IntersectionObserver;
-  private visibilityHandler?: () => void;
-
-  readonly shouldAnimate = () => {
-    return this.isVisible() && this.isTabActive() && !this.isHovering() && !this.isPausedManually();
-  };
-
-  togglePause(): void {
-    this.isPausedManually.update((v) => !v);
-  }
-
-  ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const el = this.footerRef?.nativeElement;
-    if (el && typeof IntersectionObserver !== 'undefined') {
-      this.observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            this.isVisible.set(entry.isIntersecting);
-          });
-        },
-        { threshold: 0.05 }
-      );
-      this.observer.observe(el);
+  protected readonly partnerLinks: readonly PartnerBannerLink[] = [
+    {
+      href: 'https://bis.gov.in/',
+      title: 'BIS Care App',
+      ariaLabel: 'Bureau of Indian Standards BIS Care App (opens in a new tab)',
+      imgSrc: '/footer-images/bis-care.png',
+      fallbackSrc: '/footer-images/bis.png'
+    },
+    {
+      href: 'https://acb.rajasthan.gov.in/',
+      title: 'Anti Corruption Bureau',
+      ariaLabel: 'Anti Corruption Bureau Government of Rajasthan (opens in a new tab)',
+      imgSrc: '/footer-images/acb.png'
+    },
+    {
+      href: 'https://pledge.mygov.in/',
+      title: 'Register for Pledge',
+      ariaLabel: 'Register for Pledge MyGov Portal (opens in a new tab)',
+      imgSrc: '/footer-images/pledge.jpeg'
+    },
+    {
+      href: 'https://jansoochna.rajasthan.gov.in/',
+      title: 'Jan Soochna Portal',
+      ariaLabel: 'Jan Soochna Portal Government of Rajasthan (opens in a new tab)',
+      imgSrc: '/footer-images/jansoochna.png'
     }
+  ];
 
-    this.visibilityHandler = () => {
-      this.isTabActive.set(!document.hidden);
-    };
-    document.addEventListener('visibilitychange', this.visibilityHandler);
-  }
-
-  ngOnDestroy(): void {
-    if (this.observer) {
-      this.observer.disconnect();
+  protected readonly externalPortalLinks = [
+    {
+      label: 'Rajasthan Government',
+      href: 'https://rajasthan.gov.in/',
+      ariaLabel: 'Rajasthan Government Official Portal (opens in a new tab)'
+    },
+    {
+      label: 'RSLDC',
+      href: 'https://livelihoods.rajasthan.gov.in/',
+      ariaLabel: 'RSLDC Official Portal (opens in a new tab)'
     }
-    if (this.visibilityHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityHandler);
+  ] as const;
+
+  protected readonly legalLinks = [
+    { label: 'Privacy Policy', ariaLabel: 'View Privacy Policy (opens in a new tab)' },
+    { label: 'Terms & Conditions', ariaLabel: 'View Terms & Conditions (opens in a new tab)' }
+  ] as const;
+
+  protected readonly socialLinks: readonly SocialMediaLink[] = [
+    { href: this.helplineGlobal.social.youtube, label: 'YouTube', icon: 'youtube' },
+    { href: this.helplineGlobal.social.twitter, label: 'Twitter', icon: 'x-twitter' },
+    { href: this.helplineGlobal.social.linkedin, label: 'LinkedIn', icon: 'linkedin' },
+    { href: this.helplineGlobal.social.facebook, label: 'Facebook', icon: 'facebook' }
+  ];
+
+  protected onPartnerImgError(event: Event, fallbackSrc?: string): void {
+    if (!fallbackSrc) return;
+    const img = event.target as HTMLImageElement | null;
+    if (img && !img.src.endsWith(fallbackSrc)) {
+      img.src = fallbackSrc;
     }
   }
 

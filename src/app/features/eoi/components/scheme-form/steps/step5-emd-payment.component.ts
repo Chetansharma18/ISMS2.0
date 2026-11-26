@@ -22,9 +22,21 @@ import { SchemeFormState } from '../scheme-form.state';
             <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">EMD Details</h2>
           </div>
           @if (state.emdPaid()) {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">Paid</span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">Paid</span>
+              <button appButton variant="outline" size="sm" (click)="state.downloadEmdReceipt()">
+                <app-icon name="download" size="sm" />
+                <span>Download Receipt</span>
+              </button>
+            </div>
           } @else if (state.emdExempted()) {
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">Exempted</span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">Exempted</span>
+              <button appButton variant="outline" size="sm" (click)="state.downloadEmdReceipt()">
+                <app-icon name="download" size="sm" />
+                <span>Download Receipt</span>
+              </button>
+            </div>
           }
         </div>
 

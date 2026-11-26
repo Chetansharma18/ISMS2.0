@@ -46,21 +46,21 @@ import { answerText, formatBytes } from '../eoi-apply.util';
 
       <!-- 2. Answers to the EOI's questions -->
       @if (state.hasCustomFields()) {
-        <section class="rounded-lg border border-[#D6E3F0] overflow-hidden">
-          <div class="flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 border-b border-[#D6E3F0]">
-            <h2 class="text-[15px] font-semibold text-[#1E3A5F] m-0">Scheme Proposal Details</h2>
+        <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+          <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">EOI Form</h2>
             <button appButton variant="outline" size="sm" type="button" (click)="state.goToStep(state.stepIndexCustomFields())">
               <app-icon name="edit" size="sm" />
               <span>Edit</span>
             </button>
           </div>
-          <dl class="p-4 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 m-0">
+          <dl class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 m-0">
             @for (field of state.schemeCustomFields(); track field.key) {
               <div class="min-w-0" [class.md:col-span-2]="field.type === 'textarea'">
                 <dt class="text-[11.5px] font-medium text-slate-500">
                   {{ field.label }}@if (field.mandatory) { <span class="text-red-600"> *</span> }
                 </dt>
-                <dd class="m-0 text-[13px] text-slate-900 break-words">{{ answer(field) }}</dd>
+                <dd class="m-0 mt-0.5 text-[13px] font-medium text-slate-900 break-words">{{ answer(field) }}</dd>
               </div>
             }
           </dl>
@@ -68,28 +68,34 @@ import { answerText, formatBytes } from '../eoi-apply.util';
       }
 
       <!-- 3. Documents and annexures -->
-      <section class="rounded-lg border border-[#D6E3F0] overflow-hidden">
-        <div class="flex items-center justify-between gap-3 px-4 py-2.5 bg-slate-50 border-b border-[#D6E3F0]">
-          <h2 class="text-[15px] font-semibold text-[#1E3A5F] m-0">Documents ({{ uploadedCount() }} / {{ totalCount() }} Uploaded)</h2>
+      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">Documents ({{ uploadedCount() }} / {{ totalCount() }} Uploaded)</h2>
           <button appButton variant="outline" size="sm" type="button" (click)="state.goToStep(state.stepIndexDocuments())">
             <app-icon name="edit" size="sm" />
             <span>Edit</span>
           </button>
         </div>
-        <div class="p-4 space-y-4">
+        <div class="p-4 sm:p-5 space-y-5">
           @if (state.applyDocuments().supporting.length > 0) {
-            <app-table
-              [columns]="documentColumns"
-              [data]="state.applyDocuments().supporting"
-              [customTemplates]="{ name: nameTemplate, file: fileTemplate, status: statusTemplate, action: actionTemplate }"
-            />
+            <div class="space-y-2">
+              <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-600 m-0">Supporting Documents</h3>
+              <app-table
+                [columns]="documentColumns"
+                [data]="state.applyDocuments().supporting"
+                [customTemplates]="{ name: nameTemplate, file: fileTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
+              />
+            </div>
           }
           @if (state.applyDocuments().annexures.length > 0) {
-            <app-table
-              [columns]="annexureColumns"
-              [data]="state.applyDocuments().annexures"
-              [customTemplates]="{ name: nameTemplate, file: fileTemplate, status: statusTemplate, action: actionTemplate }"
-            />
+            <div class="space-y-2">
+              <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-600 m-0">Prescribed Annexures</h3>
+              <app-table
+                [columns]="annexureColumns"
+                [data]="state.applyDocuments().annexures"
+                [customTemplates]="{ name: nameTemplate, file: fileTemplate, comment: commentTemplate, status: statusTemplate, action: actionTemplate }"
+              />
+            </div>
           }
           @if (totalCount() === 0) {
             <p class="text-xs text-slate-500 italic m-0">No documents are required for this EOI.</p>
@@ -98,22 +104,31 @@ import { answerText, formatBytes } from '../eoi-apply.util';
       </section>
 
       <ng-template #nameTemplate let-doc>
-        <span class="text-[12.5px] font-medium text-slate-900">{{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }</span>
+        <span class="text-[12.5px] font-medium text-slate-900 leading-snug block">{{ doc.name }}@if (doc.isMandatory) { <span class="text-red-600 font-bold"> *</span> }</span>
       </ng-template>
       <ng-template #fileTemplate let-doc>
         @if (doc.file; as file) {
-          <span class="text-[12px] text-slate-700 break-all">{{ file.fileName }} <span class="text-slate-400 tabular-nums">({{ size(file.sizeBytes) }})</span></span>
+          <div class="flex items-center gap-1.5 min-w-0 max-w-[230px]" [title]="file.fileName">
+            <app-icon name="check-circle" size="xs" class="text-emerald-600 shrink-0" />
+            <span class="text-[12px] text-slate-800 font-medium truncate">{{ file.fileName }}</span>
+            <span class="text-[11px] text-slate-400 tabular-nums shrink-0">({{ size(file.sizeBytes) }})</span>
+          </div>
         } @else {
           <span class="text-[12px] text-slate-400">-</span>
         }
       </ng-template>
+      <ng-template #commentTemplate let-doc>
+        <span class="text-[12px] break-words" [class.text-slate-700]="!!doc.comment?.trim()" [class.text-slate-400]="!doc.comment?.trim()">
+          {{ doc.comment?.trim() || '-' }}
+        </span>
+      </ng-template>
       <ng-template #statusTemplate let-doc>
         @if (doc.file) {
-          <span class="text-[11.5px] font-semibold text-emerald-700">Uploaded</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold whitespace-nowrap">Uploaded</span>
         } @else if (doc.isMandatory) {
-          <span class="text-[11.5px] font-semibold text-rose-600">Missing</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[11px] font-semibold whitespace-nowrap">Missing</span>
         } @else {
-          <span class="text-[11.5px] font-medium text-slate-400">Not uploaded</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-medium whitespace-nowrap">Optional</span>
         }
       </ng-template>
       <ng-template #actionTemplate let-doc>
@@ -121,6 +136,8 @@ import { answerText, formatBytes } from '../eoi-apply.util';
           <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewApplyDocument(doc)" title="View Document" aria-label="View Document">
             <app-icon name="eye" size="sm" />
           </button>
+        } @else {
+          <span class="text-[12px] text-slate-400">-</span>
         }
       </ng-template>
 
@@ -144,7 +161,7 @@ import { answerText, formatBytes } from '../eoi-apply.util';
 
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexDocuments())">
-          &larr; Back to Upload Documents
+          &larr; Back
         </button>
         <button appButton size="lg" (click)="state.goToStep(state.stepIndexProcFee())" [disabled]="!canProceed()">
           Proceed to Processing Fee Payment ({{ state.formattedProcessFee() }}) &rarr;
@@ -157,21 +174,21 @@ export class Step4CompletePreviewComponent {
   protected readonly state = inject(SchemeFormState);
 
   protected readonly documentColumns: TableColumn<EoiApplyDocument>[] = [
-    { key: '$index', label: '#', align: 'center', width: 'w-10' },
-    { key: 'name', label: 'Supporting Document', type: 'custom' },
-    { key: 'file', label: 'File', type: 'custom' },
-    { key: 'comment', label: 'Comment', cellClass: 'break-words' },
-    { key: 'status', label: 'Status', type: 'custom' },
-    { key: 'action', label: 'Action', type: 'custom', align: 'center' }
+    { key: '$index', label: '#', align: 'center', width: 'w-12' },
+    { key: 'name', label: 'Supporting Document', type: 'custom', width: 'min-w-[240px]' },
+    { key: 'file', label: 'File', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'status', label: 'Status', type: 'custom', align: 'center', width: 'w-28 whitespace-nowrap' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-20 whitespace-nowrap' }
   ];
 
   protected readonly annexureColumns: TableColumn<EoiApplyDocument>[] = [
-    { key: '$index', label: '#', align: 'center', width: 'w-10' },
-    { key: 'name', label: 'Annexure Name', type: 'custom' },
-    { key: 'file', label: 'File', type: 'custom' },
-    { key: 'comment', label: 'Comment', cellClass: 'break-words' },
-    { key: 'status', label: 'Status', type: 'custom' },
-    { key: 'action', label: 'Action', type: 'custom', align: 'center' }
+    { key: '$index', label: '#', align: 'center', width: 'w-12' },
+    { key: 'name', label: 'Annexure Name', type: 'custom', width: 'min-w-[240px]' },
+    { key: 'file', label: 'File', type: 'custom', width: 'min-w-[200px]' },
+    { key: 'comment', label: 'Comment', type: 'custom', width: 'min-w-[140px]' },
+    { key: 'status', label: 'Status', type: 'custom', align: 'center', width: 'w-28 whitespace-nowrap' },
+    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'w-20 whitespace-nowrap' }
   ];
 
   protected readonly totalCount = computed(() => this.state.application()?.documents.length ?? 0);

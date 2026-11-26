@@ -9,49 +9,51 @@ import { SchemeFormState } from '../scheme-form.state';
   host: { class: 'block' },
   template: `
     <section class="bg-white border border-[#EADCE2] rounded-xl shadow-2xs overflow-hidden">
-      <div class="p-4 sm:p-5 space-y-3.5">
-        <div class="space-y-1">
-          <h2 class="text-base sm:text-lg font-bold text-[#7C0E44] m-0">
+      <div class="px-4 py-3 space-y-2.5">
+        <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 sm:gap-4">
+          <h2 class="text-[14px] sm:text-[15px] font-bold text-[#7C0E44] m-0 leading-snug">
             {{ state.schemeTitle() }}
           </h2>
-          <p class="text-xs sm:text-sm text-slate-500 leading-relaxed m-0">
-            {{ state.schemeDescription() }}
-          </p>
+          @if (state.schemeDescription()) {
+            <p class="text-xs text-slate-500 m-0 truncate max-w-xl" [title]="state.schemeDescription()">
+              {{ state.schemeDescription() }}
+            </p>
+          }
         </div>
 
-        <!-- Parameters Strip -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-x-6 gap-y-4 pt-3.5 border-t border-[#EADCE2]/70 text-xs">
+        <!-- Parameters Strip (no duplicate Scheme Name; clean single-line values) -->
+        <div class="flex flex-wrap items-start justify-between gap-x-6 gap-y-2.5 pt-2.5 border-t border-[#EADCE2]/70 text-xs">
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Reference No.</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1 break-all tabular-nums">{{ state.schemeRefNo() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">EOI Reference No.</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap tabular-nums">{{ state.schemeRefNo() }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Scheme Name</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.schemeName() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">Scheme Category</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap">{{ state.schemeCategory() }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Scheme Category</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.schemeCategory() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">EOI Category</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap">{{ state.schemeEoiCategory() }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EOI Category</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.schemeEoiCategory() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">Date Published</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap tabular-nums">{{ state.schemeDatePublished() }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date Published</span>
-            <span class="font-medium text-slate-900 text-[12.5px] block mt-1">{{ state.schemeDatePublished() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">Date of Closing</span>
+            <span class="font-semibold text-rose-600 text-xs block mt-0.5 whitespace-nowrap tabular-nums">{{ state.schemeClosingDate() }}</span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Date of Closing</span>
-            <span class="font-semibold text-rose-600 text-[12.5px] block mt-1">{{ state.schemeClosingDate() }}</span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">EMD Fee</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap tabular-nums">
+              {{ state.schemeEmdFee() }} <span class="text-[10.5px] text-slate-500 font-normal">(Refundable)</span>
+            </span>
           </div>
           <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">EMD Fee</span>
-            <span class="font-semibold text-slate-900 text-[12.5px] block mt-1">{{ state.schemeEmdFee() }} <span class="text-[11px] text-slate-500 font-normal">(Refundable)</span></span>
-          </div>
-          <div>
-            <span class="text-slate-500 block text-[11.5px] font-normal leading-tight">Processing Fee</span>
-            <span class="font-semibold text-slate-900 text-[12.5px] block mt-1">{{ state.schemeProcessFee() }} <span class="text-[11px] text-slate-500 font-normal">(Non-Refundable)</span></span>
+            <span class="text-slate-400 block text-[10.5px] font-semibold uppercase tracking-wider leading-tight">Processing Fee</span>
+            <span class="font-semibold text-slate-900 text-xs block mt-0.5 whitespace-nowrap tabular-nums">
+              {{ state.schemeProcessFee() }} <span class="text-[10.5px] text-slate-500 font-normal">(Non-Refundable)</span>
+            </span>
           </div>
         </div>
       </div>

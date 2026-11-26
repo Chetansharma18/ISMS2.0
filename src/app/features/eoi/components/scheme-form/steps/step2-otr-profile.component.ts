@@ -51,13 +51,9 @@ import { PROFILE_STEP_KEYS, stepDone } from '../eoi-apply.util';
         <p class="text-xs text-slate-500 italic m-0">The OTR form could not be loaded, so the profile cannot be shown. Reload the page to try again.</p>
       }
 
-      <div class="pt-4 border-t border-[#EADCE2] flex flex-col sm:flex-row items-center justify-between gap-3">
-        <span class="text-xs text-slate-500 flex items-center gap-1.5">
-          <app-icon name="check-circle" size="xs" class="text-emerald-600" />
-          Verified from One-Time Registration
-        </span>
+      <div class="pt-4 border-t border-[#EADCE2] flex items-center justify-end gap-3">
         <button appButton size="lg" (click)="state.saveAndProceedToDocuments()">
-          {{ state.hasCustomFields() ? 'Proceed to Scheme Proposal Details \u2192' : 'Proceed to Upload Documents \u2192' }}
+          Next &rarr;
         </button>
       </div>
     </div>

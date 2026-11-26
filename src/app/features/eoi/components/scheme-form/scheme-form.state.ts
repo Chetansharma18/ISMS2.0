@@ -153,9 +153,9 @@ export class SchemeFormState {
 
   readonly wizardSteps = computed<StepperStep[]>(() => [
     { label: 'Registration Profile' },
-    ...(this.hasCustomFields() ? [{ label: 'Scheme Proposal Details' }] : []),
+    ...(this.hasCustomFields() ? [{ label: 'EOI Form' }] : []),
     { label: 'Upload Documents' },
-    { label: 'Complete Preview' },
+    { label: 'Preview' },
     { label: 'Processing Fee' },
     { label: 'EMD Payment' },
     { label: 'Submission Receipt' }
@@ -541,7 +541,7 @@ export class SchemeFormState {
   private submit(app: EoiApplication): void {
     if (!this.declarationAgreed()) {
       this.isPaymentProcessing.set(false);
-      this.emdError.set('Accept the declaration on the Complete Preview step, then submit your application.');
+      this.emdError.set('Accept the declaration on the Preview step, then submit your application.');
       return;
     }
     this.api
@@ -617,6 +617,24 @@ export class SchemeFormState {
   private receiptData(): SchemeReceiptData {
     const pf = this.processFee();
     const emd = this.emd();
+    const records = this.profileRecords() as Record<string, Record<string, unknown> | undefined>;
+    const orgRec = records['organisation'] ?? {};
+    const authRec = records['authorized-person'] ?? records['authorizedPerson'] ?? {};
+    const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : '');
+    const org: Step1OrgDetails = {
+      ...this.editableStep1,
+      fullName: this.editableStep1.fullName || text(orgRec['fullName']) || text(orgRec['organisationName']) || text(orgRec['organizationName']),
+      registrationNumber: this.editableStep1.registrationNumber || text(orgRec['registrationNumber']) || this.application()?.otrReferenceNo || '',
+      companyPan: this.editableStep1.companyPan || text(orgRec['companyPan']) || text(orgRec['pan']),
+      gstin: this.editableStep1.gstin || text(orgRec['gstin'])
+    };
+    const signatory: Step3AuthorizedPerson = {
+      ...this.editableStep3,
+      name: this.editableStep3.name || text(authRec['name']) || text(authRec['fullName']),
+      designation: this.editableStep3.designation || text(authRec['designation']),
+      mobileNo: this.editableStep3.mobileNo || text(authRec['mobileNo']) || text(authRec['mobile']),
+      emailId: this.editableStep3.emailId || text(authRec['emailId']) || text(authRec['email'])
+    };
     return {
       applicationNo: this.eoiApplicationId(),
       schemeTitle: this.schemeTitle(),
@@ -642,8 +660,8 @@ export class SchemeFormState {
       formattedEmdFee: this.formattedEmdFee(),
       emdFeeInWords: this.emdFeeInWords(),
       formattedTotalFee: this.formattedTotalFee(),
-      org: this.editableStep1,
-      signatory: this.editableStep3,
+      org,
+      signatory,
       documents: this.eoiDocuments()
     };
   }

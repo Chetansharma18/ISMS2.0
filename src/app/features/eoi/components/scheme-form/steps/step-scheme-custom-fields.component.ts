@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, DropdownComponent, IconComponent, InputDirective, SwitchComponent } from '../../../../../shared';
+import { ButtonComponent, DropdownComponent, InputDirective, SwitchComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiAnswerValue, EoiCustomField } from '../eoi-apply.model';
 
@@ -11,29 +11,35 @@ import { EoiAnswerValue, EoiCustomField } from '../eoi-apply.model';
 @Component({
   selector: 'app-step-scheme-custom-fields',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, DropdownComponent, IconComponent, InputDirective, SwitchComponent],
+  imports: [FormsModule, ButtonComponent, DropdownComponent, InputDirective, SwitchComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-6">
-      <div class="p-3.5 sm:p-4 rounded-lg bg-amber-50/70 border border-amber-200 text-amber-900 text-xs sm:text-[13px] leading-relaxed flex items-start gap-2.5">
-        <app-icon name="info" size="sm" class="text-amber-600 shrink-0 mt-0.5" />
+    <div class="space-y-5 font-sans">
+      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
         <div>
-          Answer the questions below for <span class="font-bold text-[#7C0E44]">{{ state.schemeTitle() }}</span>.
-          Questions marked <span class="text-red-600 font-bold">*</span> are mandatory.
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-bold text-[#7C0E44] m-0">EOI Form</h3>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+              {{ state.schemeCustomFields().length }}
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 m-0 mt-0.5">
+            Fill in the details below for <span class="font-semibold text-slate-700">{{ state.schemeTitle() }}</span>. Fields marked <span class="text-rose-600 font-bold">*</span> are mandatory.
+          </p>
         </div>
       </div>
 
       @if (state.customFieldErrors()['_form']; as message) {
-        <p class="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs text-red-600 font-medium m-0" role="alert">{{ message }}</p>
+        <p class="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium m-0" role="alert">{{ message }}</p>
       }
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-5">
         @for (field of state.schemeCustomFields(); track field.key) {
           <div class="space-y-1.5" [class.md:col-span-2]="field.type === 'textarea'">
-            <label class="block text-xs sm:text-[13px] font-semibold text-slate-800" [attr.for]="'q-' + field.key">
+            <label class="block text-xs font-semibold text-slate-700" [attr.for]="'q-' + field.key">
               {{ field.label }}
-              @if (field.mandatory) { <span class="text-red-600 font-bold">*</span> }
+              @if (field.mandatory) { <span class="text-rose-600 font-bold">*</span> }
             </label>
 
             @switch (field.type) {
@@ -120,10 +126,10 @@ import { EoiAnswerValue, EoiCustomField } from '../eoi-apply.model';
 
       <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
         <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexProfile)">
-          &larr; Back to Registration Profile
+          &larr; Back
         </button>
         <button appButton size="lg" [loading]="state.savingAnswers()" [disabled]="state.savingAnswers()" (click)="state.saveAnswersAndProceed()">
-          Save &amp; Proceed to Upload Documents &rarr;
+          Next &rarr;
         </button>
       </div>
     </div>

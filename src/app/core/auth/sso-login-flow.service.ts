@@ -5,6 +5,7 @@ import { NotificationService } from '../services/notification.service';
 import type { BackendRoleSummary, BackendUser, LoginStepResponse, TwoStepMethod } from './auth-api.models';
 import { AuthApiService } from './auth-api.service';
 import { AuthService } from './auth.service';
+import { PinStatusStore } from './pin-status.store';
 import {
   humanizeRoleName,
   resolveSessionRole,
@@ -40,6 +41,9 @@ export class SsoLoginFlowService {
   private readonly authApi = inject(AuthApiService);
   private readonly auth = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  private readonly pinStatus = inject(PinStatusStore);
+  /** The method of the two-step verification in progress (a successful PIN sign-in proves a PIN exists). */
+  private verifyingMethod: TwoStepMethod | null = null;
 
   readonly step = signal<SsoLoginStep>('idle');
   /** Roles to choose from (select-role step). */
@@ -131,6 +135,7 @@ export class SsoLoginFlowService {
 
   /** Verifies the OTP or PIN (two-step step). */
   verify(method: TwoStepMethod, code: string): void {
+    this.verifyingMethod = method;
     this.run(this.authApi.verifyTwoStep(method, code.trim()));
   }
 
@@ -155,6 +160,7 @@ export class SsoLoginFlowService {
           return;
         }
         this.pinSet.set(true);
+        this.pinStatus.record(this.user?.SSOID, true);
         this.setupToken.set(null);
         this.verify('PIN', code);
       },
@@ -291,6 +297,7 @@ export class SsoLoginFlowService {
       this.methods.set(toTwoStepMethods(res.allowedMethods));
       const status = res.twoStepStatus;
       this.pinSet.set(status?.pin ? status.pin.isSet : null);
+      this.pinStatus.record(res.user?.SSOID ?? this.user?.SSOID, status?.pin?.isSet);
       this.otpDestination.set(status?.mobile?.isSet && status.mobile.details ? status.mobile.details : null);
       this.setupToken.set(res.setupToken ?? null);
       this.otpSent.set(false);
@@ -305,6 +312,8 @@ export class SsoLoginFlowService {
    * (verify-login-token / select-role / two-step/verify). `/auth/me` is only called when the profile is opened.
    */
   private finish(): void {
+    if (this.verifyingMethod === 'PIN') this.pinStatus.record(this.user?.SSOID, true);
+    this.verifyingMethod = null;
     if (!this.user) {
       this.abort('The sign-in response did not include the user details. Please sign in again.');
       return;
@@ -366,6 +375,7 @@ export class SsoLoginFlowService {
 
   private reset(): void {
     this.step.set('idle');
+    this.verifyingMethod = null;
     this.roles.set([]);
     this.methods.set([]);
     this.otpSent.set(false);

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, computed, input, model, output, viewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, booleanAttribute, computed, input, model, output, viewChildren } from '@angular/core';
 
 /**
  * A one-time-password field made of one box per digit. It handles typing, backspace, arrow keys and
@@ -7,6 +7,7 @@ import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, comput
  *   <app-otp-input [(value)]="otp" [invalid]="!!error()" (completed)="verify()" />
  *
  * `value` holds the digits typed so far (up to `length`). `completed` fires when all boxes are filled.
+ * For a PIN: `<app-otp-input [length]="4" masked label="New PIN" [(value)]="pin" />` (digits shown as dots).
  */
 @Component({
   selector: 'app-otp-input',
@@ -17,12 +18,12 @@ import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, comput
     @for (digit of digits(); track $index; let i = $index) {
       <input
         #box
-        type="text"
+        [type]="masked() ? 'password' : 'text'"
         inputmode="numeric"
         maxlength="1"
         pattern="[0-9]*"
-        autocomplete="one-time-code"
-        [attr.aria-label]="'Digit ' + (i + 1)"
+        [attr.autocomplete]="masked() ? 'off' : 'one-time-code'"
+        [attr.aria-label]="(label() ? label() + ' digit ' : 'Digit ') + (i + 1)"
         [value]="digit"
         [disabled]="disabled()"
         (input)="onInput($event, i)"
@@ -46,6 +47,10 @@ export class OtpInputComponent {
   readonly disabled = input(false);
   /** Focus the first box when the field appears. */
   readonly autofocus = input(true);
+  /** Hide the digits (a PIN): each box shows a dot. */
+  readonly masked = input(false, { transform: booleanAttribute });
+  /** Name read out for the boxes, e.g. "New PIN" gives "New PIN digit 1" (two fields on one form stay distinct). */
+  readonly label = input('');
 
   readonly completed = output<string>();
 

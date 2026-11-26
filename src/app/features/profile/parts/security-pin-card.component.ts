@@ -1,78 +1,119 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AuthApiService } from '../../../core/auth/auth-api.service';
-import { PIN_MAX_LENGTH, PIN_MIN_LENGTH, pinError } from '../../../core/auth/security-pin.util';
+import { AuthService } from '../../../core/auth/auth.service';
+import { PinStatusStore } from '../../../core/auth/pin-status.store';
+import { PIN_LENGTH, pinError } from '../../../core/auth/security-pin.util';
 import { NotificationService } from '../../../core/services/notification.service';
-import { ButtonComponent, IconComponent, InputDirective, SectionCardComponent } from '../../../shared';
+import { ButtonComponent, IconComponent, OtpInputComponent, SectionCardComponent, StatusBadgeComponent } from '../../../shared';
 
 /**
- * Sets or changes the security PIN used for PIN sign-in (backend `two-step/pin/set`).
- * The backend only allows this for a signed-in user, so a first PIN is set here after signing in with OTP.
+ * Security PIN of the signed-in user (PIN sign-in, backend `two-step/set?type=pin`).
+ *
+ * First it says whether the user has a PIN, then offers "Set PIN now" or "Reset PIN"; the PIN boxes open only then.
+ * The backend reports whether a PIN exists only at sign-in (PinStatusStore keeps that answer). When it has not said
+ * yet, the card says so and still lets the user set one (saving replaces any PIN set before).
  */
 @Component({
   selector: 'app-security-pin-card',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, SectionCardComponent],
+  imports: [ButtonComponent, IconComponent, OtpInputComponent, SectionCardComponent, StatusBadgeComponent],
   template: `
     <app-section-card title="Security PIN" subtitle="Used to sign in when your role asks for a second check.">
-      <div class="flex flex-col gap-4 max-w-md">
-        <div class="flex items-start gap-2.5 text-[13px] leading-5 text-slate-600">
-          <app-icon name="info-circle" size="sm" class="mt-0.5 shrink-0 text-sky-600" />
-          <span>
-            Choose {{ minLength }} to {{ maxLength }} digits. Saving replaces any PIN you set before. If you have not set a PIN yet,
-            sign in with OTP once and set it here.
-          </span>
-        </div>
+      <div class="flex flex-col gap-4 max-w-xl">
+        @if (!editing()) {
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="flex items-start gap-3 min-w-0">
+              <span
+                class="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                [class.bg-emerald-50]="status() === true" [class.text-emerald-700]="status() === true"
+                [class.bg-amber-50]="status() !== true" [class.text-amber-700]="status() !== true"
+              >
+                <app-icon [name]="status() === true ? 'shield-check' : 'lock'" size="sm" />
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="m-0 text-sm font-semibold text-slate-900">
+                    @switch (status()) {
+                      @case (true) { You have a security PIN }
+                      @case (false) { You do not have a security PIN }
+                      @default { Security PIN }
+                    }
+                  </p>
+                  @switch (status()) {
+                    @case (true) { <app-status-badge variant="success">Set</app-status-badge> }
+                    @case (false) { <app-status-badge variant="warning">Not set</app-status-badge> }
+                    @default { <app-status-badge variant="neutral">Not known yet</app-status-badge> }
+                  }
+                </div>
+                <p class="m-0 mt-1 text-[13px] leading-5 text-slate-600">
+                  @switch (status()) {
+                    @case (true) { You can sign in with your {{ pinLength }}-digit PIN. If you have forgotten it, reset it here. }
+                    @case (false) { Set a {{ pinLength }}-digit PIN to use PIN sign-in. }
+                    @default {
+                      Whether you have a PIN is checked when you sign in with a role that asks for a second check. You can still set
+                      a PIN now; it replaces any PIN you set before.
+                    }
+                  }
+                </p>
+              </div>
+            </div>
+            <button appButton size="sm" type="button" [variant]="status() === true ? 'outline' : 'primary'" (click)="open()">
+              <app-icon [name]="status() === true ? 'refresh' : 'plus'" size="sm" />
+              <span>{{ status() === true ? 'Reset PIN' : 'Set PIN now' }}</span>
+            </button>
+          </div>
+        } @else {
+          <p class="m-0 text-[13px] leading-5 text-slate-600">
+            {{ status() === true ? 'Enter a new' : 'Choose a' }} {{ pinLength }}-digit PIN and type it again to confirm.
+            {{ status() === true ? 'It replaces your current PIN.' : '' }}
+          </p>
 
-        <div class="grid gap-3 sm:grid-cols-2">
-          <label class="flex flex-col gap-1.5 text-[13px] font-medium text-slate-700">
-            New PIN
-            <input
-              appInput
-              type="password"
-              inputmode="numeric"
-              autocomplete="new-password"
-              [attr.maxlength]="maxLength"
-              [invalid]="showError()"
-              [ngModel]="pin()"
-              (ngModelChange)="pin.set($event)"
-            />
-          </label>
-          <label class="flex flex-col gap-1.5 text-[13px] font-medium text-slate-700">
-            Confirm PIN
-            <input
-              appInput
-              type="password"
-              inputmode="numeric"
-              autocomplete="new-password"
-              [attr.maxlength]="maxLength"
-              [invalid]="showError()"
-              [ngModel]="confirm()"
-              (ngModelChange)="confirm.set($event)"
-              (keydown.enter)="save()"
-            />
-          </label>
-        </div>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[13px] font-medium text-slate-700">New PIN</span>
+              <app-otp-input [length]="pinLength" masked label="New PIN" [invalid]="showError()" [value]="pin()" (valueChange)="pin.set($event)" />
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[13px] font-medium text-slate-700">Confirm PIN</span>
+              <app-otp-input
+                [length]="pinLength"
+                masked
+                label="Confirm PIN"
+                [autofocus]="false"
+                [invalid]="showError()"
+                [value]="confirm()"
+                (valueChange)="confirm.set($event)"
+              />
+            </div>
+          </div>
 
-        @if (showError()) {
-          <div class="text-[13px] font-medium text-rose-700" role="alert">{{ error() }}</div>
+          @if (showError()) {
+            <div class="text-[13px] font-medium text-rose-700" role="alert">{{ error() }}</div>
+          }
+
+          <div class="flex items-center gap-2">
+            <button appButton type="button" [loading]="saving()" [disabled]="saving()" (click)="save()">
+              {{ status() === true ? 'Save New PIN' : 'Set PIN' }}
+            </button>
+            <button appButton variant="outline" type="button" [disabled]="saving()" (click)="cancel()">Cancel</button>
+          </div>
         }
-
-        <div>
-          <button appButton type="button" [loading]="saving()" [disabled]="saving()" (click)="save()">Save PIN</button>
-        </div>
       </div>
     </app-section-card>
   `
 })
 export class SecurityPinCardComponent {
   private readonly authApi = inject(AuthApiService);
+  private readonly auth = inject(AuthService);
+  private readonly pinStatus = inject(PinStatusStore);
   private readonly notifications = inject(NotificationService);
 
-  protected readonly minLength = PIN_MIN_LENGTH;
-  protected readonly maxLength = PIN_MAX_LENGTH;
+  protected readonly pinLength = PIN_LENGTH;
+  /** true / false as the backend last said, null when it has not said yet. */
+  protected readonly status = computed(() => this.pinStatus.statusOf(this.auth.currentUser()?.ssoId));
 
+  protected readonly editing = signal(false);
   protected readonly pin = signal('');
   protected readonly confirm = signal('');
   protected readonly saving = signal(false);
@@ -83,11 +124,22 @@ export class SecurityPinCardComponent {
   protected readonly error = computed(() => this.serverError() ?? pinError(this.pin(), this.confirm()));
   protected readonly showError = computed(() => this.attempted() && !!this.error());
 
+  protected open(): void {
+    this.clear();
+    this.editing.set(true);
+  }
+
+  protected cancel(): void {
+    this.clear();
+    this.editing.set(false);
+  }
+
   protected save(): void {
     this.attempted.set(true);
     this.serverError.set(null);
     if (pinError(this.pin(), this.confirm())) return;
 
+    const hadPin = this.status() === true;
     this.saving.set(true);
     this.authApi.setPin(this.pin()).subscribe({
       next: res => {
@@ -96,15 +148,24 @@ export class SecurityPinCardComponent {
           this.serverError.set(res.message ?? 'The PIN could not be saved.');
           return;
         }
-        this.pin.set('');
-        this.confirm.set('');
-        this.attempted.set(false);
-        this.notifications.success(res?.message ?? 'Security PIN set successfully.', 'PIN saved');
+        this.pinStatus.record(this.auth.currentUser()?.ssoId, true);
+        this.cancel();
+        this.notifications.success(
+          res?.message ?? (hadPin ? 'Your security PIN has been reset.' : 'Your security PIN has been set.'),
+          hadPin ? 'PIN reset' : 'PIN set'
+        );
       },
       error: err => {
         this.saving.set(false);
         this.serverError.set(err?.message ?? 'The PIN could not be saved. Please try again.');
       }
     });
+  }
+
+  private clear(): void {
+    this.pin.set('');
+    this.confirm.set('');
+    this.attempted.set(false);
+    this.serverError.set(null);
   }
 }

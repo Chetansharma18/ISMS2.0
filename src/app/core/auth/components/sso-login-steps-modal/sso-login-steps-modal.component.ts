@@ -1,8 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import type { FilterTab } from '../../../../shared/components/filter-tabs/filter-tabs.component';
-import { InputDirective } from '../../../../shared/components/form-controls/input/input.directive';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { OtpInputComponent } from '../../../../shared/components/otp-input/otp-input.component';
@@ -10,7 +8,7 @@ import type { TwoStepMethod } from '../../auth-api.models';
 import { SsoLoginFlowService } from '../../sso-login-flow.service';
 import { humanizeRoleName } from '../../sso-session.util';
 import { IconComponent } from '../../../../shared/components/icon/icon.component';
-import { PIN_MAX_LENGTH, PIN_MIN_LENGTH, isPinNotSetMessage, pinError } from '../../security-pin.util';
+import { PIN_LENGTH, isPinNotSetMessage, pinError } from '../../security-pin.util';
 
 const OTP_LENGTH = 6;
 
@@ -21,7 +19,7 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
   selector: 'app-sso-login-steps-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, IconComponent, InputDirective, LoaderComponent, ModalComponent, OtpInputComponent],
+  imports: [ButtonComponent, IconComponent, LoaderComponent, ModalComponent, OtpInputComponent],
   template: `
     @switch (flow.step()) {
       @case ('verifying') {
@@ -139,36 +137,31 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
           } @else if (pinSetup()) {
             <!-- No PIN yet and the backend sent a setup token: set the PIN here, then sign in with it -->
             <p class="text-sm text-slate-600 m-0 mb-3">
-              You have not set a security PIN yet. Choose {{ pinMin }} to {{ pinMax }} digits; you will use it to sign in from now on.
+              You have not set a security PIN yet. Choose a {{ pinLength }}-digit PIN; you will use it to sign in from now on.
             </p>
-            <div class="grid gap-3 sm:grid-cols-2">
-              <label class="flex flex-col gap-1.5 text-[13px] font-medium text-slate-700">
-                New PIN
-                <input
-                  appInput
-                  type="password"
-                  inputmode="numeric"
-                  autocomplete="new-password"
-                  [attr.maxlength]="pinMax"
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[13px] font-medium text-slate-700">New PIN</span>
+                <app-otp-input
+                  [length]="pinLength"
+                  masked
+                  label="New PIN"
                   [invalid]="setupAttempted() && !!setupError()"
-                  [ngModel]="code()"
-                  (ngModelChange)="code.set($event)"
+                  [(value)]="code"
                 />
-              </label>
-              <label class="flex flex-col gap-1.5 text-[13px] font-medium text-slate-700">
-                Confirm PIN
-                <input
-                  appInput
-                  type="password"
-                  inputmode="numeric"
-                  autocomplete="new-password"
-                  [attr.maxlength]="pinMax"
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <span class="text-[13px] font-medium text-slate-700">Confirm PIN</span>
+                <app-otp-input
+                  [length]="pinLength"
+                  masked
+                  label="Confirm PIN"
+                  [autofocus]="false"
                   [invalid]="setupAttempted() && !!setupError()"
-                  [ngModel]="confirmCode()"
-                  (ngModelChange)="confirmCode.set($event)"
-                  (keydown.enter)="setUpPin()"
+                  [(value)]="confirmCode"
+                  (completed)="setUpPin()"
                 />
-              </label>
+              </div>
             </div>
             @if (setupAttempted() && setupError()) {
               <p class="mt-3 text-xs font-semibold text-rose-700 m-0">{{ setupError() }}</p>
@@ -187,17 +180,15 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
               <button appButton variant="outline" size="sm" type="button" class="mt-3" (click)="method.set('OTP')">Use OTP instead</button>
             }
           } @else {
-            <label class="block text-sm text-slate-600 mb-2" for="sso-pin">Enter your security PIN.</label>
-            <input
-              appInput
-              id="sso-pin"
-              type="password"
-              inputmode="numeric"
-              autocomplete="one-time-code"
+            <p class="text-sm text-slate-600 m-0 mb-2">Enter your {{ pinLength }}-digit security PIN.</p>
+            <app-otp-input
+              class="my-2"
+              [length]="pinLength"
+              masked
+              label="Security PIN"
               [invalid]="!!flow.error()"
-              [ngModel]="code()"
-              (ngModelChange)="code.set($event)"
-              (keydown.enter)="submit()"
+              [(value)]="code"
+              (completed)="submit()"
             />
             <button appButton variant="ghost" size="sm" type="button" class="mt-2" (click)="forgotPin()">Forgot PIN?</button>
             @if (forgotBlocked()) {
@@ -245,8 +236,7 @@ export class SsoLoginStepsModalComponent {
     this.flow.methods().map(id => ({ id, label: METHOD_LABELS[id] }))
   );
 
-  protected readonly pinMin = PIN_MIN_LENGTH;
-  protected readonly pinMax = PIN_MAX_LENGTH;
+  protected readonly pinLength = PIN_LENGTH;
   protected readonly confirmCode = signal('');
   protected readonly setupAttempted = signal(false);
   protected readonly forgotBlocked = signal(false);
@@ -266,7 +256,7 @@ export class SsoLoginStepsModalComponent {
   protected readonly canSubmit = computed(() => {
     if (this.flow.busy()) return false;
     const code = this.code().trim();
-    return this.method() === 'OTP' ? code.length === OTP_LENGTH : code.length >= PIN_MIN_LENGTH;
+    return this.method() === 'OTP' ? code.length === OTP_LENGTH : code.length === PIN_LENGTH;
   });
 
   constructor() {

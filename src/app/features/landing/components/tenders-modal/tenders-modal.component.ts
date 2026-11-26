@@ -22,20 +22,20 @@ interface Tender {
     <app-modal
       title="Official Tenders & RFP Notices"
       subtitle="Rajasthan Skill and Livelihoods Development Corporation (RSLDC)"
-      size="lg"
+      size="xl"
       [scrollBody]="true"
       (close)="onModalClose()"
     >
         <div class="space-y-2.5">
-          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
-            <span class="text-xs font-semibold text-slate-700">Active Notices</span>
-            <span class="text-xs font-medium text-slate-500">Total Tenders: <strong class="text-slate-900 tabular-nums">{{ tenders.length }}</strong></span>
+          <div class="flex items-center justify-between pb-1.5 border-b border-[#EADCE2]">
+            <span class="text-xs font-semibold text-[#625663]">Active Notices</span>
+            <span class="text-xs font-medium text-[#89818A]">Total Tenders: <strong class="text-[#25212A] tabular-nums">{{ tenders.length }}</strong></span>
           </div>
 
           @for (item of tenders; track item.id) {
             <div
               (click)="openLoginPrompt(item)"
-              class="group relative bg-white border border-slate-200/90 shadow-2xs rounded-lg p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3.5 hover:border-navy/40 hover:bg-slate-50/40 transition-all cursor-pointer"
+              class="group relative bg-white border border-[#EADCE2] shadow-2xs rounded-xl p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3.5 hover:border-[#7C0E44]/40 hover:bg-[#FAF2F5] transition-all cursor-pointer"
             >
               @if (item.isNew) {
                 <img src="/new.png" alt="New Tender" class="absolute -top-1 -left-1 w-6 sm:w-7 h-6 sm:h-7 object-cover z-10 pointer-events-none drop-shadow-2xs rounded-tl-lg" />
@@ -47,7 +47,7 @@ interface Tender {
                   <span class="text-slate-300">•</span>
                   <span class="text-[11px] text-slate-500 tabular-nums truncate max-w-[190px] sm:max-w-none">{{ item.id }}</span>
                   <span class="text-slate-300">•</span>
-                  <span class="text-[10px] font-semibold text-brand bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">{{ item.category }}</span>
+                  <span class="text-[10px] font-semibold text-[#7C0E44] bg-[#F8EDF1] px-2 py-0.5 rounded border border-[#EADCE2]">{{ item.category }}</span>
                 </div>
 
                 <h4 class="text-xs sm:text-[13px] font-semibold text-slate-800 leading-snug group-hover:text-brand transition-colors line-clamp-2 m-0">

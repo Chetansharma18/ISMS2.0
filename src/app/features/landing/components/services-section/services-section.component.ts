@@ -12,7 +12,7 @@ import { IconComponent } from '../../../../shared';
   },
   template: `
     <!-- Section 5: ISMS 2.0 Mobile Application -->
-    <section class="relative w-full py-12 sm:py-16 md:py-20 xl:py-24 border-b border-[#DCE5EE] overflow-hidden" aria-labelledby="mobile-app-heading">
+    <section class="relative w-full py-12 sm:py-16 md:py-20 xl:py-24 border-b border-[#EADCE2] bg-white overflow-hidden" aria-labelledby="mobile-app-heading">
       
       <!-- Panoramic Rajasthan Landscape Heritage Background Layer -->
       <div class="absolute inset-0 z-0 pointer-events-none select-none overflow-hidden">
@@ -26,6 +26,8 @@ import { IconComponent } from '../../../../shared';
         />
         <!-- Soft translucent light overlay ensuring high text readability while showcasing the heritage architecture -->
         <div class="absolute inset-0 bg-white/80 sm:bg-transparent sm:bg-linear-to-r sm:from-white/35 sm:via-white/72 sm:to-white/35"></div>
+        <!-- Smooth fade-out to pure white at bottom to prevent blue water ripples leaking into the footer -->
+        <div class="absolute inset-x-0 bottom-0 h-32 bg-linear-to-b from-transparent via-white/80 to-white"></div>
       </div>
 
       <!-- Centered Content Container: Max Width 1400–1440px with Responsive Padding (20px Mobile) -->

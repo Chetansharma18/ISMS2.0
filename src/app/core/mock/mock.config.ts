@@ -17,13 +17,15 @@ export interface MockConfigSettings {
   resources: Record<string, boolean>;
 }
 
+/** Optional runtime override so toggling mock mode never mutates the imported environment object. */
+let globalMockOverride: boolean | null = null;
+
 export const MOCK_CONFIG: MockConfigSettings = {
   get globalUseMock(): boolean {
-    return environment.useMockData ?? true;
+    return globalMockOverride ?? environment.useMockData ?? true;
   },
   set globalUseMock(val: boolean) {
-    // Allows runtime override
-    environment.useMockData = val;
+    globalMockOverride = val;
   },
   simulatedDelayMs: environment.simulatedDelayMs ?? 150,
   persistInStorage: environment.enableMockPersistence ?? true,
@@ -37,6 +39,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     ASPIRANTS: true,
     IPA: true,
     MASTERS: true,
+    SANCTION_ORDERS: true,
     GRIEVANCES: true,
     REGISTRATION: true,
     AUTH: true,
@@ -56,7 +59,8 @@ export const MOCK_CONFIG: MockConfigSettings = {
     GRADING_MASTERS: true,
     DOC_MASTERS: true,
     ANNEXURE_MASTERS: true,
-    TWO_STEP_VERIFICATION: true
+    TWO_STEP_VERIFICATION: true,
+    DYNAMIC_FORM_BUILDER: true
   }
 };
 
@@ -64,7 +68,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
  * Checks whether mock data is active for a given dataKey/resource.
  */
 export function isMockEnabled(dataKey?: string): boolean {
-  if (!environment.useMockData) return false;
+  if (!MOCK_CONFIG.globalUseMock) return false;
   if (dataKey && dataKey in MOCK_CONFIG.resources) {
     return MOCK_CONFIG.resources[dataKey];
   }
@@ -88,8 +92,8 @@ export function setGlobalMock(enabled: boolean): void {
 /**
  * Universal Mock Data Resolver:
  * Wraps mock data arrays so they automatically return empty arrays when
- * environment.useMockData is set to false.
+ * mock mode is disabled.
  */
 export function resolveMock<T>(data: T[]): T[] {
-  return (environment.useMockData ?? true) ? data : [];
+  return MOCK_CONFIG.globalUseMock ? data : [];
 }

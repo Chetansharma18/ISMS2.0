@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { PressReleasesModalComponent } from '../press-releases-modal/press-releases-modal.component';
-import { ButtonComponent, IconComponent } from '../../../../shared';
+import { ButtonComponent } from '../../../../shared';
 
 export interface AnnouncementItem {
   id: string;
@@ -27,14 +27,14 @@ export interface AnnouncementItem {
   selector: 'app-news-ticker',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, PressReleasesModalComponent, ButtonComponent, IconComponent],
+  imports: [CommonModule, PressReleasesModalComponent, ButtonComponent],
   host: {
     class: 'block w-full'
   },
   template: `
     <div
       #tickerSection
-      class="w-full bg-[#0D3557] text-white border-b border-black/15 shadow-inner relative z-10 select-none overflow-hidden"
+      class="w-full bg-[#5E0832] text-white border-b border-[#7C0E44]/40 shadow-inner relative z-10 select-none overflow-hidden"
       role="region"
       aria-label="Government News Announcements Ticker"
     >
@@ -43,7 +43,7 @@ export interface AnnouncementItem {
         <!-- ============================================================
              1. FIXED LEFT: ORANGE NEWS LABEL + SEPARATOR
              ============================================================ -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0 z-20 bg-[#0D3557] pr-2 sm:pr-3">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0 z-20 bg-[#5E0832] pr-2 sm:pr-3">
           <button
             appButton
             size="sm"
@@ -86,8 +86,8 @@ export interface AnnouncementItem {
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0 focus:outline-none focus:text-[#F28C28]"
                   [attr.lang]="item.lang"
                 >
-                  <!-- Date Badge -->
-                  <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
+                  <!-- Date Badge (Themed Burgundy & Amber) -->
+                  <span class="bg-[#3D0521] text-[#F59E0B] border border-[#AA5E7A]/40 font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Language Badge -->
@@ -114,8 +114,8 @@ export interface AnnouncementItem {
                   class="ticker-link inline-flex items-center gap-2 sm:gap-2.5 text-white hover:text-[#F28C28] transition-colors cursor-pointer group no-underline shrink-0"
                   [attr.lang]="item.lang"
                 >
-                  <!-- Date Badge -->
-                  <span class="bg-[#194A70] text-[#F6C453] font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
+                  <!-- Date Badge (Themed Burgundy & Amber) -->
+                  <span class="bg-[#3D0521] text-[#F59E0B] border border-[#AA5E7A]/40 font-semibold text-[11px] sm:text-[12px] px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-[3px] whitespace-nowrap shrink-0">
                     {{ item.date }}
                   </span>
                   <!-- Language Badge -->
@@ -133,32 +133,6 @@ export interface AnnouncementItem {
             </div>
 
           </div>
-        </div>
-
-        <!-- ============================================================
-             3. FIXED RIGHT: PAUSE / RESUME CONTROL
-             ============================================================ -->
-        <div class="flex items-center gap-2 shrink-0 z-20 bg-[#0D3557] pl-2 sm:pl-3">
-          <div class="w-px h-4 sm:h-5 bg-white/25 shrink-0 hidden sm:block"></div>
-          <button
-            appButton
-            variant="secondary"
-            size="sm"
-            iconOnly
-            type="button"
-            (click)="togglePauseResume()"
-            class="shrink-0"
-            [attr.aria-label]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
-            [attr.title]="isPaused() ? 'Resume news announcements' : 'Pause news announcements'"
-          >
-            @if (isPaused()) {
-              <!-- Play / Resume Icon -->
-              <app-icon name="play" solid size="sm" class="translate-x-0.5" />
-            } @else {
-              <!-- Pause Icon -->
-              <app-icon name="pause" solid size="sm" />
-            }
-          </button>
         </div>
 
       </div>

@@ -13,19 +13,12 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
     class: 'block w-full'
   },
   template: `
-    <section class="relative w-full overflow-hidden bg-[#5E0832] flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
+    <section class="relative w-full overflow-hidden flex items-center min-h-120 sm:min-h-125 lg:min-h-130">
       
-      <!-- Authentic Panoramic Rajasthan Heritage Architecture Background -->
+      <!-- Authentic Panoramic Rajasthan Heritage Architecture Background (Directly visible without color opacity) -->
       <div 
         class="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat pointer-events-none select-none"
         style="background-image: url('/raj.png');"
-        aria-hidden="true"
-      ></div>
-
-      <!-- High-Contrast Directional Burgundy & Sunset Peach Overlay -->
-      <div 
-        class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(135deg, rgba(94, 8, 50, 0.95) 0%, rgba(124, 14, 68, 0.92) 50%, rgba(170, 94, 122, 0.85) 100%);"
         aria-hidden="true"
       ></div>
 
@@ -37,18 +30,18 @@ import { ButtonComponent, IconComponent } from '../../../../shared';
           <div class="w-full lg:w-[55%] text-left flex flex-col justify-center">
             
             <!-- Main Hero Heading -->
-            <h1 class="hero-title font-bold text-white tracking-tight leading-[1.14]">
+            <h1 class="hero-title font-bold text-white tracking-tight leading-[1.14] drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
               Integrated Scheme Management System
             </h1>
 
             <!-- Small Orange Underline -->
             <div 
-              class="w-10.5 h-[3.5px] bg-[#EA580C] rounded-full my-4" 
+              class="w-10.5 h-[3.5px] bg-[#EA580C] rounded-full my-4 shadow-sm" 
               aria-hidden="true"
             ></div>
 
             <!-- Hero Description -->
-            <p class="hero-desc font-normal text-[#FCF8FA] leading-[1.6]">
+            <p class="hero-desc font-normal text-white leading-[1.6] drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
               A unified, transparent digital ecosystem empowering skill development schemes, training operations, biometric verification, assessments, certifications, and sustainable placements across Rajasthan.
             </p>
 

@@ -72,15 +72,12 @@ export interface StepperStep {
       </nav>
     } @else if (variant === 'wizard') {
       <nav
-        class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs px-4 sm:px-8 py-3.5 sm:py-4 overflow-x-auto no-scrollbar"
+        class="bg-white rounded-xl border border-[#EADCE2] shadow-2xs px-5 sm:px-8 py-3 sm:py-3.5 overflow-x-auto no-scrollbar"
         [attr.aria-label]="ariaLabel"
       >
         <ol
           class="list-none m-0 p-0 flex items-center justify-between w-full"
-          [ngClass]="[
-            hideLabelsOnMobile ? '' : 'min-w-135 sm:min-w-0',
-            steps.length <= 2 ? 'max-w-xl mx-auto' : ''
-          ]"
+          [ngClass]="steps.length > 2 && !hideLabelsOnMobile ? 'min-w-135 sm:min-w-0' : ''"
         >
           @for (step of steps; track step.label; let i = $index; let last = $last) {
             <li class="contents">
@@ -111,7 +108,7 @@ export interface StepperStep {
 
               @if (!last) {
                 <span
-                  class="flex-1 h-0.5 mx-2.5 sm:mx-6 transition-colors duration-200"
+                  class="flex-1 h-[2px] mx-3 sm:mx-6 rounded-full transition-colors duration-200"
                   [ngClass]="isCompleted(i + 1) ? 'bg-navy' : 'bg-slate-200'"
                   aria-hidden="true"
                 ></span>

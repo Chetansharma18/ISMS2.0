@@ -25,7 +25,7 @@ import { ButtonComponent, IconComponent, ModalComponent } from '../../shared';
     </button>
 
     @if (open()) {
-      <app-modal [title]="itemName()" subtitle="Applicable schemes" size="md" (close)="open.set(false)">
+      <app-modal [title]="itemName()" subtitle="Applicable schemes" size="md" [showClose]="false" (close)="open.set(false)">
         <ul class="m-0 list-none space-y-1.5 p-0 text-[13px]">
           @for (scheme of schemes(); track scheme) {
             <li class="flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-slate-800">

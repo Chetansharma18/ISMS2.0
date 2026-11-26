@@ -141,7 +141,7 @@ const NO_ROLE = '__none__';
     />
 
     @if (assignOpen()) {
-      <app-modal title="Assign Role" subtitle="Give a user one more role. Their current roles are kept." size="md" (close)="closeAssign()">
+      <app-modal title="Assign Role" subtitle="Give a user one more role. Their current roles are kept." size="md" [showClose]="false" (close)="closeAssign()">
         <div class="space-y-4 text-[13px]">
           <div>
             <label class="block mb-1 font-medium text-slate-700">User*</label>

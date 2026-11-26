@@ -45,7 +45,7 @@ import { IconComponent } from '../icon/icon.component';
 
       <!-- Main Responsive Table Container -->
       <div class="overflow-x-auto bg-white">
-        <table class="table w-full text-left border-collapse text-[13px] bg-white">
+        <table class="table table-auto w-full text-left border-collapse text-[13px] bg-white">
           <!-- Themed Table Header -->
           <thead>
             <tr class="bg-[#F6E7EC] text-[#7C0E44] text-[13.5px] font-semibold select-none border-b border-[#EADCE2]">
@@ -201,8 +201,8 @@ import { IconComponent } from '../icon/icon.component';
         </table>
       </div>
 
-      <!-- Table Pagination Bar -->
-      @if (pagination && filteredData().length > 0) {
+      <!-- Table Pagination Bar (shown only when entries exceed pageSize, i.e. > 10) -->
+      @if (pagination && filteredData().length > pageSize) {
         <div class="px-4 py-2.5 bg-white border-t border-[#EADCE2] flex flex-col sm:flex-row items-center justify-between gap-3 text-[13px] text-[#625663] select-none font-sans">
           <span>
             Showing <strong class="text-[#25212A] font-semibold">{{ (currentPage() - 1) * pageSize + 1 }}</strong> to <strong class="text-[#25212A] font-semibold">{{ Math.min(currentPage() * pageSize, filteredData().length) }}</strong> of <strong class="text-[#25212A] font-semibold">{{ filteredData().length }}</strong> {{ itemUnit }}

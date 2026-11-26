@@ -508,14 +508,15 @@ import {
                       @if (!isFieldDisabled(field)) {
                         <button
                           appButton
-                          variant="danger"
+                          variant="ghost"
                           size="sm"
+                          iconOnly
                           type="button"
                           (click)="removeFile(field)"
-                          title="Delete Document"
+                          title="Remove Document"
+                          aria-label="Remove Document"
                         >
-                          <app-icon name="trash" size="sm" />
-                          <span>Delete</span>
+                          <app-icon name="trash" size="sm" class="text-rose-600" />
                         </button>
                       }
                     </div>

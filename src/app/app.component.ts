@@ -17,7 +17,6 @@ import { IconComponent } from './shared/components/icon/icon.component';
 import { BackdropComponent } from './shared/components/backdrop/backdrop.component';
 import { ActionModalComponent } from './shared/components/action-modal/action-modal.component';
 import { ConnectivityService } from './core/services/connectivity.service';
-import { ModalService } from './shared/services/modal.service';
 
 @Component({
   selector: 'app-root',
@@ -52,8 +51,7 @@ import { ModalService } from './shared/services/modal.service';
       @if (showHeader()) {
         <app-header
           [isSticky]="true"
-          class="shrink-0 sticky top-0"
-          [class.z-40]="!modalService.hasOpenModal()"
+          class="shrink-0 sticky top-0 z-40"
           (loginClicked)="onLoginClick()"
           (toggleMobileMenu)="toggleMobileSidebar()"
         ></app-header>
@@ -131,7 +129,6 @@ import { ModalService } from './shared/services/modal.service';
 export class AppComponent {
   authService = inject(AuthService);
   connectivityService = inject(ConnectivityService);
-  readonly modalService = inject(ModalService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
 

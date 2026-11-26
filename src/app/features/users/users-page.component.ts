@@ -90,7 +90,7 @@ const NO_ROLE = '__none__';
     </ng-template>
 
     @if (selected(); as user) {
-      <app-modal [title]="user.name || user.ssoId" [subtitle]="user.ssoId" size="lg" (close)="selected.set(null)">
+      <app-modal [title]="user.name || user.ssoId" [subtitle]="user.ssoId" size="lg" [showClose]="false" (close)="selected.set(null)">
         <div class="space-y-5 text-[13px]">
           <div class="flex flex-wrap gap-1.5">
             @for (role of user.roles; track role.name) {

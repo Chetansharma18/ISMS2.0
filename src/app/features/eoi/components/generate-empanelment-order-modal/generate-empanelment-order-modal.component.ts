@@ -59,7 +59,7 @@ const STEPS: StepperStep[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ModalComponent, ButtonComponent, IconComponent, StatusBadgeComponent, StepperComponent, TableComponent, OrderEsignModalComponent],
   template: `
-    <app-modal title="Generate Empanelment & Rejection Orders" [subtitle]="schemeName()" size="2xl" (close)="close.emit()">
+    <app-modal title="Generate Empanelment & Rejection Orders" [subtitle]="schemeName()" size="2xl" [showClose]="false" (close)="close.emit()">
       <div class="space-y-4 p-1 text-xs">
         <div class="pb-4 mb-1 border-b border-slate-200">
           <app-stepper variant="line" [bare]="true" [steps]="steps" [currentStep]="step()" (stepClick)="goTo($event)" ariaLabel="Order progress" />

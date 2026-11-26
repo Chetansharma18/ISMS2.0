@@ -27,6 +27,7 @@ export type NewUserCategory = 'student' | 'citizen';
         subtitle="Select User Category / उपयोगकर्ता प्रकार"
         widthOverride="max-w-xl"
         [closeOnBackdrop]="false"
+        [showClose]="false"
         (close)="cancel()"
       >
           <!-- Description -->

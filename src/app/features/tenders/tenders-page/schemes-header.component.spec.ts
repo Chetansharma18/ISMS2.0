@@ -18,9 +18,9 @@ describe('SchemesHeaderComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders Active Schemes title', () => {
+  it('renders Active EOI title', () => {
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Active Schemes');
+    expect(el.textContent).toContain('Active EOI');
   });
 
   it('renders Configure New EOI button when isSuperAdmin is true and emits configureEoi', () => {

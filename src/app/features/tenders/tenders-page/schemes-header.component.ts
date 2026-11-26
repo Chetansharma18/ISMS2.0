@@ -15,8 +15,8 @@ import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../sh
   template: `
     <!-- Themed Header Bar via Reusable PageHeaderComponent with Rajasthan Banner -->
     <app-page-header
-      title="Active Schemes"
-      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active Schemes' }]"
+      title="Active EOI"
+      [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'Active EOI' }]"
       [searchable]="false"
     >
       @if (isSuperAdmin()) {

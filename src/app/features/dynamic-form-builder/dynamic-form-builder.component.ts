@@ -413,7 +413,7 @@ interface FormRow extends FormManagerForm {
 
       <!-- ================= PREVIEW ================= -->
       @if (preview(); as item) {
-        <app-modal [title]="'Preview: ' + item.formType" size="xl" (close)="closePreview()">
+        <app-modal [title]="'Preview: ' + item.formType" size="xl" [showClose]="false" (close)="closePreview()">
           @if (previewVersions().length > 1) {
             <div class="flex items-center gap-2 mb-4 text-xs">
               <label for="fm-version" class="font-semibold text-slate-700">Version</label>

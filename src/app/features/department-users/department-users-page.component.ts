@@ -212,6 +212,7 @@ const SSO_CHECK_DELAY_MS = 400;
         subtitle="Map an SSO ID to a role, designation and the schemes, districts and blocks it covers."
         size="lg"
         [closeOnBackdrop]="false"
+        [showClose]="false"
         (close)="closeForm()"
       >
         <div class="grid gap-4 text-[13px] sm:grid-cols-2">
@@ -367,7 +368,7 @@ const SSO_CHECK_DELAY_MS = 400;
 
     <!-- View -->
     @if (viewing(); as u) {
-      <app-modal [title]="u.ssoId" [subtitle]="roleLabel(roleNameOf(u)) + (u.active ? ' - Active' : ' - Not activated')" size="lg" (close)="viewing.set(null)">
+      <app-modal [title]="u.ssoId" [subtitle]="roleLabel(roleNameOf(u)) + (u.active ? ' - Active' : ' - Not activated')" size="lg" [showClose]="false" (close)="viewing.set(null)">
         <div class="space-y-5 text-[13px]">
           <dl class="m-0 grid gap-x-6 gap-y-3 sm:grid-cols-2">
             @for (field of viewFields(); track field.label) {

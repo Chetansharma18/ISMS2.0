@@ -11,7 +11,6 @@ import {
   inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IconComponent } from '../icon/icon.component';
 import { ModalService } from '../../services/modal.service';
 
 export type ActionModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
@@ -30,7 +29,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
   selector: 'app-action-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule],
   host: {
     '[attr.title]': 'null'
   },
@@ -58,19 +57,6 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
             <div class="h-1 w-full shrink-0 rounded-t-xl" [ngClass]="accentBarClass"></div>
           }
 
-          <!-- Close Button -->
-          @if (showCloseButton) {
-            <button
-              type="button"
-              (click)="onClose()"
-              class="absolute top-4 right-5 sm:right-6 w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer z-10"
-              title="Close"
-              aria-label="Close"
-            >
-              <app-icon name="close" [stroke]="2.5" />
-            </button>
-          }
-
           <!-- Modal Body -->
           <div
             class="px-4 sm:px-7 pt-5 sm:pt-6 pb-5 sm:pb-7 flex flex-col"
@@ -89,7 +75,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
 
             <!-- Title -->
             @if (title) {
-              <h2 [id]="titleId" class="m-0 text-[#7C0E44] pr-6" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
+              <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
                 {{ title }}
               </h2>
             }
@@ -102,25 +88,25 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
             }
 
             <!-- Projected Custom Slot -->
-            <div class="w-full flex-1 min-h-0 flex flex-col overflow-y-auto pr-0.5">
+            <div class="w-full flex-1 min-h-0 flex flex-col" [class.overflow-y-auto]="scrollable" [class.overflow-visible]="!scrollable" [class.pr-0.5]="scrollable">
               <ng-content></ng-content>
             </div>
 
             <!-- Action Buttons Footer -->
-            @if (primaryLabel || secondaryLabel) {
+            @if (primaryLabel || cancelLabel) {
               <div class="mt-auto shrink-0">
                 @if (showFooterDivider) {
                   <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
                 }
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!secondaryLabel">
-                  @if (secondaryLabel) {
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!cancelLabel">
+                  @if (cancelLabel) {
                     <button
                       type="button"
-                      (click)="onSecondaryAction()"
+                      (click)="secondaryLabel ? onSecondaryAction() : onClose()"
                       class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#AA5E7A] text-[#7C0E44] text-sm font-medium hover:bg-[#F8EDF1] transition-colors cursor-pointer"
                     >
-                      {{ secondaryLabel }}
+                      {{ cancelLabel }}
                     </button>
                   }
                   @if (primaryLabel) {
@@ -130,9 +116,9 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
                       [disabled]="disablePrimary"
                       class="w-full py-2.5 px-5 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                       [ngClass]="primaryVariantClass"
-                      [class.sm:flex-1]="secondaryLabel"
-                      [class.sm:w-auto]="!secondaryLabel"
-                      [class.sm:min-w-[130px]]="!secondaryLabel"
+                      [class.sm:flex-1]="cancelLabel"
+                      [class.sm:w-auto]="!cancelLabel"
+                      [class.sm:min-w-[130px]]="!cancelLabel"
                     >
                       {{ primaryLabel }}
                     </button>
@@ -163,6 +149,10 @@ export class ActionModalComponent implements OnChanges, OnDestroy {
   @Input() showPrimaryArrow = true;
   @Input() showAccentBar = false;
   @Input() accentBarClass = 'bg-navy';
+  /**
+   * The dialog needs a way to close. There is no top-right ✕: when the dialog has no secondary button and its
+   * primary button is not itself a close button (Close, OK, Done), a "Cancel" button that emits `close` is shown.
+   */
   @Input() showCloseButton = false;
   @Input() showFooterDivider = true;
   @Input() size?: ActionModalSize;
@@ -174,6 +164,13 @@ export class ActionModalComponent implements OnChanges, OnDestroy {
   @Input() scrollable = false;
   /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
   @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
+
+  /** The left footer button: the screen's secondary label, else the automatic "Cancel" (see `showCloseButton`). */
+  get cancelLabel(): string {
+    if (this.secondaryLabel) return this.secondaryLabel;
+    if (!this.showCloseButton) return '';
+    return /^(close|ok|done|cancel)$/i.test(this.primaryLabel.trim()) ? '' : 'Cancel';
+  }
 
   get resolvedMaxWidthClass(): string {
     if (this.size && ACTION_MODAL_WIDTHS[this.size]) {

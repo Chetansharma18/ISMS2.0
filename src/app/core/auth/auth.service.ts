@@ -380,21 +380,13 @@ export class AuthService {
     this.clearLocalSession();
 
     if (this.isMockAuth()) {
-      this.router.navigate(['/sso-login']);
+      this.router.navigate(['/']);
       return;
     }
 
-    // Real sign-in: end the server session, then finish the sign-out at RajSSO through the page the backend returns.
-    // Whatever the server answers, the user is already signed out here.
+    // End the server session, then redirect to the portal landing page.
     this.authApi.logout().subscribe({
-      next: res => {
-        const target = res?.redirectUrl;
-        if (target && /^https?:\/\//i.test(target)) {
-          window.location.assign(target);
-        } else {
-          this.router.navigate(['/']);
-        }
-      },
+      next: () => this.router.navigate(['/']),
       error: () => this.router.navigate(['/'])
     });
   }

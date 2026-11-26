@@ -223,9 +223,15 @@ const MAX_APPEAL_FILES = 5;
                         }
                         @if (c.isOpen) {
                           <input #clarFile type="file" class="hidden" (change)="uploadClarification(doc, $event)" />
-                          <button appButton variant="outline" size="sm" type="button" [disabled]="busy()" (click)="clarFile.click()">
-                            {{ uploadFor(c.uploads, doc) ? 'Replace' : 'Upload' }}
-                          </button>
+                          @if (uploadFor(c.uploads, doc)) {
+                            <button appButton variant="ghost" size="sm" iconOnly type="button" [disabled]="busy()" (click)="clarFile.click()" title="Replace Document" aria-label="Replace Document">
+                              <app-icon name="refresh" size="sm" />
+                            </button>
+                          } @else {
+                            <button appButton variant="outline" size="sm" type="button" [disabled]="busy()" (click)="clarFile.click()">
+                              Upload
+                            </button>
+                          }
                         }
                       </span>
                     </li>

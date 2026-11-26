@@ -87,12 +87,15 @@ import { documentCategoryLabel } from './tender-status.util';
           @if (isEditing()) {
             <button
               appButton
-              variant="secondary"
+              variant="ghost"
               size="sm"
+              iconOnly
               type="button"
               (click)="replaceFileInput.click()"
+              title="Replace Document"
+              aria-label="Replace Document"
             >
-              Replace
+              <app-icon name="refresh" size="sm" />
             </button>
             <input #replaceFileInput type="file" (change)="replaceDoc.emit({ event: $event, doc })" class="hidden" accept=".pdf,.doc,.docx" />
           }

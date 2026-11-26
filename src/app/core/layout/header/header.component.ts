@@ -37,11 +37,11 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
     ActionModalComponent
   ],
   host: {
-    class: 'block w-full sticky top-0'
+    class: 'block w-full sticky top-0 z-40'
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#EADCE2] box-border select-none shadow-2xs"
+      class="w-full bg-white border-b border-[#EADCE2] box-border sticky top-0 z-40 select-none shadow-2xs"
       role="banner"
     >
       <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
@@ -350,23 +350,37 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
 
       </div>
 
-      <!-- Sign Out Confirmation Modal -->
-      <app-action-modal
-        [isOpen]="showLogoutConfirmModal()"
-        [showCloseButton]="true"
-        [closeOnBackdrop]="true"
-        [showAccentBar]="false"
-        title="Sign Out Confirmation"
-        description="Are you sure you want to sign out of the ISMS 2.0 portal?"
-        primaryLabel="Sign Out"
-        primaryVariant="danger"
-        secondaryLabel="Cancel"
-        maxWidthClass="max-w-[440px]"
-        (primaryAction)="confirmLogout()"
-        (secondaryAction)="cancelLogout()"
-        (close)="cancelLogout()"
-      />
     </header>
+
+    <!-- Sign Out Confirmation Modal (outside <header> stacking context) -->
+    <app-action-modal
+      [isOpen]="showLogoutConfirmModal()"
+      [showCloseButton]="false"
+      [closeOnBackdrop]="true"
+      [showAccentBar]="true"
+      accentBarClass="bg-[#7C0E44]"
+      primaryLabel="Sign Out"
+      primaryVariant="primary"
+      secondaryLabel="Cancel"
+      maxWidthClass="max-w-[420px]"
+      (primaryAction)="confirmLogout()"
+      (secondaryAction)="cancelLogout()"
+      (close)="cancelLogout()"
+    >
+      <div class="flex flex-col items-center text-center pt-1 pb-2 space-y-3 font-sans">
+        <div class="w-12 h-12 rounded-full bg-[#F8EDF1] border border-[#EADCE2] flex items-center justify-center text-[#7C0E44]">
+          <app-icon name="logout" size="lg" [stroke]="2" />
+        </div>
+        <div class="space-y-1.5">
+          <h2 class="m-0 text-lg font-extrabold text-[#7C0E44] tracking-tight">
+            Sign Out Confirmation
+          </h2>
+          <p class="m-0 text-[13px] text-slate-600 leading-relaxed max-w-xs mx-auto">
+            Are you sure you want to sign out of the ISMS 2.0 portal? You will need to sign in again to continue.
+          </p>
+        </div>
+      </div>
+    </app-action-modal>
   `,
   styles: [`
     :host {

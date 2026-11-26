@@ -375,7 +375,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
               <app-icon name="eye" size="sm" />
             </button>
 
-            @if (canEdit()) {
+            @if (canEdit() || canDelete()) {
               <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
             }
           }
@@ -396,20 +396,41 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
               <app-icon name="edit" size="sm" />
             </button>
 
-            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            @if (!config.hideStatusToggle) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
-            <!-- Active / Inactive Toggle -->
-            <div
-              class="inline-flex items-center"
-              [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
-              (click)="$event.stopPropagation()"
+              <!-- Active / Inactive Toggle -->
+              <div
+                class="inline-flex items-center"
+                [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+                (click)="$event.stopPropagation()"
+              >
+                <app-switch
+                  [checked]="item.status !== 'Inactive'"
+                  [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+                  (toggled)="toggleStatus(item)"
+                />
+              </div>
+            }
+          }
+
+          <!-- Delete: only when the screen asks for it and the table allows DELETE -->
+          @if (canDelete()) {
+            @if (canEdit()) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            }
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); deleteItem(item)"
+              title="Delete"
+              aria-label="Delete"
             >
-              <app-switch
-                [checked]="item.status !== 'Inactive'"
-                [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
-                (toggled)="toggleStatus(item)"
-              />
-            </div>
+              <app-icon name="trash" size="sm" />
+            </button>
           }
         </div>
       </ng-template>
@@ -534,10 +555,17 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   // Table permissions from GET /auth/permissions (always true with mock sign-in).
   private readonly tableAccess = inject(TableAccessService);
   protected canAdd(): boolean {
-    return this.tableAccess.canDataKey(this.config?.dataKey, 'POST');
+    return this.can('POST');
   }
   protected canEdit(): boolean {
-    return this.tableAccess.canDataKey(this.config?.dataKey, 'PUT');
+    return this.can('PUT');
+  }
+  protected canDelete(): boolean {
+    return !!this.config?.showDeleteAction && this.can('DELETE');
+  }
+  private can(method: 'POST' | 'PUT' | 'DELETE'): boolean {
+    const table = this.config?.permissionTable;
+    return table ? this.tableAccess.can(table, method) : this.tableAccess.canDataKey(this.config?.dataKey, method);
   }
 
   private _extraTemplates?: Record<string, TemplateRef<unknown>>;
@@ -660,7 +688,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   ngOnInit(): void {
     const normalize = this.config.normalizer;
     let index = 0;
-    this.repo = this.dataEngine.for<T>(this.config.dataKey, {
+    this.repo = this.config.repository ?? this.dataEngine.for<T>(this.config.dataKey, {
       idKey: 'id',
       normalizer: normalize ? (raw: unknown) => normalize(raw, index++) : undefined
     });
@@ -699,7 +727,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   /** The request body for the API: the config's converter when it has one (API mode only). */
   private apiBody(payload: Partial<T>, current: T | null): Partial<T> {
     const convert = this.config.toApiPayload;
-    if (!convert || this.dataEngine.isMock(this.config.dataKey)) return payload;
+    if (!convert || (!this.config.repository && this.dataEngine.isMock(this.config.dataKey))) return payload;
     return convert(payload, current) as Partial<T>;
   }
 

@@ -146,7 +146,8 @@ export function noticeToScheme(n: EoiOpenNotice, index: number): SchemeTenderIte
     processFeeAmount: n.processFee,
     isFeeExempted: n.isFeeExempted,
     status: 'Open',
-    isActive: true
+    isActive: true,
+    publishedAt: time(n.publishedDate)
   };
 }
 

@@ -56,6 +56,8 @@ export class SsoLoginFlowService {
   readonly pinSet = signal<boolean | null>(null);
   /** Masked mobile number the OTP goes to, when the backend sends it. */
   readonly otpDestination = signal<string | null>(null);
+  /** OTP value returned in the send-otp API response (when exposed for easy filling). */
+  readonly otpCodeHint = signal<string | null>(null);
   /** The backend sent a setup token: the user may set a PIN now, before signing in. */
   readonly canSetPinNow = computed(() => !!this.setupToken() && this.methods().includes('PIN') && this.pinSet() === false);
   /** "Forgot PIN": sign in with OTP, then open the profile to set a new PIN. */
@@ -122,7 +124,8 @@ export class SsoLoginFlowService {
     this.busy.set(true);
     this.error.set(null);
     this.authApi.sendOtp().subscribe({
-      next: () => {
+      next: res => {
+        this.otpCodeHint.set(this.extractOtpFromResponse(res));
         this.otpSent.set(true);
         this.busy.set(false);
       },
@@ -131,6 +134,30 @@ export class SsoLoginFlowService {
         this.error.set(err?.message ?? 'Could not send the OTP. Please try again.');
       }
     });
+  }
+
+  private extractOtpFromResponse(res: unknown): string | null {
+    if (!res) return null;
+    if (typeof res === 'string') {
+      const m = res.match(/\b(\d{4,8})\b/);
+      return m ? m[1] : null;
+    }
+    if (typeof res === 'object') {
+      const obj = res as Record<string, unknown>;
+      const direct = obj['otp'] ?? obj['code'] ?? obj['devOtp'] ?? obj['testOtp'] ?? obj['otpCode'];
+      if (direct != null && String(direct).trim()) {
+        return String(direct).trim();
+      }
+      if (obj['data'] && typeof obj['data'] === 'object') {
+        const nested = this.extractOtpFromResponse(obj['data']);
+        if (nested) return nested;
+      }
+      if (typeof obj['message'] === 'string') {
+        const m = obj['message'].match(/\b(\d{4,8})\b/);
+        if (m) return m[1];
+      }
+    }
+    return null;
   }
 
   /** Verifies the OTP or PIN (two-step step). */
@@ -386,6 +413,7 @@ export class SsoLoginFlowService {
     this.knownRoles.clear();
     this.pinSet.set(null);
     this.otpDestination.set(null);
+    this.otpCodeHint.set(null);
     this.setupToken.set(null);
     this.resettingPin.set(false);
     this.switching = false;

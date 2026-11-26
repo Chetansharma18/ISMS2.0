@@ -47,14 +47,13 @@ describe('TpUserViewModalComponent (Bug 4)', () => {
     expect(indexCol?.label).toBe('S.No');
   });
 
-  it('displays only one close control and no duplicate footer close button (Bug 4)', () => {
+  it('shows a single Cancel control and no duplicate close buttons (Bug 4)', () => {
     const el = fixture.nativeElement as HTMLElement;
-    // The top-right close button from app-modal
     const closeButtons = el.querySelectorAll('button[aria-label="Close"], button[title="Close"]');
-    expect(closeButtons.length).toBe(1);
+    expect(closeButtons.length).toBe(0);
 
-    // There should be no modalFooter buttons
-    const footerButtons = el.querySelectorAll('[modalFooter] button, .modal-footer button');
-    expect(footerButtons.length).toBe(0);
+    // The only close control is app-modal's own footer Cancel button
+    const cancelButtons = Array.from(el.querySelectorAll('button')).filter(b => b.textContent?.trim() === 'Cancel');
+    expect(cancelButtons.length).toBe(1);
   });
 });

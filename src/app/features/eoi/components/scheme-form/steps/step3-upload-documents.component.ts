@@ -84,8 +84,12 @@ import { acceptOf, formatBytes, formatsOf } from '../eoi-apply.util';
             <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewApplyDocument(doc)" title="View Document" aria-label="View Document">
               <app-icon name="eye" size="sm" />
             </button>
-            <button appButton variant="secondary" size="sm" [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()">Replace</button>
-            <button appButton variant="danger" size="sm" [disabled]="state.isDocBusy(doc)" (click)="state.removeApplyDocument(doc)">Remove</button>
+            <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()" title="Replace Document" aria-label="Replace Document">
+              <app-icon name="refresh" size="sm" />
+            </button>
+            <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="state.removeApplyDocument(doc)" title="Remove Document" aria-label="Remove Document">
+              <app-icon name="trash" size="sm" class="text-rose-600" />
+            </button>
           }
         </div>
       </ng-template>

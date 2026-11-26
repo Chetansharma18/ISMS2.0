@@ -34,7 +34,7 @@ import {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 sm:gap-y-6 pt-1">
 
         <!-- Row 1, Col 1: EOI Reference No. * -->
-        <div class="relative pt-0.5">
+        <div class="relative">
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiRefNoInput">
             EOI Reference No. <span class="text-[#DC2626] font-bold">*</span>
           </label>
@@ -123,8 +123,8 @@ import {
             id="eoiPublishedDateInput"
             appInput
             type="date"
-            [min]="minPublishedDate"
-            [max]="todayKolkata"
+            [min]="todayKolkata"
+            max="2099-12-31"
             [(ngModel)]="data().publishedDate"
             (blur)="onBlur('publishedDate')"
             (ngModelChange)="onPublishedDateChange($event)"
@@ -158,7 +158,59 @@ import {
           }
         </div>
 
-        <!-- Row 4, Col 1: EOI Duration (in Years) * -->
+        <!-- Row 4, Col 1: EMD Amount (₹) * -->
+        <div>
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiEmdFeeInput">
+            EMD Amount (₹) <span class="text-[#DC2626] font-bold">*</span>
+          </label>
+          <input
+            id="eoiEmdFeeInput"
+            appInput
+            type="text"
+            maxlength="100"
+            placeholder="e.g. ₹50,000"
+            [disabled]="isFromScheme('emdFee')"
+            [attr.title]="isFromScheme('emdFee') ? 'Filled in from the selected scheme (Scheme Master)' : null"
+            [(ngModel)]="data().emdFee"
+            (blur)="onFeeBlur('emdFee')"
+            (input)="onFeeInput('emdFee', $event)"
+            (keydown)="filterFeeKey($event)"
+            (ngModelChange)="onFieldChange('emdFee')"
+            [invalid]="hasError('emdFee')"
+            class="w-full"
+          />
+          @if (hasError('emdFee')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('emdFee') }}</p>
+          }
+        </div>
+
+        <!-- Row 4, Col 2: Process Fees (₹) * -->
+        <div>
+          <label class="block text-slate-700 font-medium mb-1.5" for="eoiProcessFeeInput">
+            Process Fees (₹) <span class="text-[#DC2626] font-bold">*</span>
+          </label>
+          <input
+            id="eoiProcessFeeInput"
+            appInput
+            type="text"
+            maxlength="100"
+            placeholder="e.g. ₹10,000"
+            [disabled]="isFromScheme('processFee')"
+            [attr.title]="isFromScheme('processFee') ? 'Filled in from the selected scheme (Scheme Master)' : null"
+            [(ngModel)]="data().processFee"
+            (blur)="onFeeBlur('processFee')"
+            (input)="onFeeInput('processFee', $event)"
+            (keydown)="filterFeeKey($event)"
+            (ngModelChange)="onFieldChange('processFee')"
+            [invalid]="hasError('processFee')"
+            class="w-full"
+          />
+          @if (hasError('processFee')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('processFee') }}</p>
+          }
+        </div>
+
+        <!-- Row 5, Col 1: EOI Duration (in Years) * -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiDurationInput">
             EOI Duration (in Years) <span class="text-[#DC2626] font-bold">*</span>
@@ -187,86 +239,7 @@ import {
           }
         </div>
 
-        <!-- Row 4, Col 2: EOI Description -->
-        <div>
-          <div class="flex items-center justify-between mb-1.5">
-            <label class="block text-slate-700 font-medium" for="eoiDescriptionInput">
-              EOI Description
-            </label>
-            <span class="text-xs text-slate-400 font-normal">
-              {{ (data().description || '').length }}/250
-            </span>
-          </div>
-          <textarea
-            id="eoiDescriptionInput"
-            appInput
-            rows="2"
-            maxlength="250"
-            placeholder="Brief description of the EOI"
-            [(ngModel)]="data().description"
-            (blur)="onBlur('description')"
-            (ngModelChange)="onFieldChange('description')"
-            [invalid]="hasError('description')"
-            class="w-full resize-none"
-          ></textarea>
-          @if (hasError('description')) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('description') }}</p>
-          }
-        </div>
-
-        <!-- Row 5, Col 1: EMD Amount (₹) * -->
-        <div>
-          <label class="block text-slate-700 font-medium mb-1.5" for="eoiEmdFeeInput">
-            EMD Amount (₹) <span class="text-[#DC2626] font-bold">*</span>
-          </label>
-          <input
-            id="eoiEmdFeeInput"
-            appInput
-            type="text"
-            maxlength="100"
-            placeholder="e.g. ₹50,000"
-            [disabled]="isFromScheme('emdFee')"
-            [attr.title]="isFromScheme('emdFee') ? 'Filled in from the selected scheme (Scheme Master)' : null"
-            [(ngModel)]="data().emdFee"
-            (blur)="onFeeBlur('emdFee')"
-            (input)="onFeeInput('emdFee', $event)"
-            (keydown)="filterFeeKey($event)"
-            (ngModelChange)="onFieldChange('emdFee')"
-            [invalid]="hasError('emdFee')"
-            class="w-full"
-          />
-          @if (hasError('emdFee')) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('emdFee') }}</p>
-          }
-        </div>
-
-        <!-- Row 5, Col 2: Process Fees (₹) * -->
-        <div>
-          <label class="block text-slate-700 font-medium mb-1.5" for="eoiProcessFeeInput">
-            Process Fees (₹) <span class="text-[#DC2626] font-bold">*</span>
-          </label>
-          <input
-            id="eoiProcessFeeInput"
-            appInput
-            type="text"
-            maxlength="100"
-            placeholder="e.g. ₹10,000"
-            [disabled]="isFromScheme('processFee')"
-            [attr.title]="isFromScheme('processFee') ? 'Filled in from the selected scheme (Scheme Master)' : null"
-            [(ngModel)]="data().processFee"
-            (blur)="onFeeBlur('processFee')"
-            (input)="onFeeInput('processFee', $event)"
-            (keydown)="filterFeeKey($event)"
-            (ngModelChange)="onFieldChange('processFee')"
-            [invalid]="hasError('processFee')"
-            class="w-full"
-          />
-          @if (hasError('processFee')) {
-            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('processFee') }}</p>
-          }
-        </div>
-
-        <!-- Row 6, Col 1: Attach Document (Single column, matching field box size) -->
+        <!-- Row 5, Col 2: Attach Document -->
         <div>
           <label class="block text-slate-700 font-medium mb-1.5" for="eoiAttachFileInput">
             Attach Document
@@ -334,13 +307,15 @@ import {
                     </button>
                     <button
                       appButton
-                      variant="secondary"
+                      variant="ghost"
                       size="sm"
+                      iconOnly
                       type="button"
                       (click)="replaceInput.click()"
                       title="Replace Document"
+                      aria-label="Replace Document"
                     >
-                      Replace
+                      <app-icon name="refresh" size="sm" />
                     </button>
                     <input
                       #replaceInput
@@ -351,13 +326,15 @@ import {
                     />
                     <button
                       appButton
-                      variant="danger"
+                      variant="ghost"
                       size="sm"
+                      iconOnly
                       type="button"
                       (click)="removeAttachmentItem(idx)"
                       title="Remove Document"
+                      aria-label="Remove Document"
                     >
-                      Remove
+                      <app-icon name="trash" size="sm" class="text-rose-600" />
                     </button>
                   </div>
                 </div>
@@ -383,6 +360,33 @@ import {
           }
         </div>
 
+        <!-- Row 6 (Full Width): EOI Description -->
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-slate-700 font-medium" for="eoiDescriptionInput">
+              EOI Description
+            </label>
+            <span class="text-xs text-slate-400 font-normal">
+              {{ (data().description || '').length }}/250
+            </span>
+          </div>
+          <textarea
+            id="eoiDescriptionInput"
+            appInput
+            rows="2"
+            maxlength="250"
+            placeholder="Brief description of the EOI"
+            [(ngModel)]="data().description"
+            (blur)="onBlur('description')"
+            (ngModelChange)="onFieldChange('description')"
+            [invalid]="hasError('description')"
+            class="w-full resize-none"
+          ></textarea>
+          @if (hasError('description')) {
+            <p class="text-xs text-red-500 font-medium m-0 mt-1">{{ getError('description') }}</p>
+          }
+        </div>
+
         <!-- Custom Form Fields for Step 1 (Publish Details) -->
         <div class="col-span-1 md:col-span-2 pt-6 mt-4 border-t border-[#E8EEF5]">
           <app-custom-form-fields
@@ -399,55 +403,48 @@ import {
              ==================================================================== -->
         <div class="space-y-6 pt-1">
           <!-- ====================================================================
-               EOI DOCUMENTS (Matching Design exactly)
+               EOI DOCUMENTS (Loaded from Doc Master)
                ==================================================================== -->
           <section class="space-y-3">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-3">
               <div>
-                <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Supporting Documents</h3>
-                <p class="text-xs text-slate-500 mt-1 mb-0">Required documents for proposal upload (Upload PDF, image, or TXT - max 25 MB)</p>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Supporting Documents</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                    {{ data().documents.length }}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1 mb-0">Required supporting documents for proposal upload (auto-loaded from Doc Master)</p>
               </div>
-              <button
-                appButton
-                variant="primary"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="addDocument.emit()"
-                title="Add Document"
-                aria-label="Add Document"
-              >
-                <app-icon name="plus" size="xs" />
-              </button>
             </div>
 
             @if (data().documents.length === 0) {
               <div class="text-[13px] text-slate-500 italic py-6 px-4 text-center border border-dashed border-[#CBD5E1] rounded-lg bg-slate-50/40">
-                Select a scheme above to automatically load required documents from Doc Master, or click + to add manually.
+                No supporting documents configured for the selected scheme in Doc Master.
               </div>
             } @else {
-              <div class="space-y-2 mt-2">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-2">
                 @for (doc of data().documents; track $index; let idx = $index) {
                   <div class="space-y-1">
-                    <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
-                      <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
-                      <div class="flex-1 min-w-0">
-                        <app-dropdown
-                          [options]="getAvailableOptionsForIndex(idx)"
-                          [(value)]="data().documents[idx]"
-                          (valueChange)="onDocChange(idx)"
-                          placeholder="-- Select Document Required --"
-                          size="sm"
-                          direction="up"
-                          [overlay]="true"
-                          [invalid]="hasDocError(idx)"
-                          class="w-full"
-                        />
+                    <div
+                      class="flex items-center justify-between gap-2.5 px-3 py-2.5 bg-white border rounded-lg shadow-2xs transition-colors"
+                      [class.border-slate-200]="!hasDocError(idx)"
+                      [class.hover:border-slate-300]="!hasDocError(idx)"
+                      [class.border-rose-300]="hasDocError(idx)"
+                    >
+                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center shrink-0">
+                          {{ idx + 1 }}
+                        </span>
+                        <app-icon name="document" size="sm" class="text-[#7C0E44] shrink-0" />
+                        <span class="text-[13px] font-medium text-slate-800 truncate" [title]="doc">
+                          {{ doc || 'Unnamed Document' }}
+                        </span>
                       </div>
 
-                      @if (isDocMandatory(data().documents[idx])) {
+                      @if (isDocMandatory(doc)) {
                         <span
-                          class="text-[11px] font-semibold text-slate-600 bg-slate-200/70 border border-slate-300 px-2 py-1 rounded shrink-0"
+                          class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md shrink-0"
                           title="Mandatory document requirements cannot be removed."
                         >
                           Mandatory
@@ -464,12 +461,12 @@ import {
                           title="Remove Document"
                           aria-label="Remove Document"
                         >
-                          <app-icon name="close" size="xs" />
+                          <app-icon name="trash" size="sm" class="text-rose-600" />
                         </button>
                       }
                     </div>
                     @if (hasDocError(idx)) {
-                      <p class="text-xs text-red-500 font-medium m-0 ml-7">{{ getDocError(idx) }}</p>
+                      <p class="text-xs text-red-500 font-medium m-0 ml-1">{{ getDocError(idx) }}</p>
                     }
                   </div>
                 }
@@ -478,55 +475,48 @@ import {
           </section>
 
           <!-- ====================================================================
-               EOI ANNEXURES (Matching Supporting Documents exactly)
+               EOI ANNEXURES (Loaded from Annexure Master)
                ==================================================================== -->
           <section class="space-y-3 pt-6 border-t border-[#E8EEF5]">
-            <div class="flex items-center justify-between">
+            <div class="flex items-center justify-between gap-3">
               <div>
-                <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Annexures</h3>
-                <p class="text-xs text-slate-500 mt-1 mb-0">Prescribed annexure formats for EOI submission (Upload PDF - max 25 MB)</p>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-[#7C0E44] font-bold text-sm tracking-wide m-0">Annexures</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
+                    {{ data().annexures.length || 0 }}
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1 mb-0">Prescribed annexure formats for EOI submission (auto-loaded from Annexure Master)</p>
               </div>
-              <button
-                appButton
-                variant="primary"
-                size="sm"
-                iconOnly
-                type="button"
-                (click)="addAnnexure.emit()"
-                title="Add Annexure"
-                aria-label="Add Annexure"
-              >
-                <app-icon name="plus" size="xs" />
-              </button>
             </div>
 
             @if (!data().annexures || data().annexures.length === 0) {
               <div class="text-[13px] text-slate-500 italic py-6 px-4 text-center border border-dashed border-[#CBD5E1] rounded-lg bg-slate-50/40">
-                Select a scheme above to automatically load annexures from Annexure Master, or click + to add manually.
+                No annexures configured for the selected scheme in Annexure Master.
               </div>
             } @else {
-              <div class="space-y-2 mt-2">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5 mt-2">
                 @for (ann of data().annexures; track $index; let idx = $index) {
                   <div class="space-y-1">
-                    <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg">
-                      <span class="text-xs font-semibold text-slate-500 w-5 text-center shrink-0">{{ idx + 1 }}.</span>
-                      <div class="flex-1 min-w-0">
-                        <app-dropdown
-                          [options]="getAvailableAnnexureOptionsForIndex(idx)"
-                          [(value)]="data().annexures[idx]"
-                          (valueChange)="onAnnexureChange(idx)"
-                          placeholder="-- Select Annexure Format --"
-                          size="sm"
-                          direction="up"
-                          [overlay]="true"
-                          [invalid]="hasAnnexureError(idx)"
-                          class="w-full"
-                        />
+                    <div
+                      class="flex items-center justify-between gap-2.5 px-3 py-2.5 bg-white border rounded-lg shadow-2xs transition-colors"
+                      [class.border-slate-200]="!hasAnnexureError(idx)"
+                      [class.hover:border-slate-300]="!hasAnnexureError(idx)"
+                      [class.border-rose-300]="hasAnnexureError(idx)"
+                    >
+                      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold flex items-center justify-center shrink-0">
+                          {{ idx + 1 }}
+                        </span>
+                        <app-icon name="pdf-badge" solid size="auto" class="w-4.5 h-4.5 text-[#E5252A] shrink-0" />
+                        <span class="text-[13px] font-medium text-slate-800 truncate" [title]="ann">
+                          {{ ann || 'Unnamed Annexure' }}
+                        </span>
                       </div>
 
-                      @if (isAnnexureMandatory(data().annexures[idx])) {
+                      @if (isAnnexureMandatory(ann)) {
                         <span
-                          class="text-[11px] font-semibold text-slate-600 bg-slate-200/70 border border-slate-300 px-2 py-1 rounded shrink-0"
+                          class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md shrink-0"
                           title="Mandatory annexure formats cannot be removed."
                         >
                           Mandatory
@@ -543,12 +533,12 @@ import {
                           title="Remove Annexure"
                           aria-label="Remove Annexure"
                         >
-                          <app-icon name="close" size="xs" />
+                          <app-icon name="trash" size="sm" class="text-rose-600" />
                         </button>
                       }
                     </div>
                     @if (hasAnnexureError(idx)) {
-                      <p class="text-xs text-red-500 font-medium m-0 ml-7">{{ getAnnexureError(idx) }}</p>
+                      <p class="text-xs text-red-500 font-medium m-0 ml-1">{{ getAnnexureError(idx) }}</p>
                     }
                   </div>
                 }
@@ -576,7 +566,6 @@ export class ConfigureEoiFormComponent {
 
   /** Current Indian Standard Time (Asia/Kolkata) date for date boundary constraints. */
   readonly todayKolkata = getTodayKolkataDate();
-  readonly minPublishedDate = `${getTodayKolkataDate().split('-')[0]}-01-01`;
 
   /** Active form step: 1 = Publish Details, 2 = Uploading Details. */
   readonly activeStep = input<number>(1);
@@ -698,6 +687,7 @@ export class ConfigureEoiFormComponent {
       activeSchemeNames: this.schemeNameOptions(),
       activeEoiCategories: [...this.eoiCategoryOptions()],
       schemeMasterItems: this.schemeMasterItems(),
+      isScheduled: true,
       todayStr: this.todayKolkata
     });
   });

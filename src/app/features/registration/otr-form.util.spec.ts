@@ -6,6 +6,7 @@ import {
   displayValue,
   documentsFrom,
   dynamicFieldErrors,
+  fieldError,
   fieldOptions,
   initialStepValues,
   isFieldVisible,
@@ -220,6 +221,15 @@ describe('otr-form.util (backend OTR form)', () => {
         .toContain('at most 1000');
       expect(dynamicFieldErrors(DYN, { ...startup, 'dynamic.annualTurnoverLakhs': '250', isGstRegistered: 'Yes', 'dynamic.cinNumber': 'abc' }))
         .toEqual({ 'dynamic.cinNumber': 'CIN has 21 characters.' });
+    });
+
+    it('checks one field on its own, for the message shown while typing', () => {
+      const turnover = field(DYN, 'dynamic.annualTurnoverLakhs');
+      const startup = { ...base, 'dynamic.orgCategory': 'startup' };
+      expect(fieldError(turnover, base)).toBeUndefined(); // hidden
+      expect(fieldError(turnover, { ...startup, 'dynamic.annualTurnoverLakhs': '' })).toContain('is required');
+      expect(fieldError(turnover, { ...startup, 'dynamic.annualTurnoverLakhs': '5000' })).toContain('at most 1000');
+      expect(fieldError(turnover, { ...startup, 'dynamic.annualTurnoverLakhs': '250' })).toBeUndefined();
     });
 
     it('sends every answer key, numbers as numbers and hidden answers as null', () => {

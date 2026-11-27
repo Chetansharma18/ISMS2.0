@@ -30,6 +30,7 @@ import {
   currentStepNumber,
   documentsFrom,
   dynamicFieldErrors,
+  fieldError,
   firstStepWithErrors,
   formSteps,
   initialStepValues,
@@ -438,7 +439,11 @@ export class RegistrationShellComponent implements OnInit {
 
   onValueChange(step: OtrStepDef, key: string, value: OtrValue): void {
     this.values.update(all => ({ ...all, [step.key]: setStepValue(step, all[step.key] ?? {}, key, value) }));
-    this.clearError(step.key, key);
+    // Check the field as the user types, so the message shows without waiting for "Save & Next".
+    const field = stepFields(step).find(f => f.key === key);
+    const message = field && field.type !== 'file' ? fieldError(field, this.values()[step.key] ?? {}) : undefined;
+    if (message) this.setFieldError(step.key, key, message);
+    else this.clearError(step.key, key);
   }
 
   onDeclarationChange(accepted: boolean): void {

@@ -341,38 +341,46 @@ function ruleMessage(field: OtrFieldDef, fallback: string): string {
 export function dynamicFieldErrors(step: OtrStepDef, values: OtrStepValues): Record<string, string> {
   const errors: Record<string, string> = {};
   for (const field of stepFields(step)) {
-    if (!field.dynamic || !isFieldVisible(field, values)) continue;
-    const value = values[field.key];
-    if (isBlank(value)) {
-      if (field.required) errors[field.key] = `${field.label} is required.`;
-      continue;
-    }
-    if (Array.isArray(value) || typeof value === 'boolean') continue;
-    const text = String(value).trim();
-    const rules = field.rules ?? {};
-    if (field.type === 'number') {
-      const n = Number(text);
-      if (!Number.isFinite(n)) errors[field.key] = `${field.label} must be a number.`;
-      else if (rules.min !== undefined && n < rules.min) errors[field.key] = ruleMessage(field, `${field.label} must be at least ${rules.min}.`);
-      else if (rules.max !== undefined && n > rules.max) errors[field.key] = ruleMessage(field, `${field.label} must be at most ${rules.max}.`);
-    } else if (field.type === 'email' && !EMAIL.test(text)) {
-      errors[field.key] = ruleMessage(field, `Enter a valid e-mail address for ${field.label}.`);
-    } else if (rules.minLength !== undefined && text.length < rules.minLength) {
-      errors[field.key] = ruleMessage(field, `${field.label} must have at least ${rules.minLength} characters.`);
-    } else if (rules.maxLength !== undefined && text.length > rules.maxLength) {
-      errors[field.key] = ruleMessage(field, `${field.label} must have at most ${rules.maxLength} characters.`);
-    }
-    if (!errors[field.key] && rules.pattern) {
-      let re: RegExp | null = null;
-      try {
-        re = new RegExp(rules.pattern);
-      } catch {
-        re = null; // A pattern the browser cannot read is not applied.
-      }
-      if (re && !re.test(text)) errors[field.key] = ruleMessage(field, `${field.label} is not in the expected format.`);
-    }
+    if (!field.dynamic) continue;
+    const message = fieldError(field, values);
+    if (message) errors[field.key] = message;
   }
   return errors;
+}
+
+/**
+ * The message for one visible field (required, number, e-mail, length, range and pattern from the schema), or
+ * undefined when the value is fine. The screen also runs it on each change, so the message shows while typing.
+ */
+export function fieldError(field: OtrFieldDef, values: OtrStepValues): string | undefined {
+  if (!isFieldVisible(field, values)) return undefined;
+  const value = values[field.key];
+  if (isBlank(value)) return field.required ? `${field.label} is required.` : undefined;
+  if (Array.isArray(value) || typeof value === 'boolean') return undefined;
+  const text = String(value).trim();
+  const rules = field.rules ?? {};
+  if (field.type === 'number') {
+    const n = Number(text);
+    if (!Number.isFinite(n)) return `${field.label} must be a number.`;
+    if (rules.min !== undefined && n < rules.min) return ruleMessage(field, `${field.label} must be at least ${rules.min}.`);
+    if (rules.max !== undefined && n > rules.max) return ruleMessage(field, `${field.label} must be at most ${rules.max}.`);
+  } else if (field.type === 'email' && !EMAIL.test(text)) {
+    return ruleMessage(field, `Enter a valid e-mail address for ${field.label}.`);
+  } else if (rules.minLength !== undefined && text.length < rules.minLength) {
+    return ruleMessage(field, `${field.label} must have at least ${rules.minLength} characters.`);
+  } else if (rules.maxLength !== undefined && text.length > rules.maxLength) {
+    return ruleMessage(field, `${field.label} must have at most ${rules.maxLength} characters.`);
+  }
+  if (rules.pattern) {
+    let re: RegExp | null = null;
+    try {
+      re = new RegExp(rules.pattern);
+    } catch {
+      re = null; // A pattern the browser cannot read is not applied.
+    }
+    if (re && !re.test(text)) return ruleMessage(field, `${field.label} is not in the expected format.`);
+  }
+  return undefined;
 }
 
 /** The "*" marker: the backend's isRequired flag. */

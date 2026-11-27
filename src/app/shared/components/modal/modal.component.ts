@@ -10,6 +10,8 @@ import {
   output
 } from '@angular/core';
 import { ModalService } from '../../services/modal.service';
+import { ButtonComponent } from '../button/button.component';
+import { IconComponent } from '../icon/icon.component';
 
 export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
@@ -45,7 +47,7 @@ let nextId = 0;
   selector: 'app-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [],
+  imports: [ButtonComponent, IconComponent],
   host: {
     '[attr.title]': 'null'
   },
@@ -68,26 +70,44 @@ let nextId = 0;
         (click)="$event.stopPropagation()"
       >
         <!-- Header -->
-        @if (title()) {
-          <div class="px-4 sm:px-7 pt-5 sm:pt-6 pb-2 shrink-0">
-            <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 800; line-height: 24px; letter-spacing: -0.01em;">
-              {{ title() }}
-            </h2>
-            @if (subtitle()) {
-              <p class="m-0 mt-1 text-[#625663] font-normal leading-relaxed text-xs">
-                {{ subtitle() }}
-              </p>
+        @if (title() || showClose()) {
+          <div class="px-5 sm:px-6 py-4 bg-[#FCF8FA] border-b border-[#EADCE2] shrink-0 flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              @if (title()) {
+                <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 700; line-height: 24px; letter-spacing: -0.01em;">
+                  {{ title() }}
+                </h2>
+              }
+              @if (subtitle()) {
+                <p class="m-0 mt-1 text-[#625663] font-normal leading-relaxed text-xs">
+                  {{ subtitle() }}
+                </p>
+              }
+            </div>
+            @if (showClose()) {
+              <button
+                appButton
+                variant="ghost"
+                size="sm"
+                iconOnly
+                type="button"
+                aria-label="Close"
+                class="-mr-1.5 -mt-1 shrink-0"
+                (click)="close.emit()"
+              >
+                <app-icon name="close" size="md" />
+              </button>
             }
           </div>
         }
 
         <!-- Body -->
-        <div class="px-4 sm:px-7 py-4" [class.flex-1]="scrollBody()" [class.min-h-0]="scrollBody()" [class.overflow-auto]="scrollBody()" [class.overflow-visible]="!scrollBody()">
+        <div class="px-5 sm:px-6 py-4" [class.flex-1]="scrollBody()" [class.min-h-0]="scrollBody()" [class.overflow-auto]="scrollBody()" [class.overflow-visible]="!scrollBody()">
           <ng-content />
         </div>
 
         <!-- Footer -->
-        <div class="px-4 sm:px-7 pb-5 sm:pb-7 pt-2 bg-white flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
+        <div class="px-5 sm:px-6 py-4 border-t border-[#EADCE2] bg-white flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
           <ng-content select="[modalFooter]" />
         </div>
       </div>

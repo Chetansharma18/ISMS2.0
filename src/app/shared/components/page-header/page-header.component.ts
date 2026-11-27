@@ -30,18 +30,18 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="relative w-full rounded-[10px] overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 px-3.5 sm:px-6 md:px-7 py-2.5 sm:py-3 bg-[#FCF0F2]"
-      style="min-height: 56px;"
+      class="relative w-full rounded-xl overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 sm:px-7 py-4 sm:py-5 bg-[#FCF0F2]"
+      style="min-height: 92px;"
     >
       <!-- Background Panoramic Fort Image with soft fade to the left -->
       <div
         class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
-        style="background-image: url('/hero-bg.png'); background-position: right 18%; opacity: 0.95;"
+        style="background-image: url('/hero-bg.png'); background-position: right 22%; opacity: 0.95;"
       ></div>
       <!-- Soft Gradient Overlay: blends fort image into #FCF0F2 background on the left -->
       <div
         class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 28%, rgba(252, 240, 242, 0.90) 52%, rgba(252, 240, 242, 0.30) 72%, transparent 100%);"
+        style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 34%, rgba(252, 240, 242, 0.88) 56%, rgba(252, 240, 242, 0.28) 76%, transparent 100%);"
       ></div>
 
       <!-- Left: Title & Subtitle -->
@@ -62,7 +62,7 @@ export interface BreadcrumbItem {
         <div class="flex flex-col justify-center leading-tight min-w-0 flex-1">
           <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
             <h1
-              class="header-title m-0 text-[18px] sm:text-[21px] md:text-[24px] font-extrabold text-[#7C0E44] tracking-tight leading-tight"
+              class="header-title m-0 text-[22px] sm:text-[26px] md:text-[30px] font-bold text-[#7C0E44] tracking-tight leading-tight"
             >
               {{ title }}
             </h1>
@@ -73,9 +73,11 @@ export interface BreadcrumbItem {
             }
           </div>
           @if (subtitle) {
-            <p class="text-xs sm:text-[13px] text-[#625663] m-0 mt-0.5 font-normal">
+            <p class="text-xs sm:text-[13px] text-[#625663] m-0 mt-1 font-normal">
               {{ subtitle }}
             </p>
+          } @else {
+            <div class="w-11 h-[3px] rounded-full bg-[#E66B22] mt-1.5" aria-hidden="true"></div>
           }
         </div>
       </div>

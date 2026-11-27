@@ -654,7 +654,17 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     return list;
   });
 
-  tableColumns = signal<TableColumn<T>[]>([]);
+  private readonly configState = signal<MasterCrudConfig<T> | null>(null);
+  readonly tableColumns = computed<TableColumn<T>[]>(() => {
+    const cfg = this.configState();
+    if (!cfg) return [];
+    const cols = [...cfg.columns];
+    if (!cfg.hideViewAction || this.canEdit()) {
+      const actionWidth = cfg.actionColumnWidth || (cfg.hideViewAction ? 'w-36 min-w-[145px]' : 'w-44 min-w-[175px]');
+      cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: actionWidth });
+    }
+    return cols;
+  });
   customTemplates = signal<Record<string, TemplateRef<unknown>>>({});
 
   ngOnInit(): void {
@@ -664,7 +674,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
       idKey: 'id',
       normalizer: normalize ? (raw: unknown) => normalize(raw, index++) : undefined
     });
-    this.buildColumns();
+    this.configState.set(this.config);
     this.rebuildTemplates();
     this.load();
   }
@@ -687,13 +697,6 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     }
     this.customTemplates.set(templates);
     this.cdr.markForCheck();
-  }
-
-  private buildColumns(): void {
-    const cols = [...this.config.columns];
-    const actionWidth = this.config.actionColumnWidth || (this.config.hideViewAction ? 'w-36 min-w-[145px]' : 'w-44 min-w-[175px]');
-    cols.push({ key: 'action', label: 'Action', align: 'center', type: 'custom', width: actionWidth });
-    this.tableColumns.set(cols);
   }
 
   /** The request body for the API: the config's converter when it has one (API mode only). */

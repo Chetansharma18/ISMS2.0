@@ -64,85 +64,60 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
             </button>
           }
 
-          <a [routerLink]="homeRoute()" class="flex items-center gap-2 sm:gap-3.5 md:gap-4 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
+          <a [routerLink]="homeRoute()" class="flex items-center gap-2.5 sm:gap-3.5 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           
-          <!-- Logos Group -->
-          <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <!-- Government of Rajasthan Emblem -->
+          <!-- Government of Rajasthan Emblem + Bilingual Title -->
+          <div class="flex items-center gap-2 shrink-0">
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
+              class="h-8 sm:h-10 w-auto object-contain shrink-0"
             />
-            <!-- ISMS Logo -->
-            <img
-              src="/rsldc-logo.png"
-              alt="ISMS"
-              class="h-7 sm:h-9 lg:h-[38px] w-auto object-contain shrink-0"
-              onerror="this.src='/Rajasthan-Sarkar.png'"
-            />
+            <div class="hidden sm:flex flex-col justify-center leading-tight">
+              <span class="text-[11px] font-semibold text-[#25212A] leading-tight">राजस्थान सरकार</span>
+              <span class="text-[10.5px] font-medium text-[#625663] leading-tight">Government of Rajasthan</span>
+            </div>
           </div>
 
           <!-- Thin Vertical Separator -->
-          <div class="w-px h-6 sm:h-8 bg-[#EADCE2] shrink-0"></div>
+          <div class="w-px h-7 sm:h-8 bg-[#EADCE2] shrink-0"></div>
+
+          <!-- RSLDC Logo -->
+          <img
+            src="/rsldc-logo.png"
+            alt="RSLDC"
+            class="h-8 sm:h-10 w-auto object-contain shrink-0"
+            onerror="this.src='/Rajasthan-Sarkar.png'"
+          />
+
+          <!-- Thin Vertical Separator -->
+          <div class="hidden sm:block w-px h-7 sm:h-8 bg-[#EADCE2] shrink-0"></div>
 
           <!-- System Identity: Name above Subtitle -->
           <div class="flex flex-col justify-center leading-none">
-            <div class="text-[17px] sm:text-[21px] lg:text-[24px] font-bold text-[#25212A] tracking-tight leading-none">
-              ISMS <span class="text-[#E26D24]">2.0</span>
+            <div class="text-[19px] sm:text-[24px] lg:text-[26px] font-bold text-[#7C0E44] tracking-tight leading-none">
+              ISMS <span class="text-[#E66B22]">2.0</span>
             </div>
-            <div class="hidden md:block text-[11px] sm:text-[12px] lg:text-[14px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
+            <div class="hidden md:block text-[11.5px] lg:text-[12.5px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
               Integrated Scheme Management System
             </div>
           </div>
         </a>
         </div>
 
-        <!-- RIGHT SIDE: Language Controls + Divider + Notification + Divider + Login / User Pill -->
+        <!-- RIGHT SIDE: Notification + Divider + Login / User Pill -->
         <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
-
-          <!-- Language Controls: Segmented Pill Toggle -->
-          <div class="lang-toggle-group" aria-label="Language selection">
-            <!-- ui-guard-allow: header language segmented toggle pill -->
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              class="lang-toggle-btn"
-              [class.active]="selectedLanguage() === 'en'"
-              (click)="onLanguageChange('en')"
-            >
-              English
-            </button>
-
-            <!-- ui-guard-allow: header language segmented toggle pill -->
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              type="button"
-              class="lang-toggle-btn"
-              [class.active]="selectedLanguage() === 'hi'"
-              (click)="onLanguageChange('hi')"
-            >
-              हिंदी
-            </button>
-          </div>
 
           <!-- When Logged In: User Profile Menu & Role Switcher (on the landing page too, with "Back to Portal");
                the notification bell only inside the portal -->
           @if (currentUser() && !isSsoPage()) {
             @if (!isLandingPage()) {
-              <!-- Thin Vertical Divider between Language & Notifications -->
-              <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
-
               <!-- Notification Option (Role-Specific Portal Notifications) -->
               <app-header-notification></app-header-notification>
-            }
 
-            <!-- Thin Vertical Divider between Notifications/Language & Username -->
-            <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
+              <!-- Thin Vertical Divider between Notifications & Username -->
+              <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
+            }
 
             <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
               <button

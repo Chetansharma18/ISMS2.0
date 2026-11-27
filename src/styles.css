@@ -20,11 +20,14 @@
 
   /* Centralized Design System Palette - Light Burgundy, Dusty Rose, Soft Peach, White */
   --color-primary: #7C0E44;
+  --color-primary-deep: #520A2E;
   --color-primary-dark: #5E0832;
   --color-primary-light: #F8EDF1;
   --color-secondary: #AA5E7A;
   --color-muted-rose: #D49A9A;
   --color-light-peach: #F2DACE;
+  --color-accent-orange: #E66B22;
+  --color-banner-bg: #FCF0F2;
 
   --color-background: #FFFFFF;
   --color-surface: #FFFFFF;

@@ -8,6 +8,7 @@ import { PermissionService } from '../../permissions/permission.service';
 import { AspirantPortalService } from '../../../features/aspirant/services/aspirant-portal.service';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import type { IconName } from '../../../shared/components/icon/icons';
 import {
   ADMIN_TOOL_NAV,
   ASPIRANT_NAV,
@@ -40,8 +41,8 @@ import { TableAccessService } from '../../permissions/table-access.service';
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="relative shrink-0 text-white border-r border-[#4A0626] h-full flex flex-col select-none overflow-hidden font-sans w-57 max-w-full"
-      style="background: linear-gradient(180deg, #5E0832 0%, #7C0E44 50%, #4A0626 100%);"
+      class="relative shrink-0 text-white border-r border-[#520A2E] h-full flex flex-col select-none overflow-hidden font-sans w-[252px] max-w-full"
+      style="background: linear-gradient(180deg, #7C0E44 0%, #680B39 55%, #520A2E 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
@@ -103,35 +104,41 @@ import { TableAccessService } from '../../permissions/table-access.service';
                   type="button"
                   (click)="toggleGroup(group.label)"
                   [attr.aria-expanded]="isGroupOpen(group.label)"
-                  class="justify-between h-auto px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white group"
+                  [class.bg-white/10]="isGroupOpen(group.label)"
+                  class="justify-between min-h-[40px] h-auto px-3.5 py-2 rounded-lg text-[13.5px] leading-5 text-white/95 hover:bg-white/10 hover:text-white transition-colors duration-150 group"
                 >
                   <div class="flex items-center gap-2.5 min-w-0">
-                    <app-icon name="list" class="text-white/80 group-hover:text-white transition-colors" />
+                    <app-icon [name]="groupIcon(group.label)" size="md" class="text-white/85 group-hover:text-white transition-colors shrink-0" />
                     <span class="tracking-tight font-medium text-white truncate">{{ group.label }}</span>
                   </div>
                   <app-icon
                     name="chevron-down"
                     size="sm"
                     [stroke]="2"
-                    class="text-white/60 group-hover:text-white transition-transform duration-200"
+                    class="text-white/70 group-hover:text-white transition-transform duration-200 shrink-0"
                     [ngClass]="{ 'transform rotate-180': isGroupOpen(group.label) }"
                   />
                 </button>
 
                 @if (isGroupOpen(group.label)) {
-                  <div class="flex flex-col gap-0.5 pl-6 pr-1 pt-1 pb-1">
+                  <div class="flex flex-col gap-0.5 pl-4 pr-1 pt-1 pb-1.5">
                     @for (item of group.items; track item.key) {
                       <a
                         [routerLink]="item.route"
                         [queryParams]="item.query"
                         [title]="item.title"
-                        routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-bold shadow-xs active-link"
+                        routerLinkActive="!bg-[#F2DACE] !text-[#7C0E44] font-semibold active-link"
                         #permRla="routerLinkActive"
                         [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
                         [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'"
-                        class="px-2.5 py-1.5 rounded-md text-[12px] text-white/80 hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2"
+                        class="px-3 py-2 rounded-lg text-[13px] text-white/85 hover:bg-white/10 hover:text-white transition-colors duration-150 flex items-center gap-2.5"
                       >
-                        <app-icon [name]="item.icon" size="sm" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                        <span
+                          class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
+                          [class.bg-[#7C0E44]]="permRla.isActive"
+                          [class.bg-white/55]="!permRla.isActive"
+                          aria-hidden="true"
+                        ></span>
                         <span class="truncate" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
                       </a>
                     }
@@ -641,6 +648,22 @@ export class SidebarComponent {
 
   toggleUserManagement(): void {
     this.isUserManagementOpen.update((v: boolean) => !v);
+  }
+
+  groupIcon(label: string): IconName {
+    const key = label.toLowerCase();
+    if (key.includes('master')) return 'squares-grid';
+    if (key.includes('eoi')) return 'document';
+    if (key.includes('sanction') || key.includes('ipa') || key.includes('approval')) return 'clipboard-check';
+    if (key.includes('sdc') || key.includes('center') || key.includes('centre')) return 'building';
+    if (key.includes('batch')) return 'users-group';
+    if (key.includes('attendance')) return 'calendar';
+    if (key.includes('user') || key.includes('role')) return 'users';
+    if (key.includes('report')) return 'trending-up';
+    if (key.includes('grievance')) return 'chat-bubble';
+    if (key.includes('payment') || key.includes('fee')) return 'bank';
+    if (key.includes('camera')) return 'camera';
+    return 'list';
   }
 
   onNavClick(event: MouseEvent): void {

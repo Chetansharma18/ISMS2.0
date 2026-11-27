@@ -40,7 +40,7 @@ const NO_ROLE = '__none__';
       [breadcrumbs]="[{ label: 'Home', url: '/' }, { label: 'User Roles' }]"
       searchPlaceholder="Search user, SSO ID, email or role..."
       [(searchQuery)]="searchQuery"
-      [columns]="columns"
+      [columns]="columns()"
       [data]="rows()"
       itemUnit="users"
       [emptyMessage]="loading() ? 'Loading...' : 'No users found.'"
@@ -232,13 +232,18 @@ export class UserRolesPageComponent {
       .map(u => ({ value: String(u.id), label: `${u.name || u.ssoId} (${u.ssoId}${u.email ? ', ' + u.email : ''})`, disabled: !u.email }))
   );
 
-  readonly columns: TableColumn<UserRoleRow>[] = [
-    { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-    { key: 'user', label: 'User / SSO ID', type: 'custom' },
-    { key: 'email', label: 'Email', cellClass: 'whitespace-nowrap text-slate-700', format: (_v, row) => row.user.email || '-' },
-    { key: 'role', label: 'Roles', type: 'custom' },
-    { key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'min-w-[120px]' }
-  ];
+  readonly columns = computed<TableColumn<UserRoleRow>[]>(() => {
+    const cols: TableColumn<UserRoleRow>[] = [
+      { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
+      { key: 'user', label: 'User / SSO ID', type: 'custom' },
+      { key: 'email', label: 'Email', cellClass: 'whitespace-nowrap text-slate-700', format: (_v, row) => row.user.email || '-' },
+      { key: 'role', label: 'Roles', type: 'custom' }
+    ];
+    if (this.canAssign()) {
+      cols.push({ key: 'action', label: 'Action', type: 'custom', align: 'center', width: 'min-w-[120px]' });
+    }
+    return cols;
+  });
 
   constructor() {
     this.loadUsers();

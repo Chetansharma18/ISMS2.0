@@ -41,8 +41,8 @@ import { TableAccessService } from '../../permissions/table-access.service';
   template: `
     <!-- Premium Sidebar -->
     <aside
-      class="relative shrink-0 text-white border-r border-[#520A2E] h-full flex flex-col select-none overflow-hidden font-sans w-[252px] max-w-full"
-      style="background: linear-gradient(180deg, #7C0E44 0%, #680B39 55%, #520A2E 100%);"
+      class="app-sidebar relative shrink-0 text-white border-r border-[#520A2E] h-full min-h-0 flex flex-col select-none overflow-hidden font-sans w-[252px] max-w-full"
+      style="background: linear-gradient(165deg, #7C0E44 0%, #680B39 55%, #520A2E 100%);"
       (click)="onNavClick($event)"
       aria-label="Portal Navigation Sidebar"
     >
@@ -65,12 +65,10 @@ import { TableAccessService } from '../../permissions/table-access.service';
         </button>
       </div>
 
-      <!-- Scrollable Nav Container: menu scrolls smoothly behind the fixed bottom fort -->
-      <div class="flex-1 min-h-0 overflow-y-auto flex flex-col relative z-0">
+      <!-- Scrollable Nav Container: independently bounded above the bottom fort illustration -->
+      <div class="sidebar-navigation flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col">
         <!-- Navigation Links -->
-        <!-- pb-32: room under the last link for the fort image (120px) fixed over the bottom of the scroll area,
-             so every link can be scrolled above it -->
-        <nav class="flex flex-col gap-1 px-2.5 pt-3 pb-32" aria-label="Main Navigation">
+        <nav class="flex flex-col gap-0.5 px-2.5 py-2.5" aria-label="Main Navigation">
           @if (activeContextItem(); as contextItem) {
             <!-- Help & Support / legal pages: the sidebar shows only that page's link -->
             <ng-container *ngTemplateOutlet="navLink; context: { $implicit: contextItem }" />
@@ -121,7 +119,7 @@ import { TableAccessService } from '../../permissions/table-access.service';
                 </button>
 
                 @if (isGroupOpen(group.label)) {
-                  <div class="flex flex-col gap-0.5 pl-4 pr-1 pt-1 pb-1.5">
+                  <div class="flex flex-col gap-0.5 pl-3.5 pr-1 pt-1 pb-1">
                     @for (item of group.items; track item.key) {
                       <a
                         [routerLink]="item.route"
@@ -131,7 +129,7 @@ import { TableAccessService } from '../../permissions/table-access.service';
                         #permRla="routerLinkActive"
                         [routerLinkActiveOptions]="item.query ? exactMatch : defaultMatch"
                         [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'"
-                        class="px-3 py-2 rounded-lg text-[13px] text-white/85 hover:bg-white/10 hover:text-white transition-colors duration-150 flex items-center gap-2.5"
+                        class="px-3 py-1.5 min-h-[36px] rounded-[7px] text-[13px] leading-snug text-white/85 hover:bg-white/10 hover:text-white transition-colors duration-150 flex items-center gap-2.5"
                       >
                         <span
                           class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
@@ -202,17 +200,8 @@ import { TableAccessService } from '../../permissions/table-access.service';
         </nav>
       </div>
 
-      <!-- Bottom: Fixed Rajasthan Fort Heritage Illustration with Smooth Gradient Mask -->
-      <div
-        class="pointer-events-none absolute bottom-0 left-0 right-0 z-10 w-full flex flex-col justify-end items-center overflow-hidden"
-        style="height: 120px; background: linear-gradient(to top, rgba(74, 6, 38, 1) 0%, rgba(74, 6, 38, 0.96) 40%, rgba(74, 6, 38, 0.7) 70%, rgba(74, 6, 38, 0) 100%);"
-      >
-        <img
-          src="/sidebar-fort-transparent.png?v=3"
-          alt="Rajasthan Heritage"
-          class="w-full h-28 object-bottom select-none opacity-90"
-        />
-      </div>
+      <!-- Bottom: Separate non-overlapping Rajasthan Fort Heritage Illustration -->
+      <div class="sidebar-decoration" aria-hidden="true"></div>
 
     </aside>
 

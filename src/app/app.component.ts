@@ -113,7 +113,7 @@ import { ConnectivityService } from './core/services/connectivity.service';
             </div>
           }
 
-          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col relative" style="background-color: #FFFFFF;">
+          <main class="main-workspace flex-1 min-w-0 overflow-y-auto flex flex-col relative" style="background-color: #FFFFFF;">
             <div
               class="absolute inset-0 z-30 flex items-center justify-center bg-white/90 isms-loader-fade"
               [class.opacity-0]="!loadingService.isPageLoading()"
@@ -123,7 +123,9 @@ import { ConnectivityService } from './core/services/connectivity.service';
             >
               <app-loader mode="page" [text]="loadingService.pageMessage()" />
             </div>
-            <router-outlet></router-outlet>
+            <div class="workspace-content flex-1 flex flex-col min-w-0 min-h-full">
+              <router-outlet></router-outlet>
+            </div>
           </main>
         </div>
       } @else {

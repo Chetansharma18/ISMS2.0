@@ -41,119 +41,116 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
   },
   template: `
     <header
-      class="w-full bg-white border-b border-[#EADCE2] box-border sticky top-0 z-40 select-none shadow-2xs"
+      class="app-header w-full box-border sticky top-0 z-40 select-none font-sans"
       role="banner"
     >
-      <div class="w-full h-[64px] sm:h-[76px] lg:h-[80px] px-3 sm:px-8 lg:px-12 flex items-center justify-between gap-2 sm:gap-6 font-sans">
+      <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + Bilingual Gov Text + RSLDC Logo + ISMS 2.0 -->
+      <div class="header-brand-group">
+        @if (currentUser() && !isLandingPage() && !isSsoPage()) {
+          <button
+            appButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            type="button"
+            (click)="toggleMobileMenu.emit()"
+            class="md:hidden -ml-1 shrink-0"
+            aria-label="Toggle navigation menu"
+            title="Open Navigation Menu"
+          >
+            <app-icon name="menu" size="lg" [stroke]="2" />
+          </button>
+        }
 
-        <!-- LEFT SIDE: Mobile Menu Toggle + Emblem + ISMS Logo + Separator + Identity -->
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          @if (currentUser() && !isLandingPage() && !isSsoPage()) {
-            <button
-              appButton
-              variant="ghost"
-              size="sm"
-              iconOnly
-              type="button"
-              (click)="toggleMobileMenu.emit()"
-              class="md:hidden -ml-1 shrink-0"
-              aria-label="Toggle navigation menu"
-              title="Open Navigation Menu"
-            >
-              <app-icon name="menu" size="lg" [stroke]="2" />
-            </button>
-          }
-
-          <a [routerLink]="homeRoute()" class="flex items-center gap-2.5 sm:gap-3.5 shrink-0 no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
-          
+        <a [routerLink]="homeRoute()" class="header-brand-group no-underline cursor-pointer group" aria-label="ISMS 2.0 Home">
           <!-- Government of Rajasthan Emblem + Bilingual Title -->
-          <div class="flex items-center gap-2 shrink-0">
+          <div class="government-brand">
             <img
               src="/Rajasthan-Sarkar.png"
               alt="Government of Rajasthan"
-              class="h-8 sm:h-10 w-auto object-contain shrink-0"
+              class="government-logo"
             />
-            <div class="hidden sm:flex flex-col justify-center leading-tight">
-              <span class="text-[11px] font-semibold text-[#25212A] leading-tight">राजस्थान सरकार</span>
-              <span class="text-[10.5px] font-medium text-[#625663] leading-tight">Government of Rajasthan</span>
+            <div class="government-text hidden sm:flex">
+              <span class="government-title-hindi">राजस्थान सरकार</span>
+              <span class="government-title-english">Government of Rajasthan</span>
             </div>
           </div>
 
           <!-- Thin Vertical Separator -->
-          <div class="w-px h-7 sm:h-8 bg-[#EADCE2] shrink-0"></div>
+          <span class="header-divider" aria-hidden="true"></span>
 
           <!-- RSLDC Logo -->
           <img
             src="/rsldc-logo.png"
             alt="RSLDC"
-            class="h-8 sm:h-10 w-auto object-contain shrink-0"
+            class="rsldc-logo"
             onerror="this.src='/Rajasthan-Sarkar.png'"
           />
 
           <!-- Thin Vertical Separator -->
-          <div class="hidden sm:block w-px h-7 sm:h-8 bg-[#EADCE2] shrink-0"></div>
+          <span class="header-divider hidden sm:block" aria-hidden="true"></span>
 
           <!-- System Identity: Name above Subtitle -->
-          <div class="flex flex-col justify-center leading-none">
-            <div class="text-[19px] sm:text-[24px] lg:text-[26px] font-bold text-[#7C0E44] tracking-tight leading-none">
-              ISMS <span class="text-[#E66B22]">2.0</span>
+          <div class="application-brand">
+            <div class="brand-title">
+              ISMS <span class="brand-version">2.0</span>
             </div>
-            <div class="hidden md:block text-[11.5px] lg:text-[12.5px] font-normal text-[#625663] tracking-normal leading-tight mt-1 whitespace-nowrap">
+            <div class="brand-subtitle hidden md:block">
               Integrated Scheme Management System
             </div>
           </div>
         </a>
-        </div>
+      </div>
 
-        <!-- RIGHT SIDE: Notification + Divider + Login / User Pill -->
-        <div class="flex items-center gap-2 sm:gap-3.5 lg:gap-4 shrink-0">
+      <!-- RIGHT SIDE: Notification + Divider + Login / User Pill -->
+      <div class="header-actions">
 
-          <!-- When Logged In: User Profile Menu & Role Switcher (on the landing page too, with "Back to Portal");
-               the notification bell only inside the portal -->
-          @if (currentUser() && !isSsoPage()) {
-            @if (!isLandingPage()) {
-              <!-- Notification Option (Role-Specific Portal Notifications) -->
-              <app-header-notification></app-header-notification>
+        <!-- When Logged In: User Profile Menu & Role Switcher (on the landing page too, with "Back to Portal");
+             the notification bell only inside the portal -->
+        @if (currentUser() && !isSsoPage()) {
+          @if (!isLandingPage()) {
+            <!-- Notification Option (Role-Specific Portal Notifications) -->
+            <app-header-notification></app-header-notification>
 
-              <!-- Thin Vertical Divider between Notifications & Username -->
-              <div class="w-px h-5 sm:h-6 bg-[#EADCE2] shrink-0"></div>
-            }
+            <!-- Thin Vertical Divider between Notifications & Username -->
+            <span class="header-divider" aria-hidden="true"></span>
+          }
 
-            <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
-              <button
-                appButton
-                variant="outline"
-                type="button"
-                id="user-menu-btn"
-                (click)="toggleDropdown()"
-                [attr.aria-expanded]="dropdownOpen()"
-                aria-haspopup="true"
-                aria-label="User profile and role menu"
-              >
-                <!-- Avatar with role-based background -->
-                <div class="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center font-bold text-[11px] sm:text-xs uppercase shrink-0 select-none shadow-xs text-white"
-                  [ngClass]="avatarBgClass()">
-                  {{ avatarChar() }}
-                </div>
+          <div class="relative z-[100]" id="user-menu-container" (appClickOutside)="closeDropdown()">
+            <button
+              appButton
+              variant="outline"
+              type="button"
+              id="user-menu-btn"
+              (click)="toggleDropdown()"
+              [attr.aria-expanded]="dropdownOpen()"
+              aria-haspopup="true"
+              aria-label="User profile and role menu"
+            >
+              <!-- Avatar with role-based background -->
+              <div class="profile-avatar rounded-full flex items-center justify-center font-semibold uppercase shrink-0 select-none text-white"
+                [ngClass]="avatarBgClass()">
+                {{ avatarChar() }}
+              </div>
 
-                <!-- Username and role badge -->
-                <div class="flex flex-col text-left leading-none max-w-28 sm:max-w-48 truncate">
-                  <span class="text-xs sm:text-[13px] font-bold text-[#25212A] truncate">
-                    {{ displayName() }}
-                  </span>
-                  <span class="text-[9.5px] sm:text-[10px] text-[#625663] font-medium truncate mt-0.5">
-                    {{ userSubLabel() }}
-                  </span>
-                </div>
+              <!-- Username and role badge -->
+              <div class="flex flex-col text-left leading-none max-w-28 sm:max-w-48 truncate">
+                <span class="text-[13px] sm:text-[14px] font-semibold text-[#25212A] truncate">
+                  {{ displayName() }}
+                </span>
+                <span class="text-[11px] sm:text-[12px] text-[#625663] font-normal truncate mt-0.5">
+                  {{ userSubLabel() }}
+                </span>
+              </div>
 
-                <!-- Chevron -->
-                <app-icon
-                  name="chevron-down"
-                  size="sm"
-                  class="transition-transform duration-200"
-                  [class.rotate-180]="dropdownOpen()"
-                />
-              </button>
+              <!-- Chevron -->
+              <app-icon
+                name="chevron-down"
+                size="sm"
+                class="transition-transform duration-200"
+                [class.rotate-180]="dropdownOpen()"
+              />
+            </button>
 
               <!-- Dropdown Menu -->
               @if (dropdownOpen()) {
@@ -322,8 +319,6 @@ import { ActionModalComponent } from '../../../shared/components/action-modal/ac
           }
 
         </div>
-
-      </div>
 
     </header>
 

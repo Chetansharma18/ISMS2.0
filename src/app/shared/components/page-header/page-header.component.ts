@@ -30,22 +30,18 @@ export interface BreadcrumbItem {
   `],
   template: `
     <div
-      class="relative w-full rounded-xl overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 sm:px-7 py-4 sm:py-5 bg-[#FCF0F2]"
-      style="min-height: 92px;"
+      class="page-title-banner relative w-full rounded-xl overflow-hidden border border-[#EADCE2] shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 px-5 sm:px-7 py-4 sm:py-5"
+      style="min-height: 92px; background: linear-gradient(105deg, #FCF0F2 0%, #F8E5E7 58%, #F2DACE 100%);"
     >
-      <!-- Background Panoramic Fort Image with soft fade to the left -->
+      <!-- Subtle Decorative Banner Waves -->
       <div
-        class="absolute inset-0 bg-cover bg-no-repeat pointer-events-none"
-        style="background-image: url('/hero-bg.png'); background-position: right 22%; opacity: 0.95;"
-      ></div>
-      <!-- Soft Gradient Overlay: blends fort image into #FCF0F2 background on the left -->
-      <div
-        class="absolute inset-0 pointer-events-none"
-        style="background: linear-gradient(90deg, #FCF0F2 0%, #FCF0F2 34%, rgba(252, 240, 242, 0.88) 56%, rgba(252, 240, 242, 0.28) 76%, transparent 100%);"
+        class="banner-waves absolute inset-x-0 bottom-0 h-[85%] bg-no-repeat bg-bottom pointer-events-none z-[1]"
+        style="background-image: var(--asset-banner-waves, url('/screenbackground/page-banner-waves.svg')); background-size: 100% 100%;"
+        aria-hidden="true"
       ></div>
 
       <!-- Left: Title & Subtitle -->
-      <div class="relative z-10 flex items-center gap-2.5 sm:gap-3 min-w-0 w-full md:w-auto">
+      <div class="banner-content relative z-10 flex items-center gap-2.5 sm:gap-3 min-w-0 w-full md:w-auto">
         <!-- Optional Back Button -->
         @if (backUrl || showBack) {
           <button
@@ -83,7 +79,7 @@ export interface BreadcrumbItem {
       </div>
 
       <!-- Right Action Slot -->
-      <div class="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
+      <div class="banner-actions relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto shrink-0 justify-end">
         @if (searchable) {
           <div class="relative w-full sm:w-80 md:w-96 lg:w-[420px] max-w-full">
             <app-icon name="search" size="sm" [stroke]="2" class="text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1600"
+     height="180"
+     viewBox="0 0 1600 180"
+     preserveAspectRatio="none">
+
+  <defs>
+
+    <linearGradient id="bannerWave"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="0%">
+
+      <stop offset="0%" stop-color="#F2DACE"/>
+      <stop offset="50%" stop-color="#D49A9A"/>
+      <stop offset="100%" stop-color="#F8EDF1"/>
+
+    </linearGradient>
+
+  </defs>
+
+  <path
+    d="M0 110
+       C190 60 350 170 600 100
+       C850 30 1150 140 1600 80
+       L1600 180
+       L0 180 Z"
+    fill="url(#bannerWave)"
+    opacity="0.24"/>
+
+  <path
+    d="M0 150
+       C210 100 420 190 700 135
+       C1000 85 1280 160 1600 120
+       L1600 180
+       L0 180 Z"
+    fill="#F2DACE"
+    opacity="0.35"/>
+
+  <path
+    d="M0 145
+       C210 75 450 190 730 115
+       C1000 45 1300 160 1600 95"
+    stroke="#FFFFFF"
+    stroke-width="2"
+    stroke-opacity="0.45"
+    fill="none"/>
+
+</svg>

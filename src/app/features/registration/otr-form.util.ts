@@ -394,6 +394,15 @@ export function fieldOptions(field: OtrFieldDef, values: OtrStepValues): OtrOpti
   return field.options ?? [];
 }
 
+/**
+ * The option whose value equals `value` ignoring case. Master names are unique ignoring case, and a case-only
+ * correction in the master ("jaipur" -> "Jaipur") must not lose an answer saved with the old case.
+ */
+function sameOption(options: OtrOption[], value: string): OtrOption | undefined {
+  const lower = value.toLowerCase();
+  return options.find(o => o.value === value) ?? options.find(o => o.value.toLowerCase() === lower);
+}
+
 /** Sets one value; a district that does not belong to a newly chosen state is cleared. */
 export function setStepValue(step: OtrStepDef, values: OtrStepValues, key: string, value: OtrValue): OtrStepValues {
   const next: OtrStepValues = { ...values, [key]: value };
@@ -401,8 +410,8 @@ export function setStepValue(step: OtrStepDef, values: OtrStepValues, key: strin
     if (field.dependsOn !== key) continue;
     const current = next[field.key];
     const options = fieldOptions(field, next);
-    if (typeof current === 'string' && current && options.length > 0 && !options.some(o => o.value === current)) {
-      next[field.key] = '';
+    if (typeof current === 'string' && current && options.length > 0) {
+      next[field.key] = sameOption(options, current)?.value ?? '';
     }
   }
   return next;
@@ -458,6 +467,13 @@ export function initialStepValues(step: OtrStepDef, record: OtrStepRecord | null
     }
     // A record created only by an upload holds the backend's empty defaults: show the screen defaults instead.
     values[field.key] = saved ? fromRecordValue(valueKind(step.key, field), field, record?.[field.key]) : emptyValue(field);
+  }
+  // A saved district written in another case than the master's name ("jaipur") shows as the master option ("Jaipur").
+  for (const field of stepFields(step)) {
+    const current = values[field.key];
+    if (!field.optionsByParent || typeof current !== 'string' || !current) continue;
+    const match = sameOption(fieldOptions(field, values), current);
+    if (match) values[field.key] = match.value;
   }
   return values;
 }

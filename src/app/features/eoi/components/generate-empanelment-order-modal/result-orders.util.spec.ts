@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 import {
   OrderDto,
   OrderEditorDto,
+  OrderSignerDto,
   OrdersOverviewDto,
+  SignerOptionDto,
+  applySigner,
+  eSignActionFor,
+  eSignActions,
+  signerOptionLabel,
+  signingAuthorityText,
   toContentRequest,
   toDraftForm,
   generateBlockers,
@@ -131,10 +138,84 @@ describe('result-orders.util', () => {
       headerAddress: 'EMI Campus',
       closingText: '',
       dispatchFileNo: '',
-      dispatchDated: ''
+      dispatchDated: '',
+      // No signing authority on the order or in the content: unchanged on save.
+      signerSsoId: null
     });
     // The form is a copy: editing it does not change the loaded rows.
     expect(dto.rows[0].category).toBe('');
+  });
+
+  it('offers one e-sign action per order, each for its own signing authority', () => {
+    const md: OrderSignerDto = { ssoId: 'RJ.MD', name: 'Committee Member 1', authorityName: '', authorityDesignation: 'Managing Director', isMe: true, canESign: true };
+    const oic: OrderSignerDto = { ssoId: 'RJ.OIC', name: 'Committee Member 2', authorityName: 'Scheme OIC', authorityDesignation: 'Scheme 1', isMe: false, canESign: false };
+    const both = eSignActions(orderSlots(overview([order('Empanelment', 'Draft', { signer: md }), order('Rejection', 'Draft', { signer: oic })])));
+    expect(both.map(a => [a.label, a.canSign])).toEqual([
+      ['E-Sign Empanelment Order', true],
+      ['E-Sign Rejection Order', false]
+    ]);
+    expect(both[0].note).toBe('');
+    expect(both[1].note).toBe('Only Committee Member 2 can e-sign this order.');
+
+    // Only the order types the EOI has: no rejected application, no Rejection Order button.
+    const one = eSignActions(orderSlots(overview([order('Empanelment', 'Draft', { signer: md })], { rejected: 0 })));
+    expect(one.map(a => a.label)).toEqual(['E-Sign Empanelment Order']);
+
+    // Each is signed independently: a signed order shows as done, the other one stays to be signed.
+    const half = eSignActions(
+      orderSlots(overview([order('Empanelment', 'Signed', { signer: { ...md, canESign: false } }), order('Rejection', 'Draft', { signer: { ...oic, isMe: true, canESign: true } })]))
+    );
+    expect(half.map(a => [a.type, a.done, a.canSign])).toEqual([
+      ['Empanelment', true, false],
+      ['Rejection', false, true]
+    ]);
+    expect(half.map(a => a.signedText)).toEqual(['Signed by Committee Member 1', '']);
+
+    // The editor's single-order action; "Signed by" uses who actually signed (signedBy) over the signer's name.
+    const signed = eSignActionFor(order('Rejection', 'Published', { signer: { ...oic, signed: true, signedBy: 'Committee Member 3' } }));
+    expect([signed.label, signed.done, signed.canSign, signed.signedText]).toEqual(['E-Sign Rejection Order', true, false, 'Signed by Committee Member 3']);
+    expect(eSignActionFor(order('Empanelment', 'Draft', { signer: md })).label).toBe('E-Sign Empanelment Order');
+
+    const stale = eSignActions(orderSlots(overview([order('Empanelment', 'Draft', { isStale: true, signer: { ...md, canESign: false } })], { rejected: 0 })));
+    expect(stale[0].note).toContain('Generate a new draft');
+    const none = eSignActions(orderSlots(overview([order('Empanelment', 'Draft', { signer: null })], { rejected: 0 })));
+    expect(none[0].note).toContain('No signing authority');
+  });
+
+  it('describes and changes the signing authority', () => {
+    expect(signingAuthorityText({ ssoId: 'RJ.OIC', name: 'Committee Member 2', authorityName: 'Scheme OIC', authorityDesignation: 'Scheme 1', isMe: false, canESign: false })).toBe('Scheme OIC, Scheme 1');
+    expect(signingAuthorityText({ ssoId: 'RJ.MD', name: 'Committee Member 1', authorityName: '', authorityDesignation: 'Managing Director', isMe: false, canESign: false })).toBe('Committee Member 1, Managing Director');
+    expect(signingAuthorityText(null)).toBe('-');
+
+    const approver: SignerOptionDto = { ssoId: 'RJ.A', name: 'Committee Member 1', role: 'Approver', designation: 'Director' };
+    const member: SignerOptionDto = { ssoId: 'RJ.B', name: 'Committee Member 2', role: 'Member', designation: null };
+    expect(signerOptionLabel(approver)).toBe('Committee Member 1 (Approver, Director)');
+    expect(signerOptionLabel(member)).toBe('Committee Member 2 (Member)');
+
+    const dto: OrderEditorDto = {
+      order: order('Rejection', 'Draft'),
+      refNo: 'EOI/1',
+      schemeName: 'Scheme 1',
+      canEdit: true,
+      content: {
+        fileNo: '', dated: '', title: null, subject: '', paragraphs: [], rows: null, signatoryName: '', signatoryDesignation: '',
+        copyTo: [], headerTitle: null, headerAddress: '', closingText: '', dispatchFileNo: '', dispatchDated: '', signerSsoId: 'RJ.A'
+      },
+      rows: [],
+      signerOptions: [approver, member]
+    };
+    const form = toDraftForm(dto);
+    expect(form.signerSsoId).toBe('RJ.A');
+
+    // Empty name and designation take the chosen person's details.
+    const chosen = applySigner(form, approver, null);
+    expect([chosen.signerSsoId, chosen.signatoryName, chosen.signatoryDesignation]).toEqual(['RJ.A', 'Committee Member 1', 'Director']);
+    // Switching replaces the previous signer's details; a designation typed by hand is kept.
+    const typed = { ...chosen, signatoryDesignation: 'Scheme OIC' };
+    const switched = applySigner(typed, member, approver);
+    expect([switched.signerSsoId, switched.signatoryName, switched.signatoryDesignation]).toEqual(['RJ.B', 'Committee Member 2', 'Scheme OIC']);
+    expect(toContentRequest(switched).signerSsoId).toBe('RJ.B');
+    expect(applySigner(form, null, approver).signerSsoId).toBe('');
   });
 
   it('labels row results, order statuses and OTP answers', () => {

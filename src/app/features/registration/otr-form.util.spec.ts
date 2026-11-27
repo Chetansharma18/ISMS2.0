@@ -116,6 +116,17 @@ describe('otr-form.util (backend OTR form)', () => {
     expect(moved['registeredDistrict']).toBe('Jaipur');
   });
 
+  it('matches a district ignoring case, so a case-only correction in District Master keeps the answer', () => {
+    const loaded = initialStepValues(ORG, { organisationName: 'Company 1', registeredState: 'Rajasthan', registeredDistrict: 'jaipur' } as any);
+    expect(loaded['registeredDistrict']).toBe('Jaipur');
+
+    const base = initialStepValues(ORG, null);
+    const kept = setStepValue(ORG, { ...base, registeredDistrict: 'AJMER' }, 'registeredState', 'rajasthan');
+    expect(kept['registeredDistrict']).toBe('Ajmer');
+    const cleared = setStepValue(ORG, { ...base, registeredDistrict: 'Kota' }, 'registeredState', 'Rajasthan');
+    expect(cleared['registeredDistrict']).toBe('');
+  });
+
   it('builds the request body the backend expects (booleans, sector ids, district id, nulls)', () => {
     const values = {
       ...initialStepValues(ORG, null),

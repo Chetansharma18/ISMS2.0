@@ -376,7 +376,14 @@ export class SsoLoginStepsModalComponent {
         if (canSetPin) this.method.set('PIN');
         else if (pinSet === false && methods.includes('OTP')) this.method.set('OTP');
         else this.method.set(methods[0] ?? 'OTP');
+        // A new challenge starts empty, even when the method stays the same (the dialog stays alive between
+        // sign-in and role switches, so the last OTP / PIN would otherwise still be in the boxes).
+        this.clearEntry();
       });
+    });
+    // A newly sent OTP (first send or "Resend OTP") replaces the old one: empty boxes.
+    effect(() => {
+      if (this.flow.otpSent()) untracked(() => this.clearEntry());
     });
     // Switching method clears what was typed, and the error, of the other one.
     effect(() => {
@@ -384,13 +391,18 @@ export class SsoLoginStepsModalComponent {
       untracked(() => {
         // Back on the PIN tab: the user remembered the PIN, so leave the "Forgot PIN" path.
         if (method === 'PIN') this.flow.cancelForgotPin();
-        this.code.set('');
-        this.confirmCode.set('');
-        this.setupAttempted.set(false);
-        this.forgotBlocked.set(false);
-        this.flow.error.set(null);
+        this.clearEntry();
       });
     });
+  }
+
+  /** Empties the OTP / PIN boxes and the messages of the current entry. */
+  private clearEntry(): void {
+    this.code.set('');
+    this.confirmCode.set('');
+    this.setupAttempted.set(false);
+    this.forgotBlocked.set(false);
+    this.flow.error.set(null);
   }
 
   protected readonly switchingText = computed(() => {

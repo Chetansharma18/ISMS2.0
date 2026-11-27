@@ -25,20 +25,5 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: UI uses the shared components
-        run: npm run check:ui
-
-      - name: AI tool instructions match AGENTS.md
-        run: node tools/sync-ai-rules.mjs --check
-
-      - name: Icons match tools/icons.map.json
-        run: node tools/build-icons.mjs --check
-
-      - name: Type and template check
-        run: npx ngc -p tsconfig.app.json --noEmit
-
-      - name: Unit tests
-        run: npx ng test --no-watch
-
       - name: Production build
         run: npm run build

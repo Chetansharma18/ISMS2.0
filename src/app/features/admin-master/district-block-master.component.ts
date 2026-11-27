@@ -1,94 +1,104 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { catchError, map, of } from 'rxjs';
-import {
-  MasterCrudPageComponent,
-  MasterCrudConfig,
-  TableColumn
-} from '../../shared';
-import { DistrictBlockMasterItem } from '../../core/models/admin-masters.model';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, catchError, map, of, tap } from 'rxjs';
+import { FilterTabsComponent, MasterCrudConfig, MasterCrudPageComponent } from '../../shared';
+import { DistrictBlockMasterItem, DistrictMasterItem } from '../../core/models/admin-masters.model';
 import { withDistrictNames } from '../../core/models/master-adapters';
+import { TableAccessService } from '../../core/permissions/table-access.service';
 import { DataEngineService } from '../../core/services/data-engine.service';
+import {
+  BLOCK_TABLE,
+  DISTRICT_BLOCK_TABS,
+  DISTRICT_TABLE,
+  DistrictBlockTab,
+  blockConfig,
+  districtConfig,
+  tabFromQuery,
+  toDistrictItem,
+  withBlockCounts
+} from './district-block-master.util';
 
-export type { DistrictBlockMasterItem };
+export type { DistrictBlockMasterItem, DistrictMasterItem };
 
-const COLUMNS: TableColumn<DistrictBlockMasterItem>[] = [
-  { key: 'sNo', label: 'S. No.', type: 'number', align: 'center', width: 'w-16 min-w-[65px]' },
-  { key: 'districtName', label: 'District Name', cellClass: 'whitespace-nowrap font-semibold text-slate-800' },
-  { key: 'districtCode', label: 'District Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700' },
-  { key: 'blockName', label: 'Block Name', cellClass: 'whitespace-nowrap font-medium text-slate-700' },
-  { key: 'blockCode', label: 'Block Code', cellClass: 'whitespace-nowrap tabular-nums text-xs text-slate-700' }
-];
-
-const CONFIG: MasterCrudConfig<DistrictBlockMasterItem> = {
-  dataKey: 'DISTRICTS',
-  entityLabel: 'District & Block',
-  title: 'District & Block Master',
-  searchPlaceholder: 'Search by district name, block name, or code...',
-  searchFields: ['districtName', 'districtCode', 'blockName', 'blockCode'],
-  itemUnit: 'entries',
-  columns: COLUMNS,
-  hasStatus: true,
-  hideViewAction: true,
-  modalWidthClass: 'max-w-[540px]',
-  filters: [
-    {
-      key: 'districtName',
-      label: 'District',
-      placeholder: 'All Districts',
-      options: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar', 'Bharatpur', 'Bhilwara']
-    }
-  ],
-  fields: [
-    { key: 'districtName', label: 'District Name', type: 'text', required: true, maxLength: 80, placeholder: 'Enter district name (e.g. Jaipur)', colSpan: 2 },
-    { key: 'districtCode', label: 'District Code', type: 'text', required: true, maxLength: 20, placeholder: 'e.g. JPR', uppercase: true, colSpan: 1 },
-    { key: 'blockName', label: 'Block Name', type: 'text', required: true, maxLength: 80, placeholder: 'Enter block name (e.g. Amber)', colSpan: 2 },
-    { key: 'blockCode', label: 'Block Code', type: 'text', maxLength: 30, placeholder: 'e.g. JPR-AMB', uppercase: true, colSpan: 1 }
-  ],
-  createDefaults: () => ({
-    districtName: '',
-    districtCode: '',
-    blockName: '',
-    blockCode: ''
-  }),
-  buildPayload: (formData) => {
-    const districtCode = formData.districtCode.trim().toUpperCase();
-    const blockCode = (formData.blockCode || '').trim() || `${districtCode}-${formData.blockName.trim().slice(0, 3).toUpperCase()}`;
-    return {
-      districtName: formData.districtName.trim(),
-      districtCode,
-      blockName: formData.blockName.trim(),
-      blockCode,
-      status: 'Active'
-    };
-  },
-  deleteConfirmText: (item) => `Are you sure you want to delete "${item.blockName}" block in "${item.districtName}"?`
-};
+type BlockRow = DistrictBlockMasterItem & { districtId?: number };
 
 /**
- * District & Block Master. Rows are blocks (`/api/master/district-blocks`); a block record carries only its
- * districtId, so the district name and code come from `/api/master/districts`. A new block names its district by
- * name and code; the backend links an existing district or creates it.
+ * District & Block Master (/admin/master/district-block): a District tab and a Block tab, each a master table with
+ * its own Add / Edit / Active switch, following the DistrictMasters and BlockMasters permissions. `?tab=block` opens
+ * the Block tab.
  */
 @Component({
   selector: 'app-district-block-master',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MasterCrudPageComponent],
-  template: `<app-master-crud-page [config]="config"></app-master-crud-page>`
+  imports: [MasterCrudPageComponent, FilterTabsComponent],
+  template: `
+    @if (tab() === 'district') {
+      <app-master-crud-page [config]="districtConfig">
+        <app-filter-tabs masterCrudTabs ariaLabel="Master" [options]="tabs()" [value]="tab()" (valueChange)="selectTab($event)" />
+      </app-master-crud-page>
+    } @else {
+      <app-master-crud-page [config]="blockConfig">
+        <app-filter-tabs masterCrudTabs ariaLabel="Master" [options]="tabs()" [value]="tab()" (valueChange)="selectTab($event)" />
+      </app-master-crud-page>
+    }
+  `
 })
 export class DistrictBlockMasterComponent {
   private readonly dataEngine = inject(DataEngineService);
+  private readonly tableAccess = inject(TableAccessService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
-  readonly config: MasterCrudConfig<DistrictBlockMasterItem> = {
-    ...CONFIG,
-    // The saved block comes back without its district, so the list is read again.
-    reloadAfterSave: true,
-    afterLoad: rows =>
-      this.dataEngine.isMock('DISTRICT_MASTERS') || this.dataEngine.isMock('DISTRICTS')
-        ? of(rows)
-        : this.dataEngine.for<unknown>('DISTRICT_MASTERS').getAll().pipe(
-            map(districts => withDistrictNames(rows, districts)),
-            catchError(() => of(rows))
-          )
-  };
+  /** Districts as last read: the Block tab's District dropdown and filter. */
+  readonly districts = signal<DistrictMasterItem[]>([]);
+
+  /** The tabs the user may read (both when neither table is known, e.g. mock sign-in). */
+  private readonly allowedTabs = computed<DistrictBlockTab[]>(() => {
+    const allowed: DistrictBlockTab[] = [];
+    if (this.tableAccess.can(DISTRICT_TABLE, 'GET')) allowed.push('district');
+    if (this.tableAccess.can(BLOCK_TABLE, 'GET')) allowed.push('block');
+    return allowed.length > 0 ? allowed : ['district', 'block'];
+  });
+  readonly tabs = computed(() => DISTRICT_BLOCK_TABS.filter(t => this.allowedTabs().includes(t.id)));
+
+  private readonly queryTab = toSignal(this.route.queryParamMap.pipe(map(p => p.get('tab'))), { initialValue: null });
+  readonly tab = computed<DistrictBlockTab>(() => tabFromQuery(this.queryTab(), this.allowedTabs()));
+
+  readonly districtConfig: MasterCrudConfig<DistrictMasterItem> = districtConfig(rows =>
+    this.blocks().pipe(map(blocks => (blocks ? withBlockCounts(rows, blocks) : rows)), tap(list => this.districts.set(list)))
+  );
+
+  readonly blockConfig: MasterCrudConfig<DistrictBlockMasterItem> = blockConfig(
+    () => this.districts(),
+    // A block record carries only its districtId; the district name comes from the District list.
+    rows => this.loadDistricts().pipe(map(raw => withDistrictNames(rows, raw)))
+  );
+
+  selectTab(tab: DistrictBlockTab): void {
+    if (tab === this.tab()) return;
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { tab }, queryParamsHandling: 'merge', replaceUrl: true });
+  }
+
+  /** Every district (raw records), also kept for the Block tab. Empty when they cannot be read. */
+  private loadDistricts(): Observable<unknown[]> {
+    if (!this.tableAccess.can(DISTRICT_TABLE, 'GET')) return of([]);
+    return this.dataEngine
+      .for<unknown>('DISTRICT_MASTERS')
+      .getAll()
+      .pipe(
+        tap(raw => this.districts.set(raw.map((d, i) => toDistrictItem(d, i)))),
+        catchError(() => of([] as unknown[]))
+      );
+  }
+
+  /** Every block, to count them per district; null when the blocks cannot be read (no BlockMasters access). */
+  private blocks(): Observable<BlockRow[] | null> {
+    if (!this.tableAccess.can(BLOCK_TABLE, 'GET')) return of(null);
+    return this.dataEngine
+      .for<BlockRow>('DISTRICTS')
+      .getAll()
+      .pipe(catchError(() => of(null)));
+  }
 }

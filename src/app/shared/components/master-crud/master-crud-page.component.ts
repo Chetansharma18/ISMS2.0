@@ -215,6 +215,9 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           }
         </app-page-header>
 
+        <!-- Optional row between the header and the filters, e.g. tabs of a screen with two masters -->
+        <ng-content select="[masterCrudTabs]" />
+
         <!-- Unified Master Filter & Search Bar -->
         <app-master-filter-bar
           [(searchQuery)]="searchQuery"
@@ -408,6 +411,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
                 <app-switch
                   [checked]="item.status !== 'Inactive'"
                   [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+                  [disabled]="isStatusSaving(item)"
                   (toggled)="toggleStatus(item)"
                 />
               </div>
@@ -1019,11 +1023,47 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.openEditModal(item);
   }
 
+  /** Ids of the rows whose Active switch is being saved (the switch is disabled meanwhile). */
+  readonly statusSaving = signal<ReadonlySet<string>>(new Set());
+
+  isStatusSaving(item: T): boolean {
+    return this.statusSaving().has(item.id);
+  }
+
+  /**
+   * The row's Active / Inactive switch. Uses the resource's dedicated status call (PATCH `.../{id}/status`
+   * `{ isActive }`) when it has one, otherwise saves `{ status }` with the normal update. The row changes only once
+   * the backend has saved it; on failure it keeps its state (the switch follows the row) and the HTTP layer shows
+   * the backend's reason (e.g. the parent record is inactive).
+   */
   toggleStatus(item: T): void {
-    const currentStatus = item.status === 'Inactive' ? 'Inactive' : 'Active';
-    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-    this.repo.update(item.id, this.apiBody({ status: newStatus } as Partial<T>, item)).subscribe(() => {
-      this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
+    if (this.isStatusSaving(item)) return;
+    const newStatus = item.status === 'Inactive' ? 'Active' : 'Inactive';
+    const useStatusCall = !this.config.repository && !!this.repo.setStatus && this.dataEngine.hasStatusEndpoint(this.config.dataKey);
+    const request$ = useStatusCall
+      ? this.repo.setStatus!(item.id, newStatus === 'Active')
+      : this.repo.update(item.id, this.apiBody({ status: newStatus } as Partial<T>, item));
+
+    this.setStatusSaving(item.id, true);
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.setStatusSaving(item.id, false);
+        this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
+      },
+      error: () => {
+        this.setStatusSaving(item.id, false);
+        // New row objects, so the switch is drawn again from the unchanged status.
+        this.items.update(current => current.map(it => (it.id === item.id ? { ...it } : it)));
+      }
+    });
+  }
+
+  private setStatusSaving(id: string, saving: boolean): void {
+    this.statusSaving.update(current => {
+      const next = new Set(current);
+      if (saving) next.add(id);
+      else next.delete(id);
+      return next;
     });
   }
 

@@ -1,5 +1,7 @@
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { OtpInputComponent } from '../../../../shared/components/otp-input/otp-input.component';
 import { describe, expect, it, vi } from 'vitest';
 import type { BackendRoleSummary, TwoStepMethod } from '../../auth-api.models';
 import { SsoLoginFlowService, type SsoLoginStep } from '../../sso-login-flow.service';
@@ -13,6 +15,7 @@ function createFlowStub(initialRoles: BackendRoleSummary[] = []) {
     otpSent: signal(false),
     pinSet: signal<boolean | null>(null),
     otpDestination: signal<string | null>(null),
+    otpCodeHint: signal<string | null>(null),
     canSetPinNow: signal(false),
     resettingPin: signal(false),
     busy: signal(false),
@@ -137,5 +140,59 @@ describe('SsoLoginStepsModalComponent (select-role layout)', () => {
     expect(dialog().className).toContain('max-w-[680px]');
     expect(grid().className).toContain('md:grid-cols-4');
     expect(grid().querySelectorAll('button')).toHaveLength(8);
+  });
+});
+
+describe('SsoLoginStepsModalComponent (two-step entry is cleared)', () => {
+  function mount(methods: TwoStepMethod[], otpSent: boolean) {
+    const flow = createFlowStub();
+    flow.step.set('two-step');
+    flow.methods.set(methods);
+    flow.pinSet.set(true);
+    flow.otpSent.set(otpSent);
+    TestBed.configureTestingModule({
+      imports: [SsoLoginStepsModalComponent],
+      providers: [{ provide: SsoLoginFlowService, useValue: flow }]
+    });
+    const fixture = TestBed.createComponent(SsoLoginStepsModalComponent);
+    fixture.detectChanges();
+    return { fixture, flow };
+  }
+
+  /** Types a code into the (single) OTP / PIN input, as the user would. */
+  function type(fixture: ReturnType<typeof mount>['fixture'], code: string): void {
+    const otpInput = fixture.debugElement.query(By.directive(OtpInputComponent)).componentInstance as OtpInputComponent;
+    otpInput.value.set(code);
+    fixture.detectChanges();
+  }
+
+  function boxes(fixture: ReturnType<typeof mount>['fixture']): string[] {
+    const el = fixture.nativeElement as HTMLElement;
+    return Array.from(el.querySelectorAll<HTMLInputElement>('app-otp-input input')).map(i => i.value);
+  }
+
+  it('empties the boxes when a new challenge starts with the same method', () => {
+    const { fixture, flow } = mount(['OTP'], true);
+    type(fixture, '123456');
+    expect(boxes(fixture).join('')).toBe('123456');
+
+    flow.methods.set(['OTP']);
+    fixture.detectChanges();
+
+    expect(boxes(fixture)).toHaveLength(6);
+    expect(boxes(fixture).every(v => v === '')).toBe(true);
+    expect(flow.verify).not.toHaveBeenCalled();
+  });
+
+  it('empties the boxes when a new OTP is sent (otpSent false -> true)', () => {
+    const { fixture, flow } = mount(['PIN', 'OTP'], false);
+    type(fixture, '1234');
+    expect(boxes(fixture).join('')).toBe('1234');
+
+    flow.otpSent.set(true);
+    fixture.detectChanges();
+
+    expect(boxes(fixture).length).toBeGreaterThan(0);
+    expect(boxes(fixture).every(v => v === '')).toBe(true);
   });
 });

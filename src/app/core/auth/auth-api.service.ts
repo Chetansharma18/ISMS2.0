@@ -131,6 +131,11 @@ export class AuthApiService {
     return this.http.call<CurrentUserResponse>(API_ENDPOINTS.AUTH.SESSION, { flags: { skipErrorToast: true } });
   }
 
+  /** Where "Back to SSO" posts and the SSO token it posts (`{ url, fieldName, token }`). */
+  backToSsoTarget(): Observable<{ url?: string; fieldName?: string; token?: string }> {
+    return this.http.call(API_ENDPOINTS.AUTH.BACK_TO_SSO_TARGET, { flags: { skipErrorToast: true } });
+  }
+
   /** Extends the RajSSO session; call every few minutes while the user is active. */
   keepAlive(): Observable<unknown> {
     return this.http.call(API_ENDPOINTS.AUTH.KEEP_ALIVE, {

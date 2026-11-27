@@ -1,37 +1,32 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, DropdownComponent, InputDirective, SwitchComponent } from '../../../../../shared';
+import { ButtonComponent, DropdownComponent, InputDirective, SectionCardComponent, SwitchComponent } from '../../../../../shared';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiAnswerValue, EoiCustomField } from '../eoi-apply.model';
+import { StepProposalDetailsComponent } from './step-proposal-details.component';
 
 /**
- * Scheme Proposal Details: the questions configured on the EOI. Answers are saved with
- * PUT /eoi/apply/applications/{id}/dynamic-answers?complete=true; the backend checks every answer.
+ * EOI Form step: the built-in sections (PUT .../proposal-details) and then the questions configured on the EOI
+ * (PUT .../dynamic-answers). Next saves both with complete=true; the backend checks every answer.
  */
 @Component({
   selector: 'app-step-scheme-custom-fields',
   standalone: true,
-  imports: [FormsModule, ButtonComponent, DropdownComponent, InputDirective, SwitchComponent],
+  imports: [FormsModule, ButtonComponent, DropdownComponent, InputDirective, SectionCardComponent, SwitchComponent, StepProposalDetailsComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="space-y-5 font-sans">
-      <div class="flex items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
-        <div>
-          <div class="flex items-center gap-2">
-            <h3 class="text-sm font-bold text-[#7C0E44] m-0">EOI Form</h3>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-[#F8EDF1] text-[#7C0E44] border border-[#EADCE2]">
-              {{ state.schemeCustomFields().length }}
-            </span>
-          </div>
-          <p class="text-xs text-slate-500 m-0 mt-0.5">
-            Fill in the details below for <span class="font-semibold text-slate-700">{{ state.schemeTitle() }}</span>. Fields marked <span class="text-rose-600 font-bold">*</span> are mandatory.
-          </p>
-        </div>
-      </div>
+    <div class="space-y-5">
+      <p class="text-xs text-slate-500 m-0">
+        Fill in the details below for <span class="font-semibold text-slate-700">{{ state.schemeTitle() }}</span>. Fields marked <span class="text-rose-600 font-bold">*</span> are mandatory.
+      </p>
 
+      <app-step-proposal-details />
+
+      @if (state.hasCustomFields()) {
+      <app-section-card title="Details Required by this EOI" [subtitle]="state.schemeCustomFields().length + ' ' + (state.schemeCustomFields().length === 1 ? 'field' : 'fields') + ' configured for this EOI'">
       @if (state.customFieldErrors()['_form']; as message) {
-        <p class="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium m-0" role="alert">{{ message }}</p>
+        <p class="p-2.5 mb-4 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium m-0" role="alert">{{ message }}</p>
       }
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 sm:gap-y-5">
@@ -123,12 +118,18 @@ import { EoiAnswerValue, EoiCustomField } from '../eoi-apply.model';
           </div>
         }
       </div>
+      </app-section-card>
+      }
+
+      @if (state.proposalErrors()['_form'] && !state.savingAnswers()) {
+        <p class="p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 font-medium m-0" role="alert">{{ state.proposalErrors()['_form'] }}</p>
+      }
 
       <div class="pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexProfile)">
+        <button appButton variant="outline" size="lg" (click)="state.saveEoiFormDraftAndGoBack()">
           &larr; Back
         </button>
-        <button appButton size="lg" [loading]="state.savingAnswers()" [disabled]="state.savingAnswers()" (click)="state.saveAnswersAndProceed()">
+        <button appButton size="lg" [loading]="state.savingAnswers()" [disabled]="state.savingAnswers()" (click)="state.saveEoiFormAndProceed()">
           Next &rarr;
         </button>
       </div>

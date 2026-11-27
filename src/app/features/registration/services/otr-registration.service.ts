@@ -38,6 +38,21 @@ const UPDATE: Record<string, EndpointDef> = {
 
 const QUIET = { skipErrorToast: true };
 
+/** GET /otr/lookups `{ sectors: [{ id, name }], districts: [{ id, name, state }] }` (also accepts `{ data }`). */
+export function toLookups(response: unknown): OtrLookups {
+  const root = response && typeof response === 'object' ? (response as Record<string, unknown>) : {};
+  const body = (root['sectors'] === undefined && root['data'] && typeof root['data'] === 'object' ? root['data'] : root) as Record<string, unknown>;
+  const list = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object') : []);
+  return {
+    sectors: list(body['sectors'])
+      .map(s => ({ id: Number(s['id']), name: String(s['name'] ?? s['sectorName'] ?? '').trim() }))
+      .filter(s => Number.isFinite(s.id) && !!s.name),
+    districts: list(body['districts'])
+      .map(d => ({ id: Number(d['id']), name: String(d['name'] ?? d['districtName'] ?? '').trim(), state: String(d['state'] ?? '').trim() }))
+      .filter(d => Number.isFinite(d.id) && !!d.name)
+  };
+}
+
 /** An empty body (204 / null) means "not saved yet". */
 const asRecord = (value: unknown): OtrStepRecord | null =>
   value && typeof value === 'object' && !Array.isArray(value) ? (value as OtrStepRecord) : null;
@@ -174,8 +189,20 @@ export class OtrRegistrationService {
     return forkJoin(calls);
   }
 
-  /** Sectors and districts for the dropdowns. A failing master only leaves its dropdown empty. */
+  /**
+   * Sectors and districts for the dropdowns, from GET /otr/lookups: it needs only the OTR permission, which every
+   * applicant has (the default role of new users cannot read the Sector / District masters). When that call fails,
+   * the masters are read instead (department users have them).
+   */
   private loadLookups(): Observable<OtrLookups> {
+    return this.http.call<unknown>(API_ENDPOINTS.OTR.LOOKUPS, { flags: QUIET }).pipe(
+      map(res => toLookups(res)),
+      catchError(() => this.loadMasterLookups())
+    );
+  }
+
+  /** The same lookups from the Sector and District masters. A failing master only leaves its dropdown empty. */
+  private loadMasterLookups(): Observable<OtrLookups> {
     const sectors = this.dataEngine.for<SectorMasterItem>('SECTORS').getAll().pipe(
       map(list =>
         list

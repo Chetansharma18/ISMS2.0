@@ -178,7 +178,10 @@ export class ApplicantSubmissionsComponent {
   readonly myRoles = computed(() => (this.list()?.notice.myRoles ?? []).join(', '));
 
   showGenerateOrderModal = signal<boolean>(false);
-  /** The approver generates and signs the orders; members can check and apply the Excel and view the orders. */
+  /**
+   * The approver generates the orders; each order is e-signed by its own signing authority (shown in the order dialog);
+   * members can check and apply the Excel and view the orders.
+   */
   readonly isApprover = computed(() => (this.list()?.notice.myRoles ?? []).includes('Approver'));
 
   readonly submissionColumns: TableColumn<SubmissionRow>[] = [

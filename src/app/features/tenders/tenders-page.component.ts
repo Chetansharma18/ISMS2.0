@@ -54,6 +54,7 @@ import {
   toInputDate,
   validateEoiFormComplete
 } from './tenders-page/tenders-page.util';
+import { publishValueErrors } from './tenders-page/publish-fields.util';
 import { StepperComponent, StepperStep } from '../../shared/components/stepper/stepper.component';
 import { ConfigureEoiFormComponent } from './tenders-page/configure-eoi-form.component';
 import { CommitteeAssignmentModalComponent } from './tenders-page/committee-assignment-modal.component';
@@ -1256,8 +1257,11 @@ export class TendersPageComponent {
     return (scheme.annexures ?? []).map((ann, idx) => ({ sNo: idx + 1, name: ann, size: '' }));
   }
 
+  /** What the EOI requires from applicants: its documents, then the details they fill in (Uploading Details fields). */
   getSchemeRequiredDocs(scheme: SchemeTender): EoiRequiredInfoItem[] {
-    return (scheme.requiredDocs ?? []).map((doc, idx) => ({ sNo: idx + 1, name: doc, note: '' }));
+    const docs = (scheme.requiredDocs ?? []).map(name => ({ name, note: '' }));
+    const details = (scheme.requiredFields ?? []).map(f => ({ name: f.label, note: f.mandatory ? 'Details to fill in, mandatory' : 'Details to fill in' }));
+    return [...docs, ...details].map((item, idx) => ({ sNo: idx + 1, ...item }));
   }
 
   // ---- Row actions ---------------------------------------------------------
@@ -1384,6 +1388,13 @@ export class TendersPageComponent {
     if (!validation.isValid) {
       const firstInvalidKey = Object.keys(validation.errors)[0];
       if (firstInvalidKey) this.focusField(firstInvalidKey);
+      return;
+    }
+
+    // Publish Details information needs its values (shown to applicants); the errors show under the fields.
+    if (publishValueErrors(this.newEoiData.publishFields).length > 0) {
+      this.goToEoiStep(1);
+      this.notifications.error('Enter the values of the Additional EOI Information on Publish Details.');
       return;
     }
 

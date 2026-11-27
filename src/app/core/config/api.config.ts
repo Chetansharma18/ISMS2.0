@@ -17,7 +17,13 @@ export type CrudEndpoints = {
   DELETE: EndpointDef;
 };
 
-export type CrudAction = keyof CrudEndpoints;
+/** A master collection: the five CRUD endpoints plus the Active / Inactive switch. */
+export type MasterEndpoints = CrudEndpoints & {
+  /** PATCH `base/{id}/status` with `{ isActive }`. */
+  STATUS: EndpointDef;
+};
+
+export type CrudAction = keyof MasterEndpoints;
 
 // ---- Builders: one line per resource instead of five --------------------------------------------
 
@@ -38,6 +44,14 @@ function crud(base: string): CrudEndpoints {
     ADD: endpoint('POST', base),
     UPDATE: endpoint('PUT', byId(base)),
     DELETE: endpoint('DELETE', byId(base))
+  };
+}
+
+/** A master collection (`/master/...`): CRUD plus PATCH `base/{id}/status` `{ isActive }` for the Active switch. */
+function master(base: string): MasterEndpoints {
+  return {
+    ...crud(base),
+    STATUS: endpoint('PATCH', (id: string | number) => `${byId(base)(id)}/status`)
   };
 }
 
@@ -84,7 +98,9 @@ export const API_ENDPOINTS = {
      * Back to SSO (RajSSO spec 2.6): opened as a full-page navigation, not called over HTTP. The backend answers with
      * a page that posts the user's SSO token to the RajSSO portal. The ISMS session stays signed in.
      */
-    BACK_TO_SSO: endpoint('GET', '/auth/backtosso')
+    BACK_TO_SSO: endpoint('GET', '/auth/backtosso'),
+    /** `{ url, fieldName, token }`: where and what the browser posts for "Back to SSO". */
+    BACK_TO_SSO_TARGET: endpoint('GET', '/auth/backtosso/target')
   },
 
   // EOI Configuration (admin, EoiNotices permission): the "Active Schemes" list and the Configure / Edit EOI form.
@@ -123,6 +139,8 @@ export const API_ENDPOINTS = {
     APPLICATION: endpoint('GET', byId('/eoi/apply/applications')),
     /** Body `{ answers }`; `?complete=true` when leaving the step (mandatory questions checked). */
     SAVE_ANSWERS: endpoint('PUT', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/dynamic-answers`),
+    /** Body = the EOI Form's proposal details; `?complete=true` when leaving the step (required fields checked). */
+    PROPOSAL_DETAILS: endpoint('PUT', (id: string | number) => `/eoi/apply/applications/${encodeURIComponent(String(id))}/proposal-details`),
     /** id = "<applicationId>/<requiredDocumentId>"; multipart: file, comment */
     UPLOAD_DOCUMENT: endpoint('POST', (id: string | number) => `/eoi/apply/applications/${String(id).split('/').map(encodeURIComponent).join('/documents/')}`),
     /** id = "<applicationId>/<requiredDocumentId>"; body `{ comment }` */
@@ -184,6 +202,8 @@ export const API_ENDPOINTS = {
   // (400 with the failing field names). Needs the OtrRegistrations permission.
   OTR: {
     FORM: endpoint('GET', '/otr/form'),
+    /** Active sectors `{ id, name }` and districts `{ id, name, state }` for the form's dropdowns (OTR permission only). */
+    LOOKUPS: endpoint('GET', '/otr/lookups'),
     /** One step's definition with its current FormManager schema (not cached, unlike FORM); id = step key. */
     STEP_FORM: endpoint('GET', byId('/otr/form/steps')),
     /** Organisation details (step 1); empty until saved. Its `status` is the registration status. */
@@ -245,11 +265,15 @@ export const API_ENDPOINTS = {
     RESULTS_READINESS: endpoint('GET', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results`),
     /** E-sign OTP to the signed-in approver's mobile `{ round }`. */
     RESULTS_CHALLENGE: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results/publish/challenge`),
-    /** `{ challengeId, otp }`: e-signs every page of both orders and releases them. */
+    /** `{ challengeId, otp }`: releases the e-signed orders to the applicants (every required order must be Signed). */
     RESULTS_PUBLISH: endpoint('POST', (eoiId: string | number) => `/eoi/responses/notices/${encodeURIComponent(String(eoiId))}/results/publish`),
     /** Editable text of an order: GET / PUT `${eoiId}/${orderId}` (EoiOrderEditorDto). */
     ORDER_CONTENT: endpoint('GET', (id: string | number) => `${orderPath(id)}/content`),
     ORDER_SAVE_CONTENT: endpoint('PUT', (id: string | number) => `${orderPath(id)}/content`),
+    /** The order's signing authority only: e-sign OTP to my mobile, id = `${eoiId}/${orderId}` (EoiPublishChallengeDto). */
+    ORDER_ESIGN_CHALLENGE: endpoint('POST', (id: string | number) => `${orderPath(id)}/esign/challenge`),
+    /** `{ challengeId, otp }`: e-signs this one order (it becomes Signed); id = `${eoiId}/${orderId}` (EoiOrderDto). */
+    ORDER_ESIGN: endpoint('POST', (id: string | number) => `${orderPath(id)}/esign`),
     /** OTR form definition, to show an applicant's registration profile (no OtrRegistrations permission needed). */
     OTR_FORM: endpoint('GET', '/eoi/responses/otr-form'),
     /** One application on the Scrutiny Desk (EoiReviewApplicationDetailDto). */
@@ -335,25 +359,25 @@ export const API_ENDPOINTS = {
 
   // Masters
   MASTERS: crud('/master'),
-  SECTORS: crud('/master/sectors'),
-  DESIGNATIONS: crud('/master/designations'),
-  COURSES: crud('/master/courses'),
-  /** District & Block screen rows: blocks (`{ id, districtId, name, code, isActive }`); create/update by district name or code. */
-  DISTRICTS: crud('/master/district-blocks'),
-  /** Districts on their own (`{ id, name, code, state, isActive }`): names for the block rows, dropdowns. */
-  DISTRICT_MASTERS: crud('/master/districts'),
+  SECTORS: master('/master/sectors'),
+  DESIGNATIONS: master('/master/designations'),
+  COURSES: master('/master/courses'),
+  /** Blocks (`{ id, districtId, name, code, isActive }`), Block tab of the District & Block screen; create/update by district name or code. */
+  DISTRICTS: master('/master/district-blocks'),
+  /** Districts (`{ id, name, code, state, isActive }`), District tab of the District & Block screen; names for the block rows, dropdowns. */
+  DISTRICT_MASTERS: master('/master/districts'),
   /** Document Master (`{ id, documentName, applicableSchemes: [{ id, schemeName }], allowedExtensions, ... }`). */
-  DOC_MASTERS: crud('/master/doc-masters'),
+  DOC_MASTERS: master('/master/doc-masters'),
   /** Annexure Master (`{ id, annexureName, applicableSchemes: [{ id, schemeName }], allowedExtensions, ... }`). */
-  ANNEXURE_MASTERS: crud('/master/annexures'),
+  ANNEXURE_MASTERS: master('/master/annexures'),
   /** Distinct departments of the designations (string[]). */
   DESIGNATION_DEPARTMENTS: { LIST: endpoint('GET', '/master/designations/departments') },
   /** Remark types for the dropdown (defaults + any stored ones, string[]). */
   REMARK_TYPES: { LIST: endpoint('GET', '/master/remarks/types') },
-  EOI_CATEGORIES: crud('/master/eoi-categories'),
+  EOI_CATEGORIES: master('/master/eoi-categories'),
   PERMISSIONS: crud('/permissions'),
-  SCHEME_MASTERS: crud('/master/schemes'),
-  SCHEME_CATEGORIES: crud('/master/scheme-categories'),
+  SCHEME_MASTERS: master('/master/schemes'),
+  SCHEME_CATEGORIES: master('/master/scheme-categories'),
   /** Roles: `{ id, name, description, isActive, userCount, permissions[] }` (see core/models/role.normalizer). */
   USER_ROLES: crud('/roles'),
   /** Table permissions of one role (backend RolePermissions, managed through the role). */
@@ -386,8 +410,8 @@ export const API_ENDPOINTS = {
     LIST: endpoint('GET', '/tablelist'),
     CATEGORIES: endpoint('GET', '/tablelist/categories')
   },
-  REMARK_MASTERS: crud('/master/remarks'),
-  GRADING_MASTERS: crud('/master/gradings'),
+  REMARK_MASTERS: master('/master/remarks'),
+  GRADING_MASTERS: master('/master/gradings'),
 
   // Administration
   TWO_STEP_VERIFICATION: crud('/admin/two-step-verification'),

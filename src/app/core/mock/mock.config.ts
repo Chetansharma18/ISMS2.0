@@ -47,6 +47,7 @@ export const MOCK_CONFIG: MockConfigSettings = {
     DESIGNATIONS: true,
     COURSES: true,
     DISTRICTS: true,
+    DISTRICT_MASTERS: true,
     EOI_CATEGORIES: true,
     PERMISSIONS: true,
     SCHEME_MASTERS: true,

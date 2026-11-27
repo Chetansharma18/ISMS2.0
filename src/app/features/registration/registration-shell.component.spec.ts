@@ -7,6 +7,7 @@ import { provideApiHttp } from '../../core/http/http.providers';
 import { NotificationService } from '../../core/services/notification.service';
 import { OtrFullFormResponse, OtrStepRecord } from './models/otr-api.model';
 import { RegistrationShellComponent } from './registration-shell.component';
+import { OtrRegistrationService } from './services/otr-registration.service';
 import { stepFields } from './otr-form.util';
 
 const fx = (fieldKey: string, label: string, fieldType: string, isRequired: boolean, sectionName: string) =>
@@ -87,8 +88,9 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
   function start(records: { organisation?: OtrStepRecord | null; person?: OtrStepRecord | null; bank?: OtrStepRecord | null } = {}): void {
     fixture.detectChanges();
     backend.expectOne(url('/otr/form')).flush(FORM);
-    backend.match(r => r.url.endsWith('/master/sectors')).forEach(r => r.flush([{ id: 3, sectorName: 'Agriculture', sectorCode: 'AGR', isActive: true }]));
-    backend.match(r => r.url.endsWith('/master/districts')).forEach(r => r.flush([{ id: 11, name: 'Jaipur', state: 'Rajasthan', isActive: true }]));
+    // Dropdown data comes from /otr/lookups (OTR permission only), not from the masters.
+    backend.expectOne(url('/otr/lookups')).flush({ sectors: [{ id: 3, name: 'Agriculture' }], districts: [{ id: 11, name: 'Jaipur', state: 'Rajasthan' }] });
+    backend.expectNone(r => r.url.endsWith('/master/sectors') || r.url.endsWith('/master/districts'));
     const reply = (path: string, record: OtrStepRecord | null | undefined) => {
       const req = backend.expectOne(url(path));
       if (record) req.flush(record); else empty(req);
@@ -98,6 +100,25 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     reply('/otr/me/bank-details', records.bank);
     fixture.detectChanges();
   }
+
+  it('fills the sector and district dropdowns from /otr/lookups', () => {
+    start();
+    const lookups = TestBed.inject(OtrRegistrationService).lookups();
+    expect(lookups.sectors).toEqual([{ id: 3, name: 'Agriculture' }]);
+    expect(lookups.districts).toEqual([{ id: 11, name: 'Jaipur', state: 'Rajasthan' }]);
+  });
+
+  it('falls back to the masters when /otr/lookups fails', () => {
+    fixture.detectChanges();
+    backend.expectOne(url('/otr/form')).flush(FORM);
+    backend.expectOne(url('/otr/lookups')).flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+    backend.match(r => r.url.endsWith('/master/sectors')).forEach(r => r.flush([{ id: 3, sectorName: 'Agriculture', sectorCode: 'AGR', isActive: true }]));
+    backend.match(r => r.url.endsWith('/master/districts')).forEach(r => r.flush([{ id: 11, name: 'Jaipur', state: 'Rajasthan', isActive: true }]));
+    for (const path of ['/otr/me', '/otr/me/authorized-person', '/otr/me/bank-details']) empty(backend.expectOne(url(path)));
+    // A 403 may also reload the permissions.
+    backend.match(r => r.url.includes('/auth/permissions')).forEach(r => r.flush({ tables: [] }));
+    expect(TestBed.inject(OtrRegistrationService).lookups().sectors).toEqual([{ id: 3, name: 'Agriculture' }]);
+  });
 
   it('renders the fields of GET /otr/form and starts at the first unsaved step', () => {
     start({ organisation: org() });

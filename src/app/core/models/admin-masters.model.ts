@@ -46,6 +46,18 @@ export interface DistrictBlockMasterItem {
   status: 'Active' | 'Inactive';
 }
 
+/** One district (`/api/master/districts`: `{ id, name, code, state, isActive }`), District tab of the District & Block screen. */
+export interface DistrictMasterItem {
+  sNo: number;
+  id: string;
+  districtName: string;
+  districtCode: string;
+  state: string;
+  /** Blocks of the district, counted from the block list; null when the blocks could not be read. */
+  blockCount: number | null;
+  status: 'Active' | 'Inactive';
+}
+
 export interface EoiCategoryItem {
   sNo: number;
   id: string;
@@ -245,6 +257,11 @@ export interface DynamicFormField {
   hint?: string;
   helpText?: string;
   defaultValue?: string | number | boolean;
+  /**
+   * EOI "Publish Details" fields: the value the department enters, shown read-only to applicants with the EOI
+   * (a checkbox holds true / false). Not used by fields the applicant fills in.
+   */
+  value?: string | boolean;
   readOnly?: boolean;
   options?: string[]; // for dropdown/radio list (comma-separated or items)
   optionsText?: string; // raw input string helper for comma-separated options

@@ -35,6 +35,10 @@ export interface SchemeTender {
   publishFields?: DynamicFormField[];
   uploadFields?: DynamicFormField[];
   customFields?: DynamicFormField[];
+  /** "Publish Details" information with its values, as applicants see it with the EOI. */
+  publishedInfo?: { label: string; value: string }[];
+  /** "Uploading Details" fields: details applicants fill in when they apply. */
+  requiredFields?: { label: string; mandatory: boolean }[];
   committeeMembers?: string[];
   committeeApprover?: string;
   createdAt?: number;

@@ -3,6 +3,7 @@ import { ApiError, ApiFieldError } from '../../../core/http/api-error';
 import { formatInr } from '../../../shared/utils/formatters.util';
 import { CommitteeAdmin, EoiAttachment, EoiDocumentItem, EoiFormData, SchemeTenderItem } from '../tenders.models';
 import { parseFeeNumber, toInputDate } from '../tenders-page/tenders-page.util';
+import { publishedInfoText } from '../tenders-page/publish-fields.util';
 import {
   EoiAttachmentDto,
   EoiDetail,
@@ -88,7 +89,31 @@ export function documentFields(
 
 /** An open EOI as an applicant (TP / User) sees it: GET /eoi/apply/notices/{id}. */
 export function noticeDetailToScheme(detail: EoiOpenNoticeDetail): SchemeTenderItem {
-  return { ...noticeToScheme(detail.notice, 0), ...documentFields(detail.requiredDocuments, detail.attachments) };
+  return {
+    ...noticeToScheme(detail.notice, 0),
+    ...documentFields(detail.requiredDocuments, detail.attachments),
+    publishedInfo: (detail.publishedInfo ?? []).map(i => ({ label: i.label, value: publishedInfoText(i) })).filter(i => !!i.value),
+    requiredFields: (detail.customFields ?? []).map(f => ({ label: f.label, mandatory: !!f.mandatory }))
+  };
+}
+
+/** The Uploading Details fields applicants fill in (file / photo fields are not collected yet). */
+export function requiredFieldsOf(fields: readonly DynamicFormField[] | null | undefined): { label: string; mandatory: boolean }[] {
+  return (fields ?? [])
+    .filter(f => !['file', 'photo', 'heading', 'divider'].includes(String(f.type ?? '').toLowerCase()) && !!f.label?.trim())
+    .map(f => ({ label: f.label.trim(), mandatory: !!f.mandatory }));
+}
+
+/** The Publish Details fields that have a value, as the EOI shows them (the admin's own view of the EOI). */
+export function publishedInfoOf(fields: readonly DynamicFormField[] | null | undefined): { label: string; value: string }[] {
+  return (fields ?? []).flatMap(f => {
+    const type = String(f.type ?? 'text').toLowerCase();
+    if (type === 'file' || type === 'photo') return [];
+    const raw = f.value;
+    const text = typeof raw === 'boolean' ? (raw ? 'Yes' : 'No') : String(raw ?? '').trim();
+    const value = text ? publishedInfoText({ type, value: text }) : '';
+    return value && f.label?.trim() ? [{ label: f.label.trim(), value }] : [];
+  });
 }
 
 export function detailToScheme(detail: EoiDetail): SchemeTenderItem {
@@ -117,6 +142,8 @@ export function detailToScheme(detail: EoiDetail): SchemeTenderItem {
     ...documentFields(detail.requiredDocuments, detail.attachments),
     publishFields: (detail.publishFields ?? []) as DynamicFormField[],
     uploadFields: (detail.uploadFields ?? []) as DynamicFormField[],
+    publishedInfo: publishedInfoOf(detail.publishFields as DynamicFormField[] | null | undefined),
+    requiredFields: requiredFieldsOf(detail.uploadFields as DynamicFormField[] | null | undefined),
     // The committee dialog lists and selects people by name; saving turns the names back into SSO IDs.
     committeeApprover: detail.approver ? userName(detail.approver) : '',
     committeeMembers: (detail.members ?? []).map(userName),

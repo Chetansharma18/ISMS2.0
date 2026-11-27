@@ -78,6 +78,15 @@ export const MOCK_DISTRICT_BLOCK_MASTER_ITEMS: DistrictBlockMasterItem[] = resol
   { sNo: 6, id: 'db-6', districtName: 'Kota', districtCode: 'KTA', blockName: 'Ladpura', blockCode: 'KTA-LDP', status: 'Active' }
 ]);
 
+/** Districts in the backend's shape (`/api/master/districts`), as other screens (OTR, Department Users) read them. */
+export const MOCK_DISTRICT_MASTER_ITEMS: { id: number; name: string; code: string; state: string; isActive: boolean }[] = resolveMock([
+  { id: 1, name: 'Jaipur', code: 'JPR', state: 'Rajasthan', isActive: true },
+  { id: 2, name: 'Jodhpur', code: 'JDH', state: 'Rajasthan', isActive: true },
+  { id: 3, name: 'Udaipur', code: 'UDP', state: 'Rajasthan', isActive: true },
+  { id: 4, name: 'Ajmer', code: 'AJM', state: 'Rajasthan', isActive: true },
+  { id: 5, name: 'Kota', code: 'KTA', state: 'Rajasthan', isActive: true }
+]);
+
 export const MOCK_EOI_CATEGORY_ITEMS: EoiCategoryItem[] = resolveMock([
   { sNo: 1, id: 'cat-1', categoryTitle: 'General', description: 'Standard Expression of Interest for all eligible training partners across general sectors.', status: 'Active' },
   { sNo: 2, id: 'cat-2', categoryTitle: 'Special', description: 'Specialized scheme proposals for specific target demographics, tribal regions, or high-priority sectors.', status: 'Active' }

@@ -387,13 +387,16 @@ import {
           }
         </div>
 
-        <!-- Custom Form Fields for Step 1 (Publish Details) -->
+        <!-- Publish Details custom fields: information FOR applicants, each with the value they are shown -->
         <div class="col-span-1 md:col-span-2 pt-6 mt-4 border-t border-[#E8EEF5]">
           <app-custom-form-fields
+            mode="info"
             [fields]="data().publishFields || []"
             (fieldsChange)="onPublishFieldsChange($event)"
-            title="Form Fields"
-            addLabel="Add Field"
+            [showErrors]="submitted()"
+            title="Additional EOI Information"
+            hint="Information shown to applicants with the EOI. Enter the value of each field; applicants cannot change it."
+            addLabel="Add Information"
           />
         </div>
       </div>
@@ -546,12 +549,14 @@ import {
             }
           </section>
 
-          <!-- Custom Form Fields for Step 2 (Uploading Details) -->
+          <!-- Uploading Details custom fields: what the EOI requires FROM applicants, asked when they apply -->
           <div class="pt-6 border-t border-[#E8EEF5]">
             <app-custom-form-fields
+              mode="question"
               [fields]="data().uploadFields || []"
               (fieldsChange)="onUploadFieldsChange($event)"
-              title="Form Fields"
+              title="Details Required from Applicants"
+              hint="Applicants fill these in on the EOI Form step when they apply; mandatory ones must be answered before submitting."
               addLabel="Add Field"
             />
           </div>

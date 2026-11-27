@@ -18,8 +18,8 @@ const QUIET = { skipErrorToast: true };
 
 /**
  * Evaluation Excel (bulk decisions), the result orders of one EOI and their e-sign on the backend. Errors reach the
- * caller as `ApiError` (no toast). Any committee member can check and apply an Excel; only the approver generates,
- * edits and e-signs the orders.
+ * caller as `ApiError` (no toast). Any committee member can check and apply an Excel; only the approver generates
+ * and edits the orders; each order is e-signed by its own signing authority; the approver (or a publisher) publishes.
  */
 @Injectable({ providedIn: 'root' })
 export class ResultOrdersService {
@@ -65,13 +65,23 @@ export class ResultOrdersService {
     return this.http.call<ReadinessDto>(API_ENDPOINTS.EOI_RESPONSES.RESULTS_READINESS, { id: eoiId, params: { round }, flags: QUIET });
   }
 
-  /** Sends the e-sign OTP to my mobile. */
-  requestESignOtp(eoiId: number, round = 1): Observable<ESignChallengeDto> {
+  /** Sends the e-sign OTP of one order to my mobile (only that order's signing authority may ask). */
+  requestOrderESignOtp(eoiId: number, orderId: number): Observable<ESignChallengeDto> {
+    return this.http.call<ESignChallengeDto>(API_ENDPOINTS.EOI_RESPONSES.ORDER_ESIGN_CHALLENGE, { id: `${eoiId}/${orderId}`, body: {}, flags: QUIET });
+  }
+
+  /** Verifies the OTP and e-signs every page of that one order (it becomes Signed). */
+  eSignOrder(eoiId: number, orderId: number, challengeId: number, otp: string): Observable<OrderDto> {
+    return this.http.call<OrderDto>(API_ENDPOINTS.EOI_RESPONSES.ORDER_ESIGN, { id: `${eoiId}/${orderId}`, body: { challengeId, otp }, flags: QUIET });
+  }
+
+  /** Sends the publishing OTP to my mobile. */
+  requestPublishOtp(eoiId: number, round = 1): Observable<ESignChallengeDto> {
     return this.http.call<ESignChallengeDto>(API_ENDPOINTS.EOI_RESPONSES.RESULTS_CHALLENGE, { id: eoiId, body: { round }, flags: QUIET });
   }
 
-  /** Verifies the OTP, e-signs every page of both orders and releases them. */
-  eSign(eoiId: number, challengeId: number, otp: string): Observable<PublishResultDto> {
+  /** Verifies the publishing OTP and releases the e-signed orders to the applicants. */
+  publish(eoiId: number, challengeId: number, otp: string): Observable<PublishResultDto> {
     return this.http.call<PublishResultDto>(API_ENDPOINTS.EOI_RESPONSES.RESULTS_PUBLISH, { id: eoiId, body: { challengeId, otp }, flags: QUIET });
   }
 }

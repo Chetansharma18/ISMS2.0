@@ -18,6 +18,21 @@ import { humanizeRoleName, landingRouteFor, toPortalRole } from './sso-session.u
 
 /** Where a real sign-in lands when the backend menu has no item for the role. */
 const NO_MENU_LANDING = '/profile';
+
+/** Posts the SSO token to RajSSO the way its "Back To SSO" integration expects (a form POST, full-page). */
+function postToSso(url: string, fieldName: string, token: string): void {
+  const form = document.createElement('form');
+  form.method = 'post';
+  form.action = url;
+  form.style.display = 'none';
+  const field = document.createElement('input');
+  field.type = 'hidden';
+  field.name = fieldName;
+  field.value = token;
+  form.appendChild(field);
+  document.body.appendChild(form);
+  form.submit();
+}
 import { TableAccessService } from '../permissions/table-access.service';
 import { TokenService } from './token.service';
 
@@ -225,12 +240,20 @@ export class AuthService {
   }
 
   /**
-   * Returns to the RajSSO portal without signing out of ISMS. The backend page posts the user's SSO token to RajSSO,
-   * so this is a full-page navigation (the browser sends the session cookie), not an HTTP call.
+   * Returns to the RajSSO portal without signing out of ISMS. RajSSO expects the SSO token POSTed as a form field
+   * ("userdetails"), so the portal asks the backend for the address and token (GET /auth/backtosso/target) and
+   * submits that form itself; the browser then leaves for RajSSO. If the call fails, the backend's own redirect page
+   * is opened instead.
    */
   backToSso(): void {
     if (!this.canGoBackToSso()) return;
-    window.location.assign(buildApiUrl(API_ENDPOINTS.AUTH.BACK_TO_SSO.url as string));
+    const fallback = () => window.location.assign(buildApiUrl(API_ENDPOINTS.AUTH.BACK_TO_SSO.url as string));
+    this.authApi
+      .backToSsoTarget()
+      .subscribe({
+        next: target => (target?.url && /^https:\/\//i.test(target.url) ? postToSso(target.url, target.fieldName || 'userdetails', target.token ?? '') : fallback()),
+        error: fallback
+      });
   }
 
   /** True while sign-in is the local persona picker (resource AUTH mocked). */

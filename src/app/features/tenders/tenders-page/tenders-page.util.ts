@@ -6,6 +6,7 @@ import {
   EoiFormData,
   SchemeTender
 } from '../tenders.models';
+import { publishValueErrors } from './publish-fields.util';
 
 /** File extensions accepted for EOI attachments and corrigenda. */
 export const ALLOWED_UPLOAD_EXTENSIONS: readonly string[] = [
@@ -730,9 +731,12 @@ export function validatePublishDetailsStep(
   options?: EoiValidationOptions
 ): { isValid: boolean; errors: Record<string, string> } {
   const complete = validateEoiFormComplete(d, options);
+  // Publish Details custom fields carry the value applicants are shown (checked like the backend does).
+  const errors: Record<string, string> = { ...complete.errors };
+  for (const { index, message } of publishValueErrors(d.publishFields)) errors[`publishFields.${index}`] = message;
   return {
-    isValid: Object.keys(complete.errors).length === 0,
-    errors: complete.errors
+    isValid: Object.keys(errors).length === 0,
+    errors
   };
 }
 

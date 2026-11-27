@@ -2,12 +2,27 @@ import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonComponent, DocTableDirective, DocumentPageComponent, IconComponent, InputDirective } from '../../../../shared';
+import {
+  ButtonComponent,
+  DocTableDirective,
+  DocumentPageComponent,
+  DropdownComponent,
+  DropdownItem,
+  IconComponent,
+  InputDirective
+} from '../../../../shared';
 import { DEFAULT_LEFT_LOGO_URL, DEFAULT_RIGHT_LOGO_URL } from '../../components/document-editor/document-editor.util';
 import { ResultOrdersService } from '../../components/generate-empanelment-order-modal/result-orders.service';
+import { OrderEsignModalComponent } from '../../components/generate-empanelment-order-modal/order-esign-modal.component';
 import {
+  ESignAction,
   OrderDraftForm,
   OrderEditorDto,
+  applySigner,
+  eSignActionFor,
+  isOrderComplete,
+  signerOptionLabel,
+  signingAuthorityText,
   toContentRequest,
   toDraftForm
 } from '../../components/generate-empanelment-order-modal/result-orders.util';
@@ -15,8 +30,9 @@ import { errorText } from '../../components/scheme-form/eoi-apply.util';
 
 /**
  * Draft Empanelment / Rejection Order, edited like the sanction order and IPA drafts. The sheet follows the RSLDC
- * order (letterhead, File No. and date, title, subject, paragraphs, the list, signatory, "Copy to"). There is no
- * e-sign stamp: the order is signed on paper and the signed copy is uploaded afterwards.
+ * order (letterhead, File No. and date, title, subject, paragraphs, the list, signatory, "Copy to"). Each order has
+ * its own signing authority, chosen here from the EOI's committee; only that person e-signs the order (OTP), which
+ * puts the e-signature on every page.
  *
  * Saving sends the text to the backend, which renders the draft PDF again. The rows come from the decisions; only
  * their Category and File Status are edited here. Only the committee approver edits, and only the latest draft.
@@ -24,7 +40,7 @@ import { errorText } from '../../components/scheme-form/eoi-apply.util';
 @Component({
   selector: 'app-result-order-editor',
   standalone: true,
-  imports: [FormsModule, DocumentPageComponent, ButtonComponent, IconComponent, InputDirective, DocTableDirective],
+  imports: [FormsModule, DocumentPageComponent, ButtonComponent, IconComponent, InputDirective, DocTableDirective, DropdownComponent, OrderEsignModalComponent],
   template: `
     <app-document-page
       [title]="pageTitle()"
@@ -151,7 +167,34 @@ import { errorText } from '../../components/scheme-form/eoi-apply.util';
           [(ngModel)]="form.closingText"
         ></textarea>
 
-        <!-- Signatory (signed by hand on the printed order; no e-sign) -->
+        <!-- Signing authority of THIS order (the Empanelment and the Rejection Order have different ones): only the
+             chosen user can e-sign it. The name and designation below are what the order prints. -->
+        <div class="mt-8 p-3 rounded-lg border border-slate-200 bg-slate-50 font-sans text-xs space-y-1.5 print:hidden">
+          <span class="block font-semibold text-slate-800">Signing authority (e-signs this order)</span>
+          @if (canEdit()) {
+            <app-dropdown
+              size="sm"
+              searchable
+              ariaLabel="Signing authority"
+              placeholder="Select the signing authority"
+              [options]="signerItems()"
+              [value]="form.signerSsoId"
+              (valueChange)="chooseSigner($event)"
+            />
+          } @else {
+            <span class="block text-slate-700">{{ signerLabel() }}</span>
+          }
+          @if (eSignAction()?.signedText; as signedText) {
+            <span class="block font-semibold text-slate-700">{{ signedText }}</span>
+          } @else {
+            <span class="block text-[11px] text-slate-500">
+              Only this person can e-sign the {{ isEmpanelment() ? 'Empanelment' : 'Rejection' }} Order, with an OTP to their mobile.
+              @if (canEdit()) { Save the draft before e-signing: the saved text is what gets signed. }
+            </span>
+          }
+        </div>
+
+        <!-- Signatory printed on the order -->
         <div class="mt-14 flex flex-col items-end gap-0.5">
           <input appInput variant="plain" type="text" aria-label="Signatory name" placeholder="Name of the signatory" class="w-72 text-right font-bold" [readonly]="!canEdit()" [(ngModel)]="form.signatoryName" />
           <input appInput variant="plain" type="text" aria-label="Signatory designation" class="w-72 text-right" [class.font-bold]="!isEmpanelment()" [readonly]="!canEdit()" [(ngModel)]="form.signatoryDesignation" />
@@ -204,9 +247,21 @@ import { errorText } from '../../components/scheme-form/eoi-apply.util';
           @if (canEdit()) {
             <button appButton size="lg" [disabled]="busy()" (click)="save()">{{ saving() ? 'Saving...' : 'Save Draft' }}</button>
           }
+          @if (eSignAction(); as a) {
+            @if (!a.done) {
+              <button appButton size="lg" [disabled]="busy() || !a.canSign" [attr.title]="a.note || null" (click)="showESign.set(true)">
+                <app-icon name="shield-check" size="sm" />
+                <span>{{ a.label }}</span>
+              </button>
+            }
+          }
         }
       </ng-container>
     </app-document-page>
+
+    @if (showESign() && editor(); as e) {
+      <app-order-esign-modal [eoiId]="eoiId" [order]="e.order" (signed)="onSigned()" (close)="showESign.set(false)" />
+    }
   `
 })
 export class ResultOrderEditorComponent implements OnInit {
@@ -227,8 +282,16 @@ export class ResultOrderEditorComponent implements OnInit {
   /** The text being edited (plain object, bound with ngModel). */
   form: OrderDraftForm | null = null;
 
-  private eoiId = 0;
+  protected eoiId = 0;
   private orderId = 0;
+  readonly showESign = signal(false);
+
+  /** "E-Sign Empanelment Order" / "E-Sign Rejection Order" for this order (enabled only for its signing authority). */
+  readonly eSignAction = computed<ESignAction | null>(() => {
+    const e = this.editor();
+    if (!e || (e.order.status !== 'Draft' && !isOrderComplete(e.order))) return null;
+    return eSignActionFor(e.order);
+  });
 
   readonly canEdit = computed(() => !!this.editor()?.canEdit);
   readonly isEmpanelment = computed(() => this.editor()?.order.type !== 'Rejection');
@@ -261,6 +324,32 @@ export class ResultOrderEditorComponent implements OnInit {
       }
       this.load();
     });
+  }
+
+  /** The EOI's committee, as signing authorities ("Committee Member 1 (Approver, Director)"). */
+  readonly signerItems = computed<DropdownItem[]>(() =>
+    (this.editor()?.signerOptions ?? []).map(o => ({ value: o.ssoId, label: signerOptionLabel(o) }))
+  );
+
+  readonly signerLabel = computed(() => {
+    const s = this.editor()?.order.signer;
+    if (!s) return '-';
+    return s.name && s.name !== s.authorityName ? `${signingAuthorityText(s)} (e-signed by ${s.name})` : signingAuthorityText(s);
+  });
+
+  /** A new signing authority: their name and designation fill the printed signature block unless typed by hand. */
+  chooseSigner(ssoId: string): void {
+    if (!this.form) return;
+    const options = this.editor()?.signerOptions ?? [];
+    const previous = options.find(o => o.ssoId === this.form!.signerSsoId) ?? null;
+    this.form = applySigner(this.form, options.find(o => o.ssoId === ssoId) ?? null, previous);
+  }
+
+  /** This order was e-signed by its signing authority: reload it (now Signed, read-only). */
+  onSigned(): void {
+    this.showESign.set(false);
+    this.showToast('The order is e-signed.');
+    this.load();
   }
 
   removeParagraph(index: number): void {

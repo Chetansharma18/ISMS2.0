@@ -1,12 +1,12 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '../icon/icon.component';
+import { LanguageService } from '../../../core/services/language.service';
+import { LoadingMessageKey } from '../../../core/translations/loading.translations';
 
-export interface LoaderBar {
-  index: number;
-  angle: number;
-  delay: string;
-}
+export type LoaderMode = 'fullscreen' | 'page' | 'modal' | 'inline';
+
+let nextGradId = 1;
 
 @Component({
   selector: 'app-loader',
@@ -14,114 +14,185 @@ export interface LoaderBar {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, IconComponent],
   template: `
-    <div
-      class="flex flex-col items-center justify-center gap-3.5 p-4 text-center font-sans select-none"
-      [class.min-h-[160px]]="centered"
-    >
-      <!-- 12-Bar Radial Spinner (From Uiverse.io by david-mohseni) -->
-      <div
-        class="loader-spinner relative shrink-0"
-        [style.width.px]="spinnerDimensions"
-        [style.height.px]="spinnerDimensions"
-        role="status"
-        aria-label="Loading..."
+    <ng-template #signatureMotion>
+      <!-- ui-guard-allow: raw-svg - Fluid Dual-Arc Ribbon signature motion loader -->
+      <svg
+        class="block shrink-0"
+        [style.width.px]="svgSizePx()"
+        [style.height.px]="svgSizePx()"
+        viewBox="0 0 76 76"
+        fill="none"
+        aria-hidden="true"
       >
-        @for (bar of bars; track bar.index) {
-          <div
-            class="loader-bar"
-            [style.transform]="'rotate(' + bar.angle + 'deg) translate(0, -130%)'"
-            [style.animationDelay]="bar.delay"
-            [style.backgroundColor]="color"
-          ></div>
+        <defs>
+          <linearGradient [attr.id]="outerGradId" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: var(--color-primary);" />
+            <stop offset="48%" style="stop-color: var(--color-secondary);" />
+            <stop offset="80%" style="stop-color: var(--color-muted-rose);" />
+            <stop offset="100%" style="stop-color: var(--color-light-peach);" />
+          </linearGradient>
+          @if (!isSimplified()) {
+            <linearGradient [attr.id]="innerGradId" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color: var(--color-secondary);" />
+              <stop offset="55%" style="stop-color: var(--color-muted-rose);" />
+              <stop offset="100%" style="stop-color: var(--color-light-peach);" />
+            </linearGradient>
+          }
+        </defs>
+
+        <circle
+          cx="38"
+          cy="38"
+          r="32"
+          style="stroke: var(--color-surface-blush);"
+          [attr.stroke-width]="isSimplified() ? 8 : 5"
+        />
+        <g class="isms-motion-outer-spin">
+          <circle
+            class="isms-motion-outer-arc"
+            cx="38"
+            cy="38"
+            r="32"
+            [attr.stroke]="'url(#' + outerGradId + ')'"
+            [attr.stroke-width]="isSimplified() ? 8 : 5"
+          />
+        </g>
+
+        @if (!isSimplified()) {
+          <g class="isms-motion-inner-spin">
+            <circle
+              class="isms-motion-inner-arc"
+              cx="38"
+              cy="38"
+              r="21"
+              [attr.stroke]="'url(#' + innerGradId + ')'"
+              stroke-width="2"
+            />
+          </g>
+        }
+      </svg>
+    </ng-template>
+
+    @if (mode() === 'fullscreen') {
+      <div
+        class="fixed inset-0 z-[120] flex items-center justify-center p-6 select-none font-sans isms-loader-fade"
+        style="background-color: var(--color-background); color: var(--color-text-secondary);"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div class="flex flex-col items-center text-center max-w-[360px] w-full">
+          <ng-container *ngTemplateOutlet="signatureMotion" />
+
+          <h1
+            class="mt-[22px] mb-0 text-[30px] leading-[1.15] font-bold tracking-[-0.025em]"
+            style="color: var(--color-primary);"
+          >
+            ISMS <span style="color: var(--color-secondary);">2.0</span>
+          </h1>
+          <p
+            class="mt-1.5 mb-0 text-[12px] leading-[1.45] font-medium"
+            style="color: var(--color-text-secondary);"
+          >
+            Integrated Scheme Management System
+          </p>
+          <p
+            class="mt-[18px] mb-0 text-[12px] leading-[1.45] font-normal"
+            style="color: var(--color-text-secondary);"
+          >
+            {{ resolvedText() }}
+          </p>
+        </div>
+      </div>
+    } @else if (mode() === 'inline') {
+      <div
+        class="inline-flex items-center gap-2 select-none font-sans"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <ng-container *ngTemplateOutlet="signatureMotion" />
+        @if (resolvedText()) {
+          <span class="text-[12px] font-medium" style="color: var(--color-text-secondary);">
+            {{ resolvedText() }}
+          </span>
         }
       </div>
+    } @else {
+      <div
+        class="flex flex-col items-center justify-center gap-3 p-6 text-center font-sans select-none rounded-xl"
+        [class.min-h-[180px]]="centered() && mode() === 'page'"
+        [class.min-h-[120px]]="centered() && mode() === 'modal'"
+        style="background-color: var(--color-background);"
+        role="status"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <ng-container *ngTemplateOutlet="signatureMotion" />
 
-      <!-- Primary Text -->
-      @if (text) {
-        <p [class]="'text-[14px] leading-snug font-semibold m-0 ' + textClass">
-          {{ text }}
-        </p>
-      }
+        @if (resolvedText()) {
+          <p class="text-[12px] leading-snug font-medium m-0" style="color: var(--color-text-secondary);">
+            {{ resolvedText() }}
+          </p>
+        }
 
-      <!-- Optional Subtext -->
-      @if (subtext) {
-        <p class="text-[12.5px] leading-relaxed text-slate-500 m-0 max-w-xs">
-          {{ subtext }}
-        </p>
-      }
+        @if (subtext()) {
+          <p class="text-[12px] leading-relaxed m-0 max-w-xs" style="color: var(--color-text-muted);">
+            {{ subtext() }}
+          </p>
+        }
 
-      <!-- Complete URL Name Pill (e.g. for SSO redirects) -->
-      @if (url) {
-        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-[11.5px] tabular-nums text-slate-700 shadow-2xs mt-0.5 max-w-full">
-          <app-icon name="lock" size="sm" [stroke]="2" class="text-navy" />
-          <span class="font-medium text-slate-800 break-all select-all">{{ url }}</span>
-        </div>
-      }
-    </div>
-  `,
-  styles: [`
-    .loader-spinner {
-      border-radius: 10px;
+        @if (url()) {
+          <div
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11.5px] tabular-nums mt-0.5 max-w-full border"
+            style="background-color: var(--color-surface-soft); border-color: var(--color-border); color: var(--color-text-primary);"
+          >
+            <app-icon name="lock" size="sm" [stroke]="2" class="text-navy" />
+            <span class="font-medium break-all select-all">{{ url() }}</span>
+          </div>
+        }
+      </div>
     }
-
-    .loader-bar {
-      width: 8%;
-      height: 24%;
-      position: absolute;
-      left: 50%;
-      top: 30%;
-      margin-left: -4%;
-      opacity: 0.2;
-      border-radius: 50px;
-      box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
-      animation: fade458 1.2s linear infinite;
-    }
-
-    @keyframes fade458 {
-      0% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0.2;
-      }
-    }
-  `]
+  `
 })
 export class LoaderComponent {
-  @Input() text: string = '';
-  @Input() textClass: string = 'text-navy';
-  @Input() subtext: string = '';
-  @Input() url: string = '';
-  @Input() size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
-  @Input() color: string = '#0B3558';
-  @Input() centered: boolean = true;
+  private readonly lang = inject(LanguageService);
 
-  readonly bars: LoaderBar[] = [
-    { index: 1, angle: 0, delay: '0s' },
-    { index: 2, angle: 30, delay: '-1.1s' },
-    { index: 3, angle: 60, delay: '-1.0s' },
-    { index: 4, angle: 90, delay: '-0.9s' },
-    { index: 5, angle: 120, delay: '-0.8s' },
-    { index: 6, angle: 150, delay: '-0.7s' },
-    { index: 7, angle: 180, delay: '-0.6s' },
-    { index: 8, angle: 210, delay: '-0.5s' },
-    { index: 9, angle: 240, delay: '-0.4s' },
-    { index: 10, angle: 270, delay: '-0.3s' },
-    { index: 11, angle: 300, delay: '-0.2s' },
-    { index: 12, angle: 330, delay: '-0.1s' }
-  ];
+  private readonly uid = nextGradId++;
+  protected readonly outerGradId = `isms-outer-grad-${this.uid}`;
+  protected readonly innerGradId = `isms-inner-grad-${this.uid}`;
 
-  get spinnerDimensions(): number {
-    switch (this.size) {
-      case 'sm':
-        return 34;
-      case 'lg':
-        return 64;
-      case 'xl':
-        return 74;
-      case 'md':
+  readonly mode = input<LoaderMode>('page');
+  readonly text = input<string>('');
+  readonly messageKey = input<LoadingMessageKey | null>(null);
+  readonly subtext = input<string>('');
+  readonly url = input<string>('');
+  readonly size = input<'sm' | 'md' | 'lg' | 'xl'>('md');
+  readonly centered = input<boolean>(true);
+
+  protected readonly svgSizePx = computed(() => {
+    switch (this.mode()) {
+      case 'fullscreen':
+        return 76;
+      case 'modal':
+        return 28;
+      case 'inline':
+        return 16;
+      case 'page':
       default:
-        return 54;
+        return 36;
     }
-  }
+  });
+
+  /** Simplified single-arc clarity for 16px inline indicators. */
+  protected readonly isSimplified = computed(() => this.mode() === 'inline');
+
+  protected readonly resolvedText = computed(() => {
+    const key = this.messageKey();
+    if (key) return this.lang.getLoadingMessage(key);
+    if (this.text()) return this.text();
+    if (this.mode() === 'fullscreen') return this.lang.getLoadingMessage('loadingApplication');
+    if (this.mode() === 'page' || this.mode() === 'modal') return this.lang.getLoadingMessage('loadingPage');
+    return this.lang.getLoadingMessage('loadingRecords');
+  });
 }

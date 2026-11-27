@@ -5,6 +5,7 @@ import {
   EventEmitter,
   signal,
   computed,
+  inject,
   TemplateRef,
   ChangeDetectionStrategy
 } from '@angular/core';
@@ -14,12 +15,14 @@ import { RouterModule } from '@angular/router';
 import { TableColumn, TableAction, BadgeVariant } from './table.types';
 import { StatusBadgeComponent } from '../status-badge/status-badge.component';
 import { IconComponent } from '../icon/icon.component';
+import { LoaderComponent } from '../loader/loader.component';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-table',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, FormsModule, RouterModule, StatusBadgeComponent, IconComponent],
+  imports: [CommonModule, FormsModule, RouterModule, StatusBadgeComponent, IconComponent, LoaderComponent],
   template: `
     <div class="bg-white border border-[#EADCE2] rounded-[10px] overflow-hidden font-sans" style="box-shadow: 0 1px 3px rgba(37, 33, 42, 0.05);">
       
@@ -85,10 +88,7 @@ import { IconComponent } from '../icon/icon.component';
             @if (loading) {
               <tr class="bg-white">
                 <td [attr.colspan]="columns.length" class="py-12 text-center text-secondary bg-white">
-                  <div class="inline-flex items-center gap-2 text-[13px] font-normal">
-                    <app-icon name="spinner" size="lg" [stroke]="2.5" class="animate-spin text-brand" />
-                    <span>Loading records...</span>
-                  </div>
+                  <app-loader mode="inline" size="sm" messageKey="loadingRecords" />
                 </td>
               </tr>
             } @else {

@@ -1132,3 +1132,118 @@ pre {
     color: #000000 !important;
   }
 }
+
+/* =========================================================
+   UNIVERSAL SIGNATURE MOTION LOADER & SKELETON SYSTEM
+   ========================================================= */
+@keyframes isms-ribbon-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes isms-ribbon-outer-flow {
+  0% {
+    stroke-dasharray: 24 201.06;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 128 201.06;
+    stroke-dashoffset: -46;
+  }
+  100% {
+    stroke-dasharray: 24 201.06;
+    stroke-dashoffset: -201.06;
+  }
+}
+
+@keyframes isms-ribbon-inner-flow {
+  0% {
+    stroke-dasharray: 18 131.95;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 76 131.95;
+    stroke-dashoffset: -30;
+  }
+  100% {
+    stroke-dasharray: 18 131.95;
+    stroke-dashoffset: -131.95;
+  }
+}
+
+@keyframes isms-skeleton-pulse {
+  0%,
+  100% {
+    background-color: var(--color-surface-rose);
+  }
+  50% {
+    background-color: var(--color-surface-blush);
+  }
+}
+
+.isms-motion-outer-spin {
+  transform-origin: 38px 38px;
+  animation: isms-ribbon-rotate 2s linear infinite;
+  will-change: transform;
+}
+
+.isms-motion-outer-arc {
+  stroke-linecap: round;
+  animation: isms-ribbon-outer-flow 2s ease-in-out infinite;
+}
+
+.isms-motion-inner-spin {
+  transform-origin: 38px 38px;
+  animation: isms-ribbon-rotate 2s linear infinite reverse;
+  will-change: transform;
+}
+
+.isms-motion-inner-arc {
+  stroke-linecap: round;
+  animation: isms-ribbon-inner-flow 2s ease-in-out infinite;
+}
+
+.isms-loader-fade {
+  transition: opacity 180ms ease-out, visibility 180ms ease-out;
+}
+
+.isms-skeleton {
+  background-color: var(--color-surface-rose);
+  border-radius: 6px;
+  animation: isms-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.isms-skeleton-card {
+  background-color: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .isms-motion-outer-spin,
+  .isms-motion-inner-spin {
+    animation: none;
+  }
+
+  .isms-motion-outer-arc {
+    animation: none;
+    stroke-dasharray: 112 201.06;
+    stroke-dashoffset: 0;
+  }
+
+  .isms-motion-inner-arc {
+    animation: none;
+    stroke-dasharray: 70 131.95;
+    stroke-dashoffset: -18;
+  }
+
+  .isms-skeleton {
+    animation: none;
+    background-color: var(--color-surface-rose);
+  }
+
+  .isms-loader-fade {
+    transition: none;
+  }
+}

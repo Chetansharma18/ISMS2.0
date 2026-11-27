@@ -24,17 +24,17 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
     @switch (flow.step()) {
       @case ('verifying') {
         <app-modal title="Signing in" [showClose]="false" [closeOnBackdrop]="false" size="sm">
-          <app-loader text="Verifying your SSO sign-in..." />
+          <app-loader mode="modal" messageKey="verifyingSession" />
         </app-modal>
       }
       @case ('switching') {
         <app-modal title="Switching role" [showClose]="false" [closeOnBackdrop]="false" size="sm">
-          <app-loader [text]="switchingText()" />
+          <app-loader mode="modal" [text]="switchingText()" />
         </app-modal>
       }
       @case ('finishing') {
         <app-modal title="Signing in" [showClose]="false" [closeOnBackdrop]="false" size="sm">
-          <app-loader text="Loading your account..." />
+          <app-loader mode="modal" messageKey="signingIn" />
         </app-modal>
       }
       @case ('select-role') {

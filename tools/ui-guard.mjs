@@ -63,8 +63,8 @@ const KIT_PREFIXES = [
   'shared/components/toast-outlet/'
 ];
 
-/** The only kit folders that may contain raw <svg>: the icon renderer (the icons are drawn here) and the progress ring (a chart). */
-const SVG_PREFIXES = ['shared/components/icon/', 'shared/components/progress-ring/'];
+/** The only kit folders that may contain raw <svg>: the icon renderer, the progress ring, and the signature motion loader. */
+const SVG_PREFIXES = ['shared/components/icon/', 'shared/components/progress-ring/', 'shared/components/loader/'];
 
 /** The printed official letters (sanction order, IPA, MoU and the sheet components they use) keep their serif face. */
 const LETTER_PATHS = /(?:document-editor\/|eoi-sanction-editor\/|ipa-editor\/|sanction-order\/|\/mou\/|document-sheet-modal\/|templates\/document-page\/)/;

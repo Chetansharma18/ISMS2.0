@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActionModalComponent, ButtonComponent, IconComponent, TableColumn, TableComponent } from '../../../../shared';
+import { ActionModalComponent, ButtonComponent, IconComponent, SkeletonLoaderComponent, TableColumn, TableComponent } from '../../../../shared';
 import type {
   AspirantSourceProfile,
   EmploymentDeptRecord,
@@ -47,7 +47,7 @@ interface MethodOption {
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
-  imports: [ActionModalComponent, ButtonComponent, IconComponent, NgTemplateOutlet, TableComponent],
+  imports: [ActionModalComponent, ButtonComponent, IconComponent, NgTemplateOutlet, SkeletonLoaderComponent, TableComponent],
   template: `
     <div class="space-y-5">
       <div role="radiogroup" aria-label="Registration method" class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -102,10 +102,7 @@ interface MethodOption {
               Tick several to register them together, or use Select to review one aspirant's details in the form.
             </p>
             @if (loading()) {
-              <div class="p-4 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-600 flex items-center gap-2.5" role="status">
-                <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-                Fetching records from the Employment Department...
-              </div>
+              <app-skeleton variant="table" [count]="4" />
             } @else {
               <ng-container *ngTemplateOutlet="bulkBar"></ng-container>
               <app-table

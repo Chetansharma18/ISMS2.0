@@ -1,7 +1,15 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
+import {
+  Router,
+  RouterOutlet,
+  NavigationStart,
+  NavigationEnd,
+  NavigationCancel,
+  NavigationError,
+  NavigationSkipped
+} from '@angular/router';
 import { fromEvent } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { HeaderComponent } from './core/layout/header/header.component';
@@ -11,11 +19,13 @@ import { SsoRedirectModalComponent } from './core/auth/components/sso-redirect-m
 import { SsoLoginStepsModalComponent } from './core/auth/components/sso-login-steps-modal/sso-login-steps-modal.component';
 import { SsoLoginFlowService } from './core/auth/sso-login-flow.service';
 import { TableAccessService } from './core/permissions/table-access.service';
+import { LoadingService } from './core/http/loading.service';
 import { ToastOutletComponent } from './shared/components/toast-outlet/toast-outlet.component';
 import { ButtonComponent } from './shared/components/button/button.component';
 import { IconComponent } from './shared/components/icon/icon.component';
 import { BackdropComponent } from './shared/components/backdrop/backdrop.component';
 import { ActionModalComponent } from './shared/components/action-modal/action-modal.component';
+import { LoaderComponent } from './shared/components/loader/loader.component';
 import { ConnectivityService } from './core/services/connectivity.service';
 
 @Component({
@@ -32,10 +42,16 @@ import { ConnectivityService } from './core/services/connectivity.service';
     ButtonComponent,
     IconComponent,
     BackdropComponent,
-    ActionModalComponent
+    ActionModalComponent,
+    LoaderComponent
   ],
   template: `
     <div class="h-screen overflow-hidden flex flex-col text-slate-900 antialiased relative" style="background-color: #FFFFFF;">
+      <!-- Global Universal Full-Screen Loader -->
+      @if (loadingService.isFullScreenLoading()) {
+        <app-loader mode="fullscreen" [text]="loadingService.fullScreenMessage()" />
+      }
+
       <!-- Global toast notifications (NotificationService) -->
       <app-toast-outlet></app-toast-outlet>
 
@@ -97,7 +113,16 @@ import { ConnectivityService } from './core/services/connectivity.service';
             </div>
           }
 
-          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col" style="background-color: #FFFFFF;">
+          <main class="flex-1 min-w-0 overflow-y-auto flex flex-col relative" style="background-color: #FFFFFF;">
+            <div
+              class="absolute inset-0 z-30 flex items-center justify-center bg-white/90 isms-loader-fade"
+              [class.opacity-0]="!loadingService.isPageLoading()"
+              [class.invisible]="!loadingService.isPageLoading()"
+              [class.pointer-events-none]="!loadingService.isPageLoading()"
+              [attr.aria-hidden]="!loadingService.isPageLoading()"
+            >
+              <app-loader mode="page" [text]="loadingService.pageMessage()" />
+            </div>
             <router-outlet></router-outlet>
           </main>
         </div>
@@ -106,6 +131,15 @@ import { ConnectivityService } from './core/services/connectivity.service';
           class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative" 
           [style.background-color]="isLandingRoute() && !authService.currentUser() ? '#070e18' : '#FFFFFF'"
         >
+          <div
+            class="absolute inset-0 z-30 flex items-center justify-center bg-white/90 isms-loader-fade"
+            [class.opacity-0]="!loadingService.isPageLoading()"
+            [class.invisible]="!loadingService.isPageLoading()"
+            [class.pointer-events-none]="!loadingService.isPageLoading()"
+            [attr.aria-hidden]="!loadingService.isPageLoading()"
+          >
+            <app-loader mode="page" [text]="loadingService.pageMessage()" />
+          </div>
           <div class="w-full flex-1 flex flex-col bg-white">
             <router-outlet></router-outlet>
           </div>
@@ -129,8 +163,10 @@ import { ConnectivityService } from './core/services/connectivity.service';
 export class AppComponent {
   authService = inject(AuthService);
   connectivityService = inject(ConnectivityService);
+  loadingService = inject(LoadingService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private navLoaderId: string | null = null;
 
   private getInitialRoute(): { isLanding: boolean; isSso: boolean; isHelpSupport: boolean } {
     if (typeof window !== 'undefined' && window.location && window.location.pathname) {
@@ -176,28 +212,53 @@ export class AppComponent {
       .subscribe(() => tableAccess.refreshIfStale());
 
     this.router.events
-      .pipe(
-        filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe((event: NavigationEnd) => {
-        const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
-        const isLanding = cleanUrl === '/' || cleanUrl === '';
-        const isSso = cleanUrl.includes('/sso-login');
-        const isHelpSupport = cleanUrl === '/help-support' || cleanUrl.startsWith('/help-support/');
-
-        this.isLandingRoute.set(isLanding);
-        this.isSsoRoute.set(isSso);
-        this.isHelpSupportRoute.set(isHelpSupport);
-        this.isMobileSidebarOpen.set(false);
-
-        // Reset scroll position on route change so new pages open at the top
-        if (typeof document !== 'undefined') {
-          const scrollMains = document.querySelectorAll('main');
-          scrollMains.forEach(el => {
-            el.scrollTop = 0;
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(event => {
+        if (event instanceof NavigationStart) {
+          this.loadingService.stopImmediate(this.navLoaderId);
+          this.navLoaderId = this.loadingService.start({
+            scope: 'router',
+            mode: 'page',
+            messageKey: 'loadingPage',
+            thresholdMs: 0,
+            minVisibleMs: 1200
           });
-          window.scrollTo(0, 0);
+          return;
+        }
+
+        if (event instanceof NavigationEnd) {
+          this.loadingService.stop(this.navLoaderId);
+          this.navLoaderId = null;
+          this.loadingService.markAppReady();
+        } else if (
+          event instanceof NavigationCancel ||
+          event instanceof NavigationError ||
+          event instanceof NavigationSkipped
+        ) {
+          this.loadingService.stopImmediate(this.navLoaderId);
+          this.navLoaderId = null;
+          this.loadingService.markAppReady();
+        }
+
+        if (event instanceof NavigationEnd) {
+          const cleanUrl = event.urlAfterRedirects.split('?')[0].split('#')[0];
+          const isLanding = cleanUrl === '/' || cleanUrl === '';
+          const isSso = cleanUrl.includes('/sso-login');
+          const isHelpSupport = cleanUrl === '/help-support' || cleanUrl.startsWith('/help-support/');
+
+          this.isLandingRoute.set(isLanding);
+          this.isSsoRoute.set(isSso);
+          this.isHelpSupportRoute.set(isHelpSupport);
+          this.isMobileSidebarOpen.set(false);
+
+          // Reset scroll position on route change so new pages open at the top
+          if (typeof document !== 'undefined') {
+            const scrollMains = document.querySelectorAll('main');
+            scrollMains.forEach(el => {
+              el.scrollTop = 0;
+            });
+            window.scrollTo(0, 0);
+          }
         }
       });
   }

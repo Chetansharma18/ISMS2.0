@@ -11,9 +11,269 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap"
     rel="stylesheet">
+  <style>
+    #isms-startup-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #FFFFFF;
+      color: #625663;
+      font-family: 'Inter', 'Noto Sans Devanagari', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 24px;
+      box-sizing: border-box;
+      transition: opacity 180ms ease-out, visibility 180ms ease-out;
+    }
+
+    #isms-startup-loader.isms-startup-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .isms-sl-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 360px;
+      width: 100%;
+    }
+
+    .isms-sl-svg {
+      width: 76px;
+      height: 76px;
+      display: block;
+    }
+
+    .isms-sl-outer-spin {
+      transform-origin: 38px 38px;
+      animation: isms-sl-rotate 2s linear infinite;
+      will-change: transform;
+    }
+
+    .isms-sl-outer-arc {
+      stroke-linecap: round;
+      animation: isms-sl-outer-flow 2s ease-in-out infinite;
+    }
+
+    .isms-sl-inner-spin {
+      transform-origin: 38px 38px;
+      animation: isms-sl-rotate 2s linear infinite reverse;
+      will-change: transform;
+    }
+
+    .isms-sl-inner-arc {
+      stroke-linecap: round;
+      animation: isms-sl-inner-flow 2s ease-in-out infinite;
+    }
+
+    .isms-sl-brand {
+      margin: 22px 0 0;
+      font-size: 30px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #7C0E44;
+    }
+
+    .isms-sl-version {
+      color: #AA5E7A;
+    }
+
+    .isms-sl-subtitle {
+      margin: 6px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 500;
+      color: #625663;
+    }
+
+    .isms-sl-message {
+      margin: 18px 0 0;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 400;
+      color: #625663;
+    }
+
+    .isms-sl-error {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 8px;
+      background-color: #FCF8FA;
+      border: 1px solid #EADCE2;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .isms-sl-error[data-visible='true'] {
+      display: block;
+    }
+
+    .isms-sl-error-text {
+      margin: 0 0 12px;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: #25212A;
+    }
+
+    .isms-sl-retry {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      padding: 0 18px;
+      border-radius: 6px;
+      border: 1px solid #7C0E44;
+      background-color: #7C0E44;
+      color: #FFFFFF;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .isms-sl-retry:hover {
+      background-color: #5E0832;
+      border-color: #5E0832;
+    }
+
+    @keyframes isms-sl-rotate {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes isms-sl-outer-flow {
+      0% {
+        stroke-dasharray: 24 201.06;
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 128 201.06;
+        stroke-dashoffset: -46;
+      }
+      100% {
+        stroke-dasharray: 24 201.06;
+        stroke-dashoffset: -201.06;
+      }
+    }
+
+    @keyframes isms-sl-inner-flow {
+      0% {
+        stroke-dasharray: 18 131.95;
+        stroke-dashoffset: 0;
+      }
+      50% {
+        stroke-dasharray: 76 131.95;
+        stroke-dashoffset: -30;
+      }
+      100% {
+        stroke-dasharray: 18 131.95;
+        stroke-dashoffset: -131.95;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .isms-sl-outer-spin,
+      .isms-sl-inner-spin {
+        animation: none;
+      }
+
+      .isms-sl-outer-arc {
+        animation: none;
+        stroke-dasharray: 112 201.06;
+        stroke-dashoffset: 0;
+      }
+
+      .isms-sl-inner-arc {
+        animation: none;
+        stroke-dasharray: 70 131.95;
+        stroke-dashoffset: -18;
+      }
+
+      #isms-startup-loader {
+        transition: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="isms-startup-loader" role="status" aria-live="polite" aria-busy="true">
+    <div class="isms-sl-center">
+      <svg class="isms-sl-svg" viewBox="0 0 76 76" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="isms-sl-outer-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7C0E44" />
+            <stop offset="48%" stop-color="#AA5E7A" />
+            <stop offset="80%" stop-color="#D49A9A" />
+            <stop offset="100%" stop-color="#F2DACE" />
+          </linearGradient>
+          <linearGradient id="isms-sl-inner-grad" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#AA5E7A" />
+            <stop offset="55%" stop-color="#D49A9A" />
+            <stop offset="100%" stop-color="#F2DACE" />
+          </linearGradient>
+        </defs>
+        <circle cx="38" cy="38" r="32" stroke="#F8EDF1" stroke-width="5" />
+        <g class="isms-sl-outer-spin">
+          <circle class="isms-sl-outer-arc" cx="38" cy="38" r="32" stroke="url(#isms-sl-outer-grad)" stroke-width="5" />
+        </g>
+        <g class="isms-sl-inner-spin">
+          <circle class="isms-sl-inner-arc" cx="38" cy="38" r="21" stroke="url(#isms-sl-inner-grad)" stroke-width="2" />
+        </g>
+      </svg>
+
+      <h1 class="isms-sl-brand">ISMS <span class="isms-sl-version">2.0</span></h1>
+      <p class="isms-sl-subtitle">Integrated Scheme Management System</p>
+      <p id="isms-startup-message" class="isms-sl-message">Loading application...</p>
+
+      <div id="isms-startup-error" class="isms-sl-error" role="alert" data-visible="false">
+        <p id="isms-startup-error-text" class="isms-sl-error-text">
+          Unable to initialize the application. Please check your connection and try again.
+        </p>
+        <button type="button" class="isms-sl-retry" onclick="window.location.reload()">
+          Reload Application
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      try {
+        if (window.localStorage && window.localStorage.getItem('isms_lang') === 'hi') {
+          var msgEl = document.getElementById('isms-startup-message');
+          if (msgEl) msgEl.textContent = 'एप्लिकेशन लोड हो रहा है...';
+        }
+      } catch (e) {}
+
+      window.__ismsStartupFail = function (message) {
+        var root = document.getElementById('isms-startup-loader');
+        var msgEl = document.getElementById('isms-startup-message');
+        var errBox = document.getElementById('isms-startup-error');
+        var errText = document.getElementById('isms-startup-error-text');
+        if (!root || !errBox) return;
+        root.classList.remove('isms-startup-hidden');
+        root.setAttribute('aria-busy', 'false');
+        if (msgEl) msgEl.style.display = 'none';
+        if (errText && message) errText.textContent = message;
+        errBox.setAttribute('data-visible', 'true');
+      };
+
+      window.__ismsStartupWatchdog = window.setTimeout(function () {
+        if (document.getElementById('isms-startup-loader')) {
+          window.__ismsStartupFail('Application startup is taking longer than expected. Please reload to try again.');
+        }
+      }, 25000);
+    })();
+  </script>
+
   <app-root></app-root>
 </body>
 

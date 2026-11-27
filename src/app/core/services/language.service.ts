@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { LANDING_TRANSLATIONS, LandingTranslations } from '../translations/landing.translations';
+import { LOADING_TRANSLATIONS, LoadingMessageKey, LoadingTranslations } from '../translations/loading.translations';
 import { StorageService } from './storage.service';
 
 export type Language = 'en' | 'hi';
@@ -20,6 +21,7 @@ export class LanguageService {
   readonly isHindi = computed(() => this.currentLanguage() === 'hi');
   readonly isEnglish = computed(() => this.currentLanguage() === 'en');
   readonly t = computed<LandingTranslations>(() => LANDING_TRANSLATIONS[this.currentLanguage()]);
+  readonly loadingText = computed<LoadingTranslations>(() => LOADING_TRANSLATIONS[this.currentLanguage()]);
 
   constructor() {
     this.initLanguage();
@@ -62,6 +64,10 @@ export class LanguageService {
 
   getText(text: BilingualText): string {
     return text[this.currentLanguage()] || text.en;
+  }
+
+  getLoadingMessage(key: LoadingMessageKey): string {
+    return this.loadingText()[key] || LOADING_TRANSLATIONS.en[key];
   }
 
   private syncDocumentLang(lang: Language): void {

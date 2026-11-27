@@ -13,6 +13,7 @@ export * from './filter-tabs/filter-tabs.component';
 export * from './status-badge/status-badge.component';
 export * from './page-header/page-header.component';
 export * from './loader/loader.component';
+export * from './loader/skeleton-loader.component';
 export * from './empty-state/empty-state.component';
 export * from './table/table.component';
 export * from './table/table.types';

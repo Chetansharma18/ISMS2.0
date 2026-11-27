@@ -40,7 +40,7 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
   },
   template: `
     @if (loading()) {
-      <app-icon name="spinner" [stroke]="2.5" class="animate-spin" />
+      <app-icon name="spinner" size="md" [stroke]="2.5" class="animate-spin shrink-0" />
     }
     <ng-content />
   `

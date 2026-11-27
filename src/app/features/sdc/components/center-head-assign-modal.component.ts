@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, filter, map, switchMap, tap } from 'rxjs';
-import { ActionModalComponent, IconComponent, InputDirective } from '../../../shared';
+import { ActionModalComponent, IconComponent, InputDirective, LoaderComponent } from '../../../shared';
 import type { SsoProfile } from '../models/sso-profile.model';
 import { SsoDirectoryService } from '../services/sso-directory.service';
 
@@ -18,7 +18,7 @@ type LookupStatus = 'idle' | 'loading' | 'found' | 'notFound';
   selector: 'app-center-head-assign-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ActionModalComponent, IconComponent, InputDirective],
+  imports: [ActionModalComponent, IconComponent, InputDirective, LoaderComponent],
   template: `
     <app-action-modal
       [isOpen]="true"
@@ -54,10 +54,7 @@ type LookupStatus = 'idle' | 'loading' | 'found' | 'notFound';
 
         @switch (status()) {
           @case ('loading') {
-            <div class="flex items-center gap-2 text-slate-600" role="status">
-              <app-icon name="spinner" size="sm" [stroke]="2.5" class="animate-spin text-brand" />
-              <span>Fetching details from SSO...</span>
-            </div>
+            <app-loader mode="inline" size="sm" text="Fetching details from SSO..." />
           }
           @case ('notFound') {
             <div class="p-2.5 rounded bg-rose-50 border border-rose-200 text-rose-800 flex items-center gap-2" role="alert">

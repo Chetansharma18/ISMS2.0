@@ -9,6 +9,7 @@ import {
   FormSectionComponent,
   FormSelectComponent,
   IconComponent,
+  LoaderComponent,
   PageShellComponent,
   StepperComponent,
   StepperStep,
@@ -98,6 +99,7 @@ function sumHours(text: string): number {
   imports: [
     ActionModalComponent,
     ButtonComponent,
+    LoaderComponent,
     FormInputComponent,
     FormSectionComponent,
     FormSelectComponent,
@@ -493,10 +495,9 @@ function sumHours(text: string): number {
             </div>
           </div>
 
-          <p class="flex items-center justify-center gap-2 text-xs text-slate-500 m-0" role="status">
-            <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Taking you to Step 2...
-          </p>
+          <div class="flex justify-center">
+            <app-loader mode="inline" size="sm" text="Taking you to Step 2..." />
+          </div>
         </div>
       </app-action-modal>
     </app-page-shell>

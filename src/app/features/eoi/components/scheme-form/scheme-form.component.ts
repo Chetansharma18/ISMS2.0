@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DocumentViewerModalComponent } from '../../../../shared/components/document-viewer-modal/document-viewer-modal.component';
 import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
 import { StepperComponent } from '../../../../shared/components/stepper/stepper.component';
-import { ButtonComponent, IconComponent, PageHeaderComponent } from '../../../../shared';
+import { ButtonComponent, IconComponent, LoaderComponent, PageHeaderComponent } from '../../../../shared';
 import { SchemeFormState } from './scheme-form.state';
 import { SchemeHeaderCardComponent } from './steps/scheme-header-card.component';
 import { Step1ProcessingFeeComponent } from './steps/step1-processing-fee.component';
@@ -25,6 +25,7 @@ export type { EoiDocumentItem } from './scheme-form.model';
   imports: [
     ButtonComponent,
     IconComponent,
+    LoaderComponent,
     PageHeaderComponent,
     ActionModalComponent,
     StepperComponent,
@@ -67,9 +68,8 @@ export type { EoiDocumentItem } from './scheme-form.model';
         </div>
 
         @if (state.loading()) {
-          <div class="p-6 rounded-xl border border-[#EADCE2] bg-white text-sm text-slate-500 flex items-center gap-2" role="status">
-            <span class="inline-block w-4 h-4 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Opening your application...
+          <div class="rounded-xl border border-[#EADCE2] bg-white">
+            <app-loader mode="page" messageKey="loadingPage" />
           </div>
         } @else if (state.loadError() || !state.application()) {
           <div class="p-5 rounded-xl border border-rose-200 bg-rose-50 text-sm text-rose-700 space-y-3" role="alert">
@@ -163,10 +163,9 @@ export type { EoiDocumentItem } from './scheme-form.model';
             </div>
           </div>
 
-          <p class="flex items-center justify-center gap-2 text-xs text-slate-500 m-0" role="status">
-            <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Taking you to EMD Payment...
-          </p>
+          <div class="flex justify-center">
+            <app-loader mode="inline" size="sm" text="Taking you to EMD Payment..." />
+          </div>
         </div>
       </app-action-modal>
 
@@ -206,10 +205,9 @@ export type { EoiDocumentItem } from './scheme-form.model';
             </div>
           </div>
 
-          <p class="flex items-center justify-center gap-2 text-xs text-slate-500 m-0" role="status">
-            <span class="inline-block w-3.5 h-3.5 rounded-full border-2 border-slate-300 border-t-navy animate-spin" aria-hidden="true"></span>
-            Taking you to your receipts...
-          </p>
+          <div class="flex justify-center">
+            <app-loader mode="inline" size="sm" text="Taking you to your receipts..." />
+          </div>
         </div>
       </app-action-modal>
 

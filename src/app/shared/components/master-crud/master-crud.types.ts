@@ -100,4 +100,15 @@ export interface MasterCrudConfig<T extends { id: string; status?: string } = an
   filters?: MasterFilterConfig[];
   /** Whether to hide the default quick Status filter [All, Active, Inactive] (defaults to false if hasStatus=true) */
   hideStatusFilter?: boolean;
+  /**
+   * Reads and writes the records through this repository instead of `DataEngineService.for(dataKey)`. Used by the
+   * generic page of a permitted table, whose endpoint comes from GET /auth/permissions.
+   */
+  repository?: import('../../../core/services/data-engine.service').ResourceRepository<T>;
+  /** Backend table whose permissions (GET /auth/permissions) drive the Add / Edit / Delete buttons, instead of `dataKey`. */
+  permissionTable?: string;
+  /** Shows a Delete button per row (with DELETE permission). */
+  showDeleteAction?: boolean;
+  /** Hides the Active / Inactive switch in the action column (records without a status). */
+  hideStatusToggle?: boolean;
 }

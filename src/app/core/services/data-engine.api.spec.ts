@@ -85,4 +85,15 @@ describe('DataEngineService (API mode)', () => {
     backend.expectOne(r => r.method === 'DELETE' && r.url === `${URL}/9`).flush({ message: 'Sector deleted successfully.' });
     expect(await removed).toBe(true);
   });
+
+  it('switches Active / Inactive with PATCH {id}/status { isActive }', async () => {
+    expect(engine.hasStatusEndpoint('SECTORS')).toBe(true);
+    expect(engine.hasStatusEndpoint('USER_ROLES')).toBe(false);
+
+    const saved = firstValueFrom(engine.for<Sector>('SECTORS').setStatus!(9, false));
+    const patch = backend.expectOne(r => r.method === 'PATCH' && r.url === `${URL}/9/status`);
+    expect(patch.request.body).toEqual({ isActive: false });
+    patch.flush({ id: 9, sectorName: 'Agriculture', sectorCode: 'AGR', isActive: false });
+    expect(await saved).toMatchObject({ id: '9', sectorName: 'Agriculture', status: 'Inactive' });
+  });
 });

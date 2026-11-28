@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { describe, expect, it, beforeEach } from 'vitest';
 import { FooterComponent } from './footer.component';
 import { EXTERNAL_LEGAL_URL } from '../sidebar/sidebar-nav.config';
+import { formatDateMedium } from '../../../shared/utils/date.util';
 
 describe('FooterComponent - Privacy Policy & Terms and Conditions External Redirect', () => {
   let fixture: ComponentFixture<FooterComponent>;
@@ -50,5 +51,10 @@ describe('FooterComponent - Privacy Policy & Terms and Conditions External Redir
     const linkTarget = helpLink.getAttribute('href') || helpLink.getAttribute('ng-reflect-router-link') || '';
     expect(linkTarget).toContain('help-support');
     expect(helpLink.getAttribute('target')).toBeNull();
+  });
+
+  it('displays today date dynamically for Last Updated', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.textContent).toContain(formatDateMedium(new Date()));
   });
 });

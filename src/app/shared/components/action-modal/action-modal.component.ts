@@ -36,7 +36,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
   template: `
     @if (isOpen) {
       <div
-        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto"
+        class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
         style="background: rgba(10,20,40,0.45); backdrop-filter: blur(3px);"
         (click)="onBackdropClick($event)"
       >
@@ -44,7 +44,7 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
           class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
           [class.overflow-visible]="!scrollable"
           [class.overflow-hidden]="scrollable"
-          [class.max-h-[90vh]]="scrollable"
+          [class.max-h-[82vh]]="scrollable"
           [ngClass]="resolvedMaxWidthClass"
           style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
           role="dialog"
@@ -93,20 +93,20 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
             </div>
 
             <!-- Action Buttons Footer -->
-            @if (primaryLabel || secondaryLabel) {
+            @if (primaryLabel || cancelLabel) {
               <div class="mt-auto shrink-0">
                 @if (showFooterDivider) {
                   <div class="mt-6 mb-5 border-t border-[#EADCE2]"></div>
                 }
 
-                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!secondaryLabel">
-                  @if (secondaryLabel) {
+                <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3" [class.mt-5]="!showFooterDivider" [class.sm:flex-row-reverse]="!cancelLabel">
+                  @if (cancelLabel) {
                     <button
                       type="button"
-                      (click)="onSecondaryAction()"
+                      (click)="secondaryLabel ? onSecondaryAction() : onClose()"
                       class="w-full sm:flex-1 py-2.5 px-4 rounded-lg border border-[#AA5E7A] text-[#7C0E44] text-sm font-medium hover:bg-[#F8EDF1] transition-colors cursor-pointer"
                     >
-                      {{ secondaryLabel }}
+                      {{ cancelLabel }}
                     </button>
                   }
                   @if (primaryLabel) {
@@ -116,9 +116,9 @@ const ACTION_MODAL_WIDTHS: Record<ActionModalSize, string> = {
                       [disabled]="disablePrimary"
                       class="w-full py-2.5 px-5 rounded-lg text-white! text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
                       [ngClass]="primaryVariantClass"
-                      [class.sm:flex-1]="secondaryLabel"
-                      [class.sm:w-auto]="!secondaryLabel"
-                      [class.sm:min-w-[130px]]="!secondaryLabel"
+                      [class.sm:flex-1]="cancelLabel"
+                      [class.sm:w-auto]="!cancelLabel"
+                      [class.sm:min-w-[130px]]="!cancelLabel"
                     >
                       {{ primaryLabel }}
                     </button>
@@ -149,6 +149,10 @@ export class ActionModalComponent implements OnChanges, OnDestroy {
   @Input() showPrimaryArrow = true;
   @Input() showAccentBar = false;
   @Input() accentBarClass = 'bg-navy';
+  /**
+   * The dialog needs a way to close. There is no top-right ✕: when the dialog has no secondary button and its
+   * primary button is not itself a close button (Close, OK, Done), a "Cancel" button that emits `close` is shown.
+   */
   @Input() showCloseButton = false;
   @Input() showFooterDivider = true;
   @Input() size?: ActionModalSize;
@@ -160,6 +164,13 @@ export class ActionModalComponent implements OnChanges, OnDestroy {
   @Input() scrollable = false;
   /** Colour of the primary action button. 'primary' keeps the default dark brand blue. */
   @Input() primaryVariant: 'primary' | 'success' | 'danger' = 'primary';
+
+  /** The left footer button: the screen's secondary label, else the automatic "Cancel" (see `showCloseButton`). */
+  get cancelLabel(): string {
+    if (this.secondaryLabel) return this.secondaryLabel;
+    if (!this.showCloseButton) return '';
+    return /^(close|ok|done|cancel)$/i.test(this.primaryLabel.trim()) ? '' : 'Cancel';
+  }
 
   get resolvedMaxWidthClass(): string {
     if (this.size && ACTION_MODAL_WIDTHS[this.size]) {

@@ -34,6 +34,21 @@ export interface OtrDynamicFieldDto {
   colSpan: number;
   sectionName?: string | null;
   options?: { label: string; value: string }[];
+  validation?: OtrDynamicValidationDto | null;
+  /** `fieldKey == 'value'` or `fieldKey != 'value'`. The backend stores it as text and never evaluates it. */
+  visibilityCondition?: string | null;
+}
+
+/** FormManager `FieldValidation`. The backend does not apply it to OTR answers, so the screen does. */
+export interface OtrDynamicValidationDto {
+  minLength?: number | null;
+  maxLength?: number | null;
+  minValue?: number | null;
+  maxValue?: number | null;
+  regexPattern?: string | null;
+  customErrorMessage?: string | null;
+  allowedExtensions?: string[] | null;
+  maxFileSizeMb?: number | null;
 }
 
 export interface OtrDynamicSchemaDto {
@@ -78,6 +93,20 @@ export interface OtrStepRecord {
   [field: string]: unknown;
 }
 
+/** One entry of GET /otr/me/update-logs (OtrUpdateLogDto): a create or update of one step. */
+export interface OtrUpdateLogDto {
+  id: number;
+  section: string;
+  action: string;
+  targetRecordId: number;
+  reason?: string | null;
+  /** Changed properties of the step (camelCase), or `["*"]` for the first save. */
+  changedFields: string[];
+  oldValuesJson?: string | null;
+  newValuesJson?: string | null;
+  createdAt: string;
+}
+
 /** The user's records per step key; null when the step has not been saved yet. */
 export type OtrRecords = Record<string, OtrStepRecord | null>;
 
@@ -90,12 +119,26 @@ export interface OtrLookups {
 // ---------------------------------------------------------------- render model
 
 export type OtrFieldType =
-  | 'text' | 'textarea' | 'select' | 'multiselect' | 'date' | 'tel' | 'email' | 'url' | 'checkbox' | 'file';
+  | 'text' | 'number' | 'textarea' | 'select' | 'multiselect' | 'date' | 'tel' | 'email' | 'url' | 'checkbox' | 'file';
 
-/** "field equals value". Checkbox values compare as "true" / "false". */
+/**
+ * "field equals value" (or "does not equal" with `notEqual`). Checkbox values compare as "true" / "false", a Yes / No
+ * choice also matches "true" / "false", and a multi select matches when it contains the value.
+ */
 export interface OtrCondition {
   field: string;
   equalTo: string;
+  notEqual?: boolean;
+}
+
+/** Checks the screen applies to a FormManager field before saving (the backend does not check them). */
+export interface OtrFieldRules {
+  minLength?: number;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  pattern?: string;
+  message?: string;
 }
 
 export interface OtrOption {
@@ -113,7 +156,8 @@ export interface OtrFieldDef {
   colSpan?: number;
   /** The "*" marker, from the backend's isRequired. */
   required?: boolean;
-  visibleWhen?: OtrCondition;
+  /** Shown only when the condition holds; with a list, when every condition holds. */
+  visibleWhen?: OtrCondition | OtrCondition[];
   copyFrom?: string;
   copyWhen?: OtrCondition;
   default?: string;
@@ -129,6 +173,8 @@ export interface OtrFieldDef {
   documentType?: string;
   /** An extra field from the step's FormManager schema, saved in dynamicFormAnswers. */
   dynamic?: boolean;
+  /** FormManager validation of a dynamic field. */
+  rules?: OtrFieldRules;
 }
 
 export interface OtrSectionDef {

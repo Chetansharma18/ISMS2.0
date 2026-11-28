@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { OTR_GENERAL_ERRORS, OtrFullFormResponse, OtrLookups, OtrRecords } from './models/otr-api.model';
+import { OTR_GENERAL_ERRORS, OtrDynamicFieldDto, OtrFullFormResponse, OtrLookups, OtrRecords } from './models/otr-api.model';
 import {
   buildFormDef,
   currentStepNumber,
   displayValue,
   documentsFrom,
+  dynamicFieldErrors,
   fieldOptions,
   initialStepValues,
   isFieldVisible,
   isSubmitted,
   mapFieldErrors,
+  parseVisibilityCondition,
   savedStepNumbers,
   setStepValue,
   stepFields,
@@ -114,6 +116,17 @@ describe('otr-form.util (backend OTR form)', () => {
     expect(moved['registeredDistrict']).toBe('Jaipur');
   });
 
+  it('matches a district ignoring case, so a case-only correction in District Master keeps the answer', () => {
+    const loaded = initialStepValues(ORG, { organisationName: 'Company 1', registeredState: 'Rajasthan', registeredDistrict: 'jaipur' } as any);
+    expect(loaded['registeredDistrict']).toBe('Jaipur');
+
+    const base = initialStepValues(ORG, null);
+    const kept = setStepValue(ORG, { ...base, registeredDistrict: 'AJMER' }, 'registeredState', 'rajasthan');
+    expect(kept['registeredDistrict']).toBe('Ajmer');
+    const cleared = setStepValue(ORG, { ...base, registeredDistrict: 'Kota' }, 'registeredState', 'Rajasthan');
+    expect(cleared['registeredDistrict']).toBe('');
+  });
+
   it('builds the request body the backend expects (booleans, sector ids, district id, nulls)', () => {
     const values = {
       ...initialStepValues(ORG, null),
@@ -153,6 +166,88 @@ describe('otr-form.util (backend OTR form)', () => {
     expect(body['dynamicFormVersion']).toBe(2);
     expect(body['dynamicFormAnswers']).toEqual({ alternateMobile: '9829012345' });
     expect('dynamic.alternateMobile' in body).toBe(false);
+  });
+
+  describe('FormManager fields with visibility and validation', () => {
+    const d = (fieldKey: string, fieldType: string, extra: Partial<OtrDynamicFieldDto> = {}): OtrDynamicFieldDto => ({
+      fieldKey, label: fieldKey, fieldType, isRequired: false, displayOrder: 1, colSpan: 6, sectionName: 'Extra', ...extra
+    });
+    const DYN = buildFormDef({
+      ...RESPONSE,
+      steps: [{
+        ...RESPONSE.steps[0],
+        dynamicFormId: 12, dynamicFormVersion: 1, hasDynamicForm: true,
+        dynamicSchema: {
+          title: 'Extra', fields: [
+            d('orgCategory', 'radio', { isRequired: true, options: [{ label: 'Startup', value: 'startup' }, { label: 'Large', value: 'large' }] }),
+            d('annualTurnoverLakhs', 'number', { isRequired: true, validation: { minValue: 1, maxValue: 1000 }, visibilityCondition: "orgCategory == 'startup'" }),
+            d('turnoverNote', 'text', { visibilityCondition: 'annualTurnoverLakhs != "0"' }),
+            d('cinNumber', 'text', { validation: { regexPattern: '^[A-Z0-9]{21}$', customErrorMessage: 'CIN has 21 characters.' }, visibilityCondition: "isGstRegistered == 'true'" })
+          ]
+        }
+      }]
+    }, LOOKUPS).steps[0];
+    const base = { ...initialStepValues(DYN, null), organisationName: 'Company 1' };
+
+    it('maps the schema types and parses visibility conditions onto screen keys', () => {
+      expect(field(DYN, 'dynamic.orgCategory').type).toBe('select');
+      expect(field(DYN, 'dynamic.annualTurnoverLakhs').type).toBe('number');
+      expect(field(DYN, 'dynamic.annualTurnoverLakhs').hint).toBe('Between 1 and 1000');
+      expect(field(DYN, 'dynamic.annualTurnoverLakhs').visibleWhen)
+        .toEqual({ field: 'dynamic.orgCategory', equalTo: 'startup', notEqual: false });
+    });
+
+    it('shows a field only when its condition holds, and hides it when its controlling field is hidden', () => {
+      const turnover = field(DYN, 'dynamic.annualTurnoverLakhs');
+      const note = field(DYN, 'dynamic.turnoverNote');
+      expect(isFieldVisible(turnover, base)).toBe(false);
+      const startup = { ...base, 'dynamic.orgCategory': 'startup', 'dynamic.annualTurnoverLakhs': '250' };
+      expect(isFieldVisible(turnover, startup)).toBe(true);
+      expect(isFieldVisible(note, startup)).toBe(true);
+      expect(isFieldVisible(note, { ...startup, 'dynamic.annualTurnoverLakhs': '0' })).toBe(false);
+      // The turnover is hidden for "large", so the note that depends on it is hidden too.
+      expect(isFieldVisible(note, { ...startup, 'dynamic.orgCategory': 'large' })).toBe(false);
+      // A condition on a fixed Yes / No field matches "true" / "false".
+      expect(isFieldVisible(field(DYN, 'dynamic.cinNumber'), { ...base, isGstRegistered: 'Yes' })).toBe(true);
+      expect(isFieldVisible(field(DYN, 'dynamic.cinNumber'), { ...base, isGstRegistered: 'No' })).toBe(false);
+    });
+
+    it('checks required, range and pattern of visible fields only', () => {
+      expect(dynamicFieldErrors(DYN, base)).toEqual({ 'dynamic.orgCategory': 'orgCategory is required.' });
+      const startup = { ...base, 'dynamic.orgCategory': 'startup' };
+      expect(Object.keys(dynamicFieldErrors(DYN, startup))).toEqual(['dynamic.annualTurnoverLakhs']);
+      expect(dynamicFieldErrors(DYN, { ...startup, 'dynamic.annualTurnoverLakhs': '5000' })['dynamic.annualTurnoverLakhs'])
+        .toContain('at most 1000');
+      expect(dynamicFieldErrors(DYN, { ...startup, 'dynamic.annualTurnoverLakhs': '250', isGstRegistered: 'Yes', 'dynamic.cinNumber': 'abc' }))
+        .toEqual({ 'dynamic.cinNumber': 'CIN has 21 characters.' });
+    });
+
+    it('sends every answer key, numbers as numbers and hidden answers as null', () => {
+      const values = { ...base, 'dynamic.orgCategory': 'large', 'dynamic.annualTurnoverLakhs': '250', 'dynamic.cinNumber': 'X' };
+      const body = toStepPayload(DYN, values, LOOKUPS);
+      expect(body['dynamicFormId']).toBe(12);
+      expect(body['dynamicFormVersion']).toBe(1);
+      expect(body['dynamicFormAnswers']).toEqual({ orgCategory: 'large', annualTurnoverLakhs: null, turnoverNote: null, cinNumber: null });
+      const startup = toStepPayload(DYN, { ...values, 'dynamic.orgCategory': 'startup' }, LOOKUPS);
+      expect((startup['dynamicFormAnswers'] as Record<string, unknown>)['annualTurnoverLakhs']).toBe(250);
+    });
+
+    it('reads saved answers back and maps dynamicFormAnswers errors to their fields', () => {
+      const values = initialStepValues(DYN, {
+        id: 1, status: 'Draft', organisationName: 'Company 1',
+        dynamicFormAnswers: { orgCategory: 'startup', annualTurnoverLakhs: 250 }
+      });
+      expect(values['dynamic.orgCategory']).toBe('startup');
+      expect(values['dynamic.annualTurnoverLakhs']).toBe('250');
+      const form = { ...FORM, steps: [DYN] };
+      const map = mapFieldErrors([{ field: 'dynamicFormAnswers.CinNumber', message: 'Bad CIN.' }], form, 'organisation');
+      expect(map['organisation']).toEqual({ 'dynamic.cinNumber': 'Bad CIN.' });
+    });
+
+    it('ignores conditions it cannot read', () => {
+      expect(parseVisibilityCondition("a == 'x' && b == 'y'")).toBeUndefined();
+      expect(parseVisibilityCondition('flag === true')).toEqual({ field: 'flag', equalTo: 'true', notEqual: false });
+    });
   });
 
   it('reads saved records back into screen values', () => {

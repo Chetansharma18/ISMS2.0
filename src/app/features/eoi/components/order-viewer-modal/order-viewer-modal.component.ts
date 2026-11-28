@@ -25,6 +25,7 @@ import type { EmpanelmentOrder } from '../../models/empanelment-order.model';
       [title]="orderTitle()"
       [subtitle]="order()?.schemeName || ''"
       size="2xl"
+      [showClose]="false"
       (close)="close.emit()"
     >
       <div id="printable-order" class="bg-white p-6 sm:p-8 text-slate-900 border border-slate-200 rounded-lg shadow-2xs max-h-[72vh] overflow-y-auto">

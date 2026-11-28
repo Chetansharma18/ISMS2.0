@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { DataEngineService } from '../../core/services/data-engine.service';
+import { NotificationService } from '../../core/services/notification.service';
 import {
   PageHeaderComponent,
   TableComponent,
@@ -287,6 +288,7 @@ export class UserManagementComponent {
   formData = signal<UserFormData>(createEmptyUserForm());
 
   private dataEngine = inject(DataEngineService);
+  private notifications = inject(NotificationService);
   private userRepo = this.dataEngine.for<UserManagementItem>('USERS');
   private roleRepo = this.dataEngine.for<UserRoleMasterItem>('USER_ROLES', { normalizer: item => toUserRoleItem(item) });
   // Maps the backend block shape ({ name, code, district: { name } }) to the screen's district/block fields.
@@ -608,10 +610,18 @@ export class UserManagementComponent {
 
   toggleUserStatus(item: UserManagementItem): void {
     const newStatus = item.schemeStatus === 'Active' ? 'Inactive' : 'Active';
-    this.userRepo.update(item.id, { schemeStatus: newStatus }).subscribe(updated => {
-      this.users.update(current =>
-        current.map(u => u.id === item.id ? { ...u, schemeStatus: updated?.schemeStatus || newStatus } : u)
-      );
+    this.userRepo.update(item.id, { schemeStatus: newStatus }).subscribe({
+      next: updated => {
+        // Only a status the backend returned is shown: PUT /users/{id} does not store a user status yet (it saves
+        // name, mobile and email), so the row must not pretend the switch was saved.
+        const saved = updated?.schemeStatus;
+        if (!saved) {
+          this.notifications.warning('The user status could not be saved: the server does not store an Active / Inactive status for users yet.');
+          return;
+        }
+        this.users.update(current => current.map(u => (u.id === item.id ? { ...u, schemeStatus: saved } : u)));
+      },
+      error: () => {}
     });
   }
 

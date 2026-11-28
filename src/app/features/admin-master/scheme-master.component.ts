@@ -262,6 +262,7 @@ const CONFIG: MasterCrudConfig<SchemeMasterItem> = {
           <app-switch
             [checked]="item.status !== 'Inactive'"
             [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+            [disabled]="!!masterCrud?.isStatusSaving(item)"
             (toggled)="masterCrud?.toggleStatus(item)"
           />
         </div>

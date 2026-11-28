@@ -48,12 +48,6 @@ import { acceptOf, formatBytes, formatsOf } from '../eoi-apply.util';
           <div class="text-[11.5px] text-slate-500 mt-0.5">
             Supported: {{ formats(doc) }} &nbsp;|&nbsp; Max size: {{ doc.maxFileSizeMb }} MB
           </div>
-          @if (doc.file; as file) {
-            <span class="text-[11.5px] tabular-nums text-emerald-700 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[320px]" [title]="file.fileName">
-              <app-icon name="check-circle" size="xs" class="shrink-0" />
-              <span class="truncate">{{ file.fileName }} ({{ size(file.sizeBytes) }})</span>
-            </span>
-          }
           @if (errorOf(doc); as message) {
             <p class="text-[11.5px] text-red-600 m-0 mt-1" role="alert">{{ message }}</p>
           }
@@ -76,26 +70,35 @@ import { acceptOf, formatBytes, formatsOf } from '../eoi-apply.util';
       </ng-template>
 
       <ng-template #actionTemplate let-doc>
-        <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
+        <div class="flex flex-col items-center justify-center gap-1">
           <input #fileInput type="file" class="hidden" [accept]="accept(doc)" (change)="onFileChange($event, doc)" />
           @if (!doc.file) {
             <button appButton size="sm" [loading]="state.isDocBusy(doc)" [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()">Upload</button>
           } @else {
-            <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewApplyDocument(doc)" title="View Document" aria-label="View Document">
-              <app-icon name="eye" size="sm" />
-            </button>
-            <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()" title="Replace Document" aria-label="Replace Document">
-              <app-icon name="refresh" size="sm" />
-            </button>
-            <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="state.removeApplyDocument(doc)" title="Remove Document" aria-label="Remove Document">
-              <app-icon name="trash" size="sm" class="text-rose-600" />
-            </button>
+            @if (doc.file; as file) {
+              <span class="text-[11px] tabular-nums text-emerald-700 font-medium inline-flex items-center gap-1 max-w-[240px]" [title]="file.fileName + ' (' + size(file.sizeBytes) + ')'">
+                <app-icon name="check-circle" size="xs" class="shrink-0" />
+                <span class="truncate">{{ file.fileName }}</span>
+                <span class="shrink-0 text-emerald-600/80">({{ size(file.sizeBytes) }})</span>
+              </span>
+            }
+            <div class="flex items-center justify-center gap-1.5 flex-nowrap whitespace-nowrap">
+              <button appButton variant="ghost" size="sm" iconOnly (click)="state.viewApplyDocument(doc)" title="View Document" aria-label="View Document">
+                <app-icon name="eye" size="sm" />
+              </button>
+              <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="fileInput.click()" title="Replace Document" aria-label="Replace Document">
+                <app-icon name="refresh" size="sm" />
+              </button>
+              <button appButton variant="ghost" size="sm" iconOnly [disabled]="state.isDocBusy(doc)" (click)="state.removeApplyDocument(doc)" title="Remove Document" aria-label="Remove Document">
+                <app-icon name="trash" size="sm" class="text-rose-600" />
+              </button>
+            </div>
           }
         </div>
       </ng-template>
 
       <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.hasCustomFields() ? state.stepIndexCustomFields() : state.stepIndexProfile)">
+        <button appButton variant="outline" size="lg" (click)="state.goToStep(state.stepIndexCustomFields())">
           &larr; Back
         </button>
         <button appButton size="lg" (click)="state.goToStep(state.stepIndexPreview())">

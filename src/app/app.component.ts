@@ -204,6 +204,9 @@ export class AppComponent {
     const tableAccess = inject(TableAccessService);
     if (!ssoReturn && this.authService.currentUser()) {
       tableAccess.refresh();
+      // The user's roles too (GET /auth/me `availableRoles`): a role assigned since sign-in appears in
+      // "Switch Role" after a page reload, without signing out.
+      this.authService.loadProfile();
     }
     const doc = inject(DOCUMENT);
     fromEvent(doc, 'visibilitychange')

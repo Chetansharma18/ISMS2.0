@@ -116,7 +116,7 @@ let nextDropdownId = 0;
     @if (isOpen()) {
       <div
         #dropdownPanel
-        class="bg-white border border-theme rounded-[6px] overflow-hidden"
+        class="bg-white border border-theme rounded-[6px] overflow-hidden flex flex-col"
         [class.mt-1]="!overlay() || resolvedDirection() === 'down'"
         [class.mb-1]="!overlay() && resolvedDirection() === 'up'"
         [class.shadow-xs]="!overlay()"
@@ -124,7 +124,7 @@ let nextDropdownId = 0;
         (keydown)="onPanelKeydown($event)"
       >
         @if (searchable()) {
-          <div class="p-2 border-b border-theme bg-surface-muted">
+          <div class="p-2 border-b border-theme bg-surface-muted shrink-0">
             <input
               #search
               appInput
@@ -145,7 +145,7 @@ let nextDropdownId = 0;
         <ul
           [id]="listId"
           role="listbox"
-          class="m-0 py-1 list-none max-h-56 overflow-y-auto divide-y divide-border/40 text-[13px]"
+          class="m-0 py-1 list-none flex-1 min-h-0 max-h-56 overflow-y-auto divide-y divide-border/40 text-[13px]"
           [attr.aria-multiselectable]="multiple() ? 'true' : null"
           [attr.aria-label]="ariaLabel() || null"
         >
@@ -198,7 +198,7 @@ let nextDropdownId = 0;
         </ul>
 
         @if (multiple() && footer()) {
-          <div class="px-3 py-2 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between gap-2 text-xs">
+          <div class="px-3 py-2 border-t border-slate-200 bg-slate-50/90 flex items-center justify-between gap-2 text-xs shrink-0">
             <span class="text-slate-600 font-medium">{{ values().length }} selected</span>
             <button appButton variant="primary" size="sm" type="button" (mousedown)="$event.preventDefault()" (click)="close(true)">Done</button>
           </div>
@@ -391,7 +391,7 @@ export class DropdownComponent implements OnDestroy {
           this.overlayRef = this.overlayService.attachConnectedOverlay(
             this.trigger().nativeElement,
             this.dropdownPanel()!.nativeElement,
-            { preferredMaxHeight: 280, gap: 4 },
+            { preferredMaxHeight: 360, gap: 4 },
             () => this.close()
           );
         }

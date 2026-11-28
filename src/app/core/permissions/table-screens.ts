@@ -48,8 +48,8 @@ export const TABLE_SCREENS: Readonly<Record<string, TableScreen>> = {
   SchemeCategoryMasters: { route: '/admin/master/scheme-category', icon: 'list', dataKey: 'SCHEME_CATEGORIES' },
   SectorMasters: { route: '/admin/master/sector', icon: 'list', dataKey: 'SECTORS' },
   CourseMasters: { route: '/admin/master/course', icon: 'list', dataKey: 'COURSES' },
-  // Districts and blocks share one screen; either permission opens it.
-  DistrictMasters: { route: '/admin/master/district-block', icon: 'list', dataKey: 'DISTRICTS' },
+  // Districts and blocks share one screen (District / Block tabs); either permission opens it. DISTRICTS is the block list.
+  DistrictMasters: { route: '/admin/master/district-block', icon: 'list', dataKey: 'DISTRICT_MASTERS' },
   BlockMasters: { route: '/admin/master/district-block', icon: 'list', dataKey: 'DISTRICTS' },
   DesignationMasters: { route: '/admin/master/designation', icon: 'list', dataKey: 'DESIGNATIONS' },
   DocMasters: { route: '/admin/master/doc', icon: 'list', dataKey: 'DOC_MASTERS' },

@@ -6,6 +6,7 @@ import {
   OtrDynamicFieldDto,
   OtrErrorMap,
   OtrFieldDef,
+  OtrFieldRules,
   OtrFieldType,
   OtrFixedFieldDto,
   OtrFormDef,
@@ -33,8 +34,9 @@ import {
 
 /*
  * Pure helpers for the OTR screen: build what to draw from GET /otr/form, turn the saved records into screen values
- * and back into request bodies, and place the backend's error messages under their fields. None of them accepts or
- * rejects a value; every check is the backend's.
+ * and back into request bodies, and place the backend's error messages under their fields. Fixed fields are checked
+ * by the backend only. FormManager (dynamic) fields are not checked by the backend, so `dynamicFieldErrors` applies
+ * their schema rules, and their `visibilityCondition` is evaluated here.
  */
 
 export const OTR_STEP_KEYS = ['organisation', 'authorized-person', 'bank-details'] as const;
@@ -45,7 +47,7 @@ const DYNAMIC_PREFIX = 'dynamic.';
 
 const FIELD_TYPES: Record<string, OtrFieldType> = {
   text: 'text', textarea: 'textarea', select: 'select', multiselect: 'multiselect', date: 'date', tel: 'tel',
-  phone: 'tel', email: 'email', url: 'url', checkbox: 'checkbox', file: 'file', number: 'text', radio: 'select'
+  phone: 'tel', email: 'email', url: 'url', checkbox: 'checkbox', file: 'file', number: 'number', radio: 'select'
 };
 
 function toOptions(list: readonly string[] | OtrOption[] | undefined): OtrOption[] | undefined {
@@ -68,7 +70,9 @@ function districtsByState(lookups: OtrLookups): Record<string, OtrOption[]> {
 
 function fixedField(stepKey: string, dto: OtrFixedFieldDto, lookups: OtrLookups): OtrFieldDef {
   const layout: OtrFieldLayout = OTR_FIELD_LAYOUT[stepKey]?.[dto.fieldKey] ?? {};
-  const type = layout.type ?? FIELD_TYPES[dto.fieldType?.toLowerCase()] ?? 'text';
+  const mapped = FIELD_TYPES[dto.fieldType?.toLowerCase()] ?? 'text';
+  // Fixed number fields (PIN code, account number) stay text inputs so leading digits and length are kept as typed.
+  const type = layout.type ?? (mapped === 'number' ? 'text' : mapped);
   const field: OtrFieldDef = {
     key: dto.fieldKey,
     label: dto.label,
@@ -93,20 +97,112 @@ function fixedField(stepKey: string, dto: OtrFixedFieldDto, lookups: OtrLookups)
   return field;
 }
 
+function num(value: number | null | undefined): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function toRules(dto: OtrDynamicFieldDto): OtrFieldRules | undefined {
+  const v = dto.validation;
+  if (!v) return undefined;
+  const rules: OtrFieldRules = {
+    minLength: num(v.minLength),
+    maxLength: num(v.maxLength),
+    min: num(v.minValue),
+    max: num(v.maxValue),
+    pattern: v.regexPattern?.trim() || undefined,
+    message: v.customErrorMessage?.trim() || undefined
+  };
+  return Object.values(rules).some(x => x !== undefined) ? rules : undefined;
+}
+
+/** A short line under the field when the admin gave no tooltip: the allowed range or length. */
+function rulesHint(type: OtrFieldType, rules: OtrFieldRules | undefined): string | undefined {
+  if (!rules) return undefined;
+  if (type === 'number') {
+    if (rules.min !== undefined && rules.max !== undefined) return `Between ${rules.min} and ${rules.max}`;
+    if (rules.min !== undefined) return `At least ${rules.min}`;
+    if (rules.max !== undefined) return `At most ${rules.max}`;
+    return undefined;
+  }
+  if (rules.minLength !== undefined && rules.maxLength !== undefined) return `${rules.minLength} to ${rules.maxLength} characters`;
+  if (rules.minLength !== undefined) return `At least ${rules.minLength} characters`;
+  if (rules.maxLength !== undefined) return `Up to ${rules.maxLength} characters`;
+  return undefined;
+}
+
+/**
+ * `fieldKey == 'value'`, `fieldKey != "value"`, `fieldKey === true` -> a condition on the raw schema key (resolved to a
+ * screen key in `toStep`). Anything else is not understood, and the field is then always shown.
+ */
+export function parseVisibilityCondition(expression: string | null | undefined): OtrCondition | undefined {
+  const match = /^\s*([A-Za-z0-9_.-]+)\s*(===?|!==?)\s*(?:'([^']*)'|"([^"]*)"|([^\s'"]+))\s*$/.exec(expression ?? '');
+  if (!match) return undefined;
+  const value = match[3] ?? match[4] ?? match[5] ?? '';
+  return { field: match[1], equalTo: value, notEqual: match[2].startsWith('!') };
+}
+
 function dynamicField(dto: OtrDynamicFieldDto): OtrFieldDef {
-  const type = FIELD_TYPES[dto.fieldType?.toLowerCase()] ?? 'text';
+  const mapped = FIELD_TYPES[dto.fieldType?.toLowerCase()] ?? 'text';
+  // FormManager file fields have no OTR upload endpoint: the applicant types a reference instead.
+  const type: OtrFieldType = mapped === 'file' ? 'text' : mapped;
+  const rules = toRules(dto);
   return {
     key: `${DYNAMIC_PREFIX}${dto.fieldKey}`,
     label: dto.label,
-    type: type === 'file' ? 'text' : type,
+    type,
     required: dto.isRequired,
     placeholder: dto.placeholder ?? undefined,
-    hint: dto.tooltip ?? undefined,
+    hint: dto.tooltip?.trim() || rulesHint(type, rules),
     default: dto.defaultValue ?? undefined,
     colSpan: (dto.colSpan ?? 12) > 6 ? 2 : 1,
-    options: dto.options?.map(o => ({ value: o.value, label: o.label })),
-    dynamic: true
+    options: dto.options?.map(o => ({ value: o.value, label: o.label || o.value })),
+    dynamic: true,
+    rules
   };
+}
+
+function conditionsOf(field: OtrFieldDef): OtrCondition[] {
+  const v = field.visibleWhen;
+  return !v ? [] : Array.isArray(v) ? v : [v];
+}
+
+/**
+ * Points each dynamic field's condition at the screen key it names (a FormManager field of the step, else a fixed
+ * field such as `isGstRegistered`), and adds the conditions of that field: a field whose controlling field is hidden
+ * stays hidden too.
+ */
+function resolveVisibility(fields: OtrFieldDef[], schema: OtrDynamicFieldDto[]): void {
+  const byKey = new Map(fields.map(f => [f.key, f]));
+  const fixedKeys = fields.filter(f => !f.dynamic).map(f => f.key);
+  const dynamicKeys = schema.map(d => d.fieldKey);
+  const screenKey = (name: string) => {
+    const lower = name.toLowerCase();
+    const dyn = dynamicKeys.find(k => k.toLowerCase() === lower);
+    if (dyn) return `${DYNAMIC_PREFIX}${dyn}`;
+    return fixedKeys.find(k => k.toLowerCase() === lower) ?? `${DYNAMIC_PREFIX}${name}`;
+  };
+  for (const dto of schema) {
+    const parsed = parseVisibilityCondition(dto.visibilityCondition);
+    const field = byKey.get(`${DYNAMIC_PREFIX}${dto.fieldKey}`);
+    if (parsed && field) field.visibleWhen = { ...parsed, field: screenKey(parsed.field) };
+  }
+  const resolved = new Map<string, OtrCondition[]>();
+  const chain = (field: OtrFieldDef, seen: Set<string>): OtrCondition[] => {
+    const done = resolved.get(field.key);
+    if (done) return done;
+    const all: OtrCondition[] = [];
+    for (const c of conditionsOf(field)) {
+      all.push(c);
+      const parent = byKey.get(c.field);
+      if (parent && !seen.has(parent.key)) all.push(...chain(parent, new Set([...seen, parent.key])));
+    }
+    resolved.set(field.key, all);
+    return all;
+  };
+  for (const field of fields.filter(f => f.dynamic)) {
+    const all = chain(field, new Set([field.key]));
+    if (all.length > 0) field.visibleWhen = all.length === 1 ? all[0] : all;
+  }
 }
 
 /** Consecutive fields with the same section name form one section. */
@@ -120,13 +216,50 @@ function toSections(stepKey: string, fields: { field: OtrFieldDef; section: stri
   return sections;
 }
 
+/**
+ * The form with one step replaced by a fresh GET /otr/form/steps/{stepKey} definition (e.g. a FormManager schema
+ * published after the full form was loaded). Returns the same form when the step is unknown.
+ */
+export function replaceStep(form: OtrFormDef, dto: OtrStepFormDto, lookups: OtrLookups): OtrFormDef {
+  const current = form.steps.find(s => s.key === dto.stepKey && s.kind === 'form');
+  if (!current || !Array.isArray(dto.fixedFields)) return form;
+  const next = toStep(dto, current.number, lookups);
+  return { ...form, steps: form.steps.map(s => (s === current ? next : s)) };
+}
+
+/** True when the step's dynamic schema or its fields differ (then the screen values need new keys). */
+export function stepChanged(a: OtrStepDef, b: OtrStepDef): boolean {
+  const keys = (s: OtrStepDef) => stepFields(s).map(f => f.key).join('|');
+  return a.dynamicFormId !== b.dynamicFormId || a.dynamicFormVersion !== b.dynamicFormVersion || keys(a) !== keys(b);
+}
+
+/** Values for a rebuilt step: what was typed stays, fields new to the step start from the saved record. */
+export function mergeStepValues(step: OtrStepDef, typed: OtrStepValues, record: OtrStepRecord | null | undefined): OtrStepValues {
+  const fresh = initialStepValues(step, record);
+  const merged: OtrStepValues = {};
+  for (const key of Object.keys(fresh)) merged[key] = key in typed ? typed[key] : fresh[key];
+  return merged;
+}
+
+/** True when the request body of the step differs from the body of what the backend holds. */
+export function stepPayloadChanged(
+  step: OtrStepDef,
+  values: OtrStepValues,
+  record: OtrStepRecord | null | undefined,
+  lookups: OtrLookups
+): boolean {
+  const saved = toStepPayload(step, initialStepValues(step, record), lookups);
+  const current = toStepPayload(step, values, lookups);
+  return JSON.stringify(saved) !== JSON.stringify(current);
+}
+
 function toStep(dto: OtrStepFormDto, number: number, lookups: OtrLookups): OtrStepDef {
   const fixed = dto.fixedFields.map(f => ({ field: fixedField(dto.stepKey, f, lookups), section: f.sectionName || dto.stepTitle }));
-  const extra = dto.hasDynamicForm && dto.dynamicSchema
-    ? [...dto.dynamicSchema.fields]
-        .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-        .map(f => ({ field: dynamicField(f), section: f.sectionName || dto.dynamicSchema?.title || 'Additional Details' }))
-    : [];
+  const schema = dto.hasDynamicForm ? dto.dynamicSchema?.fields ?? [] : [];
+  const extra = [...schema]
+    .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
+    .map(f => ({ field: dynamicField(f), section: f.sectionName || dto.dynamicSchema?.title || 'Additional Details' }));
+  resolveVisibility([...fixed, ...extra].map(x => x.field), schema);
   return {
     number,
     key: dto.stepKey,
@@ -170,15 +303,76 @@ function conditionText(value: OtrValue | undefined): string {
   return value ?? '';
 }
 
+const FLAG_WORDS: Record<string, string> = { yes: 'true', no: 'false' };
+
+function conditionMatches(expected: string, actual: OtrValue | undefined): boolean {
+  const want = expected.trim().toLowerCase();
+  if (Array.isArray(actual)) return actual.some(v => v.toLowerCase() === want);
+  const isFlag = want === 'true' || want === 'false';
+  if ((actual === null || actual === undefined || actual === '') && isFlag) return want === 'false';
+  const text = conditionText(actual).trim().toLowerCase();
+  return text === want || (isFlag && FLAG_WORDS[text] === want);
+}
+
 export function conditionHolds(condition: OtrCondition, values: OtrStepValues): boolean {
-  const actual = values[condition.field];
-  const isFlag = condition.equalTo === 'true' || condition.equalTo === 'false';
-  const text = (actual === null || actual === undefined) && isFlag ? 'false' : conditionText(actual);
-  return text.toLowerCase() === condition.equalTo.toLowerCase();
+  const match = conditionMatches(condition.equalTo, values[condition.field]);
+  return condition.notEqual ? !match : match;
 }
 
 export function isFieldVisible(field: OtrFieldDef, values: OtrStepValues): boolean {
-  return !field.visibleWhen || conditionHolds(field.visibleWhen, values);
+  return conditionsOf(field).every(c => conditionHolds(c, values));
+}
+
+function isBlank(value: OtrValue | undefined): boolean {
+  return value === null || value === undefined || value === false
+    || (typeof value === 'string' && value.trim() === '') || (Array.isArray(value) && value.length === 0);
+}
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function ruleMessage(field: OtrFieldDef, fallback: string): string {
+  return field.rules?.message ?? fallback;
+}
+
+/**
+ * Messages for the step's visible FormManager fields: required, number, e-mail, length, range and pattern from the
+ * schema. The backend saves the answers without checking them, so the screen checks them before "Save & Next".
+ */
+export function dynamicFieldErrors(step: OtrStepDef, values: OtrStepValues): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const field of stepFields(step)) {
+    if (!field.dynamic || !isFieldVisible(field, values)) continue;
+    const value = values[field.key];
+    if (isBlank(value)) {
+      if (field.required) errors[field.key] = `${field.label} is required.`;
+      continue;
+    }
+    if (Array.isArray(value) || typeof value === 'boolean') continue;
+    const text = String(value).trim();
+    const rules = field.rules ?? {};
+    if (field.type === 'number') {
+      const n = Number(text);
+      if (!Number.isFinite(n)) errors[field.key] = `${field.label} must be a number.`;
+      else if (rules.min !== undefined && n < rules.min) errors[field.key] = ruleMessage(field, `${field.label} must be at least ${rules.min}.`);
+      else if (rules.max !== undefined && n > rules.max) errors[field.key] = ruleMessage(field, `${field.label} must be at most ${rules.max}.`);
+    } else if (field.type === 'email' && !EMAIL.test(text)) {
+      errors[field.key] = ruleMessage(field, `Enter a valid e-mail address for ${field.label}.`);
+    } else if (rules.minLength !== undefined && text.length < rules.minLength) {
+      errors[field.key] = ruleMessage(field, `${field.label} must have at least ${rules.minLength} characters.`);
+    } else if (rules.maxLength !== undefined && text.length > rules.maxLength) {
+      errors[field.key] = ruleMessage(field, `${field.label} must have at most ${rules.maxLength} characters.`);
+    }
+    if (!errors[field.key] && rules.pattern) {
+      let re: RegExp | null = null;
+      try {
+        re = new RegExp(rules.pattern);
+      } catch {
+        re = null; // A pattern the browser cannot read is not applied.
+      }
+      if (re && !re.test(text)) errors[field.key] = ruleMessage(field, `${field.label} is not in the expected format.`);
+    }
+  }
+  return errors;
 }
 
 /** The "*" marker: the backend's isRequired flag. */
@@ -200,6 +394,15 @@ export function fieldOptions(field: OtrFieldDef, values: OtrStepValues): OtrOpti
   return field.options ?? [];
 }
 
+/**
+ * The option whose value equals `value` ignoring case. Master names are unique ignoring case, and a case-only
+ * correction in the master ("jaipur" -> "Jaipur") must not lose an answer saved with the old case.
+ */
+function sameOption(options: OtrOption[], value: string): OtrOption | undefined {
+  const lower = value.toLowerCase();
+  return options.find(o => o.value === value) ?? options.find(o => o.value.toLowerCase() === lower);
+}
+
 /** Sets one value; a district that does not belong to a newly chosen state is cleared. */
 export function setStepValue(step: OtrStepDef, values: OtrStepValues, key: string, value: OtrValue): OtrStepValues {
   const next: OtrStepValues = { ...values, [key]: value };
@@ -207,8 +410,8 @@ export function setStepValue(step: OtrStepDef, values: OtrStepValues, key: strin
     if (field.dependsOn !== key) continue;
     const current = next[field.key];
     const options = fieldOptions(field, next);
-    if (typeof current === 'string' && current && options.length > 0 && !options.some(o => o.value === current)) {
-      next[field.key] = '';
+    if (typeof current === 'string' && current && options.length > 0) {
+      next[field.key] = sameOption(options, current)?.value ?? '';
     }
   }
   return next;
@@ -258,11 +461,19 @@ export function initialStepValues(step: OtrStepDef, record: OtrStepRecord | null
     if (field.type === 'file') continue;
     if (field.dynamic) {
       const raw = answers[dynamicKey(field)];
-      values[field.key] = fromRecordValue(field.type === 'multiselect' ? 'ids' : field.type === 'checkbox' ? 'flag' : 'text', field, raw);
+      const kind: OtrValueKind = field.type === 'multiselect' ? 'ids' : field.type === 'checkbox' ? 'flag' : field.type === 'date' ? 'date' : 'text';
+      values[field.key] = fromRecordValue(kind, field, raw);
       continue;
     }
     // A record created only by an upload holds the backend's empty defaults: show the screen defaults instead.
     values[field.key] = saved ? fromRecordValue(valueKind(step.key, field), field, record?.[field.key]) : emptyValue(field);
+  }
+  // A saved district written in another case than the master's name ("jaipur") shows as the master option ("Jaipur").
+  for (const field of stepFields(step)) {
+    const current = values[field.key];
+    if (!field.optionsByParent || typeof current !== 'string' || !current) continue;
+    const match = sameOption(fieldOptions(field, values), current);
+    if (match) values[field.key] = match.value;
   }
   return values;
 }
@@ -278,6 +489,20 @@ function toRequestValue(kind: OtrValueKind, value: OtrValue | undefined): unknow
   }
 }
 
+/** A FormManager answer as JSON: numbers as numbers, flags as booleans, lists as arrays, empty as null. */
+function toAnswer(field: OtrFieldDef, value: OtrValue | undefined): unknown {
+  if (field.type === 'checkbox') return value === true;
+  if (Array.isArray(value)) return value.length > 0 ? value : null;
+  if (value === null || value === undefined || typeof value === 'boolean') return value ?? null;
+  const text = value.trim();
+  if (text === '') return null;
+  if (field.type === 'number') {
+    const n = Number(text);
+    return Number.isFinite(n) ? n : text;
+  }
+  return text;
+}
+
 /**
  * The body of PUT /otr/me/<step>: every fixed field of the step (hidden ones empty), the DistrictMasters id of the
  * chosen districts and the step's extra FormManager answers. Values are sent as typed: the backend trims,
@@ -290,7 +515,9 @@ export function toStepPayload(step: OtrStepDef, values: OtrStepValues, lookups: 
     if (field.type === 'file') continue;
     const visible = isFieldVisible(field, values);
     if (field.dynamic) {
-      if (visible) answers[dynamicKey(field)] = values[field.key] ?? null;
+      // Every key is sent (hidden or empty ones as null): the backend replaces the stored answers only when the
+      // object has keys, so this also clears an answer whose field is now hidden.
+      answers[dynamicKey(field)] = visible ? toAnswer(field, values[field.key]) : null;
       continue;
     }
     const kind = valueKind(step.key, field);
@@ -379,6 +606,12 @@ function matchField(raw: string, keys: string[]): string | undefined {
   let name = raw.trim();
   if (name.startsWith('$.')) name = name.slice(2);
   if (name.toLowerCase().startsWith('request.')) name = name.slice(8);
+  // `dynamicFormAnswers.cinNumber` / `dynamicFormAnswers['cinNumber']` -> the FormManager field `dynamic.cinNumber`.
+  const answer = /^dynamicFormAnswers(?:\.|\[['"]?)([^'"\]]+)/i.exec(name);
+  if (answer) {
+    const lower = `${DYNAMIC_PREFIX}${answer[1]}`.toLowerCase();
+    return keys.find(k => k.toLowerCase() === lower);
+  }
   name = name.split(/[.[]/)[0];
   const lower = name.toLowerCase();
   return keys.find(k => k.toLowerCase() === lower)

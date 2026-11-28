@@ -110,11 +110,9 @@ describe('NewUserCategoryModalComponent', () => {
     expect(host.aspirantCount).toBe(1);
   });
 
-  it('emits cancelled on clicking close button', () => {
+  it('emits cancelled when the dialog is closed with Escape', () => {
     openModal();
-    const closeBtn = el().querySelector('button[aria-label="Close"]') as HTMLButtonElement;
-    expect(closeBtn).not.toBeNull();
-    closeBtn.click();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     fixture.detectChanges();
 
     expect(host.cancelCount).toBe(1);

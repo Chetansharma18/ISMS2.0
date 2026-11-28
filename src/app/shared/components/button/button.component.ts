@@ -55,6 +55,10 @@ export class ButtonComponent {
   readonly loading = input(false, { transform: booleanAttribute });
   /** Stretches the button to the full width of its container. */
   readonly block = input(false, { transform: booleanAttribute });
+  /** Removes corner rounding (sharp 90-degree corners). */
+  readonly square = input(false, { transform: booleanAttribute });
+  /** Stacks content vertically in a square tile (icon above label). */
+  readonly tile = input(false, { transform: booleanAttribute });
   /** A square button that holds only an icon. Give it an `aria-label`. */
   readonly iconOnly = input(false, { transform: booleanAttribute });
 
@@ -69,6 +73,8 @@ export class ButtonComponent {
     if (this.size() === 'sm') parts.push('btn-sm');
     if (this.size() === 'lg') parts.push('btn-lg');
     if (this.block()) parts.push('btn-block');
+    if (this.square()) parts.push('btn-square');
+    if (this.tile()) parts.push('btn-tile');
     if (this.iconOnly()) parts.push('btn-icon');
     return parts.join(' ');
   });

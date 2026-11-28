@@ -2,6 +2,7 @@
  * Shapes of the backend's EOI Configuration API (`/api/eoi/configurations`, Features/Eoi) and of the applicant
  * notices list (`/api/eoi/apply/notices`). Dates are ISO calendar dates (yyyy-MM-dd); fees are numbers.
  */
+import type { EoiPublishedInfo } from '../tenders-page/publish-fields.util';
 
 export interface EoiSchemeOption {
   id: number;
@@ -200,4 +201,8 @@ export interface EoiOpenNoticeDetail {
   /** False until the applicant's One Time Registration is submitted. */
   otrCompleted: boolean;
   acceptsApplications: boolean;
+  /** "Publish Details" custom fields with the values the department entered: information shown with the EOI. */
+  publishedInfo?: EoiPublishedInfo[] | null;
+  /** "Uploading Details" custom fields: what the applicant fills in when applying. */
+  customFields?: { key: string; label: string; type: string; mandatory: boolean }[] | null;
 }

@@ -1,13 +1,9 @@
 // ui-guard-allow: page-frame - the public landing page has its own full-width sections
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { NewsTickerComponent } from './components/news-ticker/news-ticker.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
-import { StatsSectionComponent } from './components/stats-section/stats-section.component';
-import { SchemesSectionComponent } from './components/schemes-section/schemes-section.component';
 import { ServicesSectionComponent } from './components/services-section/services-section.component';
 import { AboutSectionComponent } from './components/about-section/about-section.component';
-import { ImportantLinksComponent } from './components/important-links/important-links.component';
 import { FooterComponent } from '../../core/layout/footer/footer.component';
 
 @Component({
@@ -15,7 +11,6 @@ import { FooterComponent } from '../../core/layout/footer/footer.component';
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     NewsTickerComponent,
     HeroSectionComponent,
     AboutSectionComponent,

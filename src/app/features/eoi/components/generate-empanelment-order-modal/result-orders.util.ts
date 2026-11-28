@@ -85,6 +85,34 @@ export interface OrderDto {
   signoffs: OrderSignoffDto[];
   signoffVerified: number;
   signoffTotal: number;
+  /** The order's own signing authority (the Empanelment and the Rejection Order have different ones). */
+  signer?: OrderSignerDto | null;
+}
+
+/** Who e-signs the order. ssoId / name: the user; authorityName / authorityDesignation: the printed signature block. */
+export interface OrderSignerDto {
+  ssoId: string | null;
+  name: string | null;
+  authorityName: string | null;
+  authorityDesignation: string | null;
+  /** The signed-in user is this order's signing authority. */
+  isMe: boolean;
+  /** isMe, and the order is the latest up-to-date draft (it can be e-signed now). */
+  canESign: boolean;
+  /** The order is Signed or Published. */
+  signed?: boolean;
+  /** Who signed it (the e-signer, or who uploaded the signed copy). */
+  signedBy?: string | null;
+  signedAt?: string | null;
+}
+
+/** A committee member who can be chosen as an order's signing authority. */
+export interface SignerOptionDto {
+  ssoId: string;
+  name: string;
+  /** Approver | Member */
+  role: string;
+  designation: string | null;
 }
 
 export interface OrdersOverviewDto {
@@ -159,6 +187,8 @@ export interface OrderContent {
   /** Dispatch line above "Copy to" (Rejection Order); empty leaves it out. */
   dispatchFileNo: string | null;
   dispatchDated: string | null;
+  /** The user who may e-sign the order (one of the EOI's committee); null on save = unchanged. */
+  signerSsoId?: string | null;
 }
 
 export interface OrderEditorRow {
@@ -180,6 +210,8 @@ export interface OrderEditorDto {
   content: OrderContent;
   rows: OrderEditorRow[];
   canEdit: boolean;
+  /** Who can be chosen as the signing authority (the EOI's committee, approver first). */
+  signerOptions?: SignerOptionDto[];
 }
 
 /** What the editor page binds to (arrays of objects, so each line keeps its input while typing). */
@@ -198,6 +230,8 @@ export interface OrderDraftForm {
   closingText: string;
   dispatchFileNo: string;
   dispatchDated: string;
+  /** SSO ID of the signing authority ('' = none chosen). */
+  signerSsoId: string;
 }
 
 export function toDraftForm(dto: OrderEditorDto): OrderDraftForm {
@@ -216,7 +250,8 @@ export function toDraftForm(dto: OrderEditorDto): OrderDraftForm {
     headerAddress: c.headerAddress ?? '',
     closingText: c.closingText ?? '',
     dispatchFileNo: c.dispatchFileNo ?? '',
-    dispatchDated: c.dispatchDated ?? ''
+    dispatchDated: c.dispatchDated ?? '',
+    signerSsoId: c.signerSsoId ?? dto.order.signer?.ssoId ?? ''
   };
 }
 
@@ -237,8 +272,82 @@ export function toContentRequest(form: OrderDraftForm): OrderContent {
     headerAddress: form.headerAddress.trim(),
     closingText: form.closingText.trim(),
     dispatchFileNo: form.dispatchFileNo.trim(),
-    dispatchDated: form.dispatchDated.trim()
+    dispatchDated: form.dispatchDated.trim(),
+    signerSsoId: form.signerSsoId.trim() || null
   };
+}
+
+/**
+ * Choosing a signing authority: sets the signer, and fills the printed name and designation from that person when
+ * they are still empty or still show the previous signer's details (text typed by hand is kept).
+ */
+export function applySigner(form: OrderDraftForm, option: SignerOptionDto | null, previous: SignerOptionDto | null): OrderDraftForm {
+  if (!option) return { ...form, signerSsoId: '' };
+  const replace = (current: string, old: string | null | undefined) => !current.trim() || (!!old && current.trim() === old.trim());
+  return {
+    ...form,
+    signerSsoId: option.ssoId,
+    signatoryName: replace(form.signatoryName, previous?.name) ? option.name : form.signatoryName,
+    signatoryDesignation:
+      option.designation && replace(form.signatoryDesignation, previous?.designation) ? option.designation : form.signatoryDesignation
+  };
+}
+
+/** "Committee Member 1 (Approver, Director)": a signer in the signing-authority list. */
+export function signerOptionLabel(option: SignerOptionDto): string {
+  return `${option.name} (${[option.role, option.designation].filter(Boolean).join(', ')})`;
+}
+
+/** "Scheme OIC, Scheme 1": the printed signing authority of an order (the signer's name when none is printed). */
+export function signingAuthorityText(signer: OrderSignerDto | null | undefined): string {
+  if (!signer) return '-';
+  const name = signer.authorityName?.trim() || signer.name?.trim() || '';
+  return [name, signer.authorityDesignation?.trim() ?? ''].filter(Boolean).join(', ') || '-';
+}
+
+/** One e-sign action per order that needs signing: "E-Sign Empanelment Order" / "E-Sign Rejection Order". */
+export interface ESignAction {
+  type: OrderType;
+  label: string;
+  order: OrderDto;
+  /** Signed (or published) already. */
+  done: boolean;
+  /** The signed-in user is this order's signing authority and it can be e-signed now. */
+  canSign: boolean;
+  /** Why the button is disabled for me (empty when I can sign it, or it is done). */
+  note: string;
+  /** "Signed by Committee Member 1" once done, else empty. */
+  signedText: string;
+}
+
+export const ESIGN_LABEL: Record<OrderType, string> = {
+  Empanelment: 'E-Sign Empanelment Order',
+  Rejection: 'E-Sign Rejection Order'
+};
+
+/** The e-sign actions of the needed orders: only the order types that exist (one button if the EOI has one type). */
+export function eSignActions(slots: OrderSlot[]): ESignAction[] {
+  return slots
+    .filter((s): s is OrderSlot & { order: OrderDto } => s.order !== null)
+    .map(s => eSignActionFor(s.order, s.type));
+}
+
+/** The e-sign action of one order: enabled only for its own signing authority, "Signed by ..." once signed. */
+export function eSignActionFor(o: OrderDto, type: OrderType = o.type === 'Rejection' ? 'Rejection' : 'Empanelment'): ESignAction {
+  const done = isOrderComplete(o);
+  const signer = o.signer ?? null;
+  const who = signer?.name || signer?.authorityName || 'the signing authority';
+  let note = '';
+  if (!done && !signer?.canESign) {
+    if (!signer?.ssoId) note = 'No signing authority is set. Choose one in the draft editor.';
+    else if (!signer.isMe) note = `Only ${who} can e-sign this order.`;
+    else if (o.isStale) note = 'A decision changed after this draft was generated. Generate a new draft first.';
+    else if (o.status === 'Final') note = 'The signed copy is uploaded; the committee OTP sign-off completes it.';
+    else note = 'This order cannot be e-signed now.';
+  }
+  const signedBy = signer?.signedBy?.trim() || signer?.name?.trim() || '';
+  const signedText = done ? (signedBy ? `Signed by ${signedBy}` : 'Signed') : '';
+  return { type, label: ESIGN_LABEL[type], order: o, done, canSign: !done && !!signer?.canESign, note, signedText };
 }
 
 /** UTC time from the backend, in the browser's time. */

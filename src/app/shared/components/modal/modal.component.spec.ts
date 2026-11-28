@@ -48,10 +48,14 @@ describe('ModalComponent', () => {
     expect(fixture.componentInstance.closed).toBe(2);
   });
 
-  it('closes from the close button', () => {
+  it('shows a footer Cancel button that closes it, and no top-right close button', () => {
     const fixture = render();
-    const button = (fixture.nativeElement as HTMLElement).querySelector('button[aria-label="Close"]') as HTMLButtonElement;
-    button.click();
+    const root = fixture.nativeElement as HTMLElement;
+    expect(root.querySelector('button[aria-label="Close"]')).toBeNull();
+
+    const cancel = Array.from(root.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Cancel');
+    expect(cancel).toBeDefined();
+    cancel!.click();
     expect(fixture.componentInstance.closed).toBe(1);
   });
 });

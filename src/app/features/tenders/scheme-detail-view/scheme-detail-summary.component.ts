@@ -71,6 +71,21 @@ import { formatFeeDisplay } from './scheme-detail-view.util';
           </div>
         }
       </dl>
+
+      <!-- Publish Details information the department added to the EOI (read-only for applicants) -->
+      @if (scheme().publishedInfo?.length) {
+        <div class="pt-4 border-t border-[#EADCE2] space-y-3">
+          <h2 class="text-sm sm:text-base font-bold text-[#7C0E44] m-0">Additional EOI Information</h2>
+          <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5 m-0">
+            @for (info of scheme().publishedInfo; track $index) {
+              <div class="space-y-1 min-w-0">
+                <dt class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{{ info.label }}</dt>
+                <dd class="text-[13.5px] font-semibold text-slate-900 m-0 break-words whitespace-pre-line">{{ info.value }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+      }
     </section>
   `
 })

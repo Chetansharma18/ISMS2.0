@@ -94,4 +94,74 @@ export interface EoiApplication {
   submittedAt: string | null;
   dynamicAnswers?: Record<string, EoiAnswerValue> | null;
   customFields?: EoiCustomField[] | null;
+  /** The EOI Form's built-in sections (PUT .../proposal-details); null until saved. */
+  proposalDetails?: EoiProposalDetails | null;
+}
+
+// ---- EOI Form: built-in proposal details (EoiApplication.ProposalDetailsJson) -----------------
+
+export interface EoiProposalOrganisation {
+  businessActivity: string | null;
+  registeringAuthority: string | null;
+  placeOfRegistration: string | null;
+  isBlacklisted: boolean | null;
+  blacklistDetails: string | null;
+}
+
+/** The project-level authorized person; the other fields are null when `sameAsOrganisation` is true. */
+export interface EoiProposalPerson {
+  sameAsOrganisation: boolean | null;
+  name: string | null;
+  designation: string | null;
+  mobile: string | null;
+  email: string | null;
+  idProofType: string | null;
+  idNumber: string | null;
+  residenceAddress: string | null;
+}
+
+export interface EoiFinancialRow {
+  financialYear: string | null;
+  totalTurnover: number | null;
+  skillTurnover: number | null;
+}
+
+export interface EoiTrainingCentreRow {
+  district: string | null;
+  centreName: string | null;
+  telephone: string | null;
+  classrooms: number | null;
+  practicalRooms: number | null;
+  separateWashrooms: boolean | null;
+  labAvailable: boolean | null;
+  address: string | null;
+}
+
+export interface EoiTrainingPlacementRow {
+  sector: string | null;
+  financialYear: string | null;
+  trained: number | null;
+  placed: number | null;
+  proofCount: number | null;
+}
+
+export interface EoiActionPlanRow {
+  year: string | null;
+  district: string | null;
+  sdcCount: number | null;
+  sdcLocation: string | null;
+  sectors: string | null;
+  courses: string | null;
+  residentialType: string | null;
+  batches: number | null;
+}
+
+/** As stored and sent (camelCase); every part may be null or absent in a draft. */
+export interface EoiProposalDetails {
+  organisation?: EoiProposalOrganisation | null;
+  projectAuthorizedPerson?: EoiProposalPerson | null;
+  financials?: EoiFinancialRow[] | null;
+  trainingCentres?: EoiTrainingCentreRow[] | null;
+  trainingPlacements?: EoiTrainingPlacementRow[] | null;
+  actionPlan?: EoiActionPlanRow[] | null;
 }

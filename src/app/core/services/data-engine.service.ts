@@ -23,6 +23,11 @@ export interface ResourceRepository<T> {
   create(payload: Partial<T>): Observable<T>;
   update(id: string | number, patch: Partial<T>): Observable<T>;
   delete(id: string | number): Observable<boolean>;
+  /**
+   * Active / Inactive switch: PATCH the resource's STATUS endpoint with `{ isActive }` (the mock store: `status`).
+   * Optional: repositories built by hand (e.g. the generic module page) leave it out and use `update`.
+   */
+  setStatus?(id: string | number, active: boolean): Observable<T>;
 }
 
 /**
@@ -63,13 +68,19 @@ export class DataEngineService {
       getById: (id: string | number) => this.getById<T>(dataKey, id, { idKey, normalizer }),
       create: (payload: Partial<T>) => this.create<T>(dataKey, body(payload), { idKey, normalizer }),
       update: (id: string | number, patch: Partial<T>) => this.update<T>(dataKey, id, body(patch), { idKey, normalizer }),
-      delete: (id: string | number) => this.delete(dataKey, id, { idKey })
+      delete: (id: string | number) => this.delete(dataKey, id, { idKey }),
+      setStatus: (id: string | number, active: boolean) => this.setStatus<T>(dataKey, id, active, { idKey, normalizer })
     };
   }
 
   /** True when the resource is served from the mock store rather than the API. */
   isMock(dataKey: string): boolean {
     return isMockEnabled(dataKey);
+  }
+
+  /** True when the resource has a dedicated Active / Inactive call (API mode with a STATUS endpoint). */
+  hasStatusEndpoint(dataKey: string): boolean {
+    return !isMockEnabled(dataKey) && this.endpoint(dataKey, 'STATUS') !== null;
   }
 
   /** Resets mock store and storage for a resource (or all resources). */
@@ -189,6 +200,32 @@ export class DataEngineService {
     if (!endpoint) return this.missingEndpoint(dataKey, 'UPDATE');
 
     return this.http.call<unknown>(endpoint, { id, body: patch }).pipe(map(res => normalizer(unwrapData(res))));
+  }
+
+  /**
+   * STATUS: activates or deactivates a record and returns it as saved. API mode: PATCH the STATUS endpoint with
+   * `{ isActive }`; the mock store gets `{ status: 'Active' | 'Inactive' }`.
+   */
+  setStatus<T = any>(
+    dataKey: string,
+    id: string | number,
+    active: boolean,
+    options: ResourceRepositoryOptions<T> = {}
+  ): Observable<T> {
+    const idKey = options.idKey || 'id';
+    const normalizer = options.normalizer || ((item: unknown) => item as T);
+
+    if (isMockEnabled(dataKey)) {
+      const patch = { status: active ? 'Active' : 'Inactive' } as unknown as Partial<T>;
+      return this.mockReply(normalizer(this.mockDb.update<T>(dataKey, id, patch, idKey)));
+    }
+
+    const endpoint = this.endpoint(dataKey, 'STATUS');
+    if (!endpoint) return this.missingEndpoint(dataKey, 'STATUS');
+
+    return this.http
+      .call<unknown>(endpoint, { id, body: { isActive: active } })
+      .pipe(map(res => normalizer(unwrapData(res))));
   }
 
   /** DELETE: removes a record. True when it was removed. */

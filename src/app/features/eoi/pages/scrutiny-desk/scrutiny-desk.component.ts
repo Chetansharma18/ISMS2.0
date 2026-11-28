@@ -20,6 +20,8 @@ import { documentsFrom, formSteps, initialStepValues, stepFields } from '../../.
 import { OtrRegistrationService } from '../../../registration/services/otr-registration.service';
 import { EoiApplyDocument } from '../../components/scheme-form/eoi-apply.model';
 import { errorText, formatBytes } from '../../components/scheme-form/eoi-apply.util';
+import { otrPersonName } from '../../components/scheme-form/proposal-details.util';
+import { ProposalDetailsViewComponent } from '../../components/proposal-details-view/proposal-details-view.component';
 import { DecisionSubmission, ScrutinyDecisionModalComponent } from './components/scrutiny-decision-modal.component';
 import { ScrutinyReviewService } from './scrutiny-review.service';
 import {
@@ -37,7 +39,7 @@ import {
   toGradeOptions
 } from './scrutiny-desk.util';
 
-type StepKey = 'overview' | (typeof PROFILE_SECTIONS)[number]['key'] | 'documents' | 'past-performance' | 'activity';
+type StepKey = 'overview' | (typeof PROFILE_SECTIONS)[number]['key'] | 'proposal' | 'documents' | 'past-performance' | 'activity';
 type DecisionModal = 'remark' | 'reject' | 'approve' | null;
 
 /**
@@ -57,6 +59,7 @@ type DecisionModal = 'remark' | 'reject' | 'approve' | null;
     StepperComponent,
     TableComponent,
     OtrReviewComponent,
+    ProposalDetailsViewComponent,
     ScrutinyDecisionModalComponent
   ],
   template: `
@@ -206,11 +209,17 @@ type DecisionModal = 'remark' | 'reject' | 'approve' | null;
                 @case ('organisation') {
                   <ng-container *ngTemplateOutlet="profileSection; context: { $implicit: 'organisation' }" />
 
-                  <!-- The answers to the EOI's own questions belong to the organisation's proposal. -->
+                  <!-- The EOI Form: organisation details given for this EOI, then the answers to the EOI's own questions. -->
+                  <app-proposal-details-view
+                    class="mt-5"
+                    [details]="app.proposalDetails"
+                    [sections]="['organisation']"
+                    emptyText="The applicant has not filled in the EOI Form."
+                  />
                   @if (answers().length) {
                     <section class="mt-5 rounded-lg border border-slate-200/90 overflow-hidden" aria-labelledby="answers-heading">
                       <h3 id="answers-heading" class="m-0 px-4 py-2.5 bg-slate-50 border-b border-slate-200/90 text-[13px] font-semibold text-slate-700">
-                        Scheme Proposal Details
+                        Details Required by this EOI
                       </h3>
                       <dl class="m-0 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5 p-4">
                         @for (row of answers(); track row.key) {
@@ -226,6 +235,21 @@ type DecisionModal = 'remark' | 'reject' | 'approve' | null;
 
                 @case ('authorized-person') {
                   <ng-container *ngTemplateOutlet="profileSection; context: { $implicit: 'authorized-person' }" />
+                  <app-proposal-details-view
+                    class="mt-5"
+                    [details]="app.proposalDetails"
+                    [sections]="['person']"
+                    [otrPersonName]="otrPersonName()"
+                    emptyText="The applicant has not filled in the EOI Form."
+                  />
+                }
+
+                @case ('proposal') {
+                  <app-proposal-details-view
+                    [details]="app.proposalDetails"
+                    [sections]="['financials', 'centres', 'placements', 'actionPlan']"
+                    emptyText="The applicant has not filled in the EOI Form."
+                  />
                 }
 
                 @case ('bank-details') {
@@ -390,6 +414,8 @@ export class ScrutinyDeskComponent {
   readonly status = computed(() => reviewStatus(this.detail()?.status ?? ''));
   readonly answers = computed(() => answerRows(this.detail()?.customFields ?? null, this.detail()?.dynamicAnswers ?? null));
   readonly activity = computed(() => activityEntries(this.detail()?.activity ?? []));
+  /** The OTR authorized person, named when the project-level person is the same. */
+  readonly otrPersonName = computed(() => otrPersonName(this.detail()?.profile));
   /** The organisation's name; the anonymous label only when the backend has no name. */
   readonly applicantName = computed(() => {
     const app = this.detail();
@@ -407,6 +433,7 @@ export class ScrutinyDeskComponent {
     return [
       { key: 'overview', step: { label: 'Overview', description: 'Application summary & fees' } },
       ...PROFILE_SECTIONS.map(s => ({ key: s.key as StepKey, step: { label: s.label, description: s.description } })),
+      { key: 'proposal', step: { label: 'EOI Proposal Details', description: 'Financials, centres, placements & action plan' } },
       { key: 'documents', step: { label: 'Uploaded Documents', description: `${files} proposal ${files === 1 ? 'file' : 'files'}` } },
       { key: 'past-performance', step: { label: 'Past Performance', description: `${past} scheme ${past === 1 ? 'engagement' : 'engagements'}` } },
       { key: 'activity', step: { label: 'Department Remarks', description: 'Officer notes & audit timeline' } }

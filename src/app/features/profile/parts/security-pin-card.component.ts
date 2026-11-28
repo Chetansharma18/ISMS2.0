@@ -18,9 +18,11 @@ import { ButtonComponent, IconComponent, OtpInputComponent, SectionCardComponent
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ButtonComponent, IconComponent, OtpInputComponent, SectionCardComponent, StatusBadgeComponent],
+  // Block, so the page's vertical spacing applies (a custom element is inline by default).
+  host: { class: 'block' },
   template: `
     <app-section-card title="Security PIN" subtitle="Used to sign in when your role asks for a second check.">
-      <div class="flex flex-col gap-4 max-w-xl">
+      <div class="flex flex-col gap-5">
         @if (!editing()) {
           <div class="flex items-start justify-between gap-4 flex-wrap">
             <div class="flex items-start gap-3 min-w-0">
@@ -64,39 +66,49 @@ import { ButtonComponent, IconComponent, OtpInputComponent, SectionCardComponent
             </button>
           </div>
         } @else {
-          <p class="m-0 text-[13px] leading-5 text-slate-600">
-            {{ status() === true ? 'Enter a new' : 'Choose a' }} {{ pinLength }}-digit PIN and type it again to confirm.
-            {{ status() === true ? 'It replaces your current PIN.' : '' }}
-          </p>
-
-          <div class="grid gap-4 sm:grid-cols-2">
-            <div class="flex flex-col gap-1.5">
-              <span class="text-[13px] font-medium text-slate-700">New PIN</span>
-              <app-otp-input [length]="pinLength" masked label="New PIN" [invalid]="showError()" [value]="pin()" (valueChange)="pin.set($event)" />
+          <!-- PIN entry: centred, the two PINs side by side with clear space between them -->
+          <div class="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-2">
+            <div class="text-center space-y-1">
+              <p class="m-0 text-sm font-semibold text-slate-900">{{ status() === true ? 'Reset your security PIN' : 'Set your security PIN' }}</p>
+              <p class="m-0 text-[13px] leading-5 text-slate-600">
+                {{ status() === true ? 'Enter a new' : 'Choose a' }} {{ pinLength }}-digit PIN and type it again to confirm.
+                {{ status() === true ? 'It replaces your current PIN.' : '' }}
+              </p>
             </div>
-            <div class="flex flex-col gap-1.5">
-              <span class="text-[13px] font-medium text-slate-700">Confirm PIN</span>
-              <app-otp-input
-                [length]="pinLength"
-                masked
-                label="Confirm PIN"
-                [autofocus]="false"
-                [invalid]="showError()"
-                [value]="confirm()"
-                (valueChange)="confirm.set($event)"
-              />
+
+            <div class="w-full grid gap-6 sm:grid-cols-2 sm:gap-12">
+              <div class="flex flex-col items-center gap-2.5">
+                <span class="text-[13px] font-semibold text-slate-700">New PIN</span>
+                <div class="w-full max-w-[240px]">
+                  <app-otp-input [length]="pinLength" masked label="New PIN" [invalid]="showError()" [value]="pin()" (valueChange)="pin.set($event)" />
+                </div>
+              </div>
+              <div class="flex flex-col items-center gap-2.5">
+                <span class="text-[13px] font-semibold text-slate-700">Confirm PIN</span>
+                <div class="w-full max-w-[240px]">
+                  <app-otp-input
+                    [length]="pinLength"
+                    masked
+                    label="Confirm PIN"
+                    [autofocus]="false"
+                    [invalid]="showError()"
+                    [value]="confirm()"
+                    (valueChange)="confirm.set($event)"
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          @if (showError()) {
-            <div class="text-[13px] font-medium text-rose-700" role="alert">{{ error() }}</div>
-          }
+            @if (showError()) {
+              <div class="text-[13px] font-medium text-rose-700 text-center" role="alert">{{ error() }}</div>
+            }
 
-          <div class="flex items-center gap-2">
-            <button appButton type="button" [loading]="saving()" [disabled]="saving()" (click)="save()">
-              {{ status() === true ? 'Save New PIN' : 'Set PIN' }}
-            </button>
-            <button appButton variant="outline" type="button" [disabled]="saving()" (click)="cancel()">Cancel</button>
+            <div class="flex items-center justify-center gap-3 pt-1">
+              <button appButton variant="outline" type="button" [disabled]="saving()" (click)="cancel()">Cancel</button>
+              <button appButton type="button" [loading]="saving()" [disabled]="saving()" (click)="save()">
+                {{ status() === true ? 'Save New PIN' : 'Set PIN' }}
+              </button>
+            </div>
           </div>
         }
       </div>

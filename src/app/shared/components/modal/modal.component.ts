@@ -11,7 +11,6 @@ import {
 } from '@angular/core';
 import { ModalService } from '../../services/modal.service';
 import { ButtonComponent } from '../button/button.component';
-import { IconComponent } from '../icon/icon.component';
 
 export type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
@@ -47,13 +46,13 @@ let nextId = 0;
   selector: 'app-modal',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonComponent, IconComponent],
+  imports: [ButtonComponent],
   host: {
     '[attr.title]': 'null'
   },
   template: `
     <div
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 overflow-y-auto font-sans print:static print:p-0 print:block print:bg-white"
       style="background: rgba(10, 20, 40, 0.45); backdrop-filter: blur(3px);"
       (click)="onBackdrop($event)"
     >
@@ -61,7 +60,7 @@ let nextId = 0;
         class="w-full bg-white rounded-xl border border-[#EADCE2] relative font-sans my-auto flex flex-col"
         [class.overflow-visible]="!scrollBody()"
         [class.overflow-hidden]="scrollBody()"
-        [class.max-h-[90vh]]="scrollBody()"
+        [class.max-h-[82vh]]="scrollBody()"
         style="box-shadow: 0 20px 60px rgba(0,0,0,0.18);"
         [class]="widthClass()"
         role="dialog"
@@ -70,33 +69,15 @@ let nextId = 0;
         (click)="$event.stopPropagation()"
       >
         <!-- Header -->
-        @if (title() || showClose()) {
-          <div class="px-5 sm:px-6 py-4 bg-[#FCF8FA] border-b border-[#EADCE2] shrink-0 flex items-start justify-between gap-3">
-            <div class="min-w-0">
-              @if (title()) {
-                <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 700; line-height: 24px; letter-spacing: -0.01em;">
-                  {{ title() }}
-                </h2>
-              }
-              @if (subtitle()) {
-                <p class="m-0 mt-1 text-[#625663] font-normal leading-relaxed text-xs">
-                  {{ subtitle() }}
-                </p>
-              }
-            </div>
-            @if (showClose()) {
-              <button
-                appButton
-                variant="ghost"
-                size="sm"
-                iconOnly
-                type="button"
-                aria-label="Close"
-                class="-mr-1.5 -mt-1 shrink-0"
-                (click)="close.emit()"
-              >
-                <app-icon name="close" size="md" />
-              </button>
+        @if (title()) {
+          <div class="px-5 sm:px-6 py-4 bg-[#FCF8FA] border-b border-[#EADCE2] shrink-0">
+            <h2 [id]="titleId" class="m-0 text-[#7C0E44]" style="font-size: 18px; font-weight: 700; line-height: 24px; letter-spacing: -0.01em;">
+              {{ title() }}
+            </h2>
+            @if (subtitle()) {
+              <p class="m-0 mt-1 text-[#625663] font-normal leading-relaxed text-xs">
+                {{ subtitle() }}
+              </p>
             }
           </div>
         }
@@ -107,7 +88,12 @@ let nextId = 0;
         </div>
 
         <!-- Footer -->
-        <div class="px-5 sm:px-6 py-4 border-t border-[#EADCE2] bg-white flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
+        <div class="px-4 sm:px-7 pb-5 sm:pb-7 pt-2 bg-white flex items-center justify-end gap-2.5 shrink-0 whitespace-nowrap empty:hidden print:hidden">
+          <!-- No top-right ✕: the footer's Cancel closes the dialog (turn off with [showClose]="false" when the
+               dialog has its own Cancel / Close button) -->
+          @if (showClose()) {
+            <button appButton variant="outline" type="button" (click)="close.emit()">Cancel</button>
+          }
           <ng-content select="[modalFooter]" />
         </div>
       </div>
@@ -122,6 +108,7 @@ export class ModalComponent implements OnInit, OnDestroy {
   readonly size = input<ModalSize>('md');
   /** A width class that replaces `size` for the odd dialog, for example `max-w-[560px]`. */
   readonly widthOverride = input('');
+  /** Shows a "Cancel" button in the footer that emits `close`. */
   readonly showClose = input(true);
   readonly closeOnBackdrop = input(true);
   /** Turn off when the body manages its own scrolling or contains overlay dropdowns. */

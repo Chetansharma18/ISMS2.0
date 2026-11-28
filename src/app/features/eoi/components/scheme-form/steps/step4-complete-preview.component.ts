@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonComponent, IconComponent, TableColumn, TableComponent } from '../../../../../shared';
+import { ButtonComponent, IconComponent, SectionCardComponent, TableColumn, TableComponent } from '../../../../../shared';
 import { OtrReviewComponent } from '../../../../registration/parts/otr-review.component';
+import { ProposalDetailsViewComponent } from '../../proposal-details-view/proposal-details-view.component';
 import { SchemeFormState } from '../scheme-form.state';
 import { EoiApplyDocument, EoiCustomField } from '../eoi-apply.model';
 import { answerText, formatBytes } from '../eoi-apply.util';
+import { otrPersonName } from '../proposal-details.util';
 
 /**
  * Complete Preview: everything the application holds on the backend (profile from the OTR, answers to the
@@ -14,7 +16,7 @@ import { answerText, formatBytes } from '../eoi-apply.util';
   selector: 'app-step4-complete-preview',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ButtonComponent, IconComponent, TableComponent, OtrReviewComponent],
+  imports: [FormsModule, ButtonComponent, IconComponent, SectionCardComponent, TableComponent, OtrReviewComponent, ProposalDetailsViewComponent],
   host: { class: 'block' },
   template: `
     <div class="space-y-6">
@@ -44,17 +46,23 @@ import { answerText, formatBytes } from '../eoi-apply.util';
         }
       </section>
 
-      <!-- 2. Answers to the EOI's questions -->
+      <!-- 2. EOI Form: the built-in sections, then the answers to the EOI's own questions -->
+      <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
+        <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
+          <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">EOI Form</h2>
+          <button appButton variant="outline" size="sm" type="button" (click)="state.goToStep(state.stepIndexCustomFields())">
+            <app-icon name="edit" size="sm" />
+            <span>Edit</span>
+          </button>
+        </div>
+        <div class="p-4 sm:p-5">
+          <app-proposal-details-view [details]="state.application()?.proposalDetails" [otrPersonName]="otrPersonName()" />
+        </div>
+      </section>
+
       @if (state.hasCustomFields()) {
-        <section class="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-2xs">
-          <div class="bg-slate-50/90 px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3">
-            <h2 class="text-sm sm:text-base font-bold text-slate-900 m-0">EOI Form</h2>
-            <button appButton variant="outline" size="sm" type="button" (click)="state.goToStep(state.stepIndexCustomFields())">
-              <app-icon name="edit" size="sm" />
-              <span>Edit</span>
-            </button>
-          </div>
-          <dl class="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 m-0">
+        <app-section-card title="Details Required by this EOI">
+          <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 m-0">
             @for (field of state.schemeCustomFields(); track field.key) {
               <div class="min-w-0" [class.md:col-span-2]="field.type === 'textarea'">
                 <dt class="text-[11.5px] font-medium text-slate-500">
@@ -64,7 +72,7 @@ import { answerText, formatBytes } from '../eoi-apply.util';
               </div>
             }
           </dl>
-        </section>
+        </app-section-card>
       }
 
       <!-- 3. Documents and annexures -->
@@ -196,6 +204,8 @@ export class Step4CompletePreviewComponent {
 
   /** The fee steps open once the backend has everything for steps 1-3 and the declaration is ticked. */
   protected readonly canProceed = computed(() => this.state.declarationAgreed() && this.state.pendingBeforeFees().length === 0);
+
+  protected readonly otrPersonName = computed(() => otrPersonName(this.state.application()?.profile));
 
   protected answer(field: EoiCustomField): string {
     return answerText(field, this.state.customFieldAnswers()[field.key]);

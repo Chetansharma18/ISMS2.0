@@ -13,10 +13,10 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'app-section-card',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block bg-white border border-[#EADCE2] rounded-[10px] shadow-2xs overflow-hidden' },
+  host: { class: 'block bg-white border border-[#EADCE2] rounded-[10px] shadow-2xs overflow-visible' },
   template: `
     @if (title()) {
-      <div class="px-4 sm:px-5 py-3 border-b border-[#EADCE2] bg-[#F8E9EE] flex items-center justify-between gap-3">
+      <div class="px-4 sm:px-5 py-3 border-b border-[#EADCE2] bg-[#F8E9EE] rounded-t-[9px] flex items-center justify-between gap-3">
         <div class="min-w-0">
           <h3 class="text-sm font-semibold text-[#7C0E44] m-0">{{ title() }}</h3>
           @if (subtitle()) {

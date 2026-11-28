@@ -7,6 +7,7 @@ import { provideApiHttp } from '../../core/http/http.providers';
 import { NotificationService } from '../../core/services/notification.service';
 import { OtrFullFormResponse, OtrStepRecord } from './models/otr-api.model';
 import { RegistrationShellComponent } from './registration-shell.component';
+import { OtrRegistrationService } from './services/otr-registration.service';
 import { stepFields } from './otr-form.util';
 
 const fx = (fieldKey: string, label: string, fieldType: string, isRequired: boolean, sectionName: string) =>
@@ -73,7 +74,13 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     component = fixture.componentInstance;
   });
 
-  afterEach(() => backend.verify());
+  /** Answers the step re-reads (GET /otr/form/steps/{key}) made on opening a step: no change. */
+  const flushStepReads = () => backend.match(r => r.url.includes('/otr/form/steps/')).forEach(r => r.flush(null));
+
+  afterEach(() => {
+    flushStepReads();
+    backend.verify();
+  });
 
   /** An empty answer, as ASP.NET sends for a step that was never saved (Ok(null) -> 204). */
   const empty = (req: TestRequest) => req.flush(null, { status: 204, statusText: 'No Content' });
@@ -81,8 +88,9 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
   function start(records: { organisation?: OtrStepRecord | null; person?: OtrStepRecord | null; bank?: OtrStepRecord | null } = {}): void {
     fixture.detectChanges();
     backend.expectOne(url('/otr/form')).flush(FORM);
-    backend.match(r => r.url.endsWith('/master/sectors')).forEach(r => r.flush([{ id: 3, sectorName: 'Agriculture', sectorCode: 'AGR', isActive: true }]));
-    backend.match(r => r.url.endsWith('/master/districts')).forEach(r => r.flush([{ id: 11, name: 'Jaipur', state: 'Rajasthan', isActive: true }]));
+    // Dropdown data comes from /otr/lookups (OTR permission only), not from the masters.
+    backend.expectOne(url('/otr/lookups')).flush({ sectors: [{ id: 3, name: 'Agriculture' }], districts: [{ id: 11, name: 'Jaipur', state: 'Rajasthan' }] });
+    backend.expectNone(r => r.url.endsWith('/master/sectors') || r.url.endsWith('/master/districts'));
     const reply = (path: string, record: OtrStepRecord | null | undefined) => {
       const req = backend.expectOne(url(path));
       if (record) req.flush(record); else empty(req);
@@ -92,6 +100,25 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     reply('/otr/me/bank-details', records.bank);
     fixture.detectChanges();
   }
+
+  it('fills the sector and district dropdowns from /otr/lookups', () => {
+    start();
+    const lookups = TestBed.inject(OtrRegistrationService).lookups();
+    expect(lookups.sectors).toEqual([{ id: 3, name: 'Agriculture' }]);
+    expect(lookups.districts).toEqual([{ id: 11, name: 'Jaipur', state: 'Rajasthan' }]);
+  });
+
+  it('falls back to the masters when /otr/lookups fails', () => {
+    fixture.detectChanges();
+    backend.expectOne(url('/otr/form')).flush(FORM);
+    backend.expectOne(url('/otr/lookups')).flush({ message: 'Forbidden' }, { status: 403, statusText: 'Forbidden' });
+    backend.match(r => r.url.endsWith('/master/sectors')).forEach(r => r.flush([{ id: 3, sectorName: 'Agriculture', sectorCode: 'AGR', isActive: true }]));
+    backend.match(r => r.url.endsWith('/master/districts')).forEach(r => r.flush([{ id: 11, name: 'Jaipur', state: 'Rajasthan', isActive: true }]));
+    for (const path of ['/otr/me', '/otr/me/authorized-person', '/otr/me/bank-details']) empty(backend.expectOne(url(path)));
+    // A 403 may also reload the permissions.
+    backend.match(r => r.url.includes('/auth/permissions')).forEach(r => r.flush({ tables: [] }));
+    expect(TestBed.inject(OtrRegistrationService).lookups().sectors).toEqual([{ id: 3, name: 'Agriculture' }]);
+  });
 
   it('renders the fields of GET /otr/form and starts at the first unsaved step', () => {
     start({ organisation: org() });
@@ -216,6 +243,63 @@ describe('RegistrationShellComponent (OTR on /api/otr)', () => {
     component.goToStep(1);
     expect(component.activeStep()).toBe(1);
     backend.expectNone(url('/otr/me/organisation'));
+  });
+
+  it('re-reads the open step and draws FormManager fields published after the form was loaded', () => {
+    start();
+    const req = backend.expectOne(url('/otr/form/steps/organisation'));
+    const step = FORM.steps[0];
+    req.flush({
+      ...step,
+      dynamicFormId: 12, dynamicFormVersion: 1, hasDynamicForm: true,
+      dynamicSchema: { title: 'Extra', fields: [{ fieldKey: 'cinNumber', label: 'CIN Number', fieldType: 'text', isRequired: false, displayOrder: 1, colSpan: 6 }] }
+    });
+    fixture.detectChanges();
+    expect(component.form()!.steps[0].dynamicFormId).toBe(12);
+    expect(component.values()['organisation']['dynamic.cinNumber']).toBe('');
+    expect(fixture.nativeElement.textContent).toContain('CIN Number');
+  });
+
+  it('asks for a reason and saves a change to a saved step with PATCH', () => {
+    start({ organisation: org(), person: person() });
+    component.goToStep(1);
+    flushStepReads();
+    const step = component.form()!.steps[0];
+
+    // Nothing changed: no call, the screen just moves on.
+    component.nextStep();
+    backend.expectNone(url('/otr/me/organisation'));
+    expect(component.activeStep()).toBe(2);
+
+    component.goToStep(1);
+    flushStepReads();
+    component.onValueChange(step, 'organisationName', 'Company 2');
+    component.nextStep();
+    expect(component.reasonOpen()).toBe(true);
+    backend.expectNone(url('/otr/me/organisation'));
+
+    component.confirmReason(); // no reason yet
+    expect(component.reasonOpen()).toBe(true);
+
+    component.changeReason.set('Name changed');
+    component.confirmReason();
+    const req = backend.expectOne(url('/otr/me/organisation'));
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body['reason']).toBe('Name changed');
+    expect(req.request.body['organisationName']).toBe('Company 2');
+    req.flush(org({ organisationName: 'Company 2' }));
+    expect(component.activeStep()).toBe(2);
+  });
+
+  it('shows the change history of the registration', () => {
+    start({ organisation: org() });
+    expect(component.hasSavedSteps()).toBe(true);
+    component.openHistory();
+    backend.expectOne(url('/otr/me/update-logs')).flush([
+      { id: 1, section: 'OrganisationDetails', action: 'Create', targetRecordId: 1, reason: 'Initial creation', changedFields: ['*'], createdAt: '2026-01-02T10:00:00Z' }
+    ]);
+    expect(component.historyOpen()).toBe(true);
+    expect(component.historyLogs().length).toBe(1);
   });
 
   it('explains a missing permission instead of showing an empty form', () => {

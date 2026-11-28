@@ -7,6 +7,7 @@ import {
   governingRoute,
   humanizeTableName,
   tableAllows,
+  tableApiPath,
   tablesByRoute,
   toPermittedTablesState
 } from './permitted-tables.util';
@@ -136,6 +137,27 @@ describe('permitted tables', () => {
     const groups = buildNavGroups(own, SCREENS);
     expect(groups.map(g => [g.label, g.standalone])).toEqual([['Own', true], ['Master Data', false]]);
     expect(groups[0].items.map(i => i.route)).toEqual(['/admin/user-management']);
+  });
+
+  it('keeps the apiEndpoint of a table and accepts only our own API paths', () => {
+    const state = toPermittedTablesState({
+      tables: [
+        { tableName: 'News', allowedMethods: ['GET'], apiEndpoint: ' /api/news ' },
+        { tableName: 'AuditLogs', allowedMethods: ['GET'] }
+      ]
+    });
+    expect(state.tables[0].apiEndpoint).toBe('/api/news');
+    expect('apiEndpoint' in state.tables[1]).toBe(false);
+
+    expect(tableApiPath('/api/news')).toBe('/news');
+    expect(tableApiPath('/api/payments/refunds/')).toBe('/payments/refunds');
+    expect(tableApiPath('/API/audit-logs')).toBe('/audit-logs');
+    expect(tableApiPath('/api')).toBeNull();
+    expect(tableApiPath('https://example.com/api/news')).toBeNull();
+    expect(tableApiPath('//example.com/api/news')).toBeNull();
+    expect(tableApiPath('/api/../secret')).toBeNull();
+    expect(tableApiPath('/other/news')).toBeNull();
+    expect(tableApiPath(null)).toBeNull();
   });
 
   it('names tables readably', () => {

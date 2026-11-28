@@ -9,26 +9,18 @@ import {
   inject,
   PLATFORM_ID
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { TendersModalComponent } from '../tenders-modal/tenders-modal.component';
+import { isPlatformBrowser } from '@angular/common';
+import { TendersModalComponent, PUBLIC_TENDERS, type PublicTenderItem } from '../tenders-modal/tenders-modal.component';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { ActionModalComponent, ButtonComponent, IconComponent } from '../../../../shared';
-
-interface TenderItem {
-  date: string;
-  id: string;
-  category: string;
-  isNew: boolean;
-  status: string;
-  title: string;
-}
+import { ActionModalComponent } from '../../../../shared/components/action-modal/action-modal.component';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-hero-tenders',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, RouterModule, TendersModalComponent, ActionModalComponent, ButtonComponent, IconComponent],
+  imports: [TendersModalComponent, ActionModalComponent, ButtonComponent, IconComponent],
   template: `
     <!-- Right Column Panel: 540–600px desktop width, 410–430px height, clean official government card -->
     <div class="w-full max-w-135 lg:max-w-145 xl:max-w-150 mx-auto lg:ml-auto">
@@ -158,7 +150,8 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
 
   readonly isTendersModalOpen = signal(false);
   readonly showLoginModal = signal(false);
-  readonly selectedTender = signal<TenderItem | null>(null);
+  readonly selectedTender = signal<PublicTenderItem | null>(null);
+  readonly tenders: PublicTenderItem[] = PUBLIC_TENDERS;
 
   private animationFrameId?: number;
   private isInteracting = false;
@@ -171,7 +164,7 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
     this.isTendersModalOpen.set(true);
   }
 
-  openLoginPrompt(tender: TenderItem): void {
+  openLoginPrompt(tender: PublicTenderItem): void {
     this.selectedTender.set(tender);
     this.showLoginModal.set(true);
     this.pauseScroll();
@@ -203,89 +196,6 @@ export class HeroTendersComponent implements AfterViewInit, OnDestroy {
       this.isInteracting = false;
     }, 2000);
   }
-
-  tenders: TenderItem[] = [
-    {
-      date: '23/01/2026',
-      id: 'RSLDC/EOI/MMKVY Cat I II III/2026-27/01',
-      category: 'MMKVY',
-      isNew: true,
-      status: 'Open',
-      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
-    },
-    {
-      date: '17/02/2026',
-      id: 'RSLDC/EOI/MNSKSY/2025-26/01',
-      category: 'MNSKSY',
-      isNew: true,
-      status: 'Open',
-      title: 'Expression of Interest (EOI) MNSKSY in RSLDC.'
-    },
-    {
-      date: '26/09/2024',
-      id: 'RSLDC/EOI/MMKVY Cat I II III/2024-25/01',
-      category: 'MMKVY',
-      isNew: false,
-      status: 'Closed',
-      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under MMKVY Scheme'
-    },
-    {
-      date: '26/09/2024',
-      id: 'RSLDC/EOI/IMSHAKTI/2024-25/01',
-      category: 'IM_Shakti',
-      isNew: false,
-      status: 'Closed',
-      title: 'Expression of Interest for submission of proposal to undertake the Skill Training under IM Shakti Scheme'
-    },
-    {
-      date: '02/05/2023',
-      id: 'RSLDC/EOI2023-24/Cat-III/RAJKVik RTD',
-      category: 'RAJKVIKRTD',
-      isNew: false,
-      status: 'Closed',
-      title: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan Kaushal Vikas Karyakram (MMKVY-CAT-III 'RAJKVIK)' scheme of RSLDC"
-    },
-    {
-      date: '05/07/2023',
-      id: 'RSLDC/MMYKY2/EoI23-24/01',
-      category: 'MMYKY',
-      isNew: false,
-      status: 'Closed',
-      title: 'EoI for MMYKY 2.O for RSLDC'
-    },
-    {
-      date: '18/04/2023',
-      id: 'RSLDC/EoI/2023-24/1/MMKVYSAMARTH',
-      category: 'SAMARTH',
-      isNew: false,
-      status: 'Closed',
-      title: 'EoI for submission of proposal to undertake the project under MMKVY(Cat-III: SAMARTH) scheme of RSLDC'
-    },
-    {
-      date: '18/04/2023',
-      id: 'RSLDC/EoI/2023-24/1-RAJKVIK General',
-      category: 'RAJKVIK',
-      isNew: false,
-      status: 'Closed',
-      title: 'Eol for submission of proposal to undertake the project under RAJKVIK scheme of RSLDC.'
-    },
-    {
-      date: '18/04/2023',
-      id: 'RSLDC/EoI/2023-24/1/MMKVYSAKSHM',
-      category: 'SAKSHM',
-      isNew: false,
-      status: 'Closed',
-      title: 'Eol for submission of proposal to undertake the project under MMKVY(Cat-II: SAKSHM) scheme of RSLDC'
-    },
-    {
-      date: '08/07/2022',
-      id: 'RSLDC/EOI/2022-23/1MMKVYRTD',
-      category: 'RAJKVIK',
-      isNew: false,
-      status: 'Closed',
-      title: "EOI for Recruit-TrainDeploy (RTD) model under Mukhya Mantri Kaushal Vikas Yojana Category-1 'Rojgar Aadharit Jan"
-    }
-  ];
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;

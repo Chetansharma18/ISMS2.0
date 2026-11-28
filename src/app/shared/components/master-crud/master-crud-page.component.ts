@@ -215,6 +215,9 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
           }
         </app-page-header>
 
+        <!-- Optional row between the header and the filters, e.g. tabs of a screen with two masters -->
+        <ng-content select="[masterCrudTabs]" />
+
         <!-- Unified Master Filter & Search Bar -->
         <app-master-filter-bar
           [(searchQuery)]="searchQuery"
@@ -375,7 +378,7 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
               <app-icon name="eye" size="sm" />
             </button>
 
-            @if (canEdit()) {
+            @if (canEdit() || canDelete()) {
               <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
             }
           }
@@ -396,20 +399,42 @@ import { MasterCrudConfig, MasterFieldConfig } from './master-crud.types';
               <app-icon name="edit" size="sm" />
             </button>
 
-            <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            @if (!config.hideStatusToggle) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
 
-            <!-- Active / Inactive Toggle -->
-            <div
-              class="inline-flex items-center"
-              [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
-              (click)="$event.stopPropagation()"
+              <!-- Active / Inactive Toggle -->
+              <div
+                class="inline-flex items-center"
+                [title]="item.status === 'Inactive' ? 'Status: Inactive (Click to activate)' : 'Status: Active (Click to deactivate)'"
+                (click)="$event.stopPropagation()"
+              >
+                <app-switch
+                  [checked]="item.status !== 'Inactive'"
+                  [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
+                  [disabled]="isStatusSaving(item)"
+                  (toggled)="toggleStatus(item)"
+                />
+              </div>
+            }
+          }
+
+          <!-- Delete: only when the screen asks for it and the table allows DELETE -->
+          @if (canDelete()) {
+            @if (canEdit()) {
+              <div class="h-3.5 w-px bg-slate-200 shrink-0"></div>
+            }
+            <button
+              appButton
+              variant="ghost"
+              size="sm"
+              iconOnly
+              type="button"
+              (click)="$event.stopPropagation(); deleteItem(item)"
+              title="Delete"
+              aria-label="Delete"
             >
-              <app-switch
-                [checked]="item.status !== 'Inactive'"
-                [label]="item.status === 'Inactive' ? 'Inactive' : 'Active'"
-                (toggled)="toggleStatus(item)"
-              />
-            </div>
+              <app-icon name="trash" size="sm" />
+            </button>
           }
         </div>
       </ng-template>
@@ -534,10 +559,17 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   // Table permissions from GET /auth/permissions (always true with mock sign-in).
   private readonly tableAccess = inject(TableAccessService);
   protected canAdd(): boolean {
-    return this.tableAccess.canDataKey(this.config?.dataKey, 'POST');
+    return this.can('POST');
   }
   protected canEdit(): boolean {
-    return this.tableAccess.canDataKey(this.config?.dataKey, 'PUT');
+    return this.can('PUT');
+  }
+  protected canDelete(): boolean {
+    return !!this.config?.showDeleteAction && this.can('DELETE');
+  }
+  private can(method: 'POST' | 'PUT' | 'DELETE'): boolean {
+    const table = this.config?.permissionTable;
+    return table ? this.tableAccess.can(table, method) : this.tableAccess.canDataKey(this.config?.dataKey, method);
   }
 
   private _extraTemplates?: Record<string, TemplateRef<unknown>>;
@@ -670,7 +702,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   ngOnInit(): void {
     const normalize = this.config.normalizer;
     let index = 0;
-    this.repo = this.dataEngine.for<T>(this.config.dataKey, {
+    this.repo = this.config.repository ?? this.dataEngine.for<T>(this.config.dataKey, {
       idKey: 'id',
       normalizer: normalize ? (raw: unknown) => normalize(raw, index++) : undefined
     });
@@ -702,7 +734,7 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
   /** The request body for the API: the config's converter when it has one (API mode only). */
   private apiBody(payload: Partial<T>, current: T | null): Partial<T> {
     const convert = this.config.toApiPayload;
-    if (!convert || this.dataEngine.isMock(this.config.dataKey)) return payload;
+    if (!convert || (!this.config.repository && this.dataEngine.isMock(this.config.dataKey))) return payload;
     return convert(payload, current) as Partial<T>;
   }
 
@@ -994,11 +1026,47 @@ export class MasterCrudPageComponent<T extends { id: string; status?: string } =
     this.openEditModal(item);
   }
 
+  /** Ids of the rows whose Active switch is being saved (the switch is disabled meanwhile). */
+  readonly statusSaving = signal<ReadonlySet<string>>(new Set());
+
+  isStatusSaving(item: T): boolean {
+    return this.statusSaving().has(item.id);
+  }
+
+  /**
+   * The row's Active / Inactive switch. Uses the resource's dedicated status call (PATCH `.../{id}/status`
+   * `{ isActive }`) when it has one, otherwise saves `{ status }` with the normal update. The row changes only once
+   * the backend has saved it; on failure it keeps its state (the switch follows the row) and the HTTP layer shows
+   * the backend's reason (e.g. the parent record is inactive).
+   */
   toggleStatus(item: T): void {
-    const currentStatus = item.status === 'Inactive' ? 'Inactive' : 'Active';
-    const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-    this.repo.update(item.id, this.apiBody({ status: newStatus } as Partial<T>, item)).subscribe(() => {
-      this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
+    if (this.isStatusSaving(item)) return;
+    const newStatus = item.status === 'Inactive' ? 'Active' : 'Inactive';
+    const useStatusCall = !this.config.repository && !!this.repo.setStatus && this.dataEngine.hasStatusEndpoint(this.config.dataKey);
+    const request$ = useStatusCall
+      ? this.repo.setStatus!(item.id, newStatus === 'Active')
+      : this.repo.update(item.id, this.apiBody({ status: newStatus } as Partial<T>, item));
+
+    this.setStatusSaving(item.id, true);
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => {
+        this.setStatusSaving(item.id, false);
+        this.items.update(current => current.map(it => (it.id === item.id ? { ...it, status: newStatus } : it)));
+      },
+      error: () => {
+        this.setStatusSaving(item.id, false);
+        // New row objects, so the switch is drawn again from the unchanged status.
+        this.items.update(current => current.map(it => (it.id === item.id ? { ...it } : it)));
+      }
+    });
+  }
+
+  private setStatusSaving(id: string, saving: boolean): void {
+    this.statusSaving.update(current => {
+      const next = new Set(current);
+      if (saving) next.add(id);
+      else next.delete(id);
+      return next;
     });
   }
 

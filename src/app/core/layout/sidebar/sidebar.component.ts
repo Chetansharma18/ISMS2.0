@@ -88,7 +88,7 @@ import { TableAccessService } from '../../permissions/table-access.service';
                     [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'"
                     class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] leading-5 text-white/90 hover:bg-white/10 hover:text-white transition-all cursor-pointer group"
                   >
-                    <app-icon [name]="item.icon" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'" />
+                    <app-icon [name]="parentIcon" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'" />
                     <span class="tracking-tight truncate" [style.color]="ownRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
                   </a>
                 }
@@ -106,7 +106,7 @@ import { TableAccessService } from '../../permissions/table-access.service';
                   class="justify-between min-h-[40px] h-auto px-3.5 py-2 rounded-lg text-[13.5px] leading-5 text-white/95 hover:bg-white/10 hover:text-white transition-colors duration-150 group"
                 >
                   <div class="flex items-center gap-2.5 min-w-0">
-                    <app-icon [name]="groupIcon(group.label)" size="md" class="text-white/85 group-hover:text-white transition-colors shrink-0" />
+                    <app-icon [name]="parentIcon" class="text-white/80 group-hover:text-white transition-colors" />
                     <span class="tracking-tight font-medium text-white truncate">{{ group.label }}</span>
                   </div>
                   <app-icon
@@ -131,12 +131,7 @@ import { TableAccessService } from '../../permissions/table-access.service';
                         [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'"
                         class="px-3 py-1.5 min-h-[36px] rounded-[7px] text-[13px] leading-snug text-white/85 hover:bg-white/10 hover:text-white transition-colors duration-150 flex items-center gap-2.5"
                       >
-                        <span
-                          class="w-1.5 h-1.5 rounded-full shrink-0 transition-colors"
-                          [class.bg-[#7C0E44]]="permRla.isActive"
-                          [class.bg-white/55]="!permRla.isActive"
-                          aria-hidden="true"
-                        ></span>
+                        <app-icon [name]="childIcon" size="sm" [stroke]="4" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'" />
                         <span class="truncate" [style.color]="permRla.isActive ? '#7C0E44' : '#FFFFFF'">{{ item.label }}</span>
                       </a>
                     }
@@ -338,6 +333,9 @@ export class SidebarComponent {
   readonly navGroups = this.tableAccess.navGroups;
   readonly permissionsLoading = this.tableAccess.loading;
   protected readonly profileNav = PROFILE_NAV;
+  /** One icon for every top-level module row (group headers and "Own" links), one for every link inside a group. */
+  protected readonly parentIcon: IconName = 'squares-grid';
+  protected readonly childIcon: IconName = 'dot';
   /** Groups the user collapsed; all groups start open. */
   private readonly collapsedGroups = signal<ReadonlySet<string>>(new Set());
 

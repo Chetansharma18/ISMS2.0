@@ -94,25 +94,14 @@ export type { EoiDocumentItem } from './scheme-form.model';
             </p>
           </div>
 
-          @if (state.hasCustomFields()) {
-            @switch (state.currentStep()) {
-              @case (1) { <app-step2-otr-profile /> }
-              @case (2) { <app-step-scheme-custom-fields /> }
-              @case (3) { <app-step3-upload-documents /> }
-              @case (4) { <app-step4-complete-preview /> }
-              @case (5) { <app-step1-processing-fee /> }
-              @case (6) { <app-step5-emd-payment /> }
-              @case (7) { <app-step6-receipts /> }
-            }
-          } @else {
-            @switch (state.currentStep()) {
-              @case (1) { <app-step2-otr-profile /> }
-              @case (2) { <app-step3-upload-documents /> }
-              @case (3) { <app-step4-complete-preview /> }
-              @case (4) { <app-step1-processing-fee /> }
-              @case (5) { <app-step5-emd-payment /> }
-              @case (6) { <app-step6-receipts /> }
-            }
+          @switch (state.currentStep()) {
+            @case (1) { <app-step2-otr-profile /> }
+            @case (2) { <app-step-scheme-custom-fields /> }
+            @case (3) { <app-step3-upload-documents /> }
+            @case (4) { <app-step4-complete-preview /> }
+            @case (5) { <app-step1-processing-fee /> }
+            @case (6) { <app-step5-emd-payment /> }
+            @case (7) { <app-step6-receipts /> }
           }
         </div>
         }
@@ -226,28 +215,23 @@ export class SchemeFormComponent {
 
   /** One-line description shown under the step title. */
   protected stepSubtitle(): string {
-    const hasCustom = this.state.hasCustomFields();
     const step = this.state.currentStep();
     if (step === 1) {
       return 'Verify the organisation, authorized signatory and bank details that will accompany your EOI application.';
     }
-    if (hasCustom && step === 2) {
-      return 'Fill in the EOI form fields configured for this scheme.';
+    if (step === this.state.stepIndexCustomFields()) {
+      return 'Fill in the EOI application details: organisation, project authorized person, financials, training centres, placements and action plan.';
     }
-    const docStep = hasCustom ? 3 : 2;
-    const previewStep = hasCustom ? 4 : 3;
-    const procStep = hasCustom ? 5 : 4;
-    const emdStep = hasCustom ? 6 : 5;
-    if (step === docStep) {
+    if (step === this.state.stepIndexDocuments()) {
       return 'Upload the required supporting documents in the supported format and size shown against each one.';
     }
-    if (step === previewStep) {
+    if (step === this.state.stepIndexPreview()) {
       return 'Please verify the information provided below before proceeding to the processing fee payment.';
     }
-    if (step === procStep) {
+    if (step === this.state.stepIndexProcFee()) {
       return `As per RSLDC EOI guidelines, all applicants must pay the non-refundable processing fee of ${this.state.formattedProcessFee()} before submitting their proposal application.`;
     }
-    if (step === emdStep) {
+    if (step === this.state.stepIndexEmd()) {
       return 'Pay the refundable Earnest Money Deposit (EMD) to complete your application.';
     }
     return 'Download your receipts and acknowledgement for the submitted application.';

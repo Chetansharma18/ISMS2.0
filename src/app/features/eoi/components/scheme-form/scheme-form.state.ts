@@ -29,6 +29,24 @@ import {
 import { EoiDocumentItem } from './scheme-form.model';
 import { SchemeFormReceiptsService, SchemeReceiptData } from './scheme-form-receipts.service';
 import { numberToIndianWords } from './scheme-form.util';
+import {
+  MAX_ROWS,
+  ProposalErrors,
+  ProposalForm,
+  ProposalRowList,
+  ProposalSection,
+  ROW_FACTORIES,
+  emptyProposal,
+  proposalErrorsFrom,
+  proposalForm,
+  toProposalRequest,
+  validateProposal,
+  withoutListErrors
+} from './proposal-details.util';
+
+/** Sorted distinct master names for a dropdown. */
+const uniqueNames = (list: readonly { name: string }[]): string[] =>
+  Array.from(new Set(list.map(x => x.name.trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
 
 /** How long the processing-fee success screen stays up before the EMD step opens by itself. */
 const PROC_FEE_SUCCESS_REDIRECT_MS = 2500;
@@ -103,6 +121,16 @@ export class SchemeFormState {
   readonly customFieldErrors = signal<Record<string, string>>({});
   readonly savingAnswers = signal<boolean>(false);
 
+  // ---- EOI Form built-in sections (proposal details) -------------------------------------------
+
+  /** What the applicant is editing; loaded from `application.proposalDetails` when the wizard opens. */
+  readonly proposal = signal<ProposalForm>(emptyProposal());
+  /** Messages by the backend's field path (`financials[1].skillTurnover`); `_form` for a general message. */
+  readonly proposalErrors = signal<ProposalErrors>({});
+  /** District and sector names from the masters read with the OTR form (empty: the fields become free text). */
+  readonly districtOptions = computed(() => uniqueNames(this.otrApi.lookups?.().districts ?? []));
+  readonly sectorOptions = computed(() => uniqueNames(this.otrApi.lookups?.().sectors ?? []));
+
   // ---- Profile (OTR copy) ---------------------------------------------------------------------
 
   readonly profileRecords = computed<OtrRecords>(() => (this.application()?.profile ?? {}) as OtrRecords);
@@ -143,17 +171,18 @@ export class SchemeFormState {
 
   // ---- Wizard steps ---------------------------------------------------------------------------
 
+  // The EOI Form step always exists (its built-in sections), so the step numbers are fixed.
   readonly stepIndexProfile = 1;
-  readonly stepIndexCustomFields = computed(() => (this.hasCustomFields() ? 2 : -1));
-  readonly stepIndexDocuments = computed(() => (this.hasCustomFields() ? 3 : 2));
-  readonly stepIndexPreview = computed(() => (this.hasCustomFields() ? 4 : 3));
-  readonly stepIndexProcFee = computed(() => (this.hasCustomFields() ? 5 : 4));
-  readonly stepIndexEmd = computed(() => (this.hasCustomFields() ? 6 : 5));
-  readonly stepIndexReceipts = computed(() => (this.hasCustomFields() ? 7 : 6));
+  readonly stepIndexCustomFields = computed(() => 2);
+  readonly stepIndexDocuments = computed(() => 3);
+  readonly stepIndexPreview = computed(() => 4);
+  readonly stepIndexProcFee = computed(() => 5);
+  readonly stepIndexEmd = computed(() => 6);
+  readonly stepIndexReceipts = computed(() => 7);
 
   readonly wizardSteps = computed<StepperStep[]>(() => [
     { label: 'Registration Profile' },
-    ...(this.hasCustomFields() ? [{ label: 'EOI Form' }] : []),
+    { label: 'EOI Form' },
     { label: 'Upload Documents' },
     { label: 'Preview' },
     { label: 'Processing Fee' },
@@ -243,6 +272,8 @@ export class SchemeFormState {
           this.otrForm.set(form);
           this.applyServerApplication(app);
           this.customFieldAnswers.set(initialAnswers(app.customFields ?? [], app.dynamicAnswers));
+          this.proposal.set(proposalForm(app.proposalDetails));
+          this.proposalErrors.set({});
           this.declarationAgreed.set(app.declarationAccepted || this.storage.getSessionItem<boolean>(DECLARATION_KEY(app.id)) === true);
           this.syncProfileModels();
           this.loading.set(false);
@@ -286,7 +317,7 @@ export class SchemeFormState {
 
   /** The profile is locked to the OTR, so leaving the step saves nothing. */
   saveAndProceedToDocuments(): void {
-    this.goToStep(this.hasCustomFields() ? this.stepIndexCustomFields() : this.stepIndexDocuments());
+    this.goToStep(this.stepIndexCustomFields());
   }
 
   // ---- Step: Scheme Proposal Details ---------------------------------------------------------
@@ -302,15 +333,70 @@ export class SchemeFormState {
     }
   }
 
-  /** Saves the answers; the backend checks them and every mandatory question, then the wizard moves on. */
-  saveAnswersAndProceed(): void {
+  // ---- Step: EOI Form, built-in sections (proposal details) ----------------------------------
+
+  updateProposalField(section: ProposalSection, key: string, value: unknown): void {
+    this.proposal.update(p => ({ ...p, [section]: { ...p[section], [key]: value } }));
+    this.clearProposalError(`${section}.${key}`);
+  }
+
+  updateProposalRow(list: ProposalRowList | 'financials', index: number, key: string, value: unknown): void {
+    this.proposal.update(p => ({
+      ...p,
+      [list]: (p[list] as object[]).map((row, i) => (i === index ? { ...row, [key]: value } : row))
+    }));
+    this.clearProposalError(`${list}[${index}].${key}`);
+  }
+
+  addProposalRow(list: ProposalRowList): void {
+    if (this.proposal()[list].length >= MAX_ROWS) return;
+    this.proposal.update(p => ({ ...p, [list]: [...p[list], ROW_FACTORIES[list]()] }));
+    this.proposalErrors.update(e => withoutListErrors(e, list));
+  }
+
+  removeProposalRow(list: ProposalRowList, index: number): void {
+    this.proposal.update(p => ({ ...p, [list]: (p[list] as object[]).filter((_, i) => i !== index) }));
+    this.proposalErrors.update(e => withoutListErrors(e, list));
+  }
+
+  private clearProposalError(path: string): void {
+    const errors = this.proposalErrors();
+    if (!errors[path] && !errors['_form']) return;
+    this.proposalErrors.update(curr => {
+      const next = { ...curr };
+      delete next[path];
+      delete next['_form'];
+      return next;
+    });
+  }
+
+  /**
+   * Next on the EOI Form: checks the built-in sections here (same rules as the backend), saves them complete,
+   * then saves the answers to the EOI's questions; the wizard moves on only when both are accepted.
+   */
+  saveEoiFormAndProceed(): void {
     const app = this.application();
     if (!app || this.savingAnswers()) return;
-    this.savingAnswers.set(true);
     this.customFieldErrors.set({});
+    const clientErrors = validateProposal(this.proposal(), true);
+    if (Object.keys(clientErrors).length) {
+      this.proposalErrors.set({ ...clientErrors, _form: 'Some details are missing or not valid. Correct the highlighted fields.' });
+      return;
+    }
+    this.proposalErrors.set({});
+    this.savingAnswers.set(true);
+    let stage: 'proposal' | 'answers' = 'proposal';
     this.api
-      .saveAnswers(app.id, this.customFieldAnswers(), true)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .saveProposalDetails(app.id, toProposalRequest(this.proposal()), true)
+      .pipe(
+        switchMap(saved => {
+          this.applyServerApplication(saved);
+          if (!this.hasCustomFields()) return of(saved);
+          stage = 'answers';
+          return this.api.saveAnswers(app.id, this.customFieldAnswers(), true);
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe({
         next: saved => {
           this.savingAnswers.set(false);
@@ -319,12 +405,32 @@ export class SchemeFormState {
         },
         error: (error: unknown) => {
           this.savingAnswers.set(false);
+          if (stage === 'proposal') {
+            const byField = proposalErrorsFrom(error);
+            this.proposalErrors.set(
+              Object.keys(byField).length
+                ? { _form: 'Some details are missing or not valid. Correct the highlighted fields.', ...byField }
+                : { _form: errorText(error, 'The EOI Form could not be saved. Please try again.') }
+            );
+            return;
+          }
           const byField = answerErrors(error);
           this.customFieldErrors.set(
             Object.keys(byField).length ? byField : { _form: errorText(error, 'Your answers could not be saved. Please try again.') }
           );
         }
       });
+  }
+
+  /** Back on the EOI Form: keeps what was typed as a draft (complete=false) when it passes the draft rules. */
+  saveEoiFormDraftAndGoBack(): void {
+    const app = this.application();
+    this.goToStep(this.stepIndexProfile);
+    if (!app || app.status !== 'Draft' || Object.keys(validateProposal(this.proposal(), false)).length) return;
+    this.api
+      .saveProposalDetails(app.id, toProposalRequest(this.proposal()), false)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({ next: saved => this.applyServerApplication(saved), error: () => undefined });
   }
 
   // ---- Step: Upload Documents ----------------------------------------------------------------

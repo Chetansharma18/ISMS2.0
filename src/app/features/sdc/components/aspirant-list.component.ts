@@ -263,6 +263,7 @@ export function aspirantStatusClass(status: AspirantTrainingStatus): string {
           [subtitle]="target.aspirantName + ' · Batch ' + target.batchCode"
           widthOverride="max-w-[580px]"
           [closeOnBackdrop]="false"
+          [showClose]="false"
           (close)="dropping.set(null)"
         >
           <div class="space-y-3 text-xs text-slate-700">

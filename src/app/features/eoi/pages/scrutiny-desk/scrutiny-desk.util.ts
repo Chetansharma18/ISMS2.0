@@ -3,7 +3,7 @@ import type { BadgeVariant } from '../../../../shared/components/table/table.typ
 import { formatDateTime } from '../../../../shared/utils/date.util';
 import { formatInr } from '../../../../shared/utils/formatters.util';
 import { answerText } from '../../components/scheme-form/eoi-apply.util';
-import type { EoiAnswerValue, EoiApplyDocument, EoiApplyFee, EoiCustomField } from '../../components/scheme-form/eoi-apply.model';
+import type { EoiAnswerValue, EoiApplyDocument, EoiApplyFee, EoiCustomField, EoiProposalDetails } from '../../components/scheme-form/eoi-apply.model';
 import type { GradeOption } from './components/scrutiny-decision-modal.component';
 
 // ------------------------------------------------------------------------------------------------
@@ -80,6 +80,8 @@ export interface ReviewDetail {
   remarkOptions: ReviewRemarkOptionDto[];
   dynamicAnswers: Record<string, EoiAnswerValue> | null;
   customFields: EoiCustomField[] | null;
+  /** The EOI Form's built-in sections as the applicant saved them (null when none). */
+  proposalDetails?: EoiProposalDetails | null;
   decisionVersion: string | null;
   /** The organisation's other submitted EOI applications, newest first. */
   pastApplications: PastApplicationDto[] | null;

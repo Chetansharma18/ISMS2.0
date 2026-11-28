@@ -1,18 +1,66 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import type { FilterTab } from '../../../../shared/components/filter-tabs/filter-tabs.component';
+import { IconComponent } from '../../../../shared/components/icon/icon.component';
+import type { IconName } from '../../../../shared/components/icon/icons';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { ModalComponent } from '../../../../shared/components/modal/modal.component';
 import { OtpInputComponent } from '../../../../shared/components/otp-input/otp-input.component';
 import type { TwoStepMethod } from '../../auth-api.models';
 import { SsoLoginFlowService } from '../../sso-login-flow.service';
 import { humanizeRoleName } from '../../sso-session.util';
-import { IconComponent } from '../../../../shared/components/icon/icon.component';
 import { PIN_LENGTH, isPinNotSetMessage, pinError } from '../../security-pin.util';
 
 const OTP_LENGTH = 6;
 
 const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN: 'Security PIN' };
+
+const ROLE_ICONS: Record<string, IconName> = {
+  superadmin: 'shield-cog',
+  admin: 'shield-user',
+  deptadmin: 'shield-user',
+  departmentuser: 'shield-user',
+  tp: 'school',
+  trainingpartner: 'school',
+  aspirant: 'graduation-cap',
+  committee: 'users-committee',
+  committeemember: 'users-committee',
+  approver: 'badge-check',
+  schemeoic: 'badge-check',
+  auditor: 'badge-check',
+  user: 'circle-user-round'
+};
+
+export interface RoleSelectionLayout {
+  widthOverride: string;
+  columns: 1 | 2 | 3 | 4;
+  gridClass: string;
+}
+
+/**
+ * Picks a horizontal-proportioned modal width and responsive grid columns from the number of roles
+ * returned by the backend so the dialog stays landscape and text fits on a single line:
+ * - 0 roles:    empty state (`max-w-[420px]`)
+ * - 1 role:     1 centered tile (`max-w-[420px]`)
+ * - 2 or 4:     2 columns (`max-w-[440px]`, e.g. 4 roles -> 2 rows x 2 cols)
+ * - 3, 5-6:     3 columns on sm+ (`max-w-[540px]`, e.g. 3 roles -> 1x3, 6 roles -> 2x3)
+ * - 7+ roles:   4 columns on md+ (`max-w-[680px]`, scrolls cleanly within 90vh)
+ */
+export function roleSelectionLayout(roleCount: number): RoleSelectionLayout {
+  if (roleCount <= 0) {
+    return { widthOverride: 'max-w-[420px]', columns: 1, gridClass: 'grid-cols-1' };
+  }
+  if (roleCount === 1) {
+    return { widthOverride: 'max-w-[420px]', columns: 1, gridClass: 'grid-cols-1 max-w-[190px] mx-auto' };
+  }
+  if (roleCount === 2 || roleCount === 4) {
+    return { widthOverride: 'max-w-[440px]', columns: 2, gridClass: 'grid-cols-2' };
+  }
+  if (roleCount <= 6) {
+    return { widthOverride: 'max-w-[540px]', columns: 3, gridClass: 'grid-cols-2 sm:grid-cols-3' };
+  }
+  return { widthOverride: 'max-w-[680px]', columns: 4, gridClass: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4' };
+}
 
 /** The sign-in steps after the return from RajSSO: waiting, role choice and second-factor check. */
 @Component({
@@ -40,44 +88,52 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
       @case ('select-role') {
         <app-modal
           title="Choose a role"
-          subtitle="Your account has more than one role. Choose the one to continue with."
-          size="sm"
+          subtitle="Select a role below to continue to your workspace."
+          [widthOverride]="roleLayout().widthOverride"
+          [scrollBody]="true"
           [closeOnBackdrop]="!flow.switchTargetName()"
           (close)="flow.cancel()"
         >
-          <div class="flex flex-col gap-2" role="group" aria-label="Your roles">
-            @for (role of flow.roles(); track role.id) {
-              <button
-                appButton
-                variant="outline"
-                size="lg"
-                block
-                type="button"
-                class="justify-start gap-3"
-                [loading]="flow.busy() && chosenRoleId() === role.id"
-                [disabled]="flow.busy()"
-                (click)="chooseRole(role.id)"
-              >
-                @if (!(flow.busy() && chosenRoleId() === role.id)) {
-                  <span
-                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FCF0F2] text-xs font-bold uppercase text-[#7C0E44]"
-                    aria-hidden="true"
-                  >{{ roleInitial(role.name) }}</span>
-                }
-                <span class="min-w-0 flex-1 truncate text-left font-semibold">{{ roleLabel(role.name) }}</span>
-                <app-icon name="chevron-right" size="sm" class="shrink-0 opacity-60" />
-              </button>
-            } @empty {
-              <p class="text-sm text-slate-600 m-0">No role is available for this account.</p>
-            }
+          <div class="border-t border-[#F0E4EA] pt-3.5">
+            <div class="grid gap-3" [class]="roleLayout().gridClass" role="group" aria-label="Your roles">
+              @for (role of flow.roles(); track role.id) {
+                <button
+                  appButton
+                  variant="primary"
+                  block
+                  square
+                  tile
+                  type="button"
+                  class="group min-w-0"
+                  [attr.title]="roleLabel(role.name)"
+                  [loading]="flow.busy() && chosenRoleId() === role.id"
+                  [disabled]="flow.busy()"
+                  (click)="chooseRole(role.id)"
+                >
+                  @if (!(flow.busy() && chosenRoleId() === role.id)) {
+                    <app-icon
+                      [name]="roleIcon(role.name)"
+                      size="auto"
+                      [stroke]="1.85"
+                      class="h-7 w-7 text-white transition-transform duration-150 group-hover:scale-105"
+                    />
+                  }
+                  <span class="w-full truncate text-center text-[13px] font-semibold leading-snug text-white">
+                    {{ roleLabel(role.name) }}
+                  </span>
+                </button>
+              } @empty {
+                <p class="text-sm text-slate-600 m-0">No role is available for this account.</p>
+              }
+            </div>
           </div>
           @if (flow.error()) {
             <p class="mt-3 text-xs font-semibold text-rose-700 m-0" role="alert">{{ flow.error() }}</p>
           }
           @if (flow.roles().length > 1) {
-            <p class="mt-4 mb-0 flex items-center gap-1.5 text-xs text-slate-500">
-              <app-icon name="switch-horizontal" size="sm" />
-              You can switch roles later from the menu under your name.
+            <p class="mt-3.5 mb-0 flex items-center gap-2 border-t border-[#F0E4EA] pt-3 text-xs whitespace-nowrap text-[#625663]">
+              <app-icon name="switch-horizontal" size="xs" class="shrink-0 text-[#7C0E44]" />
+              <span class="truncate">Switch roles anytime from your profile menu.</span>
             </p>
           }
         </app-modal>
@@ -88,6 +144,7 @@ const METHOD_LABELS: Record<TwoStepMethod, string> = { OTP: 'OTP on mobile', PIN
           [subtitle]="twoStepSubtitle()"
           size="md"
           [closeOnBackdrop]="!flow.switchTargetName()"
+          [showClose]="false"
           (close)="flow.cancel()"
         >
           <div class="space-y-4 font-sans">
@@ -319,7 +376,14 @@ export class SsoLoginStepsModalComponent {
         if (canSetPin) this.method.set('PIN');
         else if (pinSet === false && methods.includes('OTP')) this.method.set('OTP');
         else this.method.set(methods[0] ?? 'OTP');
+        // A new challenge starts empty, even when the method stays the same (the dialog stays alive between
+        // sign-in and role switches, so the last OTP / PIN would otherwise still be in the boxes).
+        this.clearEntry();
       });
+    });
+    // A newly sent OTP (first send or "Resend OTP") replaces the old one: empty boxes.
+    effect(() => {
+      if (this.flow.otpSent()) untracked(() => this.clearEntry());
     });
     // Switching method clears what was typed, and the error, of the other one.
     effect(() => {
@@ -327,13 +391,18 @@ export class SsoLoginStepsModalComponent {
       untracked(() => {
         // Back on the PIN tab: the user remembered the PIN, so leave the "Forgot PIN" path.
         if (method === 'PIN') this.flow.cancelForgotPin();
-        this.code.set('');
-        this.confirmCode.set('');
-        this.setupAttempted.set(false);
-        this.forgotBlocked.set(false);
-        this.flow.error.set(null);
+        this.clearEntry();
       });
     });
+  }
+
+  /** Empties the OTP / PIN boxes and the messages of the current entry. */
+  private clearEntry(): void {
+    this.code.set('');
+    this.confirmCode.set('');
+    this.setupAttempted.set(false);
+    this.forgotBlocked.set(false);
+    this.flow.error.set(null);
   }
 
   protected readonly switchingText = computed(() => {
@@ -348,6 +417,9 @@ export class SsoLoginStepsModalComponent {
       : 'Your role requires a second verification step. Verify with OTP or your security PIN to sign in.';
   });
 
+  /** Dynamic modal width and column count based on the backend role count. */
+  protected readonly roleLayout = computed(() => roleSelectionLayout(this.flow.roles().length));
+
   /** The role the user clicked, so only its row shows the spinner. */
   protected readonly chosenRoleId = signal<number | null>(null);
 
@@ -355,8 +427,9 @@ export class SsoLoginStepsModalComponent {
     return humanizeRoleName(name);
   }
 
-  protected roleInitial(name: string): string {
-    return humanizeRoleName(name).charAt(0) || '?';
+  protected roleIcon(name: string): IconName {
+    const key = name.trim().toLowerCase().replace(/[\s_-]+/g, '');
+    return ROLE_ICONS[key] ?? 'circle-user-round';
   }
 
   protected chooseRole(roleId: number): void {

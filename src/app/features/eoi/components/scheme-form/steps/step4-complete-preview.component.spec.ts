@@ -69,6 +69,17 @@ describe('Step4CompletePreviewComponent', () => {
     expect(text).toContain('Upload the mandatory document: Annexure-1: Covering Letter.');
   });
 
+  it('always has the EOI Form step and shows its section, even without custom fields', () => {
+    setup(false);
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(state.wizardSteps().map(s => s.label)).toEqual([
+      'Registration Profile', 'EOI Form', 'Upload Documents', 'Preview', 'Processing Fee', 'EMD Payment', 'Submission Receipt'
+    ]);
+    expect(state.stepIndexDocuments()).toBe(3);
+    expect(text).toContain('The EOI Form has not been filled in yet.');
+    expect(text).not.toContain('Details Required by this EOI');
+  });
+
   it('opens the fee step only when nothing is missing and the declaration is ticked', () => {
     setup(true);
     const proceed = () => Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('button'))

@@ -20,7 +20,9 @@ import { OtrFormDef, OtrRecords } from '../../registration/models/otr-api.model'
 import { documentsFrom, formSteps, initialStepValues, stepFields } from '../../registration/otr-form.util';
 import { OtrRegistrationService } from '../../registration/services/otr-registration.service';
 import type { EoiApplyDocument } from '../../eoi/components/scheme-form/eoi-apply.model';
-import { errorText, formatBytes } from '../../eoi/components/scheme-form/eoi-apply.util';
+import { answerText, errorText, formatBytes } from '../../eoi/components/scheme-form/eoi-apply.util';
+import { otrPersonName } from '../../eoi/components/scheme-form/proposal-details.util';
+import { ProposalDetailsViewComponent } from '../../eoi/components/proposal-details-view/proposal-details-view.component';
 import { toDisplayDay } from '../services/eoi-config.util';
 import type { EoiAppealInfo, EoiStatusApplication } from './eoi-status.model';
 import { EoiStatusService } from './eoi-status.service';
@@ -37,7 +39,7 @@ import {
 } from './eoi-status.util';
 
 type ListTab = 'all' | 'UnderReview' | 'Reverted' | 'Approved' | 'Rejected' | 'Draft';
-type DetailTab = 'profile' | 'documents' | 'payments';
+type DetailTab = 'profile' | 'eoiForm' | 'documents' | 'payments';
 
 const LIST_TABS: FilterTab<ListTab>[] = [
   { id: 'all', label: 'All' },
@@ -50,6 +52,7 @@ const LIST_TABS: FilterTab<ListTab>[] = [
 
 const DETAIL_TABS: FilterTab<DetailTab>[] = [
   { id: 'profile', label: 'Registration Profile' },
+  { id: 'eoiForm', label: 'EOI Form' },
   { id: 'documents', label: 'Uploaded Documents' },
   { id: 'payments', label: 'Payments' }
 ];
@@ -72,7 +75,8 @@ const MAX_APPEAL_FILES = 5;
     ListPageComponent,
     StatusBadgeComponent,
     TableComponent,
-    OtrReviewComponent
+    OtrReviewComponent,
+    ProposalDetailsViewComponent
   ],
   template: `
     @if (!selected()) {
@@ -340,6 +344,23 @@ const MAX_APPEAL_FILES = 5;
                     <p class="m-0 text-xs text-slate-500">{{ otrFormFailed() ? 'The registration form could not be loaded.' : 'Loading the registration profile...' }}</p>
                   }
                 }
+                @case ('eoiForm') {
+                  <!-- Step 2 "EOI Form" as submitted: the built-in sections, then the EOI's own questions -->
+                  <app-proposal-details-view [details]="app.proposalDetails" [otrPersonName]="otrPerson()" />
+                  @if (customAnswers().length > 0) {
+                    <div class="space-y-2 pt-2">
+                      <h3 class="m-0 text-[13px] font-semibold text-slate-700">Details Required by this EOI</h3>
+                      <dl class="m-0 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2.5">
+                        @for (row of customAnswers(); track row.key) {
+                          <div class="min-w-0">
+                            <dt class="text-[11.5px] font-medium text-slate-500">{{ row.label }}</dt>
+                            <dd class="m-0 text-[13px] text-slate-900 break-words whitespace-pre-line">{{ row.value || '-' }}</dd>
+                          </div>
+                        }
+                      </dl>
+                    </div>
+                  }
+                }
                 @case ('documents') {
                   <app-table [columns]="docColumns" [data]="app.documents" [customTemplates]="{ file: fileTpl, view: viewTpl }" />
                   <ng-template #fileTpl let-doc>
@@ -397,6 +418,14 @@ export class EoiStatusComponent implements OnInit {
   readonly selected = signal<EoiStatusApplication | null>(null);
   readonly busy = signal(false);
   readonly detailTab = signal<DetailTab>('profile');
+  /** The organisation-level authorized person's name (for "Same as organisation-level authorized person"). */
+  readonly otrPerson = computed(() => otrPersonName(this.selected()?.profile));
+  /** The EOI's own "Details Required" questions with the answers given. */
+  readonly customAnswers = computed(() => {
+    const app = this.selected();
+    const answers = app?.dynamicAnswers ?? {};
+    return (app?.customFields ?? []).map(field => ({ key: field.key, label: field.label, value: answerText(field, answers[field.key]) }));
+  });
   readonly otrForm = signal<OtrFormDef | null>(null);
   readonly otrFormFailed = signal(false);
   readonly clarComment = signal('');

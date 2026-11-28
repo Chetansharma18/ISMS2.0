@@ -18,6 +18,8 @@ import { ResultOrdersService } from './result-orders.service';
 import {
   BulkRowDto,
   BulkUploadDto,
+  ESignAction,
+  ORDER_TITLE,
   OrderDto,
   OrderSlot,
   OrderStep,
@@ -25,6 +27,7 @@ import {
   OrdersOverviewDto,
   PublishResultDto,
   ReadinessDto,
+  eSignActions,
   generateBlockers,
   initialOrderStep,
   isOrderComplete,
@@ -32,7 +35,8 @@ import {
   orderSlots,
   orderStatusBadge,
   orderTime,
-  rowResultBadge
+  rowResultBadge,
+  signingAuthorityText
 } from './result-orders.util';
 import { OrderEsignModalComponent } from './order-esign-modal.component';
 
@@ -49,9 +53,10 @@ const STEPS: StepperStep[] = [
  * 1. Decisions: the decisions already recorded (Approve / Reject on the Scrutiny Desk), and the evaluation Excel:
  *    upload it, read the backend's row-by-row check, then apply it. Both methods write the same decision.
  * 2. Draft Orders: the approver generates the draft PDF of each order from the current decisions.
- * 3. Sign & Verify: the approver e-signs both orders with one OTP (the backend's publish OTP): every page gets the
- *    e-signature, the orders become final (decisions lock) and they are released to the applicants.
- * 4. Orders Released: the e-signed orders.
+ * 3. Sign & Verify: each order has its own signing authority (set in the draft editor). "E-Sign Empanelment Order"
+ *    and "E-Sign Rejection Order" each open the OTP e-sign of that order only, for its signing authority only: every
+ *    page of that order gets the e-signature and it becomes final (decisions lock).
+ * 4. Orders Released: once every order is signed, the approver (or a results publisher) publishes them with an OTP.
  */
 @Component({
   selector: 'app-generate-empanelment-order-modal',
@@ -59,7 +64,7 @@ const STEPS: StepperStep[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ModalComponent, ButtonComponent, IconComponent, StatusBadgeComponent, StepperComponent, TableComponent, OrderEsignModalComponent],
   template: `
-    <app-modal title="Generate Empanelment & Rejection Orders" [subtitle]="schemeName()" size="2xl" (close)="close.emit()">
+    <app-modal title="Generate Empanelment & Rejection Orders" [subtitle]="schemeName()" size="2xl" [showClose]="false" (close)="close.emit()">
       <div class="space-y-4 p-1 text-xs">
         <div class="pb-4 mb-1 border-b border-slate-200">
           <app-stepper variant="line" [bare]="true" [steps]="steps" [currentStep]="step()" (stepClick)="goTo($event)" ariaLabel="Order progress" />
@@ -95,7 +100,7 @@ const STEPS: StepperStep[] = [
 
               @if (overview()!.decisionsLocked) {
                 <p class="m-0 p-2.5 text-xs rounded-lg bg-amber-50 border border-amber-200 text-amber-900">
-                  Decisions are locked: a signed order has been uploaded. Discard it to change decisions.
+                  Decisions are locked: an order has been signed. Discard it to change decisions.
                 </p>
               } @else {
                 <div class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50/50 space-y-3">
@@ -238,6 +243,13 @@ const STEPS: StepperStep[] = [
                     @if (slot.order.isStale) {
                       <p class="m-0 text-xs text-amber-800">A decision changed after this draft was generated. Generate a new draft before signing.</p>
                     }
+                    @if (slot.order.signer; as s) {
+                      <p class="m-0 text-xs text-slate-600">
+                        Signing authority:
+                        <span class="font-semibold text-slate-800">{{ authority(s) }}</span>
+                        @if (s.name && s.name !== s.authorityName) { <span class="text-slate-500">(e-signed by {{ s.name }})</span> }
+                      </p>
+                    }
                     <div class="flex items-center gap-2 flex-wrap">
                       @if (slot.order.status === 'Draft') {
                         <button appButton variant="outline" size="sm" type="button" (click)="openEditor(slot.order)">
@@ -249,33 +261,30 @@ const STEPS: StepperStep[] = [
                         <app-icon name="eye" size="sm" />
                         <span>{{ isFinal(slot.order) ? 'View E-Signed Order' : 'View Draft PDF' }}</span>
                       </button>
+                      @if (actionFor(slot.type); as a) {
+                        @if (!a.done) {
+                          <button appButton size="sm" type="button" [disabled]="isBusy() || !a.canSign" (click)="eSignOrder.set(a.order)">
+                            <app-icon name="shield-check" size="sm" />
+                            <span>{{ a.label }}</span>
+                          </button>
+                        }
+                      }
                     </div>
+                    @if (actionFor(slot.type); as a) {
+                      @if (a.done) {
+                        <p class="m-0 text-xs font-semibold text-slate-700">{{ a.signedText }}@if (slot.order.signer?.signedAt) { <span class="font-normal text-slate-500"> &middot; {{ time(slot.order.signer!.signedAt) }}</span> }</p>
+                      } @else if (a.note) {
+                        <p class="m-0 text-xs text-slate-500">{{ a.note }}</p>
+                      }
+                    }
                   }
                 </section>
               }
-
-              @if (!allComplete()) {
-                <section class="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
-                  <h3 class="m-0 text-sm font-bold text-slate-900">E-Sign</h3>
-                  <p class="m-0 text-xs text-slate-600 leading-relaxed">
-                    One e-signature signs both orders. An OTP is sent to the signer's mobile; once it is entered, every page of
-                    the orders is e-signed, the orders become final (decisions lock) and they are released to the applicants.
-                  </p>
-                  @if (readiness()?.missing?.length) {
-                    <ul class="m-0 p-2.5 pl-6 text-xs rounded-lg bg-amber-50 border border-amber-200 text-amber-900 space-y-1">
-                      @for (m of readiness()!.missing; track m) { <li>{{ m }}</li> }
-                    </ul>
-                  }
-                  @if (readiness()?.canPublish) {
-                    <button appButton size="sm" type="button" [disabled]="isBusy()" (click)="showESign.set(true)">
-                      <app-icon name="shield-check" size="sm" />
-                      <span>E-Sign Orders</span>
-                    </button>
-                  } @else if (!isApprover()) {
-                    <p class="m-0 text-xs text-slate-500">Only the committee approver can e-sign the orders.</p>
-                  }
-                </section>
-              }
+              <p class="m-0 text-xs text-slate-500 leading-relaxed">
+                Each order is e-signed separately by its own signing authority, with an OTP to their mobile. E-signing puts the
+                e-signature on every page of that order and makes it final (decisions lock). Once every order is signed, the
+                results can be published.
+              </p>
             }
 
             @case (4) {
@@ -287,9 +296,29 @@ const STEPS: StepperStep[] = [
                   {{ released() ? 'The orders are e-signed and released' : allComplete() ? 'The orders are signed' : 'The orders are not e-signed yet' }}
                 </h3>
                 <p class="m-0 text-xs text-slate-500">
-                  {{ released() ? 'Applicants can now see their result and download their order.' : 'E-sign the orders in Sign & Verify first.' }}
+                  {{ released() ? 'Applicants can now see their result and download their order.'
+                     : allComplete() ? 'Publish the results to release the e-signed orders to the applicants.'
+                     : 'E-sign every order in Sign & Verify first.' }}
                 </p>
               </div>
+              @if (allComplete() && !released()) {
+                <section class="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
+                  <h3 class="m-0 text-sm font-bold text-slate-900">Publish Results</h3>
+                  @if (readiness()?.missing?.length) {
+                    <ul class="m-0 p-2.5 pl-6 text-xs rounded-lg bg-amber-50 border border-amber-200 text-amber-900 space-y-1">
+                      @for (m of readiness()!.missing; track m) { <li>{{ m }}</li> }
+                    </ul>
+                  }
+                  @if (readiness()?.canPublish) {
+                    <button appButton size="sm" type="button" [disabled]="isBusy()" (click)="showPublish.set(true)">
+                      <app-icon name="shield-check" size="sm" />
+                      <span>Publish Results</span>
+                    </button>
+                  } @else {
+                    <p class="m-0 text-xs text-slate-500">Only the committee approver (or a results publisher) can publish the results.</p>
+                  }
+                </section>
+              }
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 @for (slot of slots(); track slot.type) {
                   <section class="rounded-xl border border-slate-200 p-4 space-y-2">
@@ -332,8 +361,11 @@ const STEPS: StepperStep[] = [
       </ng-container>
     </app-modal>
 
-    @if (showESign()) {
-      <app-order-esign-modal [eoiId]="eoiId()" [orderNames]="orderNames()" (signed)="onSigned($event)" (close)="showESign.set(false)" />
+    @if (eSignOrder(); as o) {
+      <app-order-esign-modal [eoiId]="eoiId()" [order]="o" (signed)="onOrderSigned($event)" (close)="eSignOrder.set(null)" />
+    }
+    @if (showPublish()) {
+      <app-order-esign-modal [eoiId]="eoiId()" [orderNames]="orderNames()" (published)="onPublished($event)" (close)="showPublish.set(false)" />
     }
   `
 })
@@ -364,11 +396,15 @@ export class GenerateEmpanelmentOrderModalComponent implements OnInit {
   readonly isBusy = computed(() => this.busy() !== '');
   /** Can the orders be e-signed now (and by me), and what is missing. */
   readonly readiness = signal<ReadinessDto | null>(null);
-  readonly showESign = signal(false);
-  /** "Final Empanelment Order and Final Rejection Order", for the e-sign dialog. */
+  /** The order whose e-sign dialog is open (each order is e-signed by its own signing authority). */
+  readonly eSignOrder = signal<OrderDto | null>(null);
+  readonly showPublish = signal(false);
+  /** "Final Empanelment Order and Final Rejection Order", for the publish dialog. */
   readonly orderNames = computed(() => this.slots().map(s => s.title).join(' and ') || 'result orders');
 
   readonly slots = computed(() => orderSlots(this.overview()));
+  /** "E-Sign Empanelment Order" / "E-Sign Rejection Order": one per order type the EOI has. */
+  readonly eSignActions = computed(() => eSignActions(this.slots()));
   readonly blockers = computed(() => generateBlockers(this.overview()));
   readonly allComplete = computed(() => this.slots().length > 0 && this.slots().every(s => isOrderComplete(s.order)));
   readonly released = computed(() => this.slots().length > 0 && this.slots().every(s => s.order?.status === 'Published'));
@@ -456,13 +492,27 @@ export class GenerateEmpanelmentOrderModalComponent implements OnInit {
       });
   }
 
-  // ---- Step 3: e-sign --------------------------------------------------------------------------
+  // ---- Step 3: e-sign, step 4: publish ---------------------------------------------------------
 
-  /** The e-sign OTP was verified: both orders are e-signed and released. */
-  onSigned(result: PublishResultDto): void {
-    this.showESign.set(false);
+  protected authority = signingAuthorityText;
+
+  actionFor(type: OrderType): ESignAction | null {
+    return this.eSignActions().find(a => a.type === type) ?? null;
+  }
+
+  /** One order was e-signed by its signing authority; the other one is signed separately. */
+  onOrderSigned(order: OrderDto): void {
+    this.eSignOrder.set(null);
+    this.notifications.success(`The ${ORDER_TITLE[order.type as OrderType] ?? 'order'} is e-signed.`);
+    this.decisionsChanged.emit();
+    this.reload(false);
+  }
+
+  /** The publishing OTP was verified: the e-signed orders are released. */
+  onPublished(result: PublishResultDto): void {
+    this.showPublish.set(false);
     this.notifications.success(
-      `The orders are e-signed and released${result.applicantsNotified ? `; ${result.applicantsNotified} applicant(s) notified` : ''}.`
+      `The results are published${result.applicantsNotified ? `; ${result.applicantsNotified} applicant(s) notified` : ''}.`
     );
     this.decisionsChanged.emit();
     this.reload(false, 4);
